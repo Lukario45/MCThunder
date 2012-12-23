@@ -15,13 +15,6 @@ public class srvInfo
 	private static String srvVersion = "1.0.0";
 	public static String mcVersion = "1.4.6";
 	private static List<String> devs = new ArrayList<String>();
-	private static String devLego = "Legorek";
-	private static String devLuka = "Lukario45";
-	private static String devMine = "MineDroidFTW";
-	private static String devZack = "zack6849";
-	private static String dev3pic = "3pic_Killz";
-	private static String devKiller = "KillerFoxE";
-	
 	public static String getVersion(){
 		return srvVersion;
 	}
