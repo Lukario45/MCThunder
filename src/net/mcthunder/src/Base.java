@@ -23,15 +23,6 @@ public class Base
 {
 	//Variables that are needed
 	static String curVersion;
-	 
-	
-	
-	/**
-	 * Check to see if Version Of Server is the same
-	 *  From mcthunder.net/srvinfo.txt
-	 *  not important
-	 */
-	
 	
 	
 	//send console message;
@@ -52,11 +43,9 @@ public class Base
 		        //String str; 
 		    	curVersion = in.readLine();
 		    	in.close();
-		    	return curVersion;
+		    	return curVersion;	
 		    	
-		    	
-		    	
-		} 
+			} 
 		catch (MalformedURLException e) 
 		{
 			
