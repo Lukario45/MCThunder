@@ -12,17 +12,27 @@ import java.util.List;
 
 public class srvInfo 
 {
-	static String srvVersion = "1.0.0";
-	static List<String> devs = new ArrayList<String>();
-	static String mcVersion = "1.4.6";
-	static String devLego = "Legorek";
-	static String devLuka = "Lukario45";
-	static String devMine = "MineDroidFTW";
-	static String devZack = "zack6849";
-	static String dev3pic = "3pic_Killz";
-	static String devKiller = "KillerFoxE";
+	private static String srvVersion = "1.0.0";
+	public static String mcVersion = "1.4.6";
+	private static List<String> devs = new ArrayList<String>();
+	private static String devLego = "Legorek";
+	private static String devLuka = "Lukario45";
+	private static String devMine = "MineDroidFTW";
+	private static String devZack = "zack6849";
+	private static String dev3pic = "3pic_Killz";
+	private static String devKiller = "KillerFoxE";
 	
-	static String conMSG;
-	
+	public static String getVersion(){
+		return srvVersion;
+	}
+	public static List<String> getDevelopers(){
+		devs.add("3pic_Killz");
+		devs.add("KillerFoxE");
+		devs.add("Legorek");
+		devs.add("Lukario45");
+		devs.add("MineDroidFTW");
+		devs.add("zack6849");
+		return devs;
+	}
 
 }

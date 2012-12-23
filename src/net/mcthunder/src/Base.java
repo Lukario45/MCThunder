@@ -23,14 +23,11 @@ public class Base {
 	static String curVersion;
 	public static void main(String[] args) {
 		// Before Startup Messages
-		tellConsole("INFO","MCThunder " + srvInfo.srvVersion + " for Minecraft "+ srvInfo.mcVersion);
+		tellConsole("INFO","MCThunder " + srvInfo.getVersion() + " for Minecraft "+ srvInfo.mcVersion);
 		tellConsole("INFO", "Developers");
-		tellConsole("INFO",srvInfo.dev3pic);
-		tellConsole("INFO", srvInfo.devLego);
-		tellConsole("INFO", srvInfo.devLuka);
-		tellConsole("INFO", srvInfo.devMine);
-		tellConsole("INFO", srvInfo.devZack);
-		tellConsole("INFO", srvInfo.devKiller);
+		for(String s : srvInfo.getDevelopers()){
+			tellConsole("info", s);
+		}
 		start();
 	}
 
@@ -71,7 +68,7 @@ public class Base {
 	// This is for seeing if the Server Version and most Current Version are the
 	// same
 	public static void chkVersion() {
-		if (curVersion.equals(srvInfo.srvVersion)) {
+		if (curVersion.equals(srvInfo.getVersion())) {
 			tellConsole("INFO","Your version of MCThunder is up to date!");
 		}else {
 			tellConsole("WARNING", "MCThunder is out of date! You should consider updating to version " + curVersion + "!");
