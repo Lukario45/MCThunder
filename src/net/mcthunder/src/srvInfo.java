@@ -1,4 +1,8 @@
 package net.mcthunder.src;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * srvInfo.java
  * This Class if for all of the Server Information Like Versions and Devs
@@ -9,6 +13,7 @@ package net.mcthunder.src;
 public class srvInfo 
 {
 	static String srvVersion = "1.0.0";
+	static List<String> devs = new ArrayList<String>();
 	static String mcVersion = "1.4.6";
 	static String devLego = "Legorek";
 	static String devLuka = "Lukario45";
