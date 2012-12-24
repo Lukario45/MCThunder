@@ -19,13 +19,16 @@ import java.util.Date;
  * 
  */
 
-public class Base {
+public class Base 
+{
 	static String curVersion;
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 		// Before Startup Messages
 		tellConsole("INFO","MCThunder " + srvInfo.getVersion() + " for Minecraft "+ srvInfo.mcVersion);
 		tellConsole("INFO", "Developers");
-		for(String s : srvInfo.getDevelopers()){
+		for(String s : srvInfo.getDevelopers())
+		{
 			tellConsole("INFO", s);
 		}
 		start();
@@ -35,32 +38,41 @@ public class Base {
 	/**
 	 * Start The Server
 	 */
-	public static void start() {
+	public static void start() 
+	{
 		tellConsole("INFO", "Server startup initiated...");
 		tellConsole("INFO", "Checking Version...");
 		curVersion = getCurVersion(curVersion);
 		chkVersion();
+		tellConsole("INFO", "Checking for Worlds...");
 	}
 	/**
 	 * @param prefix: the string to prefix the message with
 	 * @param message: the message to print to the log
 	 */
-	public static void tellConsole(String prefix, String message){
+	public static void tellConsole(String prefix, String message)
+	{
 		String time = String.format("[%tF %<tT]", new Date());
 		System.out.println(time + " [" + prefix + "] " + message);
 	}
 	
 	// This is for getting the version off of MCThunder.net
-	public static String getCurVersion(String curVersion) {
-		try {
+	public static String getCurVersion(String curVersion) 
+	{
+		try 
+		{
 			URL url = new URL("http://www.mcthunder.net/version.html");
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 			url.openStream()));
 			curVersion = in.readLine();
 			in.close();
-		} catch (MalformedURLException e) {
+		} 
+		catch (MalformedURLException e) 
+		{
 			tellConsole("SEVERE", "Error checking version, malformed url!");
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			tellConsole("SEVERE", "Error checkingcurrent version, IOExcpetion");
 		}
 		return curVersion;
@@ -68,10 +80,14 @@ public class Base {
 
 	// This is for seeing if the Server Version and most Current Version are the
 	// same
-	public static void chkVersion() {
-		if (curVersion.equals(srvInfo.getVersion())) {
+	public static void chkVersion() 
+	{
+		if (curVersion.equals(srvInfo.getVersion())) 
+		{
 			tellConsole("INFO","Your version of MCThunder is up to date!");
-		}else {
+		}
+		else 
+		{
 			tellConsole("WARNING", "MCThunder is out of date! You should consider updating to version " + curVersion + "!");
 		}
 	}

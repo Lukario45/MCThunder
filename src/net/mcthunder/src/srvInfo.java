@@ -15,10 +15,12 @@ public class srvInfo
 	private static String srvVersion = "1.0.0";
 	public static String mcVersion = "1.4.6";
 	private static List<String> devs = new ArrayList<String>();
-	public static String getVersion(){
+	public static String getVersion()
+	{
 		return srvVersion;
 	}
-	public static List<String> getDevelopers(){
+	public static List<String> getDevelopers()
+	{
 		devs.add("3pic_Killz");
 		devs.add("Legorek");
 		devs.add("Lukario45");
