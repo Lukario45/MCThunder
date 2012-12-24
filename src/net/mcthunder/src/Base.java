@@ -15,7 +15,7 @@ import java.util.Date;
 
 /**
  * MCThunder SMP Developers Lukario45, Brandon Busk, Zack Craig, 3pik_killz, and
- * Rekkeh. For Minecraft 1.4.5
+ * Rekkeh. For Minecraft 1.4.6
  * 
  */
 
@@ -26,7 +26,7 @@ public class Base {
 		tellConsole("INFO","MCThunder " + srvInfo.getVersion() + " for Minecraft "+ srvInfo.mcVersion);
 		tellConsole("INFO", "Developers");
 		for(String s : srvInfo.getDevelopers()){
-			tellConsole("info", s);
+			tellConsole("INFO", s);
 		}
 		start();
 	}
