@@ -73,7 +73,7 @@ public class Base
 		} 
 		catch (IOException e) 
 		{
-			tellConsole("SEVERE", "Error checkingcurrent version, IOExcpetion");
+			tellConsole("SEVERE", "Error checking current version, IOExcpetion");
 		}
 		return curVersion;
 	}
