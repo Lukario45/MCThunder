@@ -26,6 +26,7 @@ public class srvInfo
 		devs.add("Lukario45");
 		devs.add("MineDroidFTW");
 		devs.add("zack6849");
+		devs.add("Mod_Chris");
 		return devs;
 	}
 

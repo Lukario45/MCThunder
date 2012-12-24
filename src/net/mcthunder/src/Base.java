@@ -45,6 +45,8 @@ public class Base
 		curVersion = getCurVersion(curVersion);
 		chkVersion();
 		tellConsole("INFO", "Checking for Worlds...");
+		
+	
 	}
 	/**
 	 * @param prefix: the string to prefix the message with
