@@ -20,7 +20,6 @@ public class srvInfo
 	}
 	public static List<String> getDevelopers(){
 		devs.add("3pic_Killz");
-		devs.add("KillerFoxE");
 		devs.add("Legorek");
 		devs.add("Lukario45");
 		devs.add("MineDroidFTW");
