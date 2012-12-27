@@ -21,7 +21,7 @@ public class srvInfo
 	}
 	public static List<String> getDevelopers()
 	{
-		return Collections.unmodifiableList(Array.asList(devs));
+		return Collections.unmodifiableList(Arrays.asList(devs));
 	}
 
 }
