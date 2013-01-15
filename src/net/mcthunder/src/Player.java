@@ -13,6 +13,7 @@ public class Player
 		this.PlayerNick = pn;
 	}
 	//Getters
+	//Get the Players Nick 
 	public String getPlayerNick()
 	{
 		return this.PlayerNick;
