@@ -28,10 +28,17 @@ public class Player
 	}
 	public boolean getOnGround()
 	{
-		if this.OnGround == true;
+		if (OnGround == true)
 		{
 			Base.tellConsole("INFO", PlayerNick + " Is Not Flying");
+			return true;
 		}
+		else
+		{
+			Base.tellConsole("INFO",PlayerNick + " Is not on the ground");
+			return false;
+		}
+		
 	}
 	//is the player flying or on the ground?
 	 
