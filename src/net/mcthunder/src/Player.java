@@ -10,11 +10,13 @@ public class Player
   private String PlayerNick;
   private Float PlayerEXP;
   private boolean OnGround;
-	public Player(String pn, Float EXP, boolean OG)
+  private String PlayerRank;
+	public Player(String pn, Float EXP, boolean OG, String pr)
 	{
 		this.PlayerNick = pn;
 		this.PlayerEXP = EXP;
 		this.OnGround = OG;
+		this.PlayerRank = pr;
 	}
 	//Getters
 	//Get the Players Nick 
@@ -25,6 +27,10 @@ public class Player
 	public Float getPlayerEXP()
 	{
 		return this.PlayerEXP;
+	}
+	public String getPlayerRank()
+	{
+		return this.PlayerNick;
 	}
 	public boolean getOnGround()
 	{
