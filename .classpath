@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="Entity"/>
-	<classpathentry kind="src" path="Level"/>
-	<classpathentry kind="src" path="Network"/>
-	<classpathentry kind="src" path="Objects"/>
-	<classpathentry kind="src" path="Player"/>
-	<classpathentry kind="src" path="Plugins"/>
-	<classpathentry kind="src" path="Properties"/>
-	<classpathentry kind="src" path="Server"/>
-	<classpathentry kind="src" path="Utilities"/>
-	<classpathentry kind="src" path="Inventory"/>
-	<classpathentry kind="src" path="world"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="src" path="Commands"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

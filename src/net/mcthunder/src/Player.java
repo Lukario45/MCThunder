@@ -8,9 +8,13 @@ package net.mcthunder.src;
 public class Player 
 {
   private String PlayerNick;
-	public Player(String pn)
+  private Float PlayerEXP;
+  private boolean OnGround;
+	public Player(String pn, Float EXP, boolean OG)
 	{
 		this.PlayerNick = pn;
+		this.PlayerEXP = EXP;
+		this.OnGround = OG;
 	}
 	//Getters
 	//Get the Players Nick 
@@ -18,9 +22,11 @@ public class Player
 	{
 		return this.PlayerNick;
 	}
-	//To String
-	public String toString()
+	public Float getPlayerEXP()
 	{
-		return PlayerNick;
+		return this.PlayerEXP;
 	}
+	//is the player flying or on the ground?
+	 
+	
 }
