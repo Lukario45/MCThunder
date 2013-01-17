@@ -35,7 +35,7 @@ public class Groups
 		
 	}
 	
-	public void LoadMembers()
+	public static void LoadMembers()
 	{
 		if(!new File("Ranks").exists());
 		if(!new File("Ranks").mkdir());

@@ -1,6 +1,7 @@
 package net.mcthunder.src;
 
 import java.io.BufferedReader;
+import net.mcthunder.src.Groups;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -46,6 +47,8 @@ public class Base
 		tellConsole("INFO", "Checking Version...");
 		curVersion = getCurVersion(curVersion);
 		chkVersion();
+		tellConsole("INFO", "Loading Ranks...");
+		Groups.LoadMembers();
 		tellConsole("INFO", "Checking for Plugins...");
 		tellConsole("INFO", "Checking for Worlds...");
 		
