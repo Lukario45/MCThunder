@@ -7,6 +7,8 @@ package net.mcthunder.src;
 
 public class Player 
 {
+
+  public  String Username;
   private String PlayerNick;
   private Float PlayerEXP;
   private boolean OnGround;
@@ -20,6 +22,10 @@ public class Player
 	}
 	//Getters
 	//Get the Players Nick 
+	public String getUsername()
+	{
+		return this.Username;
+	}
 	public String getPlayerNick()
 	{
 		return this.PlayerNick;

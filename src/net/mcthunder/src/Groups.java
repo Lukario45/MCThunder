@@ -2,6 +2,7 @@ package net.mcthunder.src;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 /**
  * Groups.java
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 public class Groups 
 {
 	static ArrayList<Groups> groups = new ArrayList<Groups>();
+	private ArrayList<String> members = new ArrayList<String>();
 	
 	public String RankName;
 	public int permissionlvl;
@@ -32,14 +34,26 @@ public class Groups
 	
 	void LoadRanks()
 	{
-		
+		Logger.getLogger("Loading Ranks");	
+		if(!new File("Ranks").exists());
+		if(!new File("Ranks").mkdir());
+		return;
 	}
 	
 	public static void LoadMembers()
 	{
-		if(!new File("Ranks").exists());
-		if(!new File("Ranks").mkdir());
-		return;
+		
+	}
+	
+	public void addMember(String name)
+	{
+		if (members.contains(name))
+			return;
+	}
+	
+	public void addPlayer(Player p){
+		addMember(p.Username);
+		
 	}
 	
 }
