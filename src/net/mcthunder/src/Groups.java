@@ -1,22 +1,31 @@
 package net.mcthunder.src;
-
-public class Groups {
+/**
+ * Groups.java
+ * This is the Main class For the Player Groups
+ * ~Lukario45
+ * Author 3picKillz
+ */
+public class Groups 
+{
 	
 	public String RankName;
 	public int permissionlvl;
 	public String Color;
 	
-	public Groups(String RankName, int permissionlvl, String Color){
+	public Groups(String RankName, int permissionlvl, String Color)
+	{
 		this.RankName = RankName;
 		this.permissionlvl = permissionlvl;
 		this.Color = Color;
 	}
 	
-	public void groups(){
+	public void groups()
+	{
 		this.LoadRanks();
 	}
 	
-	void LoadRanks(){
+	void LoadRanks()
+	{
 		
 	}
 	
