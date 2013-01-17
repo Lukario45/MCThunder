@@ -1,4 +1,8 @@
 package net.mcthunder.src;
+
+import java.io.File;
+import java.util.ArrayList;
+
 /**
  * Groups.java
  * This is the Main class For the Player Groups
@@ -7,10 +11,12 @@ package net.mcthunder.src;
  */
 public class Groups 
 {
+	static ArrayList<Groups> groups = new ArrayList<Groups>();
 	
 	public String RankName;
 	public int permissionlvl;
 	public String Color;
+	public boolean isOP = false;
 	
 	public Groups(String RankName, int permissionlvl, String Color)
 	{
@@ -29,9 +35,11 @@ public class Groups
 		
 	}
 	
-	public void addRank(String RankName, int permissionlvl, String Color)
+	public void LoadMembers()
 	{
-		
+		if(!new File("Ranks").exists());
+		if(!new File("Ranks").mkdir());
+		return;
 	}
 	
 }
