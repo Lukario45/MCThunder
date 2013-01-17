@@ -51,7 +51,8 @@ public class Groups
 			return;
 	}
 	
-	public void addPlayer(Player p){
+	public void addPlayer(Player p)
+	{
 		addMember(p.Username);
 		
 	}
