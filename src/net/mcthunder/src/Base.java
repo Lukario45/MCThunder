@@ -40,8 +40,9 @@ public class Base
 	 */
 	public static void start() 
 	{
-		tellConsole("INFO","NULL Commands, NULL Acheivementsm, NULL Blocks");
+		
 		tellConsole("INFO", "Server startup initiated...");
+		tellConsole("INFO","NULL Commands, NULL Acheivementsm, NULL Blocks");
 		tellConsole("INFO", "Checking Version...");
 		curVersion = getCurVersion(curVersion);
 		chkVersion();
