@@ -16,10 +16,15 @@ public class srvInfo
 {
 	private static String srvVersion = "1.0.0";
 	public static String mcVersion = "1.4.7";
+	public static String ServerName = "MCThunder Premium";
 	private static String[] devs = new String[] { "3pic_Killz", "Legorek", "Lukario45", "MineDroidFTW", "zack6849", "Mod_Chris" };
 	public static String getVersion()
 	{
 		return srvVersion;
+	}
+	public static String getServerName()
+	{
+		return ServerName; 
 	}
 	public static List<String> getDevelopers()
 	{

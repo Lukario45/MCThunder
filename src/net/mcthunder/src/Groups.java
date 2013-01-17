@@ -6,6 +6,12 @@ public class Groups {
 	public int permissionlvl;
 	public String Color;
 	
+	public Groups(String RankName, int permissionlvl, String Color){
+		this.RankName = RankName;
+		this.permissionlvl = permissionlvl;
+		this.Color = Color;
+	}
+	
 	public void groups(){
 		this.LoadRanks();
 	}
