@@ -45,7 +45,7 @@ public class Base
 		tellConsole("INFO", "Checking Version...");
 		curVersion = getCurVersion(curVersion);
 		chkVersion();
-		tellConsole("INFO", "Checking for Plugins");
+		tellConsole("INFO", "Checking for Plugins...");
 		tellConsole("INFO", "Checking for Worlds...");
 		
 	
