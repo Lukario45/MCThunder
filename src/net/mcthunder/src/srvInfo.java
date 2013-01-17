@@ -33,5 +33,10 @@ public class srvInfo
 	{
 		return Collections.unmodifiableList(Arrays.asList(devs));
 	}
+	
+	public static void LoadProperties()
+	{
+		
+	}
 
 }

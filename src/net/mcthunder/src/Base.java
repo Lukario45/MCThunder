@@ -51,6 +51,9 @@ public class Base
 		Groups.LoadMembers();
 		tellConsole("INFO", "Checking for Plugins...");
 		tellConsole("INFO", "Checking for Worlds...");
+		tellConsole("INFO", "Checking Configuration");
+		srvInfo.LoadProperties();
+		tellConsole("INFO", "Done loading properties");
 		
 	
 	}
