@@ -57,6 +57,7 @@ public class Base
 		tellConsole("INFO", "Checking Configuration");
 		srvInfo.LoadProperties();
 		tellConsole("INFO", "Done loading properties");
+		tellConsole("INFO", "Startup complete you may now enter Commands.");
 		String line = new Scanner(System.in).nextLine();
 		if (line.startsWith("/")) {
 			//We Need to add stuff
