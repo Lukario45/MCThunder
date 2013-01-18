@@ -65,7 +65,7 @@ public class Base
         	  if(line.startsWith("/")){
         	    String command = line.replaceFirst("/", "");
         	      if(command.equalsIgnoreCase("stop")){
-        			System.exit(0);
+        			stop();
         	      }
         	   }
         	}
@@ -120,6 +120,14 @@ public class Base
 		{
 			tellConsole("WARNING", "MCThunder is out of date! You should consider updating to version " + curVersion + "!");
 		}
+	}
+	public static void stop()
+	{
+		tellConsole("INFO","Stopping Server!");
+		tellConsole("INFO", "Databases Saved!");
+		tellConsole("INFO", "Shutdown Complete");
+		System.exit(0);
+		
 	}
 
 }
