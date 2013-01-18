@@ -1,6 +1,7 @@
 package net.mcthunder.src;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -15,7 +16,7 @@ public class Groups
 	static ArrayList<Groups> groups = new ArrayList<Groups>();
 	private ArrayList<String> members = new ArrayList<String>();
 	
-	public String RankName;
+	public static String RankName;
 	public int permissionlvl;
 	public String Color;
 	public boolean isOP = false;
@@ -40,20 +41,26 @@ public class Groups
 		return;
 	}
 	
-	public static void LoadMembers()
+	public static void LoadMembers() throws IOException
 	{
-		
+		if (!new File("ranks/" + RankName).exists());
+		return;
 	}
 	
 	public void addMember(String name)
 	{
 		if (members.contains(name))
 			return;
+		members.add(name);
+		saveMembers();
 	}
 	
-	public void addPlayer(Player p)
-	{
+	public void addPlayer(Player p){
 		addMember(p.Username);
+		
+	}
+	
+	public void saveMembers(){
 		
 	}
 	
