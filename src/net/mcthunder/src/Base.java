@@ -58,10 +58,17 @@ public class Base
 		srvInfo.LoadProperties();
 		tellConsole("INFO", "Done loading properties");
 		tellConsole("INFO", "Startup complete you may now enter Commands.");
-		String line = new Scanner(System.in).nextLine();
-		if (line.startsWith("/")) {
-			//We Need to add stuff
-		}
+		Scanner s = new Scanner(System.in);
+        	String line;
+        	while(s.hasNextLine()){
+        	  line = s.nextLine();
+        	  if(line.startsWith("/")){
+        	    String command = line.replaceFirst("/", "");
+        	      if(command.equalsIgnoreCase("stop")){
+        			System.exit(0);
+        	      }
+        	   }
+        	}
 		while (true)
 		{
 			System.console();
