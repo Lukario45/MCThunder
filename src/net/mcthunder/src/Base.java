@@ -59,7 +59,7 @@ public class Base
 		tellConsole("INFO", "Done loading properties");
 		String line = new Scanner(System.in).nextLine();
 		if (line.startsWith("/")) {
-			
+			//We Need to add stuff
 		}
 		while (true)
 		{
