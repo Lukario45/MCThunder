@@ -48,7 +48,7 @@ public class Base
 		curVersion = getCurVersion(curVersion);
 		chkVersion();
 		tellConsole("INFO", "Loading Ranks...");
-		Groups.LoadMembers();
+		//Groups.LoadMembers();
 		tellConsole("INFO", "Checking for Plugins...");
 		tellConsole("INFO", "Checking for Worlds...");
 		tellConsole("INFO", "Checking Configuration");
