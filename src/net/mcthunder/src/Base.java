@@ -54,6 +54,10 @@ public class Base
 		tellConsole("INFO", "Checking Configuration");
 		srvInfo.LoadProperties();
 		tellConsole("INFO", "Done loading properties");
+		while (true)
+		{
+			System.out.println(true);			
+		}
 		
 	
 	}
