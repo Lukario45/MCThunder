@@ -7,6 +7,9 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.Scanner;
+
+import javax.sound.sampled.Line;
 
 /**
  * Base.java
@@ -54,6 +57,10 @@ public class Base
 		tellConsole("INFO", "Checking Configuration");
 		srvInfo.LoadProperties();
 		tellConsole("INFO", "Done loading properties");
+		String line = new Scanner(System.in).nextLine();
+		if (line.startsWith("/")) {
+			
+		}
 		while (true)
 		{
 			System.console();
