@@ -6,5 +6,8 @@ package net.mcthunder.src;
  */
 public class World 
 {
-
+	public long Heigth;
+	public long Width;
+	public long Depth;
+	
 }
