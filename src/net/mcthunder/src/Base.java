@@ -11,6 +11,8 @@ import java.util.Scanner;
 
 import javax.sound.sampled.Line;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 /**
  * Base.java
  * This class is MCThunders Base Class
@@ -26,7 +28,7 @@ import javax.sound.sampled.Line;
 public class Base 
 {
 	static String curVersion;
-	public static void main(String[] args) 
+	public static void main(String[] args) throws ConfigurationException, IOException 
 	{
 		// Before Startup Messages
 		tellConsole("INFO","MCThunder " + srvInfo.getVersion() + " for Minecraft "+ srvInfo.mcVersion);
@@ -41,8 +43,9 @@ public class Base
 //test pull
 	/**
 	 * Start The Server
+	 
 	 */
-	public static void start() 
+	public static void start() throws ConfigurationException, IOException 
 	{
 		
 		tellConsole("INFO", "Server startup initiated...");
@@ -56,6 +59,7 @@ public class Base
 		tellConsole("INFO", "Checking for Worlds...");
 		tellConsole("INFO", "Checking Configuration");
 		//srvInfo.LoadProperties();
+		Congif.loadConfig();
 		tellConsole("INFO", "Done loading properties");
 		tellConsole("INFO", "Startup complete you may now enter Commands.");
 		Scanner s = new Scanner(System.in);
