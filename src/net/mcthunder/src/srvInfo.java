@@ -26,10 +26,12 @@ public class srvInfo
 	{
 		return srvVersion;
 	}
+	/**
 	public static String getServerName()
 	{
 		return ServerName; 
 	}
+	*/
 	public static List<String> getDevelopers()
 	{
 		return Collections.unmodifiableList(Arrays.asList(devs));

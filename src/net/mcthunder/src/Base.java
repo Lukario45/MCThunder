@@ -55,7 +55,7 @@ public class Base
 		tellConsole("INFO", "Checking for Plugins...");
 		tellConsole("INFO", "Checking for Worlds...");
 		tellConsole("INFO", "Checking Configuration");
-		srvInfo.LoadProperties();
+		//srvInfo.LoadProperties();
 		tellConsole("INFO", "Done loading properties");
 		tellConsole("INFO", "Startup complete you may now enter Commands.");
 		Scanner s = new Scanner(System.in);
