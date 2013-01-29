@@ -16,7 +16,8 @@ public class srvInfo
 {
 	private static String srvVersion = "1.0.0";
 	public static String mcVersion = "1.4.7";
-	public static String ServerName = "MCThunder Premium";
+	public static String serverName = "MCThunder Premium";
+	public static int port = 25565;
 	private static String[] devs = new String[] 
 	{
 		"3pic_Killz", "Legorek", "Lukario45", "MineDroidFTW", "zack6849", "Mod_Chris"
@@ -34,9 +35,10 @@ public class srvInfo
 		return Collections.unmodifiableList(Arrays.asList(devs));
 	}
 	
-	public static void LoadProperties()
+	/**public static void LoadProperties()
 	{
 		
 	}
+	*/
 
 }

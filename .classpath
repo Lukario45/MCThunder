@@ -2,5 +2,19 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="resources/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="resources/commons-configuration-1.9-javadoc.jar"/>
+	<classpathentry kind="lib" path="resources/commons-configuration-1.9-sources.jar"/>
+	<classpathentry kind="lib" path="resources/commons-configuration-1.9-tests.jar"/>
+	<classpathentry kind="lib" path="resources/commons-configuration-1.9.jar"/>
+	<classpathentry kind="lib" path="resources/commons-lang-2.6-javadoc.jar"/>
+	<classpathentry kind="lib" path="resources/commons-lang-2.6-sources.jar"/>
+	<classpathentry kind="lib" path="resources/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="resources/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="resources/commons-logging-adapters-1.1.1.jar"/>
+	<classpathentry kind="lib" path="resources/commons-logging-api-1.1.1.jar"/>
+	<classpathentry kind="lib" path="resources/google-ajax-apis.jar"/>
+	<classpathentry kind="lib" path="resources/gson-1.4.jar"/>
+	<classpathentry kind="lib" path="resources/pircbotx-1.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
