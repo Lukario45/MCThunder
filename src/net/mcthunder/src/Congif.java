@@ -67,6 +67,15 @@ public class Congif
 		worldName = conf.getString("World_Name");
 		netherWorld = conf.getBoolean("Nether_World");
 		onlineMode = conf.getBoolean("Online_Mode");
+		ownerName = conf.getString("Server_Owner_Name");
+		globalChatNick = conf.getString("Global_Chat_Nick");
+		irc = conf.getBoolean("IRC");
+		ircServer = conf.getString("IRC_Server");
+		ircPort = conf.getInt("IRC_Port");
+		opChannel = conf.getString("IRC_OP_Channel");
+		channelOne = conf.getString("First_IRC_Channel");
+		channelTwo = conf.getString("Seccond_IRC_Channel");
+		
 		
 	}
 }
