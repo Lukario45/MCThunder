@@ -74,8 +74,60 @@ public class Congif
 		ircPort = conf.getInt("IRC_Port");
 		opChannel = conf.getString("IRC_OP_Channel");
 		channelOne = conf.getString("First_IRC_Channel");
-		channelTwo = conf.getString("Seccond_IRC_Channel");
-		
-		
+		channelTwo = conf.getString("Seccond_IRC_Channel");	
 	}
+	//The Config Getters
+	public static int getPort()
+	{
+		return port;
+	}
+	public static String getServerName()
+	{
+		return serverName;
+	}
+	public static String getWorldName()
+	{
+		return worldName;
+	}
+	public static boolean getNetherWorld()
+	{
+		return netherWorld;
+	}
+	public static boolean getOnlineMode()
+	{
+		return onlineMode;
+	}
+	public static String getOwnerName()
+	{
+		return ownerName;
+	}
+	public static String getGlobalChatNick()
+	{
+		return globalChatNick;
+	}
+	public static boolean getIrc()
+	{
+		return irc;
+	}
+	public static String getIrcServer()
+	{
+		return ircServer;
+	}
+	public static int getIrcPort()
+	{
+		return ircPort;
+	}
+	public static String getOpChannel()
+	{
+		return opChannel;
+	}
+	public static String getChannelOne()
+	{
+		return channelOne;
+	}
+	public static String getChannelTwo()
+	{
+		return channelTwo;
+	}
+	
 }

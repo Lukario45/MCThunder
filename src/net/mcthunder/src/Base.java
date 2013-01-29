@@ -130,6 +130,7 @@ public class Base
 		tellConsole("INFO","Stopping Server!");
 		tellConsole("INFO", "Databases Saved!");
 		tellConsole("INFO", "Shutdown Complete");
+		//tellConsole("TEST", Congif.getGlobalChatNick()); << It works
 		System.exit(0);
 		
 	}
