@@ -10,7 +10,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 
-public class Congif 
+public class Config 
 {
 	private static PropertiesConfiguration conf;
 	public static File cnf = new File(System.getProperty("user.home") + "/.MCThunder/config.yml");

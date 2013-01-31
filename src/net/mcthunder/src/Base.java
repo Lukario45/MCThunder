@@ -59,7 +59,7 @@ public class Base
 		tellConsole("INFO", "Checking for Worlds...");
 		tellConsole("INFO", "Checking Configuration");
 		//srvInfo.LoadProperties();
-		Congif.loadConfig();
+		Config.loadConfig();
 		tellConsole("INFO", "Done loading properties");
 		tellConsole("INFO", "Startup complete you may now enter Commands.");
 		Scanner s = new Scanner(System.in);
