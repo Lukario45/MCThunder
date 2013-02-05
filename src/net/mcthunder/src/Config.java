@@ -1,6 +1,8 @@
 package net.mcthunder.src;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 
 import java.io.IOException;
 import java.util.Random;
@@ -28,6 +30,18 @@ public class Config
 	private static String channelOne;
 	private static String channelTwo;
 	
+	public Config() { 			//default constructor. make a config file for easy editing
+		try {					//if we don't need to make a config file, at least we have a constructor now.
+			FileWriter test = new FileWriter("config.txt"); //I'll use better names later.
+			BufferedWriter test2 = new BufferedWriter(test); //
+			test2.write(" "); //ill edit this later.
+			test2.close();
+			
+		}catch (Exception e) {	//just in case.
+			System.out.println("Error - " + e.getMessage());
+		}
+	}							//feel free to get rid of this. i'm not fully sure what to add to this project, so i just made this.
+
 	
 
 	public static void loadConfig() throws ConfigurationException, IOException
@@ -129,5 +143,7 @@ public class Config
 	{
 		return channelTwo;
 	}
+	
+	
 	
 }
