@@ -48,6 +48,7 @@ public class Base
 	public static void start() throws ConfigurationException, IOException 
 	{
 		
+		net.gui.src.Main.guiTime();
 		tellConsole("INFO", "Server startup initiated...");
 		tellConsole("INFO","NULL Commands, NULL Acheivementsm, NULL Blocks");
 		tellConsole("INFO", "Checking Version...");

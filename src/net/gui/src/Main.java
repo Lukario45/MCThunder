@@ -7,7 +7,7 @@ import javax.swing.JFrame;;
 
 public class Main extends JFrame{
 
-	public static void main(String[] a){
+	public static void guiTime(){
 		JFrame frame = new JFrame ("MCThunder");
 		JButton makebutton = new JButton ("Shutdown");
 		frame.getContentPane().setLayout(new FlowLayout());
