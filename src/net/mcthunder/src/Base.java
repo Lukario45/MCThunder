@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Scanner;
-import java.awt.TextArea;
 
 import javax.sound.sampled.Line;
 
@@ -28,6 +27,7 @@ import org.apache.commons.configuration.ConfigurationException;
 
 public class Base 
 {
+	
 	static String curVersion;
 	public static void main(String[] args) throws ConfigurationException, IOException 
 	{
@@ -49,7 +49,7 @@ public class Base
 	public static void start() throws ConfigurationException, IOException 
 	{
 		
-	    net.gui.src.Main.guiTime();
+	    GUI.guiTime();
 		tellConsole("INFO", "Server startup initiated...");
 		tellConsole("INFO","NULL Commands, NULL Acheivementsm, NULL Blocks");
 		tellConsole("INFO", "Checking Version...");
@@ -88,9 +88,15 @@ public class Base
 	 */
 	public static void tellConsole(String prefix, String message)
 	{
+		
 		String time = String.format("[%tF %<tT]", new Date());
+		String appendConsoleMessage = time + " [" + prefix + "] " + message;
 		System.out.println(time + " [" + prefix + "] " + message);
+		//ConsoleOutMessage = appendConsoleMessage;
+		//GUI.tabHomeConsoleOut.setText(GUI.getConsoleText() + "\nyour appended text");
+		
 	}
+	public static String ConsoleOutMessage;
 	
 	// This is for getting the version off of MCThunder.net
 	public static String getCurVersion(String curVersion) 

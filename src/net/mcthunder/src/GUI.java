@@ -1,4 +1,4 @@
-package net.gui.src;
+package net.mcthunder.src;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.JTextComponent;
 import javax.swing.JTabbedPane;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 import java.awt.Component;
@@ -19,8 +20,9 @@ import javax.swing.JScrollPane;
 import java.awt.TextArea;
 import javax.swing.JTextPane;
 
-public class Main extends JFrame {
+public class GUI extends JFrame {
 
+	public static Object tabHomeConsoleOut;
 	private JPanel contentPane;
 
 	/**
@@ -30,7 +32,7 @@ public class Main extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Main frame = new Main();
+					GUI frame = new GUI();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -42,7 +44,7 @@ public class Main extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Main() {
+	public GUI() {
 		
 		setTitle("MCThunder");
 		setResizable(false);
@@ -60,9 +62,20 @@ public class Main extends JFrame {
 		JPanel tabHome = new JPanel();
 		tabbedPane.addTab("Home", null, tabHome, null);
 		tabHome.setLayout(null);
+		//String appendConsoleMessage;
 		
-		TextArea tabHomeConsoleOut = new TextArea();
+		JTextArea tabHomeConsoleOut = new JTextArea();
+		tabHomeConsoleOut.setText("MCThunder");
 		tabHomeConsoleOut.setBounds(0, 10, 432, 293);
 		tabHome.add(tabHomeConsoleOut);
+	}
+	public static void appendConsoleOut(String appendConsoleMessage)
+	{
+		((JTextComponent) tabHomeConsoleOut).setText((String) append(((JTextComponent) tabHomeConsoleOut).getText(), appendConsoleMessage));
+	}
+
+	private static Object append(String text, String string) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
