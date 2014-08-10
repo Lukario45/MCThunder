@@ -1,4 +1,4 @@
-package net.mcthunder.auth;
+package net.mcthunder.auth.response;
 
 public class Response {
     private String error;
