@@ -5,6 +5,7 @@ package net.mcthunder.packet.essentials;
  */
 
 
+import net.mcthunder.events.session.SessionEvent;
 import net.mcthunder.listeners.SessionListener;
 
 import java.util.List;

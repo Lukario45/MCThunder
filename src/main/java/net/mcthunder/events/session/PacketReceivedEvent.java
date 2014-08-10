@@ -17,16 +17,16 @@ public class PacketReceivedEvent
         this.packet = packet;
     }
 
-    public Session getSession() {
-        return this.session;
-    }
-
-    public <T extends Packet> T getPacket() {
+    public <T extends Packet> getPacket() {
         try {
             return this.packet;
         } catch (ClassCastException e) {
         }
         throw new IllegalStateException("Tried to get packet as the wrong type. Actual type: " + this.packet.getClass().getName());
+    }
+
+    public Session getSession() {
+        return this.session;
     }
 
     public void call(SessionListener listener) {
