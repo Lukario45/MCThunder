@@ -1,6 +1,6 @@
 package net.mcthunder.events.server;
 
-import net.mcthunder.listeners.ServerListener;
+import net.mcthunder.listeners.abstrsct.ServerListener;
 import net.mcthunder.packet.essentials.Server;
 import net.mcthunder.packet.essentials.Session;
 

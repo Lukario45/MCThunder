@@ -1,6 +1,6 @@
 package net.mcthunder.events.server;
 
-import net.mcthunder.listeners.ServerListener;
+import net.mcthunder.listeners.abstrsct.ServerListener;
 
 public class ServerAdapter
         implements ServerListener {

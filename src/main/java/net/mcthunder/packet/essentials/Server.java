@@ -7,7 +7,7 @@ package net.mcthunder.packet.essentials;
 
 import net.mcthunder.events.server.*;
 import net.mcthunder.listeners.ConnectionListener;
-import net.mcthunder.listeners.ServerListener;
+import net.mcthunder.listeners.abstrsct.ServerListener;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
