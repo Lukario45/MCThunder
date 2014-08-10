@@ -1,5 +1,6 @@
 package net.mcthunder.packet.ingame.client.player;
 
+import net.mcthunder.game.essentials.ItemStack;
 import net.mcthunder.packet.essentials.NetIn;
 import net.mcthunder.packet.essentials.NetOut;
 import net.mcthunder.packet.essentials.NetUtil;
