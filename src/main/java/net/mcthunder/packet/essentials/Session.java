@@ -27,7 +27,7 @@ public abstract interface Session {
 
     public abstract boolean hasFlag(String paramString);
 
-    public abstract <T> T getFlag(String paramString);
+    public abstract String getFlag(String paramString);
 
     public abstract void setFlag(String paramString, Object paramObject);
 
