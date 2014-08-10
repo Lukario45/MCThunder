@@ -1,6 +1,6 @@
 package net.mcthunder.protocol.data.game;
 
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import net.mcthunder.opennbt.tag.builtin.CompoundTag;
 
 public class ItemStack {
 

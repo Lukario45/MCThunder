@@ -1,10 +1,10 @@
 package net.mcthunder.protocol.packet.ingame.server.world;
 
+import net.mcthunder.opennbt.tag.builtin.CompoundTag;
 import net.mcthunder.packetlib.io.NetInput;
 import net.mcthunder.packetlib.io.NetOutput;
 import net.mcthunder.packetlib.packet.Packet;
 import net.mcthunder.protocol.util.NetUtil;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
 import java.io.IOException;
 
