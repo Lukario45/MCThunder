@@ -17,9 +17,9 @@ public class PacketReceivedEvent
         this.packet = packet;
     }
 
-    public <T extends Packet> getPacket() {
+    public <T extends Packet> T getPacket() {
         try {
-            return this.packet;
+            return (T) this.packet;
         } catch (ClassCastException e) {
         }
         throw new IllegalStateException("Tried to get packet as the wrong type. Actual type: " + this.packet.getClass().getName());

@@ -5,7 +5,7 @@ package net.mcthunder.packet.essentials;
  */
 
 
-import net.mcthunder.events.server.ServerBoundEvent;
+import net.mcthunder.events.server.*;
 import net.mcthunder.listeners.ConnectionListener;
 import net.mcthunder.listeners.ServerListener;
 
@@ -63,7 +63,7 @@ public class Server {
             throw new IllegalStateException("PacketProtocol \"" + this.protocol.getName() + "\" does not have a no-params constructor for instantiation.");
         } catch (Exception e) {
         }
-        throw new IllegalStateException("Failed to instantiate PacketProtocol " + this.protocol.getName() + ".", e);
+        throw new IllegalStateException("Failed to instantiate PacketProtocol " + this.protocol.getName() + ".");
     }
 
     public Map<String, Object> getGlobalFlags() {
@@ -80,7 +80,7 @@ public class Server {
             return null;
         }
         try {
-            return value;
+            return (T) value;
         } catch (ClassCastException e) {
         }
         throw new IllegalStateException("Tried to get flag \"" + key + "\" as the wrong type. Actual type: " + value.getClass().getName());
