@@ -1,0 +1,13 @@
+package net.mcthunder.auth.properties;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class PropertyMap extends HashMap<String, Property> {
+    public PropertyMap() {
+    }
+
+    public PropertyMap(Map<String, Property> copy) {
+        super(copy);
+    }
+}
