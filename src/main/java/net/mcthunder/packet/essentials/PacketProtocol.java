@@ -20,7 +20,7 @@ public abstract class PacketProtocol {
 
     public abstract PacketHead getPacketHeader();
 
-    public abstract PacketEncrypter getEncryption();
+    public abstract AESEncryption getEncryption();
 
     public abstract void newClientSession(Client paramClient, Session paramSession);
 
