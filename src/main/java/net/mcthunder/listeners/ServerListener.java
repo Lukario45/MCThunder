@@ -2,6 +2,7 @@ package net.mcthunder.listeners;
 
 import net.mcthunder.apis.MinecraftProtocol;
 import net.mcthunder.apis.ProtocolMode;
+import net.mcthunder.apis.ServerInfoBuilder;
 import net.mcthunder.auth.GameProfile;
 import net.mcthunder.auth.expection.AuthenticationUnavailableException;
 import net.mcthunder.events.session.DisconnectingEvent;
@@ -147,7 +148,7 @@ public class ServerListener extends SessionAdapter {
                 long curr = System.nanoTime() / 1000000L;
                 long time = curr - ServerListener.this.lastPingTime;
                 if (time > 2000L) {
-                    ServerListener. (ServerListener.this, curr);
+                    ServerListener.access$302(ServerListener.this, curr);
                     ServerListener.access$402(ServerListener.this, (int) curr);
                     this.session.send(new ServerKeepAlivePacket(ServerListener.this.lastPingId));
                 }
