@@ -1,5 +1,7 @@
 package net.mcthunder.game.essentials;
 
+import net.mcthunder.game.essentials.tags.CompoundTag;
+
 public class ItemStack {
     private int id;
     private int amount;

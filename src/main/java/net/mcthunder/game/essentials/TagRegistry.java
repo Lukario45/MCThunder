@@ -1,5 +1,7 @@
 package net.mcthunder.game.essentials;
 
+import net.mcthunder.game.essentials.tags.*;
+
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +53,7 @@ public class TagRegistry {
             return (Tag) constructor.newInstance(new Object[]{tagName});
         } catch (Exception e) {
         }
-        throw new TagCreateException("Failed to create instance of tag \"" + clazz.getSimpleName() + "\".", e);
+        throw new TagCreateException("Failed to create instance of tag \"" + clazz.getSimpleName() + "\".");
     }
 
     static {
