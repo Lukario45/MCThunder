@@ -50,7 +50,7 @@ public abstract class PacketProtocol {
         this.outgoing.put(packet, Integer.valueOf(id));
     }
 
-    public final Packet createIncomingPacket(int id) {
+    public final Packet createIncomingPacket(int id) throws IllegalStateException {
         if ((id < 0) || (!this.incoming.containsKey(Integer.valueOf(id))) || (this.incoming.get(Integer.valueOf(id)) == null)) {
             throw new IllegalArgumentException("Invalid packet id: " + id);
         }
@@ -67,7 +67,9 @@ public abstract class PacketProtocol {
             throw new IllegalStateException("Packet \"" + id + ", " + packet.getName() + "\" does not have a no-params constructor for instantiation.");
         } catch (Exception e) {
         }
-        throw new IllegalStateException("Failed to instantiate packet \"" + id + ", " + packet.getName() + "\".", e);
+        throw new IllegalStateException("Failed to instantiate packet \"" + id + ", " + packet.getName() + "\".");
+
+
     }
 
     public final int getOutgoingId(Class<? extends Packet> packet) {
