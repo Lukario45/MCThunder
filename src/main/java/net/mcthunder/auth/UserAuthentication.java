@@ -1,8 +1,8 @@
 package net.mcthunder.auth;
 
-import net.mcthunder.auth.expection.AuthenticationException;
-import net.mcthunder.auth.expection.InvalidCredentialsException;
-import net.mcthunder.auth.expection.PropertyDeserializeException;
+import net.mcthunder.auth.exception.AuthenticationException;
+import net.mcthunder.auth.exception.InvalidCredentialsException;
+import net.mcthunder.auth.exception.PropertyDeserializeException;
 import net.mcthunder.auth.properties.Property;
 import net.mcthunder.auth.properties.PropertyMap;
 import net.mcthunder.auth.request.AuthenticationRequest;
@@ -17,9 +17,10 @@ import java.net.URL;
 import java.util.*;
 
 public class UserAuthentication {
+
     private static final String BASE_URL = "https://authserver.mojang.com/";
-    private static final URL ROUTE_AUTHENTICATE = URLUtils.constantURL("https://authserver.mojang.com/authenticate");
-    private static final URL ROUTE_REFRESH = URLUtils.constantURL("https://authserver.mojang.com/refresh");
+    private static final URL ROUTE_AUTHENTICATE = URLUtils.constantURL(BASE_URL + "authenticate");
+    private static final URL ROUTE_REFRESH = URLUtils.constantURL(BASE_URL + "refresh");
     private static final String STORAGE_KEY_PROFILE_NAME = "displayName";
     private static final String STORAGE_KEY_PROFILE_ID = "uuid";
     private static final String STORAGE_KEY_PROFILE_PROPERTIES = "profileProperties";
@@ -27,6 +28,7 @@ public class UserAuthentication {
     private static final String STORAGE_KEY_USER_ID = "userid";
     private static final String STORAGE_KEY_USER_PROPERTIES = "userProperties";
     private static final String STORAGE_KEY_ACCESS_TOKEN = "accessToken";
+
     private String clientToken;
     private PropertyMap userProperties = new PropertyMap();
     private String userId;
@@ -34,7 +36,7 @@ public class UserAuthentication {
     private String password;
     private String accessToken;
     private boolean isOnline;
-    private List<GameProfile> profiles = new ArrayList();
+    private List<GameProfile> profiles = new ArrayList<GameProfile>();
     private GameProfile selectedProfile;
     private UserType userType;
 
@@ -59,10 +61,11 @@ public class UserAuthentication {
     }
 
     public void setAccessToken(String accessToken) {
-        if ((isLoggedIn()) && (canPlayOnline())) {
+        if (this.isLoggedIn() && this.canPlayOnline()) {
             throw new IllegalStateException("Cannot change accessToken whilst logged in & online");
+        } else {
+            this.accessToken = accessToken;
         }
-        this.accessToken = accessToken;
     }
 
     public List<GameProfile> getAvailableProfiles() {
@@ -74,78 +77,82 @@ public class UserAuthentication {
     }
 
     public UserType getUserType() {
-        return isLoggedIn() ? this.userType : this.userType == null ? UserType.LEGACY : null;
+        return this.isLoggedIn() ? (this.userType == null ? UserType.LEGACY : this.userType) : null;
     }
 
     public PropertyMap getUserProperties() {
-        return isLoggedIn() ? new PropertyMap(this.userProperties) : new PropertyMap();
+        return this.isLoggedIn() ? new PropertyMap(this.userProperties) : new PropertyMap();
     }
 
     public boolean isLoggedIn() {
-        return (this.accessToken != null) && (!this.accessToken.equals(""));
+        return this.accessToken != null && !this.accessToken.equals("");
     }
 
     public boolean canPlayOnline() {
-        return (isLoggedIn()) && (getSelectedProfile() != null) && (this.isOnline);
+        return this.isLoggedIn() && this.getSelectedProfile() != null && this.isOnline;
     }
 
     public boolean canLogIn() {
-        return (!canPlayOnline()) && (this.username != null) && (!this.username.equals("")) && (((this.password != null) && (!this.password.equals(""))) || ((this.accessToken != null) && (!this.accessToken.equals(""))));
+        return !this.canPlayOnline() && this.username != null && !this.username.equals("") && ((this.password != null && !this.password.equals("")) || (this.accessToken != null && !this.accessToken.equals("")));
     }
 
     public void setUsername(String username) {
-        if ((isLoggedIn()) && (canPlayOnline())) {
+        if (this.isLoggedIn() && this.canPlayOnline()) {
             throw new IllegalStateException("Cannot change username whilst logged in & online");
+        } else {
+            this.username = username;
         }
-        this.username = username;
     }
 
     public void setPassword(String password) {
-        if ((isLoggedIn()) && (canPlayOnline()) && (this.password != null) && (!this.password.equals(""))) {
+        if (this.isLoggedIn() && this.canPlayOnline() && this.password != null && !this.password.equals("")) {
             throw new IllegalStateException("Cannot set password whilst logged in & online");
+        } else {
+            this.password = password;
         }
-        this.password = password;
     }
 
     public void loadFromStorage(Map<String, Object> credentials) throws PropertyDeserializeException {
-        logout();
-        setUsername((String) credentials.get("username"));
-        if (credentials.containsKey("userid"))
-            this.userId = ((String) credentials.get("userid"));
-        else {
+        this.logout();
+        this.setUsername((String) credentials.get(STORAGE_KEY_USER_NAME));
+        if (credentials.containsKey(STORAGE_KEY_USER_ID)) {
+            this.userId = (String) credentials.get(STORAGE_KEY_USER_ID);
+        } else {
             this.userId = this.username;
         }
 
-        if (credentials.containsKey("userProperties")) {
+        if (credentials.containsKey(STORAGE_KEY_USER_PROPERTIES)) {
             try {
-                List list = (List) credentials.get("userProperties");
-                for (Map propertyMap : list) {
-                    String name = (String) propertyMap.get("name");
-                    String value = (String) propertyMap.get("value");
-                    String signature = (String) propertyMap.get("signature");
-                    if (signature == null)
+                List<Map<String, String>> list = (List<Map<String, String>>) credentials.get(STORAGE_KEY_USER_PROPERTIES);
+                for (Map<String, String> propertyMap : list) {
+                    String name = propertyMap.get("name");
+                    String value = propertyMap.get("value");
+                    String signature = propertyMap.get("signature");
+                    if (signature == null) {
                         this.userProperties.put(name, new Property(name, value));
-                    else
+                    } else {
                         this.userProperties.put(name, new Property(name, value, signature));
+                    }
                 }
             } catch (Throwable t) {
                 throw new PropertyDeserializeException("Couldn't deserialize user properties", t);
             }
         }
 
-        if ((credentials.containsKey("displayName")) && (credentials.containsKey("uuid"))) {
-            GameProfile profile = new GameProfile(UUIDSerializer.fromString((String) credentials.get("uuid")), (String) credentials.get("displayName"));
-            if (credentials.containsKey("profileProperties")) {
+        if (credentials.containsKey(STORAGE_KEY_PROFILE_NAME) && credentials.containsKey(STORAGE_KEY_PROFILE_ID)) {
+            GameProfile profile = new GameProfile(UUIDSerializer.fromString((String) credentials.get(STORAGE_KEY_PROFILE_ID)), (String) credentials.get(STORAGE_KEY_PROFILE_NAME));
+            if (credentials.containsKey(STORAGE_KEY_PROFILE_PROPERTIES)) {
                 try {
-                    List list = (List) credentials.get("profileProperties");
-                    for (Map propertyMap : list) {
-                        String name = (String) propertyMap.get("name");
-                        String value = (String) propertyMap.get("value");
-                        String signature = (String) propertyMap.get("signature");
-                        if (signature == null)
+                    List<Map<String, String>> list = (List<Map<String, String>>) credentials.get(STORAGE_KEY_PROFILE_PROPERTIES);
+                    for (Map<String, String> propertyMap : list) {
+                        String name = propertyMap.get("name");
+                        String value = propertyMap.get("value");
+                        String signature = propertyMap.get("signature");
+                        if (signature == null) {
                             profile.getProperties().put(name, new Property(name, value));
-                        else
+                        } else {
                             profile.getProperties().put(name, new Property(name, value, signature));
+                        }
                     }
                 } catch (Throwable t) {
                     throw new PropertyDeserializeException("Couldn't deserialize profile properties", t);
@@ -155,39 +162,39 @@ public class UserAuthentication {
             this.selectedProfile = profile;
         }
 
-        this.accessToken = ((String) credentials.get("accessToken"));
+        this.accessToken = (String) credentials.get(STORAGE_KEY_ACCESS_TOKEN);
     }
 
     public Map<String, Object> saveForStorage() {
-        Map result = new HashMap();
+        Map<String, Object> result = new HashMap<String, Object>();
         if (this.username != null) {
-            result.put("username", this.username);
+            result.put(STORAGE_KEY_USER_NAME, this.username);
         }
 
-        if (getUserID() != null) {
-            result.put("userid", this.userId);
+        if (this.getUserID() != null) {
+            result.put(STORAGE_KEY_USER_ID, this.userId);
         }
 
-        if (!getUserProperties().isEmpty()) {
-            List properties = new ArrayList();
-            for (Property userProperty : getUserProperties().values()) {
-                Map property = new HashMap();
+        if (!this.getUserProperties().isEmpty()) {
+            List<Map<String, String>> properties = new ArrayList<Map<String, String>>();
+            for (Property userProperty : this.getUserProperties().values()) {
+                Map<String, String> property = new HashMap<String, String>();
                 property.put("name", userProperty.getName());
                 property.put("value", userProperty.getValue());
                 property.put("signature", userProperty.getSignature());
                 properties.add(property);
             }
 
-            result.put("userProperties", properties);
+            result.put(STORAGE_KEY_USER_PROPERTIES, properties);
         }
 
-        GameProfile selectedProfile = getSelectedProfile();
+        GameProfile selectedProfile = this.getSelectedProfile();
         if (selectedProfile != null) {
-            result.put("displayName", selectedProfile.getName());
-            result.put("uuid", selectedProfile.getId());
-            List properties = new ArrayList();
+            result.put(STORAGE_KEY_PROFILE_NAME, selectedProfile.getName());
+            result.put(STORAGE_KEY_PROFILE_ID, selectedProfile.getId());
+            List<Map<String, String>> properties = new ArrayList<Map<String, String>>();
             for (Property profileProperty : selectedProfile.getProperties().values()) {
-                Map property = new HashMap();
+                Map<String, String> property = new HashMap<String, String>();
                 property.put("name", profileProperty.getName());
                 property.put("value", profileProperty.getValue());
                 property.put("signature", profileProperty.getSignature());
@@ -195,97 +202,101 @@ public class UserAuthentication {
             }
 
             if (!properties.isEmpty()) {
-                result.put("profileProperties", properties);
+                result.put(STORAGE_KEY_PROFILE_PROPERTIES, properties);
             }
         }
 
-        if ((this.accessToken != null) && (!this.accessToken.equals(""))) {
-            result.put("accessToken", this.accessToken);
+        if (this.accessToken != null && !this.accessToken.equals("")) {
+            result.put(STORAGE_KEY_ACCESS_TOKEN, this.accessToken);
         }
 
         return result;
     }
 
     public void login() throws AuthenticationException {
-        if ((this.username == null) || (this.username.equals(""))) {
+        if (this.username == null || this.username.equals("")) {
             throw new InvalidCredentialsException("Invalid username");
-        }
-        if ((this.accessToken != null) && (!this.accessToken.equals(""))) {
-            loginWithToken();
         } else {
-            if ((this.password == null) || (this.password.equals(""))) {
-                throw new InvalidCredentialsException("Invalid password");
-            }
+            if (this.accessToken != null && !this.accessToken.equals("")) {
+                this.loginWithToken();
+            } else {
+                if (this.password == null || this.password.equals("")) {
+                    throw new InvalidCredentialsException("Invalid password");
+                }
 
-            loginWithPassword();
+                this.loginWithPassword();
+            }
         }
     }
 
     private void loginWithPassword() throws AuthenticationException {
-        if ((this.username == null) || (this.username.equals("")))
+        if (this.username == null || this.username.equals("")) {
             throw new InvalidCredentialsException("Invalid username");
-        if ((this.password == null) || (this.password.equals(""))) {
+        } else if (this.password == null || this.password.equals("")) {
             throw new InvalidCredentialsException("Invalid password");
-        }
-        AuthenticationRequest request = new AuthenticationRequest(this, this.username, this.password);
-        AuthenticationResponse response = (AuthenticationResponse) URLUtils.makeRequest(ROUTE_AUTHENTICATE, request, AuthenticationResponse.class);
-        if (!response.getClientToken().equals(getClientToken())) {
-            throw new AuthenticationException("Server requested we change our client token. Don't know how to handle this!");
-        }
-        if (response.getSelectedProfile() != null)
-            this.userType = (response.getSelectedProfile().isLegacy() ? UserType.LEGACY : UserType.MOJANG);
-        else if ((response.getAvailableProfiles() != null) && (response.getAvailableProfiles().length != 0)) {
-            this.userType = (response.getAvailableProfiles()[0].isLegacy() ? UserType.LEGACY : UserType.MOJANG);
-        }
+        } else {
+            AuthenticationRequest request = new AuthenticationRequest(this, this.username, this.password);
+            AuthenticationResponse response = URLUtils.makeRequest(ROUTE_AUTHENTICATE, request, AuthenticationResponse.class);
+            if (!response.getClientToken().equals(this.getClientToken())) {
+                throw new AuthenticationException("Server requested we change our client token. Don't know how to handle this!");
+            } else {
+                if (response.getSelectedProfile() != null) {
+                    this.userType = response.getSelectedProfile().isLegacy() ? UserType.LEGACY : UserType.MOJANG;
+                } else if (response.getAvailableProfiles() != null && response.getAvailableProfiles().length != 0) {
+                    this.userType = response.getAvailableProfiles()[0].isLegacy() ? UserType.LEGACY : UserType.MOJANG;
+                }
 
-        if ((response.getUser() != null) && (response.getUser().getId() != null))
-            this.userId = response.getUser().getId();
-        else {
-            this.userId = this.username;
-        }
+                if (response.getUser() != null && response.getUser().getId() != null) {
+                    this.userId = response.getUser().getId();
+                } else {
+                    this.userId = this.username;
+                }
 
-        this.isOnline = true;
-        this.accessToken = response.getAccessToken();
-        this.profiles = Arrays.asList(response.getAvailableProfiles());
-        this.selectedProfile = response.getSelectedProfile();
-        updateProperties(response.getUser());
+                this.isOnline = true;
+                this.accessToken = response.getAccessToken();
+                this.profiles = Arrays.asList(response.getAvailableProfiles());
+                this.selectedProfile = response.getSelectedProfile();
+                this.updateProperties(response.getUser());
+            }
+        }
     }
 
-    private void loginWithToken()
-            throws AuthenticationException {
-        if ((this.userId == null) || (this.userId.equals(""))) {
-            if ((this.username == null) || (this.username.equals(""))) {
+    private void loginWithToken() throws AuthenticationException {
+        if (this.userId == null || this.userId.equals("")) {
+            if (this.username == null || this.username.equals("")) {
                 throw new InvalidCredentialsException("Invalid uuid & username");
             }
 
             this.userId = this.username;
         }
 
-        if ((this.accessToken == null) || (this.accessToken.equals(""))) {
+        if (this.accessToken == null || this.accessToken.equals("")) {
             throw new InvalidCredentialsException("Invalid access token");
-        }
-        RefreshRequest request = new RefreshRequest(this);
-        RefreshResponse response = (RefreshResponse) URLUtils.makeRequest(ROUTE_REFRESH, request, RefreshResponse.class);
-        if (!response.getClientToken().equals(getClientToken())) {
-            throw new AuthenticationException("Server requested we change our client token. Don't know how to handle this!");
-        }
-        if (response.getSelectedProfile() != null)
-            this.userType = (response.getSelectedProfile().isLegacy() ? UserType.LEGACY : UserType.MOJANG);
-        else if ((response.getAvailableProfiles() != null) && (response.getAvailableProfiles().length != 0)) {
-            this.userType = (response.getAvailableProfiles()[0].isLegacy() ? UserType.LEGACY : UserType.MOJANG);
-        }
+        } else {
+            RefreshRequest request = new RefreshRequest(this);
+            RefreshResponse response = URLUtils.makeRequest(ROUTE_REFRESH, request, RefreshResponse.class);
+            if (!response.getClientToken().equals(this.getClientToken())) {
+                throw new AuthenticationException("Server requested we change our client token. Don't know how to handle this!");
+            } else {
+                if (response.getSelectedProfile() != null) {
+                    this.userType = response.getSelectedProfile().isLegacy() ? UserType.LEGACY : UserType.MOJANG;
+                } else if (response.getAvailableProfiles() != null && response.getAvailableProfiles().length != 0) {
+                    this.userType = response.getAvailableProfiles()[0].isLegacy() ? UserType.LEGACY : UserType.MOJANG;
+                }
 
-        if ((response.getUser() != null) && (response.getUser().getId() != null))
-            this.userId = response.getUser().getId();
-        else {
-            this.userId = this.username;
-        }
+                if (response.getUser() != null && response.getUser().getId() != null) {
+                    this.userId = response.getUser().getId();
+                } else {
+                    this.userId = this.username;
+                }
 
-        this.isOnline = true;
-        this.accessToken = response.getAccessToken();
-        this.profiles = Arrays.asList(response.getAvailableProfiles());
-        this.selectedProfile = response.getSelectedProfile();
-        updateProperties(response.getUser());
+                this.isOnline = true;
+                this.accessToken = response.getAccessToken();
+                this.profiles = Arrays.asList(response.getAvailableProfiles());
+                this.selectedProfile = response.getSelectedProfile();
+                this.updateProperties(response.getUser());
+            }
+        }
     }
 
     public void logout() {
@@ -300,31 +311,35 @@ public class UserAuthentication {
     }
 
     public void selectGameProfile(GameProfile profile) throws AuthenticationException {
-        if (!isLoggedIn())
+        if (!this.isLoggedIn()) {
             throw new AuthenticationException("Cannot change game profile whilst not logged in");
-        if (getSelectedProfile() != null)
+        } else if (this.getSelectedProfile() != null) {
             throw new AuthenticationException("Cannot change game profile. You must log out and back in.");
-        if ((profile != null) && (this.profiles.contains(profile))) {
+        } else if (profile != null && this.profiles.contains(profile)) {
             RefreshRequest request = new RefreshRequest(this, profile);
-            RefreshResponse response = (RefreshResponse) URLUtils.makeRequest(ROUTE_REFRESH, request, RefreshResponse.class);
-            if (!response.getClientToken().equals(getClientToken())) {
+            RefreshResponse response = URLUtils.makeRequest(ROUTE_REFRESH, request, RefreshResponse.class);
+            if (!response.getClientToken().equals(this.getClientToken())) {
                 throw new AuthenticationException("Server requested we change our client token. Don't know how to handle this!");
+            } else {
+                this.isOnline = true;
+                this.accessToken = response.getAccessToken();
+                this.selectedProfile = response.getSelectedProfile();
             }
-            this.isOnline = true;
-            this.accessToken = response.getAccessToken();
-            this.selectedProfile = response.getSelectedProfile();
         } else {
             throw new IllegalArgumentException("Invalid profile '" + profile + "'");
         }
     }
 
+    @Override
     public String toString() {
-        return "UserAuthentication{profiles=" + this.profiles + ", selectedProfile=" + getSelectedProfile() + ", username=" + this.username + ", isLoggedIn=" + isLoggedIn() + ", canPlayOnline=" + canPlayOnline() + ", accessToken=" + this.accessToken + ", clientToken=" + getClientToken() + "}";
+        return "UserAuthentication{profiles=" + this.profiles + ", selectedProfile=" + this.getSelectedProfile() + ", username=" + this.username + ", isLoggedIn=" + this.isLoggedIn() + ", canPlayOnline=" + this.canPlayOnline() + ", accessToken=" + this.accessToken + ", clientToken=" + this.getClientToken() + "}";
     }
 
     private void updateProperties(User user) {
         this.userProperties.clear();
-        if ((user != null) && (user.getProperties() != null))
+        if (user != null && user.getProperties() != null) {
             this.userProperties.putAll(user.getProperties());
+        }
     }
+
 }

@@ -3,6 +3,7 @@ package net.mcthunder.auth.response;
 import net.mcthunder.auth.GameProfile;
 
 public class AuthenticationResponse extends Response {
+
     private String accessToken;
     private String clientToken;
     private GameProfile selectedProfile;
@@ -28,4 +29,5 @@ public class AuthenticationResponse extends Response {
     public User getUser() {
         return this.user;
     }
+
 }

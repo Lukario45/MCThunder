@@ -3,7 +3,9 @@ package net.mcthunder.auth.request;
 import net.mcthunder.auth.GameProfile;
 import net.mcthunder.auth.UserAuthentication;
 
+@SuppressWarnings("unused")
 public class RefreshRequest {
+
     private String clientToken;
     private String accessToken;
     private GameProfile selectedProfile;
@@ -19,4 +21,5 @@ public class RefreshRequest {
         this.accessToken = authService.getAccessToken();
         this.selectedProfile = profile;
     }
+
 }

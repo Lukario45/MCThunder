@@ -1,6 +1,7 @@
 package net.mcthunder.auth.request;
 
 public class Agent {
+
     private String name;
     private int version;
 
@@ -16,4 +17,5 @@ public class Agent {
     public int getVersion() {
         return this.version;
     }
+
 }

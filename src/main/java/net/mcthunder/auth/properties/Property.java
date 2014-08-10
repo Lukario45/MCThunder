@@ -1,12 +1,13 @@
 package net.mcthunder.auth.properties;
 
-import net.mcthunder.auth.expection.SignatureValidateException;
+import net.mcthunder.auth.exception.SignatureValidateException;
 import net.mcthunder.auth.util.Base64;
 
 import java.security.PublicKey;
 import java.security.Signature;
 
 public class Property {
+
     private String name;
     private String value;
     private String signature;
@@ -44,7 +45,8 @@ public class Property {
             sig.update(this.value.getBytes());
             return sig.verify(Base64.decode(this.signature.getBytes("UTF-8")));
         } catch (Exception e) {
+            throw new SignatureValidateException("Could not validate property signature.", e);
         }
-        throw new SignatureValidateException("Could not validate property signature.");
     }
+
 }

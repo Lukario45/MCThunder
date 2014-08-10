@@ -2,7 +2,9 @@ package net.mcthunder.auth.request;
 
 import net.mcthunder.auth.UserAuthentication;
 
+@SuppressWarnings("unused")
 public class AuthenticationRequest {
+
     private Agent agent;
     private String username;
     private String password;
@@ -15,4 +17,5 @@ public class AuthenticationRequest {
         this.clientToken = auth.getClientToken();
         this.password = password;
     }
+
 }

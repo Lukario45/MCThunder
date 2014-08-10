@@ -2,12 +2,14 @@ package net.mcthunder.auth.response;
 
 import net.mcthunder.auth.properties.PropertyMap;
 
-public class User {
+import java.util.UUID;
 
-    private String id;
+public class HasJoinedResponse extends Response {
+
+    private UUID id;
     private PropertyMap properties;
 
-    public String getId() {
+    public UUID getId() {
         return this.id;
     }
 
