@@ -1,4 +1,4 @@
-package net.mcthunder.apis;
+package net.mcthunder.packet.essentials;
 
 import java.io.IOException;
 
