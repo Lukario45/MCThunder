@@ -5,6 +5,8 @@ package net.mcthunder.packet.essentials;
  */
 
 
+import net.mcthunder.listeners.ConnectionListener;
+
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
