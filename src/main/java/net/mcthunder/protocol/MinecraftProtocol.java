@@ -1,5 +1,16 @@
 package net.mcthunder.protocol;
 
+import net.mcthunder.auth.GameProfile;
+import net.mcthunder.auth.UserAuthentication;
+import net.mcthunder.auth.exception.AuthenticationException;
+import net.mcthunder.packetlib.Client;
+import net.mcthunder.packetlib.Server;
+import net.mcthunder.packetlib.Session;
+import net.mcthunder.packetlib.crypt.AESEncryption;
+import net.mcthunder.packetlib.crypt.PacketEncryption;
+import net.mcthunder.packetlib.packet.DefaultPacketHeader;
+import net.mcthunder.packetlib.packet.PacketHeader;
+import net.mcthunder.packetlib.packet.PacketProtocol;
 import net.mcthunder.protocol.packet.handshake.client.HandshakePacket;
 import net.mcthunder.protocol.packet.ingame.client.*;
 import net.mcthunder.protocol.packet.ingame.client.player.*;
@@ -24,17 +35,6 @@ import net.mcthunder.protocol.packet.status.client.StatusPingPacket;
 import net.mcthunder.protocol.packet.status.client.StatusQueryPacket;
 import net.mcthunder.protocol.packet.status.server.StatusPongPacket;
 import net.mcthunder.protocol.packet.status.server.StatusResponsePacket;
-import org.spacehq.mc.auth.GameProfile;
-import org.spacehq.mc.auth.UserAuthentication;
-import org.spacehq.mc.auth.exception.AuthenticationException;
-import org.spacehq.packetlib.Client;
-import org.spacehq.packetlib.Server;
-import org.spacehq.packetlib.Session;
-import org.spacehq.packetlib.crypt.AESEncryption;
-import org.spacehq.packetlib.crypt.PacketEncryption;
-import org.spacehq.packetlib.packet.DefaultPacketHeader;
-import org.spacehq.packetlib.packet.PacketHeader;
-import org.spacehq.packetlib.packet.PacketProtocol;
 
 import java.security.GeneralSecurityException;
 import java.security.Key;

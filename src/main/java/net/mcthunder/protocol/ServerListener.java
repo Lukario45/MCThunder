@@ -1,5 +1,12 @@
 package net.mcthunder.protocol;
 
+import net.mcthunder.auth.GameProfile;
+import net.mcthunder.auth.SessionService;
+import net.mcthunder.auth.exception.AuthenticationUnavailableException;
+import net.mcthunder.packetlib.Session;
+import net.mcthunder.packetlib.event.session.DisconnectingEvent;
+import net.mcthunder.packetlib.event.session.PacketReceivedEvent;
+import net.mcthunder.packetlib.event.session.SessionAdapter;
 import net.mcthunder.protocol.data.status.ServerStatusInfo;
 import net.mcthunder.protocol.data.status.handler.ServerInfoBuilder;
 import net.mcthunder.protocol.packet.handshake.client.HandshakePacket;
@@ -16,13 +23,6 @@ import net.mcthunder.protocol.packet.status.client.StatusQueryPacket;
 import net.mcthunder.protocol.packet.status.server.StatusPongPacket;
 import net.mcthunder.protocol.packet.status.server.StatusResponsePacket;
 import net.mcthunder.protocol.util.CryptUtil;
-import org.spacehq.mc.auth.GameProfile;
-import org.spacehq.mc.auth.SessionService;
-import org.spacehq.mc.auth.exception.AuthenticationUnavailableException;
-import org.spacehq.packetlib.Session;
-import org.spacehq.packetlib.event.session.DisconnectingEvent;
-import org.spacehq.packetlib.event.session.PacketReceivedEvent;
-import org.spacehq.packetlib.event.session.SessionAdapter;
 
 import javax.crypto.SecretKey;
 import java.math.BigInteger;

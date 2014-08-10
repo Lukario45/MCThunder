@@ -1,6 +1,6 @@
 package net.mcthunder.protocol.data.status;
 
-import org.spacehq.mc.auth.GameProfile;
+import net.mcthunder.auth.GameProfile;
 
 public class PlayerInfo {
 

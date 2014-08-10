@@ -1,10 +1,10 @@
 package net.mcthunder.protocol.util;
 
+import net.mcthunder.packetlib.io.NetInput;
+import net.mcthunder.packetlib.io.NetOutput;
 import net.mcthunder.protocol.data.game.*;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import org.spacehq.packetlib.io.NetInput;
-import org.spacehq.packetlib.io.NetOutput;
 
 import java.io.*;
 import java.util.ArrayList;

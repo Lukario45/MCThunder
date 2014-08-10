@@ -1,10 +1,10 @@
 package net.mcthunder.protocol.packet.ingame.server.entity;
 
+import net.mcthunder.packetlib.io.NetInput;
+import net.mcthunder.packetlib.io.NetOutput;
+import net.mcthunder.packetlib.packet.Packet;
 import net.mcthunder.protocol.data.game.Attribute;
 import net.mcthunder.protocol.data.game.AttributeModifier;
-import org.spacehq.packetlib.io.NetInput;
-import org.spacehq.packetlib.io.NetOutput;
-import org.spacehq.packetlib.packet.Packet;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,12 +1,12 @@
 package net.mcthunder.protocol.packet.ingame.server.entity.spawn;
 
+import net.mcthunder.auth.GameProfile;
+import net.mcthunder.auth.properties.Property;
+import net.mcthunder.packetlib.io.NetInput;
+import net.mcthunder.packetlib.io.NetOutput;
+import net.mcthunder.packetlib.packet.Packet;
 import net.mcthunder.protocol.data.game.EntityMetadata;
 import net.mcthunder.protocol.util.NetUtil;
-import org.spacehq.mc.auth.GameProfile;
-import org.spacehq.mc.auth.properties.Property;
-import org.spacehq.packetlib.io.NetInput;
-import org.spacehq.packetlib.io.NetOutput;
-import org.spacehq.packetlib.packet.Packet;
 
 import java.io.IOException;
 

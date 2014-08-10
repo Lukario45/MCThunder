@@ -1,7 +1,7 @@
 package net.mcthunder.protocol.data.status.handler;
 
+import net.mcthunder.packetlib.Session;
 import net.mcthunder.protocol.data.status.ServerStatusInfo;
-import org.spacehq.packetlib.Session;
 
 public interface ServerInfoBuilder {
 

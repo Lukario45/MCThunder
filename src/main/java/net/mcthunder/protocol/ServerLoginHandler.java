@@ -1,6 +1,6 @@
 package net.mcthunder.protocol;
 
-import org.spacehq.packetlib.Session;
+import net.mcthunder.packetlib.Session;
 
 public interface ServerLoginHandler {
 
