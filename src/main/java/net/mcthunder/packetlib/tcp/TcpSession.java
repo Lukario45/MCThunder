@@ -269,11 +269,16 @@ public class TcpSession extends SimpleChannelInboundHandler<Packet> implements S
         this.disconnected = true;
     }
 
-    @Override
+
     protected void messageReceived(ChannelHandlerContext ctx, Packet packet) throws Exception {
         if (!packet.isPriority()) {
             this.packets.add(packet);
         }
+    }
+
+
+    protected void channelRead0(ChannelHandlerContext ctx, Packet msg) throws Exception {
+
     }
 
     private class PacketHandleThread extends Thread {

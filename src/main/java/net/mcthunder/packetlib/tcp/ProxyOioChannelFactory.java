@@ -20,4 +20,8 @@ public class ProxyOioChannelFactory implements ChannelFactory<OioSocketChannel> 
         return new OioSocketChannel(eventLoop, new Socket(this.proxy));
     }
 
+
+    public OioSocketChannel newChannel() {
+        return null;
+    }
 }
