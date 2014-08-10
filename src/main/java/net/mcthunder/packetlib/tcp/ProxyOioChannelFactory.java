@@ -21,7 +21,4 @@ public class ProxyOioChannelFactory implements ChannelFactory<OioSocketChannel> 
     }
 
 
-    public OioSocketChannel newChannel() {
-        return null;
-    }
 }
