@@ -4,6 +4,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 /**
  * Created by Kevin on 8/10/2014.
@@ -30,9 +32,13 @@ public class Config {
     public void loadConfig() {
         try {
             //Make Config
-            setConf(new PropertiesConfiguration(new File("config.yml")));
+            String path = Config.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "config.yml";
+            String pathDecoded = URLDecoder.decode(path, "UTF-8");
+            setConf(new PropertiesConfiguration(new File(pathDecoded)));
+
             //See if the Config Exists yet. If not make it
             if (!getConf().getFile().exists()) {
+                Utils.tellConsole("INFO", "Creating Server Configuration at " + path);
                 getConf().getFile().getParentFile().mkdirs();
                 getConf().setProperty("SERVER-NAME", "A MCThunder Minecraft Server");
                 getConf().setProperty("SERVER-HOST", "127.0.0.1");
@@ -49,6 +55,7 @@ public class Config {
                 getConf().setProperty("ALLOW-NETHER", true);
                 getConf().setProperty("ALLOW-PVP", true);
                 getConf().setProperty("USE-COMMAND-BLOCKS", false);
+                getConf().save();
             }
             //Set all of the values from the config
             getConf().load();
@@ -70,6 +77,9 @@ public class Config {
 
         } catch (ConfigurationException e) {
             Utils.tellConsole("ERROR", "Check Config File!");
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            Utils.tellConsole("ERROR", "Change your server location!");
             e.printStackTrace();
         }
     }
