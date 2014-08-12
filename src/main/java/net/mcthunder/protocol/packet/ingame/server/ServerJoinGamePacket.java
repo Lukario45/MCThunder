@@ -30,6 +30,7 @@ public class ServerJoinGamePacket implements Packet {
         this.worldType = worldType;
     }
 
+
     private static String typeToName(WorldType type) throws IOException {
         if (type == WorldType.DEFAULT) {
             return "default";

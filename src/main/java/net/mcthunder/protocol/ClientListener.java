@@ -34,6 +34,7 @@ public class ClientListener extends SessionAdapter {
 
     private SecretKey key;
 
+
     @Override
     public void packetReceived(PacketReceivedEvent event) {
         MinecraftProtocol protocol = (MinecraftProtocol) event.getSession().getPacketProtocol();
