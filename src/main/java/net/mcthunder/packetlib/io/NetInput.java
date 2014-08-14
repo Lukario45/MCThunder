@@ -1,6 +1,7 @@
 package net.mcthunder.packetlib.io;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * An interface for reading network data.
@@ -132,7 +133,7 @@ public interface NetInput {
     /**
      * Reads the given amount of bytes into the given array at the given offset.
      *
-     * @param b      Byte array to read to.
+     * @param b Byte array to read to.
      * @param offset Offset of the array to read to.
      * @param length Length of bytes to read.
      * @return The amount of bytes read, or -1 if no bytes could be read.
@@ -147,6 +148,14 @@ public interface NetInput {
      * @throws java.io.IOException If an I/O error occurs.
      */
     public String readString() throws IOException;
+
+    /**
+     * Reads the next UUID.
+     *
+     * @return The next UUID.
+     * @throws java.io.IOException If an I/O error occurs.
+     */
+    public UUID readUUID() throws IOException;
 
     /**
      * Gets the number of available bytes.

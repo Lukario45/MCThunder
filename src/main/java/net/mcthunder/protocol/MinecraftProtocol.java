@@ -70,7 +70,6 @@ public class MinecraftProtocol extends PacketProtocol {
     public MinecraftProtocol(String username) {
         this(ProtocolMode.LOGIN);
         this.profile = new GameProfile((UUID) null, username);
-        this.clientListener = new ClientListener();
     }
 
     public MinecraftProtocol(String username, String using, boolean token) throws AuthenticationException {
@@ -87,7 +86,21 @@ public class MinecraftProtocol extends PacketProtocol {
         auth.login();
         this.profile = auth.getSelectedProfile();
         this.accessToken = auth.getAccessToken();
-        this.clientListener = new ClientListener();
+    }
+
+    public MinecraftProtocol(GameProfile profile, String accessToken) {
+        this(ProtocolMode.LOGIN);
+        this.profile = profile;
+        this.accessToken = accessToken;
+
+    }
+
+    public GameProfile getProfile() {
+        return this.profile;
+    }
+
+    public String getAccessToken() {
+        return this.accessToken;
     }
 
     @Override
