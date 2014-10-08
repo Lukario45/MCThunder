@@ -1,28 +1,44 @@
 package net.mcthunder;
 
 import net.mcthunder.apis.Config;
-import net.mcthunder.apis.Utils;
-import net.mcthunder.auth.GameProfile;
-import net.mcthunder.packetlib.Server;
-import net.mcthunder.packetlib.Session;
-import net.mcthunder.packetlib.event.server.ServerAdapter;
-import net.mcthunder.packetlib.event.server.SessionAddedEvent;
-import net.mcthunder.packetlib.event.server.SessionRemovedEvent;
-import net.mcthunder.packetlib.event.session.PacketReceivedEvent;
-import net.mcthunder.packetlib.event.session.SessionAdapter;
-import net.mcthunder.packetlib.tcp.TcpSessionFactory;
-import net.mcthunder.protocol.MinecraftProtocol;
-import net.mcthunder.protocol.ProtocolConstants;
-import net.mcthunder.protocol.ProtocolMode;
-import net.mcthunder.protocol.ServerLoginHandler;
-import net.mcthunder.protocol.data.message.*;
-import net.mcthunder.protocol.data.status.PlayerInfo;
-import net.mcthunder.protocol.data.status.ServerStatusInfo;
-import net.mcthunder.protocol.data.status.VersionInfo;
-import net.mcthunder.protocol.data.status.handler.ServerInfoBuilder;
-import net.mcthunder.protocol.packet.ingame.client.ClientChatPacket;
-import net.mcthunder.protocol.packet.ingame.server.ServerChatPacket;
-import net.mcthunder.protocol.packet.ingame.server.ServerJoinGamePacket;
+import org.spacehq.mc.auth.GameProfile;
+import org.spacehq.mc.protocol.MinecraftProtocol;
+import org.spacehq.mc.protocol.ProtocolConstants;
+import org.spacehq.mc.protocol.ServerLoginHandler;
+import org.spacehq.mc.protocol.data.game.Position;
+import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
+import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
+import org.spacehq.mc.protocol.data.game.values.world.WorldType;
+import org.spacehq.mc.protocol.data.message.ChatColor;
+import org.spacehq.mc.protocol.data.message.Message;
+import org.spacehq.mc.protocol.data.message.MessageStyle;
+import org.spacehq.mc.protocol.data.message.TextMessage;
+import org.spacehq.mc.protocol.data.status.PlayerInfo;
+import org.spacehq.mc.protocol.data.status.ServerStatusInfo;
+import org.spacehq.mc.protocol.data.status.VersionInfo;
+import org.spacehq.mc.protocol.data.status.handler.ServerInfoBuilder;
+import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
+import org.spacehq.mc.protocol.packet.ingame.client.ClientKeepAlivePacket;
+import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerMovementPacket;
+import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPositionPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
+import org.spacehq.mc.protocol.packet.login.client.LoginStartPacket;
+import org.spacehq.packetlib.Server;
+import org.spacehq.packetlib.Session;
+import org.spacehq.packetlib.event.server.ServerAdapter;
+import org.spacehq.packetlib.event.server.SessionAddedEvent;
+import org.spacehq.packetlib.event.session.PacketReceivedEvent;
+import org.spacehq.packetlib.event.session.PacketSentEvent;
+import org.spacehq.packetlib.event.session.SessionAdapter;
+import org.spacehq.packetlib.tcp.TcpSessionFactory;
+
+import java.util.List;
+
+import static net.mcthunder.apis.Utils.tellConsole;
 
 
 /**
@@ -38,17 +54,24 @@ public class MCThunder {
     private static String USERNAME = "test";
     private static String PASSWORD = "test";
     private static MinecraftProtocol protocol;
+    private static List<Session> sessionsList;
+    private static Session[] sessions = null;
+    int[] in = null;
+
 
 
     public static void main(String args[]) {
+
         conf = new Config();
         conf.loadConfig();
         VERIFY_USERS = conf.getOnlineMode();
         HOST = conf.getHost();
-        Utils.tellConsole("INFO", "HOST " + HOST);
+        PORT = conf.getPort();
+        tellConsole("INFO", "HOST " + HOST);
         if (SPAWN_SERVER) {
-            Server server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
+            final Server server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
+            server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
             server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
                 @Override
                 public ServerStatusInfo buildInfo(Session session) {
@@ -59,40 +82,90 @@ public class MCThunder {
             server.setGlobalFlag(ProtocolConstants.SERVER_LOGIN_HANDLER_KEY, new ServerLoginHandler() {
                 @Override
                 public void loggedIn(Session session) {
-                    session.send(new ServerJoinGamePacket(0, false, ServerJoinGamePacket.GameMode.SURVIVAL, 0, ServerJoinGamePacket.Difficulty.PEACEFUL, 10, ServerJoinGamePacket.WorldType.DEFAULT));
+
+                    session.send(new ServerJoinGamePacket(0, false, GameMode.SURVIVAL, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
+
                 }
             });
 
             server.addListener(new ServerAdapter() {
                 @Override
                 public void sessionAdded(SessionAddedEvent event) {
+
+                    //sessionsList.add(event.getSession());
+
+
+
+
+
+
+
                     event.getSession().addListener(new SessionAdapter() {
+
 
                         @Override
                         public void packetReceived(PacketReceivedEvent event) {
-                            if (event.getPacket() instanceof ClientChatPacket) {
-                                ClientChatPacket packet = event.getPacket();
-                                GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                                System.out.println(profile.getName() + ": " + packet.getMessage());
-                                Message msg = new TextMessage("Hello, ").setStyle(new MessageStyle().setColor(ChatColor.GREEN));
-                                Message name = new TextMessage(profile.getName()).setStyle(new MessageStyle().setColor(ChatColor.AQUA).addFormat(ChatFormat.UNDERLINED));
-                                Message end = new TextMessage("!");
-                                msg.addExtra(name);
-                                msg.addExtra(end);
-                                event.getSession().send(new ServerChatPacket(msg));
+
+                            if (event.getPacket() instanceof LoginStartPacket) {
+                                String username = ((LoginStartPacket) event.getPacket()).getUsername().toString();
+                                tellConsole("DEBUG", "User " + username + " is trying to log in!");
+                            } else {
+                                if (event.getPacket() instanceof ClientPlayerPositionPacket) {
+                                    event.getSession().send(new ServerChunkDataPacket(0, 0));
+                                    event.getSession().send(new ServerSpawnPositionPacket(new Position(0, 0, 0)));
+                                    event.getSession().send(new ServerPlayerPositionRotationPacket(0, 0, 0, 0, 0));
+
+                                } else {
+                                    if (event.getPacket() instanceof ClientChatPacket) {
+                                        ClientChatPacket chat = event.getPacket();
+                                        GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+                                        String userName = profile.getName();
+                                        String message = chat.getMessage();
+                                        tellConsole("CHAT", userName + ": " + message);
+                                        Message msg = new TextMessage(userName).setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
+                                        Message body = new TextMessage(": " + message).setStyle(new MessageStyle().setColor(ChatColor.WHITE));
+                                        msg.addExtra(body);
+                                        sessionsList = server.getSessions();
+                                        for (Session session : sessionsList) {
+                                            session.send(new ServerChatPacket(msg));
+                                        }
+                                        tellConsole("DEBUG", "Session dump: ");
+                                        for (Session session : sessionsList) {
+                                            tellConsole("DEBUG", "Found session for user " + session.getFlag(ProtocolConstants.PROFILE_KEY));
+
+                                        }
+                                    } else if (event.getPacket() instanceof ClientPlayerMovementPacket) {
+
+                                    } else if (event.getPacket() instanceof ClientKeepAlivePacket) {
+
+                                    } else {
+                                        tellConsole("INFO", event.getPacket().toString());
+                                    }
+                                }
                             }
                         }
+
+                        @Override
+                        public void packetSent(PacketSentEvent event) {
+                            if (event.getPacket() instanceof ServerChatPacket) {
+
+
+                            }
+
+                        }
+
                     });
                 }
 
-                @Override
-                public void sessionRemoved(SessionRemovedEvent event) {
-                    MinecraftProtocol protocol = (MinecraftProtocol) event.getSession().getPacketProtocol();
-                    if (protocol.getMode() == ProtocolMode.GAME) {
-                        System.out.println("Closing server.");
-                        event.getServer().close();
-                    }
-                }
+
+                // @Override
+                //  public void sessionRemoved(SessionRemovedEvent event) {
+                // MinecraftProtocol protocol = (MinecraftProtocol) event.getSession().getPacketProtocol();
+                // if (protocol.getMode() == ProtocolMode.GAME) {
+                //     System.out.println("Closing server.");
+                //     event.getServer().close();
+                // }
+                // }
             });
 
             server.bind();
