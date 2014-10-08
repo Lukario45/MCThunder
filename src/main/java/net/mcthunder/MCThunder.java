@@ -1,6 +1,7 @@
 package net.mcthunder;
 
 import net.mcthunder.apis.Config;
+import net.mcthunder.handlers.ServerChatHandler;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
@@ -9,9 +10,6 @@ import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
-import org.spacehq.mc.protocol.data.message.ChatColor;
-import org.spacehq.mc.protocol.data.message.Message;
-import org.spacehq.mc.protocol.data.message.MessageStyle;
 import org.spacehq.mc.protocol.data.message.TextMessage;
 import org.spacehq.mc.protocol.data.status.PlayerInfo;
 import org.spacehq.mc.protocol.data.status.ServerStatusInfo;
@@ -55,7 +53,8 @@ public class MCThunder {
     private static String PASSWORD = "test";
     private static MinecraftProtocol protocol;
     private static List<Session> sessionsList;
-    private static Session[] sessions = null;
+    private static ServerChatHandler chatHandler;
+    //private static Session[] sessions = null;
     int[] in = null;
 
 
@@ -109,31 +108,18 @@ public class MCThunder {
                             if (event.getPacket() instanceof LoginStartPacket) {
                                 String username = ((LoginStartPacket) event.getPacket()).getUsername().toString();
                                 tellConsole("DEBUG", "User " + username + " is trying to log in!");
-                            } else {
-                                if (event.getPacket() instanceof ClientPlayerPositionPacket) {
+                            } else if (event.getPacket() instanceof ClientPlayerPositionPacket) {
                                     event.getSession().send(new ServerChunkDataPacket(0, 0));
                                     event.getSession().send(new ServerSpawnPositionPacket(new Position(0, 0, 0)));
                                     event.getSession().send(new ServerPlayerPositionRotationPacket(0, 0, 0, 0, 0));
 
-                                } else {
-                                    if (event.getPacket() instanceof ClientChatPacket) {
-                                        ClientChatPacket chat = event.getPacket();
-                                        GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                                        String userName = profile.getName();
-                                        String message = chat.getMessage();
-                                        tellConsole("CHAT", userName + ": " + message);
-                                        Message msg = new TextMessage(userName).setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
-                                        Message body = new TextMessage(": " + message).setStyle(new MessageStyle().setColor(ChatColor.WHITE));
-                                        msg.addExtra(body);
-                                        sessionsList = server.getSessions();
-                                        for (Session session : sessionsList) {
-                                            session.send(new ServerChatPacket(msg));
-                                        }
-                                        tellConsole("DEBUG", "Session dump: ");
-                                        for (Session session : sessionsList) {
-                                            tellConsole("DEBUG", "Found session for user " + session.getFlag(ProtocolConstants.PROFILE_KEY));
+                            } else if (event.getPacket() instanceof ClientChatPacket) {
 
-                                        }
+                                ClientChatPacket packet = event.getPacket();
+                                chatHandler = new ServerChatHandler();
+                                chatHandler.handleChat(server, event.getSession(), packet, event, sessionsList);
+
+
                                     } else if (event.getPacket() instanceof ClientPlayerMovementPacket) {
 
                                     } else if (event.getPacket() instanceof ClientKeepAlivePacket) {
@@ -142,8 +128,7 @@ public class MCThunder {
                                         tellConsole("INFO", event.getPacket().toString());
                                     }
                                 }
-                            }
-                        }
+
 
                         @Override
                         public void packetSent(PacketSentEvent event) {
