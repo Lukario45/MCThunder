@@ -44,11 +44,18 @@ public class ServerChatHandler {
         } catch (IllegalArgumentException e) {
 
         }
-        //tellConsole("DEBUG", "Session dump: ");
-        //for (Session s : sessionsList) {
-        //  tellConsole("DEBUG", "Found session for user " + session.getFlag(ProtocolConstants.PROFILE_KEY));
 
-        // }
+
+
+    }
+
+    public void sendMessage(Server server, String message) {
+        List<Session> sessionList = server.getSessions();
+        Message msg = new TextMessage(message).setStyle(new MessageStyle().setColor(ChatColor.AQUA));
+        for (Session s : sessionList) {
+            s.send(new ServerChatPacket(msg));
+        }
+        tellConsole("SERVER", message);
 
 
     }
