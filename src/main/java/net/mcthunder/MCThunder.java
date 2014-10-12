@@ -121,6 +121,9 @@ public class MCThunder {
                                 event.getSession().send(new ServerChunkDataPacket(0, 0));
                                 event.getSession().send(new ServerSpawnPositionPacket(new Position(0, 62, 0)));
                                 event.getSession().send(new ServerPlayerPositionRotationPacket(0, 62, 0, 0, 0));
+                                GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+
+                                chatHandler.sendMessage(server, profile.getName() + " has joined " + serverName);
 
 
                             } else if (event.getPacket() instanceof ClientPlayerPositionPacket) {
@@ -186,9 +189,7 @@ public class MCThunder {
                                 GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
 
                             } else if (event.getPacket() instanceof ClientSettingsPacket) {
-                                GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-
-                                chatHandler.sendMessage(server, profile.getName() + " has joined " + serverName);
+                                ;
                                 //ServerBlockChangePacket packet;
                                 // Position p;
                                 // int x = 0, y = 60, z = 0;
