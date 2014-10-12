@@ -2,6 +2,7 @@ package net.mcthunder;
 
 import net.mcthunder.apis.Config;
 import net.mcthunder.handlers.ServerChatHandler;
+import org.apache.commons.lang.StringUtils;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
@@ -18,6 +19,7 @@ import org.spacehq.mc.protocol.data.status.handler.ServerInfoBuilder;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientSettingsPacket;
+import org.spacehq.mc.protocol.packet.ingame.client.ClientTabCompletePacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerMovementPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPositionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
@@ -122,6 +124,8 @@ public class MCThunder {
                                 event.getSession().send(new ServerSpawnPositionPacket(new Position(0, 62, 0)));
                                 event.getSession().send(new ServerPlayerPositionRotationPacket(0, 62, 0, 0, 0));
                                 GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+                                //
+                                // ServerUpdateTimePacket serverUpdateTimePacket = new ServerUpdateTimePacket(server.getT);
 
                                 chatHandler.sendMessage(server, profile.getName() + " has joined " + serverName);
 
@@ -213,6 +217,31 @@ public class MCThunder {
                                 //      }
 
 
+                            } else if (event.getPacket() instanceof ClientTabCompletePacket) {
+                                ClientTabCompletePacket packet = event.getPacket();
+                                String[] text = packet.getText().split(" ");
+                                String tabComplete = text[text.length - 1];
+                                List<Session> sessions = server.getSessions();
+                                String[] names = null;
+                                GameProfile p;
+
+                                for (Session s : sessions) {
+                                    p = s.getFlag(ProtocolConstants.PROFILE_KEY);
+                                    String name = p.getName();
+                                    if (!p.getName().isEmpty()) {
+                                        if (p.getName().startsWith(tabComplete)) {
+                                            names[names.length] = p.getName();
+                                        } else {
+
+                                        }
+                                    }
+                                }
+                                if (names.length != 0) {
+                                    chatHandler.sendPrivateMessage(event.getSession(), StringUtils.join(names, ", "));
+                                }
+
+
+                                //tellConsole("DEBUG", tabComplete);
                             } else {
                                 tellConsole("INFO", event.getPacket().toString());
                             }

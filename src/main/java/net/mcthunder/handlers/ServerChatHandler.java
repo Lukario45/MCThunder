@@ -60,4 +60,10 @@ public class ServerChatHandler {
 
     }
 
+    public void sendPrivateMessage(Session session, String privMessage) {
+        Message privMsg = new TextMessage(privMessage);
+        session.send(new ServerChatPacket(privMsg));
+
+    }
+
 }
