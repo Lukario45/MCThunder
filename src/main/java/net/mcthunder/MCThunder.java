@@ -2,7 +2,7 @@ package net.mcthunder;
 
 import net.mcthunder.apis.Config;
 import net.mcthunder.handlers.ServerChatHandler;
-import org.apache.commons.lang.StringUtils;
+import net.mcthunder.handlers.ServerTabHandler;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
@@ -41,6 +41,7 @@ import org.spacehq.packetlib.tcp.TcpSessionFactory;
 import java.util.List;
 
 import static net.mcthunder.apis.Utils.tellConsole;
+import static net.mcthunder.apis.Utils.updatePlayerEntryList;
 
 
 /**
@@ -59,6 +60,7 @@ public class MCThunder {
     private static MinecraftProtocol protocol;
     private static List<Session> sessionsList;
     private static ServerChatHandler chatHandler;
+    private static ServerTabHandler tabHandler;
     private static int online = 0;
     //private static Session[] sessions = null;
     int[] in = null;
@@ -91,7 +93,17 @@ public class MCThunder {
                 @Override
                 public void loggedIn(Session session) {
                     online++;
+                    GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
                     session.send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
+                    String username = profile.getName();
+                    tellConsole("DEBUG", "User " + username + " is trying to log in!");
+                    ;
+                    updatePlayerEntryList(server, session);
+                    session.send(new ServerChunkDataPacket(0, 0));
+                    session.send(new ServerSpawnPositionPacket(new Position(0, 62, 0)));
+                    session.send(new ServerPlayerPositionRotationPacket(0, 62, 0, 0, 0));
+                    chatHandler.sendMessage(server, profile.getName() + " has joined " + serverName);
+
 
                 }
             });
@@ -111,46 +123,9 @@ public class MCThunder {
                         public void packetReceived(PacketReceivedEvent event) {
 
                             if (event.getPacket() instanceof LoginStartPacket) {
-                                //Array[] short
-                                //ShortArray3d blocks = new ShortArray3d(16);
-                                // NibbleArray3d skylight = new NibbleArray3d(1);
-                                // NibbleArray3d blockLight = new NibbleArray3d(1);
-                                // Chunk c = new Chunk(blocks,blockLight, skylight );
-                                // Chunk[] chunks = null;
-                                // chunks[0] = c;
-                                String username = ((LoginStartPacket) event.getPacket()).getUsername().toString();
-                                tellConsole("DEBUG", "User " + username + " is trying to log in!");
-                                event.getSession().send(new ServerChunkDataPacket(0, 0));
-                                event.getSession().send(new ServerSpawnPositionPacket(new Position(0, 62, 0)));
-                                event.getSession().send(new ServerPlayerPositionRotationPacket(0, 62, 0, 0, 0));
-                                GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                                //
-                                // ServerUpdateTimePacket serverUpdateTimePacket = new ServerUpdateTimePacket(server.getT);
-
-                                chatHandler.sendMessage(server, profile.getName() + " has joined " + serverName);
 
 
                             } else if (event.getPacket() instanceof ClientPlayerPositionPacket) {
-                                ClientPlayerMovementPacket packet = event.getPacket();
-                                double pitch2 = packet.getPitch();
-                                float pitch = (float) pitch2;
-                                double Yaw2 = packet.getYaw();
-                                float yaw = (float) Yaw2;
-                                boolean onGround = packet.isOnGround();
-                                double x = packet.getX();
-                                double y = packet.getY() * 0.2;
-                                double z = packet.getZ();
-                                ServerPlayerPositionRotationPacket newPacket = new ServerPlayerPositionRotationPacket(0, 64, 0, yaw, pitch);
-                                //tellConsole("DEBUG", String.valueOf(x)+ "/"+ String.valueOf(y)+ " " + String.valueOf(z));
-
-
-                                // event.getSession().send(newPacket);
-
-
-                                // tellConsole("DEBUG", "NEW PLAYER POSITION");
-
-
-
 
                             } else if (event.getPacket() instanceof ClientChatPacket) {
 
@@ -161,89 +136,18 @@ public class MCThunder {
 
                             } else if (event.getPacket() instanceof ClientPlayerMovementPacket) {
 
-                                ClientPlayerMovementPacket packet = event.getPacket();
-                                double pitch2 = packet.getPitch();
-
-
-                                float pitch = (float) pitch2;
-                                double Yaw2 = packet.getYaw();
-                                float yaw = (float) Yaw2;
-                                boolean onGround = packet.isOnGround();
-                                double x = packet.getX();
-                                double y = packet.getY() * 0.2;
-                                double z = packet.getZ();
-                                ServerPlayerPositionRotationPacket newPacket = new ServerPlayerPositionRotationPacket(0, 64, 0, yaw, pitch);
-                                String[] debug = {String.valueOf(x), "/", String.valueOf(y), " ", String.valueOf(z)};
-                                //ServerPlayerPositionRotationPacket newPacket = new ServerPlayerPositionRotationPacket(0,64,0,yaw,pitch);
-                                //tellConsole("DEBUG", String.valueOf(x)+ "/"+ String.valueOf(y)+ " " + String.valueOf(z));
-
-                                //event.getSession().send(newPacket);
-
 
                             } else if (event.getPacket() instanceof ClientKeepAlivePacket) {
-                                // List<Session> sessions= server.getSessions();
-                                //if(sessionsList.contains(null)){
-                                //   sessions.remove(null);
-                                //  tellConsole("DEBUG", "REMOVED NULL SESSION");
-                                //  }
-                                //online = sessions.size();
-                                // for (Session s : sessionsList){
-                                //    tellConsole("DEBUG", "Sessions for " + s.getFlag(ProtocolConstants.PROFILE_KEY));
-                                // }
-                                GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+
 
                             } else if (event.getPacket() instanceof ClientSettingsPacket) {
-                                ;
-                                //ServerBlockChangePacket packet;
-                                // Position p;
-                                // int x = 0, y = 60, z = 0;
-                                //  Position position;
-                                //  BlockChangeRecord blockChangeRecord;
-
-
-                                //       while (x < 16){
-                                //            p = new Position(x,y,z);
-
-                                // position = p;
-                                ///            blockChangeRecord = new BlockChangeRecord(p,1);
-                                //           packet = new ServerBlockChangePacket(blockChangeRecord);
-                                //            event.getSession().send(packet);
-                                //           ServerBlock
-
-                                ///           z++;
-                                //          x++;
-                                //           tellConsole("DEBUG", "Created Block " + p.getX());
-
-                                //      }
 
 
                             } else if (event.getPacket() instanceof ClientTabCompletePacket) {
                                 ClientTabCompletePacket packet = event.getPacket();
-                                String[] text = packet.getText().split(" ");
-                                String tabComplete = text[text.length - 1];
-                                List<Session> sessions = server.getSessions();
-                                String[] names = null;
-                                GameProfile p;
-
-                                for (Session s : sessions) {
-                                    p = s.getFlag(ProtocolConstants.PROFILE_KEY);
-                                    String name = p.getName();
-                                    if (!p.getName().isEmpty()) {
-                                        if (p.getName().startsWith(tabComplete)) {
-                                            names[names.length] = p.getName();
-                                        } else {
-
-                                        }
-                                    }
-                                }
-                                if (names.length != 0) {
-                                    chatHandler.sendPrivateMessage(event.getSession(), StringUtils.join(names, ", "));
-                                }
-
-
-                                //tellConsole("DEBUG", tabComplete);
+                                tabHandler.handleTabComplete(server, event.getSession(), packet);
                             } else {
-                                tellConsole("INFO", event.getPacket().toString());
+                                tellConsole("DEBUG", event.getPacket().toString());
                             }
                         }
 

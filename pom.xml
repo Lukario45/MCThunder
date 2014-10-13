@@ -22,6 +22,11 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>org.spacehq</groupId>
+            <artifactId>mcprotocollib</artifactId>
+            <version>1.8-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>5.0.0.Alpha1</version>
@@ -53,6 +58,16 @@
             <version>2.2.3</version>
         </dependency>
     </dependencies>
+    <repositories>
+    <repository>
+        <id>spacehq-releases</id>
+        <url>http://repo.spacehq.org/content/repositories/release/</url>
+    </repository>
+    <repository>
+        <id>spacehq-snapshots</id>
+        <url>http://repo.spacehq.org/content/repositories/snapshots/</url>
+    </repository>
+</repositories>
     <build>
         <defaultGoal>clean package</defaultGoal>
         <directory>target</directory>
