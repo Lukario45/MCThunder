@@ -51,9 +51,7 @@ public class Utils {
 
 
     public static void tellConsole(String type, String message) {
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        Date d = new Date();
-        String date = dateFormat.format(d);
+        String date = new SimpleDateFormat("HH:mm:ss").format(new Date());
         System.out.println(date + " [" + type + "]: " + message);
     }
 
