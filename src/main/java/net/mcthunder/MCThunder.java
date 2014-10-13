@@ -2,10 +2,12 @@ package net.mcthunder;
 
 import net.mcthunder.apis.Config;
 import net.mcthunder.handlers.ServerChatHandler;
+import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
+import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
 import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
@@ -41,7 +43,6 @@ import org.spacehq.packetlib.tcp.TcpSessionFactory;
 import java.util.List;
 
 import static net.mcthunder.apis.Utils.tellConsole;
-import static net.mcthunder.apis.Utils.updatePlayerEntryList;
 
 
 /**
@@ -61,6 +62,7 @@ public class MCThunder {
     private static List<Session> sessionsList;
     private static ServerChatHandler chatHandler;
     private static ServerTabHandler tabHandler;
+    private static ServerPlayerEntryListHandler entryListHandler;
     private static int online = 0;
     //private static Session[] sessions = null;
     int[] in = null;
@@ -72,6 +74,8 @@ public class MCThunder {
         chatHandler = new ServerChatHandler();
         conf = new Config();
         conf.loadConfig();
+        entryListHandler = new ServerPlayerEntryListHandler();
+        tabHandler = new ServerTabHandler();
         serverName = conf.getServerName();
         VERIFY_USERS = conf.getOnlineMode();
         HOST = conf.getHost();
@@ -97,7 +101,7 @@ public class MCThunder {
                     session.send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
                     String username = profile.getName();
                     tellConsole("DEBUG", "User " + username + " is trying to log in!");
-                    updatePlayerEntryList(server, session);
+                    entryListHandler.addToPlayerEntryList(server, session);
                     session.send(new ServerChunkDataPacket(0, 0));
                     session.send(new ServerSpawnPositionPacket(new Position(0, 62, 0)));
                     session.send(new ServerPlayerPositionRotationPacket(0, 62, 0, 0, 0));
@@ -110,11 +114,6 @@ public class MCThunder {
             server.addListener(new ServerAdapter() {
                 @Override
                 public void sessionAdded(SessionAddedEvent event) {
-
-
-                    //sessionsList.add(event.getSession());
-
-
                     event.getSession().addListener(new SessionAdapter() {
 
 
@@ -166,6 +165,13 @@ public class MCThunder {
 
                 @Override
                 public void sessionRemoved(SessionRemovedEvent event) {
+                    if (((MinecraftProtocol) event.getSession().getPacketProtocol()).getMode() == ProtocolMode.GAME) {
+                        GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+                        chatHandler.sendMessage(server, profile.getName() + " has left " + conf.getServerName());
+                        online--;
+                        entryListHandler.deleteFromPlayerEntryList(server, event.getSession());
+                    }
+
 
 
                 }
