@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -32,7 +33,36 @@ public class Utils {
 
     }
 
+    //Based off Of Necessities Code!
+    public static void makeDir(String location) {
+        File dir = new File(location);
+        if (!dir.exists()) {
+            tellConsole("INFO", "Making " + location + " directory.");
+            dir.mkdir();
+            tellConsole("INFO", "Done!");
+        } else {
+
+        }
+    }
+
+    //End
+    public static void createInitialDirs() {
+        tellConsole("INFO", "Checking Directorys.");
+        String playerFilesDir = "PlayerFiles";
+        String wolrdsDir = "worlds";
+        String pluginsDir = "plugins";
+        String logsDir = "logs";
+        makeDir(playerFilesDir);
+        makeDir(wolrdsDir);
+        makeDir(pluginsDir);
+        makeDir(logsDir);
+        tellConsole("INFO", "Completed checking directorys!");
+
+
+    }
+
     public static void tellPublicIpAddress() {
+
         conf = new Config();
         conf.loadConfig();
         try {
