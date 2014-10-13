@@ -42,7 +42,7 @@ import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
 import java.util.List;
 
-import static net.mcthunder.apis.Utils.tellConsole;
+import static net.mcthunder.apis.Utils.*;
 
 
 /**
@@ -78,9 +78,10 @@ public class MCThunder {
         tabHandler = new ServerTabHandler();
         serverName = conf.getServerName();
         VERIFY_USERS = conf.getOnlineMode();
-        HOST = conf.getHost();
+        HOST = getIP();
         PORT = conf.getPort();
         tellConsole("INFO", "HOST " + HOST);
+        tellPublicIpAddress();
         if (SPAWN_SERVER) {
             final Server server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
