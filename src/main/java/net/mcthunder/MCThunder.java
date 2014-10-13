@@ -97,7 +97,6 @@ public class MCThunder {
                     session.send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
                     String username = profile.getName();
                     tellConsole("DEBUG", "User " + username + " is trying to log in!");
-                    ;
                     updatePlayerEntryList(server, session);
                     session.send(new ServerChunkDataPacket(0, 0));
                     session.send(new ServerSpawnPositionPacket(new Position(0, 62, 0)));
