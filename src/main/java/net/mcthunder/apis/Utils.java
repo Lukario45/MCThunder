@@ -47,7 +47,7 @@ public class Utils {
 
     //End
     public static void createInitialDirs() {
-        tellConsole("INFO", "Checking Directorys.");
+        tellConsole("INFO", "Checking Directories.");
         String playerFilesDir = "PlayerFiles";
         String wolrdsDir = "worlds";
         String pluginsDir = "plugins";
@@ -56,7 +56,7 @@ public class Utils {
         makeDir(wolrdsDir);
         makeDir(pluginsDir);
         makeDir(logsDir);
-        tellConsole("INFO", "Completed checking directorys!");
+        tellConsole("INFO", "Completed checking directories!");
 
 
     }
