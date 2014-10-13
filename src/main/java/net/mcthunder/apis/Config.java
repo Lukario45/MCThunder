@@ -4,8 +4,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 /**
  * Created by Kevin on 8/10/2014.
@@ -32,14 +32,14 @@ public class Config {
     public void loadConfig() {
         try {
             //Make Config
-            String path = Config.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "config.yml";
-            String pathDecoded = URLDecoder.decode(path, "UTF-8");
-            setConf(new PropertiesConfiguration(new File(pathDecoded)));
+            String path = "config.yml";
+            //String pathDecoded = URLDecoder.decode(path, "UTF-8");
+            setConf(new PropertiesConfiguration(new File(path)));
 
             //See if the Config Exists yet. If not make it
             if (!getConf().getFile().exists()) {
                 Utils.tellConsole("INFO", "Creating Server Configuration at " + path);
-                getConf().getFile().getParentFile().mkdirs();
+                getConf().getFile().createNewFile();
                 getConf().setProperty("SERVER-NAME", "A MCThunder Minecraft Server");
                 getConf().setProperty("SERVER-HOST", "127.0.0.1");
                 getConf().setProperty("SERVER-PORT", 25565);
@@ -50,7 +50,7 @@ public class Config {
                 getConf().setProperty("GLOBAL-NICK-PASSWORD", "password");
                 getConf().setProperty("WORLD-NAME", "world");
                 getConf().setProperty("SERVER-MOTD", "A MCThunder Minecraft Server");
-                getConf().setProperty("SERVER-ONLINE-MODE", true);
+                getConf().setProperty("SERVER-ONLINE-MODE", false);
                 getConf().setProperty("ALLOW-FLYING", false);
                 getConf().setProperty("ALLOW-NETHER", true);
                 getConf().setProperty("ALLOW-PVP", true);
@@ -80,6 +80,8 @@ public class Config {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             Utils.tellConsole("ERROR", "Change your server location!");
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
