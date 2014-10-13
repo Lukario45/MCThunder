@@ -2,7 +2,7 @@ target/
 .idea/
 *.iml
 logs/
-PlayerFiles/
+PlayerFiles/*
 plugins/
 worlds/
 config.yml
