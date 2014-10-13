@@ -1,6 +1,7 @@
 package net.mcthunder;
 
 import net.mcthunder.apis.Config;
+import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
@@ -55,35 +56,40 @@ public class MCThunder {
     private static boolean VERIFY_USERS = false;
     private static String HOST;
     private static int PORT;
-    private static boolean isRunning;
-    private static String USERNAME = "test";
-    private static String PASSWORD = "test";
     private static MinecraftProtocol protocol;
     private static List<Session> sessionsList;
     private static ServerChatHandler chatHandler;
     private static ServerTabHandler tabHandler;
     private static ServerPlayerEntryListHandler entryListHandler;
     private static int online = 0;
-    //private static Session[] sessions = null;
-    int[] in = null;
+    private static PlayerProfileHandler playerProfileHandler;
 
 
     public static void main(String args[]) {
 
 
-        chatHandler = new ServerChatHandler();
         conf = new Config();
         conf.loadConfig();
-        entryListHandler = new ServerPlayerEntryListHandler();
-        tabHandler = new ServerTabHandler();
+
+
+        //Set Server data
         serverName = conf.getServerName();
         VERIFY_USERS = conf.getOnlineMode();
         HOST = getIP();
         PORT = conf.getPort();
+        //Done Set Server Data
         tellConsole("INFO", "HOST " + HOST);
+
+        createInitialDirs();
         tellPublicIpAddress();
         if (SPAWN_SERVER) {
             final Server server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
+            //Set Handlers
+            chatHandler = new ServerChatHandler();
+            entryListHandler = new ServerPlayerEntryListHandler();
+            tabHandler = new ServerTabHandler();
+            playerProfileHandler = new PlayerProfileHandler(server);
+            //Done Set Handlers
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
             server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
             server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
@@ -107,6 +113,7 @@ public class MCThunder {
                     session.send(new ServerSpawnPositionPacket(new Position(0, 62, 0)));
                     session.send(new ServerPlayerPositionRotationPacket(0, 62, 0, 0, 0));
                     chatHandler.sendMessage(server, profile.getName() + " has joined " + serverName);
+                    playerProfileHandler.checkPlayer(profile);
 
 
                 }

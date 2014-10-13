@@ -36,6 +36,9 @@ public class PlayerProfileHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            tellConsole("INFO", "Done!");
+            chatHandler.sendMessage(server, "Welcome " + playerName + " to the server!");
+
         }
     }
 }
