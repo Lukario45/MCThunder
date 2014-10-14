@@ -98,7 +98,7 @@ public class MCThunder {
         HOST = getIP();
         PORT = conf.getPort();
         //Done Set Server Data
-        tellConsole("INFO", "HOST " + HOST);
+        tellConsole("INFO", "INTERNAL PORT " + HOST);
 
         createInitialDirs();
         tellPublicIpAddress();
@@ -140,7 +140,7 @@ public class MCThunder {
                 @Override
                 public ServerStatusInfo buildInfo(Session session) {
                     sessionsList = server.getSessions();
-                    return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(100, online, new GameProfile[0]), new TextMessage("Hello world!"), null);
+                    return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), online, new GameProfile[0]), new TextMessage("Hello world!"), null);
                 }
             });
 
@@ -151,7 +151,8 @@ public class MCThunder {
                     GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
                     session.send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
                     String username = profile.getName();
-                    tellConsole("DEBUG", "User " + username + " is trying to log in!");
+                    //Would that be good to keep? V 
+                    tellConsole("INFO", "User " + username + " is trying to log in!");
                     entryListHandler.addToPlayerEntryList(server, session);
                     session.send(new ServerChunkDataPacket(0, 0));
                     session.send(new ServerSpawnPositionPacket(new Position(0, 62, 0)));
