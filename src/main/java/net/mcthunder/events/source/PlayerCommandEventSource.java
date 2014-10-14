@@ -16,22 +16,22 @@ import java.util.List;
 public class PlayerCommandEventSource {
     private List playerChatEventListeners = new ArrayList();
 
-    public synchronized void addEventListener(PlayerChatEventListener listener) {
+    public synchronized void addEventListener(PlayerCommandEventListener listener) {
         if (listener.removeDefaultListener()) {
             playerChatEventListeners.remove(0);
         }
         playerChatEventListeners.add(listener);
     }
 
-    public synchronized void removeEventListener(PlayerChatEventListener listener) {
+    public synchronized void removeEventListener(PlayerCommandEventListener listener) {
         playerChatEventListeners.remove(listener);
     }
 
     public synchronized void fireEvent(Server server, Session session, ClientChatPacket packet) {
-        PlayerChatEvent event = new PlayerChatEvent(this);
+        PlayerCommandEvent event = new PlayerCommandEvent(this);
         Iterator iterator = playerChatEventListeners.iterator();
         while (iterator.hasNext()) {
-            ((PlayerChatEventListener) iterator.next()).onCommand(server, session, packet);
+            ((PlayerCommandEventListener) iterator.next()).onCommand(server, session, packet);
         }
     }
 }

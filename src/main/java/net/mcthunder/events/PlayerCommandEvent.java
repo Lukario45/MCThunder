@@ -1,3 +1,7 @@
+package net.mcthunder.events;
+
+import java.util.EventObject;
+
 public class PlayerCommandEvent extends EventObject {
     /**
      * Constructs a prototypical Event.
@@ -5,7 +9,7 @@ public class PlayerCommandEvent extends EventObject {
      * @param source The object on which the Event initially occurred.
      * @throws IllegalArgumentException if source is null.
      */
-    public PlayerChatEvent(Object source) {
+    public PlayerCommandEvent(Object source) {
         super(source);
     }
 }

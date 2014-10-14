@@ -2,17 +2,20 @@ package net.mcthunder;
 
 
 //MCThunder Code Imports 
+
 import net.mcthunder.apis.Command;
 import net.mcthunder.apis.CommandRegistry;
 import net.mcthunder.apis.Config;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
+import net.mcthunder.events.listeners.PlayerCommandEventListener;
 import net.mcthunder.events.source.PlayerChatEventSource;
+import net.mcthunder.events.source.PlayerCommandEventSource;
 import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
-
-//MCPacketLib Imports
+import org.apache.commons.lang.StringUtils;
+import org.reflections.Reflections;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
@@ -49,16 +52,15 @@ import org.spacehq.packetlib.event.session.PacketSentEvent;
 import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
-//Java Imports
 import java.util.List;
 import java.util.Set;
 
-//Misc Library Imports
-import org.apache.commons.lang.StringUtils;
-import org.reflections.Reflections;
-
-//Static Mist Imports
 import static net.mcthunder.apis.Utils.*;
+
+//MCPacketLib Imports
+//Java Imports
+//Misc Library Imports
+//Static Mist Imports
 
 
 /**
@@ -184,7 +186,7 @@ public class MCThunder {
                                 if (packet.getMessage().startsWith("/")) {
                                     String command = StringUtils.lowerCase(packet.getMessage().split(" ")[0].split("/")[1]);
 
-                                    playerCommandEventSource.fireEvent(server, event.getSession(), packet)
+                                    playerCommandEventSource.fireEvent(server, event.getSession(), packet);
 
                                 } else {
                                     playerChatEventSource.fireEvent(server, event.getSession(), packet, server.getSessions());
