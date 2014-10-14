@@ -10,7 +10,6 @@ import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
-import org.spacehq.packetlib.event.session.PacketReceivedEvent;
 
 import java.util.List;
 
@@ -26,11 +25,9 @@ public class ServerChatHandler {
 
     }
 
-    public void handleChat(Server server, Session session, ClientChatPacket packet, PacketReceivedEvent event, List<Session> sessionsList) {
+    public void handleChat(Server server, Session session, ClientChatPacket packet, List<Session> sessionsList) {
         try {
-
-
-            GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+            GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
             String userName = profile.getName();
             String message = packet.getMessage();
             tellConsole("CHAT", userName + ": " + message);

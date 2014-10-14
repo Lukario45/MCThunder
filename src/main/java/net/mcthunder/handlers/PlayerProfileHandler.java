@@ -41,4 +41,25 @@ public class PlayerProfileHandler {
 
         }
     }
+
+    public void addAttribute(GameProfile profile, String attribute, String attributeData) {
+
+    }
+
+    public void deleteAttribute(GameProfile profile, String attribute, String attributeData) {
+
+    }
+
+    public void changeAttribute(GameProfile profile, String attribute, String attributeData) {
+
+    }
+
+    public void getAttribute(GameProfile profile, String attribute, String attributeData) {
+
+    }
+
+    public void addMultiAttribute(GameProfile profile, String attribute, String attributeData) {
+
+    }
+
 }

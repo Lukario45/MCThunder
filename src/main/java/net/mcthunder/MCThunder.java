@@ -1,6 +1,9 @@
 package net.mcthunder;
 
+
 import net.mcthunder.apis.Config;
+import net.mcthunder.events.listeners.PlayerChatEventListener;
+import net.mcthunder.events.source.PlayerChatEventSource;
 import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
@@ -63,6 +66,9 @@ public class MCThunder {
     private static ServerPlayerEntryListHandler entryListHandler;
     private static int online = 0;
     private static PlayerProfileHandler playerProfileHandler;
+    private static Server server;
+    private static PlayerChatEventListener defaultPlayerChatEventListener;
+    private static PlayerChatEventSource playerChatEventSource;
 
 
     public static void main(String args[]) {
@@ -83,13 +89,18 @@ public class MCThunder {
         createInitialDirs();
         tellPublicIpAddress();
         if (SPAWN_SERVER) {
-            final Server server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
+            server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
             //Set Handlers
             chatHandler = new ServerChatHandler();
             entryListHandler = new ServerPlayerEntryListHandler();
             tabHandler = new ServerTabHandler();
             playerProfileHandler = new PlayerProfileHandler(server);
             //Done Set Handlers
+            defaultPlayerChatEventListener = new PlayerChatEventListener();
+            playerChatEventSource = new PlayerChatEventSource();
+            playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
+
+
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
             server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
             server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
@@ -136,8 +147,14 @@ public class MCThunder {
                             } else if (event.getPacket() instanceof ClientChatPacket) {
 
                                 ClientChatPacket packet = event.getPacket();
+                                if (packet.getMessage().startsWith("/")) {
 
-                                chatHandler.handleChat(server, event.getSession(), packet, event, sessionsList);
+                                } else {
+                                    playerChatEventSource.fireEvent(server, event.getSession(), packet, server.getSessions());
+                                }
+
+
+                                //chatHandler.handleChat(server, event.getSession(), packet, sessionsList);
 
 
                             } else if (event.getPacket() instanceof ClientPlayerMovementPacket) {
@@ -191,4 +208,9 @@ public class MCThunder {
         }
 
     }
+
+    public Server getServer() {
+        return this.server;
+    }
+
 }
