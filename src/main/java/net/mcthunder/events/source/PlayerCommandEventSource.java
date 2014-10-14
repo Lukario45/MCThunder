@@ -1,7 +1,7 @@
 package net.mcthunder.events.source;
 
-import net.mcthunder.events.PlayerChatEvent;
-import net.mcthunder.interfaces.PlayerChatEventListener;
+import net.mcthunder.events.PlayerCommandEvent;
+import net.mcthunder.interfaces.PlayerCommandEventListener;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
@@ -27,11 +27,11 @@ public class PlayerCommandEventSource {
         playerChatEventListeners.remove(listener);
     }
 
-    public synchronized void fireEvent(Server server, Session session, ClientChatPacket packet, List<Session> sessionsList) {
+    public synchronized void fireEvent(Server server, Session session, ClientChatPacket packet) {
         PlayerChatEvent event = new PlayerChatEvent(this);
         Iterator iterator = playerChatEventListeners.iterator();
         while (iterator.hasNext()) {
-            ((PlayerChatEventListener) iterator.next()).onChat(server, session, packet, sessionsList);
+            ((PlayerChatEventListener) iterator.next()).onCommand(server, session, packet);
         }
     }
 }
