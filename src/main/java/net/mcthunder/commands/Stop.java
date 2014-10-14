@@ -37,6 +37,6 @@ public class Stop extends Command {
             }
             server.close();
         }
-        return false;
+        return true;
     }
 }
