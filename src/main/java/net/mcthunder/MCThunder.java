@@ -1,5 +1,7 @@
 package net.mcthunder;
 
+
+//MCThunder Code Imports 
 import net.mcthunder.apis.Command;
 import net.mcthunder.apis.CommandRegistry;
 import net.mcthunder.apis.Config;
@@ -9,8 +11,8 @@ import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
-import org.apache.commons.lang.StringUtils;
-import org.reflections.Reflections;
+
+//MCPacketLib Imports
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
@@ -47,9 +49,15 @@ import org.spacehq.packetlib.event.session.PacketSentEvent;
 import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
+//Java Imports
 import java.util.List;
 import java.util.Set;
 
+//Misc Library Imports
+import org.apache.commons.lang.StringUtils;
+import org.reflections.Reflections;
+
+//Static Mist Imports
 import static net.mcthunder.apis.Utils.*;
 
 
@@ -73,6 +81,8 @@ public class MCThunder {
     private static Server server;
     private static PlayerChatEventListener defaultPlayerChatEventListener;
     private static PlayerChatEventSource playerChatEventSource;
+    private static PlayerCommandEventSource playerCommandEventSource;
+    private static PlayerCommandEventListener defaultPlayerCommandEventListener;
 
 
     public static void main(String args[]) {
@@ -113,9 +123,15 @@ public class MCThunder {
             tabHandler = new ServerTabHandler();
             playerProfileHandler = new PlayerProfileHandler(server);
             //Done Set Handlers
+            //Listeners
             defaultPlayerChatEventListener = new PlayerChatEventListener();
+            defaultPlayerCommandEventListener = new PlayerCommandEventListener();
             playerChatEventSource = new PlayerChatEventSource();
+            playerCommandEventSource = new PlayerCommandEventSource();
             playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
+            playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
+            //Done Listeners
+            
 
 
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
@@ -167,8 +183,7 @@ public class MCThunder {
                                 if (packet.getMessage().startsWith("/")) {
                                     String command = StringUtils.lowerCase(packet.getMessage().split(" ")[0].split("/")[1]);
 
-                                    Command cmd = CommandRegistry.getCommand(command, "net.mcthunder.commands.");
-                                    cmd.execute(server, event.getSession(), packet);
+                                    playerCommandEventSource.fireEvent(server, event.getSession(), packet)
 
                                 } else {
                                     playerChatEventSource.fireEvent(server, event.getSession(), packet, server.getSessions());
