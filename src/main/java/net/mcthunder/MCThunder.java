@@ -1,6 +1,7 @@
 package net.mcthunder;
 
-
+import net.mcthunder.apis.Command;
+import net.mcthunder.apis.CommandRegistry;
 import net.mcthunder.apis.Config;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
 import net.mcthunder.events.source.PlayerChatEventSource;
@@ -8,6 +9,8 @@ import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
+import org.apache.commons.lang.StringUtils;
+import org.reflections.Reflections;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
@@ -45,6 +48,7 @@ import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
 import java.util.List;
+import java.util.Set;
 
 import static net.mcthunder.apis.Utils.*;
 
@@ -88,6 +92,16 @@ public class MCThunder {
 
         createInitialDirs();
         tellPublicIpAddress();
+        //Register Default Commands
+        String pkg = "net.mcthunder.commands.";
+        Reflections reflections = new Reflections("net.mcthunder.commands");
+        Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
+        for (Class c : subTypes) {
+            Command cmd = CommandRegistry.getCommand(c.getSimpleName(), pkg);
+
+            CommandRegistry.register(cmd);
+        }
+        //Done
         if (SPAWN_SERVER) {
             server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
             //Set Handlers
@@ -148,6 +162,10 @@ public class MCThunder {
 
                                 ClientChatPacket packet = event.getPacket();
                                 if (packet.getMessage().startsWith("/")) {
+                                    String command = StringUtils.lowerCase(packet.getMessage().split(" ")[0].split("/")[1]);
+
+                                    Command cmd = CommandRegistry.getCommand(command, "net.mcthunder.commands.");
+                                    cmd.execute(server, event.getSession(), packet);
 
                                 } else {
                                     playerChatEventSource.fireEvent(server, event.getSession(), packet, server.getSessions());
@@ -185,7 +203,7 @@ public class MCThunder {
                         }
 
                     });
-                }
+                    }
 
 
                 @Override
@@ -198,7 +216,6 @@ public class MCThunder {
                     }
 
 
-
                 }
             });
 
@@ -206,6 +223,7 @@ public class MCThunder {
 
 
         }
+
 
     }
 

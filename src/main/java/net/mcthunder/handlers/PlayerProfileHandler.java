@@ -28,7 +28,7 @@ public class PlayerProfileHandler {
         File playerFile = new File("PlayerFiles", playerID + ".yml");
         if (!playerFile.exists()) {
             tellConsole("INFO", "Player: " + playerName + "'s file does not exist yet, creating file!");
-            chatHandler.sendMessage(server, "Welcome " + playerName + " to the server!");
+            //chatHandler.sendMessage(server, "Welcome " + playerName + " to the server!");
             //    playerFile.mkdirs();
 
             try {
