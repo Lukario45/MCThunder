@@ -7,7 +7,7 @@ import org.spacehq.packetlib.Session;
 /**
  * Created by Kevin on 10/14/2014.
  */
-public interface PlayerCommandListener {
+public interface PlayerCommandEventListener {
     public boolean removeDefaultListener();
 
     public void onCommand(Server server, Session session, ClientChatPacket packet);
