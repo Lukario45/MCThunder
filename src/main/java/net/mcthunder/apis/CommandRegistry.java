@@ -5,7 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.HashMap;
 
 /**
- * Created by Kevin on 10/13/2014.
+ * Based of of Alphabot/Lukabot code that was created by zack6849
  */
 public class CommandRegistry {
     public static HashMap<String, Command> commands = new HashMap<>();

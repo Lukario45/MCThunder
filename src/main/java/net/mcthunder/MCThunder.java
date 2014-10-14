@@ -93,6 +93,9 @@ public class MCThunder {
         createInitialDirs();
         tellPublicIpAddress();
         //Register Default Commands
+        /**
+         * Based of of Alphabot/Lukabot code that was created by zack6849
+         */
         String pkg = "net.mcthunder.commands.";
         Reflections reflections = new Reflections("net.mcthunder.commands");
         Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);

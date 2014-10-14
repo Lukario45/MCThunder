@@ -5,7 +5,7 @@ import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
 /**
- * Created by Kevin on 10/13/2014.
+ * Based of of Alphabot/Lukabot code that was created by zack6849
  */
 public abstract class Command {
     private final String name;
