@@ -158,13 +158,13 @@ public class MCThunder {
                     tellConsole("INFO", "User " + username + " is trying to log in!");
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
-                    int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
-                    EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
-                    playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
 
 
                     //Done
                     session.send(new ServerPlayerPositionRotationPacket(0, 62, 0, 0, 0));
+                    int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+                    EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
+                    playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
                     byte[] light = new byte[4096];
                     Arrays.fill(light, (byte) 15);
                     Chunk[] chunks = new Chunk[16];
@@ -200,9 +200,21 @@ public class MCThunder {
 
                     session.send(new ServerSpawnPositionPacket(new Position(0, 62, 0)));
 
+                    Player player = playerHashMap.get(profile.getId());
+
+
 
                     chatHandler.sendMessage(server, profile.getName() + " has joined " + serverName);
                     playerProfileHandler.checkPlayer(profile);
+                    ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), player.getHeldItem(), player.getMetadata());
+                    for (Player player1 : playerHashMap.values()) {
+                        player1.getSession().send(toAllPlayers);
+                        ServerSpawnPlayerPacket toNewPlayer = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), player.getHeldItem(), player.getMetadata());
+                        player.getSession().send(toNewPlayer);
+                    }
+                    for (Player player1 : playerHashMap.values()) {
+
+                    }
 
 
                 }
@@ -221,27 +233,18 @@ public class MCThunder {
 
 
                             } else if (event.getPacket() instanceof ClientPlayerPositionPacket) {
-                                sessionsList = server.getSessions();
+
+
                                 ClientPlayerPositionPacket packet = event.getPacket();
                                 GameProfile p = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
                                 Player player = playerHashMap.get(p.getId());
-                                int entityID = player.getEntityID();
-                                UUID uuid = player.gameProfile().getId();
-                                double x = packet.getX();
-                                double y = packet.getY();
-                                double z = packet.getZ();
-                                float yaw = (float) packet.getYaw();
-                                float pitch = (float) packet.getPitch();
-                                int currentItem = player.getHeldItem();
-                                EntityMetadata[] metadata = player.getMetadata();
+                                player.setX(packet.getX());
+                                player.setY(packet.getY());
+                                player.setZ(packet.getZ());
+                                player.setYaw(packet.getYaw());
+                                player.setPitch(packet.getPitch());
 
-                                ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(entityID, uuid, x, y, z, yaw, pitch, currentItem, metadata);
-                                for (Session s : sessionsList) {
-                                    s.send(toAllPlayers);
-                                }
-                                for (Player player1 : playerHashMap.values()) {
-                                    //tellConsole("DEBUG", player1.gameProfile().getName());
-                                }
+                                //ServerPlayerPositionRotationPacket playerPositionRotationPacket = new ServerPlayerPositionRotationPacket()
 
 
                             } else if (event.getPacket() instanceof ClientChatPacket) {
