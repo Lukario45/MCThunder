@@ -21,7 +21,10 @@ import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
+import org.spacehq.mc.protocol.data.game.Chunk;
+import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.Position;
+import org.spacehq.mc.protocol.data.game.ShortArray3d;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
@@ -36,10 +39,8 @@ import org.spacehq.mc.protocol.packet.ingame.client.ClientSettingsPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientTabCompletePacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerMovementPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPositionPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.mc.protocol.packet.login.client.LoginStartPacket;
 import org.spacehq.packetlib.Server;
@@ -52,6 +53,7 @@ import org.spacehq.packetlib.event.session.PacketSentEvent;
 import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -156,8 +158,38 @@ public class MCThunder {
                     //Would that be good to keep? V 
                     tellConsole("INFO", "User " + username + " is trying to log in!");
                     entryListHandler.addToPlayerEntryList(server, session);
-                    session.send(new ServerChunkDataPacket(0, 0));
+                    //Send World Data
+
+                    //Done
+
                     session.send(new ServerSpawnPositionPacket(new Position(0, 62, 0)));
+                    byte[] light = new byte[4096];
+                    Arrays.fill(light, (byte) 15);
+                    Chunk[] chunks = new Chunk[16];
+                    for (int i = 0; i < chunks.length; i++) {
+                        NibbleArray3d blocklight = new NibbleArray3d(light);
+                        NibbleArray3d skylight = new NibbleArray3d(light);
+                        ShortArray3d blocks = new ShortArray3d(4096);
+                        for (int cY = 0; cY < 24; cY++) {
+                            for (int cZ = 0; cZ < 16; cZ++) {
+                                for (int cX = 0; cX < 16; cX++) {
+                                    int y = cY - i * 16;
+                                    if ((cY < (i + 1) * 16) && (cY > i * 16)) {
+                                        if (cY < 1) {
+                                            blocks.set(cX, y, cZ, 7);
+                                        } else if (cY < 23) {
+                                            blocks.set(cX, y, cZ, 3);
+                                        } else {
+                                            blocks.set(cX, y, cZ, 2);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Chunk chunk = new Chunk(blocks, blocklight, skylight);
+                        chunks[i] = chunk;
+                    }
                     session.send(new ServerPlayerPositionRotationPacket(0, 62, 0, 0, 0));
                     chatHandler.sendMessage(server, profile.getName() + " has joined " + serverName);
                     playerProfileHandler.checkPlayer(profile);
@@ -216,7 +248,10 @@ public class MCThunder {
 
                         @Override
                         public void packetSent(PacketSentEvent event) {
-                            if (event.getPacket() instanceof ServerChatPacket) {
+                            if (event.getPacket() instanceof ServerJoinGamePacket) {
+
+
+
 
 
                             }
