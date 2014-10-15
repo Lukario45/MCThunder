@@ -17,6 +17,11 @@ public class CommandRegistry {
         commands.put(command.getName(), command);
     }
 
+    public static void registerCommands() {
+
+    }
+
+
     public static void unregister(Command command) {
         commands.remove(command.getName());
     }

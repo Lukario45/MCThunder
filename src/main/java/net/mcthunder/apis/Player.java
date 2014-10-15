@@ -24,7 +24,7 @@ public class Player {
     private double z;
     private double yaw;
     private double pitch;
-    //private EntityMetadata metadata;
+    private boolean onGround;
 
     public Player(Server server, Session session, GameProfile profile, int entityID, int heldItem, EntityMetadata metadata) {
         this.metadataList = new ArrayList<>();
@@ -119,6 +119,14 @@ public class Player {
     public void setPitch(double pitch) {
         this.pitch = pitch;
 
+    }
+
+    public boolean isOnGround() {
+        return this.onGround;
+    }
+
+    public void setOnGround(boolean onGround) {
+        this.onGround = onGround;
     }
 
 }
