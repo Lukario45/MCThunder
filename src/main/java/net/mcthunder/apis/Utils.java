@@ -80,4 +80,9 @@ public class Utils {
         System.out.println(date + " [" + type + "]: " + message);
     }
 
+    public static int makeRandomEntityID() {
+        int entityID = 0;
+        return entityID;
+    }
+
 }

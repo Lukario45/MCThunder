@@ -6,6 +6,7 @@ package net.mcthunder;
 import net.mcthunder.apis.Command;
 import net.mcthunder.apis.CommandRegistry;
 import net.mcthunder.apis.Config;
+import net.mcthunder.apis.Player;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
 import net.mcthunder.events.listeners.PlayerCommandEventListener;
 import net.mcthunder.events.source.PlayerChatEventSource;
@@ -22,6 +23,7 @@ import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
 import org.spacehq.mc.protocol.data.game.*;
+import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
@@ -38,6 +40,7 @@ import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerMovementP
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPositionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.mc.protocol.packet.login.client.LoginStartPacket;
@@ -51,10 +54,7 @@ import org.spacehq.packetlib.event.session.PacketSentEvent;
 import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static net.mcthunder.apis.Utils.*;
 
@@ -68,6 +68,7 @@ import static net.mcthunder.apis.Utils.*;
  * Created by Kevin on 8/9/2014.
  */
 public class MCThunder {
+    public static HashMap<UUID, Player> playerHashMap;
     private static Config conf;
     private static String serverName;
     private static boolean SPAWN_SERVER = true;
@@ -86,7 +87,6 @@ public class MCThunder {
     private static PlayerChatEventSource playerChatEventSource;
     private static PlayerCommandEventSource playerCommandEventSource;
     private static PlayerCommandEventListener defaultPlayerCommandEventListener;
-
 
     public static void main(String args[]) {
 
@@ -109,7 +109,7 @@ public class MCThunder {
         /**
          * Based of of Alphabot/Lukabot code that was created by zack6849
          */
-        String pkg = "net.mcthunder.commands.";
+        final String pkg = "net.mcthunder.commands.";
         Reflections reflections = new Reflections("net.mcthunder.commands");
         Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
         for (Class c : subTypes) {
@@ -134,7 +134,7 @@ public class MCThunder {
             playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
             playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
             //Done Listeners
-            
+            playerHashMap = new HashMap<UUID, Player>(conf.getSlots());
 
 
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
@@ -158,6 +158,10 @@ public class MCThunder {
                     tellConsole("INFO", "User " + username + " is trying to log in!");
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
+                    int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+                    EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
+                    playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
+
 
                     //Done
                     session.send(new ServerPlayerPositionRotationPacket(0, 62, 0, 0, 0));
@@ -219,28 +223,35 @@ public class MCThunder {
                             } else if (event.getPacket() instanceof ClientPlayerPositionPacket) {
                                 sessionsList = server.getSessions();
                                 ClientPlayerPositionPacket packet = event.getPacket();
-                                GameProfile player = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                                //int entityID = packet.get
-                                UUID uuid = player.getId();
+                                GameProfile p = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+                                Player player = playerHashMap.get(p.getId());
+                                int entityID = player.getEntityID();
+                                UUID uuid = player.gameProfile().getId();
                                 double x = packet.getX();
                                 double y = packet.getY();
                                 double z = packet.getZ();
                                 float yaw = (float) packet.getYaw();
                                 float pitch = (float) packet.getPitch();
-                                int currentItem = 7;
-                                EntityMetadata[] metadata;
+                                int currentItem = player.getHeldItem();
+                                EntityMetadata[] metadata = player.getMetadata();
 
-                                //ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket();
+                                ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(entityID, uuid, x, y, z, yaw, pitch, currentItem, metadata);
                                 for (Session s : sessionsList) {
-
+                                    s.send(toAllPlayers);
+                                }
+                                for (Player player1 : playerHashMap.values()) {
+                                    //tellConsole("DEBUG", player1.gameProfile().getName());
                                 }
 
 
                             } else if (event.getPacket() instanceof ClientChatPacket) {
 
                                 ClientChatPacket packet = event.getPacket();
+                                GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
                                 if (packet.getMessage().startsWith("/")) {
                                     String command = StringUtils.lowerCase(packet.getMessage().split(" ")[0].split("/")[1]);
+                                    Player player = playerHashMap.get(profile.getId());
+                                    tellConsole("DEBUG", player.gameProfile().getName() + " " + player.getEntityID());
 
                                     playerCommandEventSource.fireEvent(server, event.getSession(), packet);
 
