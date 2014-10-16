@@ -34,7 +34,7 @@ public class CommandRegistry {
             commands.put(name, (Command) Command.class.getClassLoader().loadClass(pkg + StringUtils.capitalize(name)).newInstance());
             return commands.get(name);
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
         return null;
     }
