@@ -26,7 +26,7 @@ public class PlayerCommandEventSource {
         playerChatEventListeners.remove(listener);
     }
 
-    public synchronized void fireEvent(Player player, ClientChatPacket packet) {
+    public synchronized void fireEvent(Player player, ClientChatPacket packet) throws ClassNotFoundException {
         PlayerCommandEvent event = new PlayerCommandEvent(this);
         Iterator iterator = playerChatEventListeners.iterator();
         while (iterator.hasNext()) {

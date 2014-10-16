@@ -405,7 +405,11 @@ public class MCThunder {
                                         chatHandler.sendPrivateMessage(event.getSession(), "Command does not exists!");
                                     } else {
 
-                                        playerCommandEventSource.fireEvent(player, packet);
+                                        try {
+                                            playerCommandEventSource.fireEvent(player, packet);
+                                        } catch (ClassNotFoundException e) {
+                                            player.sendMessageToPlayer("Unknown Command");
+                                        }
 
 
                                     }

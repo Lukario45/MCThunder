@@ -20,7 +20,8 @@ public class PlayerCommandEventListener implements net.mcthunder.interfaces.Play
         commandHandler = new CommandHandler();
         try {
             commandHandler.handlePlayerCommand(player, packet);
-        } catch (ClassNotFoundException e) {
+        } catch (NullPointerException e) {
+            player.sendMessageToPlayer("Unknown Command!");
 
         }
     }

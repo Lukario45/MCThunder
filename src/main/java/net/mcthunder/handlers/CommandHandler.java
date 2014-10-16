@@ -11,7 +11,7 @@ import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 public class CommandHandler {
 
 
-    public void handlePlayerCommand(Player player, ClientChatPacket packet) throws ClassNotFoundException {
+    public void handlePlayerCommand(Player player, ClientChatPacket packet) throws NullPointerException {
         String command = StringUtils.lowerCase(packet.getMessage().split(" ")[0].split("/")[1]);
 
         Command cmd = CommandRegistry.getCommand(command, "net.mcthunder.commands.");
