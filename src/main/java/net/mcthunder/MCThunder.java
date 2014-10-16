@@ -23,6 +23,7 @@ import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
 import org.spacehq.mc.protocol.data.game.*;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
+import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
@@ -35,10 +36,7 @@ import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientSettingsPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientTabCompletePacket;
-import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerMovementPacket;
-import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPositionPacket;
-import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
-import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerRotationPacket;
+import org.spacehq.mc.protocol.packet.ingame.client.player.*;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
@@ -154,6 +152,10 @@ public class MCThunder {
                 @Override
                 public void loggedIn(Session session) {
                     GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
+					if(playerHashMap.containsKey(profile.getId())) {
+						playerHashMap.get(profile.getId()).getSession().disconnect("You logged in from another location!");
+					}
+
                     int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
                     EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
                     playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
@@ -204,10 +206,10 @@ public class MCThunder {
 
                     player.getChatHandler().sendMessage(server, profile.getName() + " has joined " + serverName);
                     playerProfileHandler.checkPlayer(profile);
-                    ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), 0, 24, 0, player.getYaw(), player.getPitch(), player.getHeldItem(), player.getMetadata());
+                    ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), 0, 24, 0, player.getYaw(), player.getPitch(), player.getHeldItem(), player.getMetadata().getMetadataArray());
                     for (Player player1 : playerHashMap.values()) {
                         player1.getSession().send(toAllPlayers);
-                        ServerSpawnPlayerPacket toNewPlayer = new ServerSpawnPlayerPacket(player1.getEntityID(), player1.gameProfile().getId(), player1.getX(), player1.getY(), player1.getZ(), player1.getYaw(), player1.getPitch(), player1.getHeldItem(), player1.getMetadata());
+                        ServerSpawnPlayerPacket toNewPlayer = new ServerSpawnPlayerPacket(player1.getEntityID(), player1.gameProfile().getId(), player1.getX(), player1.getY(), player1.getZ(), player1.getYaw(), player1.getPitch(), player1.getHeldItem(), player1.getMetadata().getMetadataArray());
                         player.getSession().send(toNewPlayer);
                     }
                 }
@@ -220,15 +222,48 @@ public class MCThunder {
                         @Override
                         public void packetReceived(PacketReceivedEvent event) {
 							if (event.getPacket() instanceof ClientPlayerMovementPacket) {
-                                for(Packet packet : createUpdatePackets(event.getSession(), event.<ClientPlayerMovementPacket>getPacket())) {
-									for (Player p : playerHashMap.values()) {
+								ClientPlayerMovementPacket pack = event.getPacket();
+								for(Packet packet : createUpdatePackets(event.getSession(), pack)) {
+									for(Player p : playerHashMap.values()) {
 										if(!p.gameProfile().getName().equals(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getName())) {
 											p.getSession().send(packet);
 										}
 									}
 								}
 
-								updatePlayerPosition(event.getSession(), event.<ClientPlayerMovementPacket>getPacket());
+								updatePlayerPosition(event.getSession(), pack);
+							} else if(event.getPacket() instanceof ClientPlayerStatePacket) {
+								ClientPlayerStatePacket packet = event.getPacket();
+								GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+								Player player = playerHashMap.get(profile.getId());
+								switch(packet.getState()) {
+									case START_SNEAKING:
+										player.setSneaking(true);
+										break;
+									case STOP_SNEAKING:
+										player.setSneaking(false);
+										break;
+									case LEAVE_BED:
+										break;
+									case START_SPRINTING:
+										player.setSprinting(true);
+										break;
+									case STOP_SPRINTING:
+										player.setSprinting(false);
+										break;
+									case RIDING_JUMP:
+										break;
+									case OPEN_INVENTORY:
+										break;
+								}
+							} else if(event.getPacket() instanceof ClientSwingArmPacket) {
+								GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+								Player player = playerHashMap.get(profile.getId());
+								for(Player p : playerHashMap.values()) {
+									if(!p.gameProfile().getName().equals(profile.getName())) {
+										p.getSession().send(new ServerAnimationPacket(player.getEntityID(), Animation.SWING_ARM));
+									}
+								}
                             } else if (event.getPacket() instanceof ClientChatPacket) {
                                 ClientChatPacket packet = event.getPacket();
                                 GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
@@ -283,6 +318,24 @@ public class MCThunder {
             });
 
             server.bind();
+			while(server.isListening()) {
+				for(Player player : playerHashMap.values()) {
+					EntityMetadata changes[] = player.getMetadata().getChanges();
+					if(changes != null) {
+						for(Player p : playerHashMap.values()) {
+							if(!p.gameProfile().getName().equals(player.gameProfile().getName())) {
+								p.getSession().send(new ServerEntityMetadataPacket(player.getEntityID(), changes));
+							}
+						}
+					}
+				}
+
+				// Don't overload CPU with loops.
+				try {
+					Thread.sleep(20);
+				} catch(InterruptedException e) {
+				}
+			}
         }
     }
 
@@ -303,6 +356,8 @@ public class MCThunder {
 			player.setYaw(packet.getYaw());
 			player.setPitch(packet.getPitch());
 		}
+
+		player.setOnGround(packet.isOnGround());
 	}
 
 	private static List<Packet> createUpdatePackets(Session session, ClientPlayerMovementPacket packet) {

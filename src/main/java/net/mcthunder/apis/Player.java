@@ -6,9 +6,6 @@ import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Kevin on 10/14/2014.
  */
@@ -18,27 +15,25 @@ public class Player {
     private GameProfile gameProfile;
     private Session session;
     private Server server;
-    private EntityMetadata[] metadata;
-    private List<EntityMetadata> metadataList;
+    private MetadataMap metadata;
     private double x;
     private double y;
     private double z;
     private double yaw;
     private double pitch;
     private boolean onGround;
+	private boolean sneaking;
+	private boolean sprinting;
     private ServerChatHandler chatHandler;
 
     public Player(Server server, Session session, GameProfile profile, int entityID, int heldItem, EntityMetadata metadata) {
-        this.metadataList = new ArrayList<>();
         this.chatHandler = new ServerChatHandler();
         this.server = server;
         this.session = session;
         this.gameProfile = profile;
         this.entityID = entityID;
         this.heldItem = heldItem;
-        this.metadataList.add(metadata);
-
-
+		this.metadata = new MetadataMap();
     }
 
     public int getHeldItem() {
@@ -47,7 +42,6 @@ public class Player {
 
     public void setHeldItem(int newItem) {
         this.heldItem = newItem;
-
     }
 
     public int getEntityID() {
@@ -70,16 +64,9 @@ public class Player {
         return this.gameProfile;
     }
 
-    public EntityMetadata[] getMetadata() {
-        this.metadata = metadataList.toArray(new EntityMetadata[metadataList.size()]);
+    public MetadataMap getMetadata() {
         return this.metadata;
     }
-
-    public void addMetadata(EntityMetadata metadata) {
-        this.metadataList.add(metadata);
-
-    }
-
 
     public double getX() {
         return this.x;
@@ -129,6 +116,24 @@ public class Player {
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
     }
+
+	public boolean isSneaking() {
+		return this.sneaking;
+	}
+
+	public void setSneaking(boolean sneaking) {
+		this.sneaking = sneaking;
+		this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, sneaking);
+	}
+
+	public boolean isSprinting() {
+		return this.sprinting;
+	}
+
+	public void setSprinting(boolean sprinting) {
+		this.sprinting = sprinting;
+		this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, sneaking);
+	}
 
     public ServerChatHandler getChatHandler() {
         return this.chatHandler;
