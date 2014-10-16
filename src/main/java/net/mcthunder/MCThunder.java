@@ -40,14 +40,12 @@ import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPositionP
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityPositionPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityPositionRotationPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityRotationPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
-import org.spacehq.mc.protocol.packet.login.client.LoginStartPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.event.server.ServerAdapter;
@@ -56,11 +54,15 @@ import org.spacehq.packetlib.event.server.SessionRemovedEvent;
 import org.spacehq.packetlib.event.session.PacketReceivedEvent;
 import org.spacehq.packetlib.event.session.PacketSentEvent;
 import org.spacehq.packetlib.event.session.SessionAdapter;
+import org.spacehq.packetlib.packet.Packet;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
 import java.util.*;
 
-import static net.mcthunder.apis.Utils.*;
+import static net.mcthunder.apis.Utils.createInitialDirs;
+import static net.mcthunder.apis.Utils.getIP;
+import static net.mcthunder.apis.Utils.tellConsole;
+import static net.mcthunder.apis.Utils.tellPublicIpAddress;
 
 //MCPacketLib Imports
 //Java Imports
@@ -93,11 +95,8 @@ public class MCThunder {
     private static PlayerCommandEventListener defaultPlayerCommandEventListener;
 
     public static void main(String args[]) {
-
-
         conf = new Config();
         conf.loadConfig();
-
 
         //Set Server data
         serverName = conf.getServerName();
@@ -141,7 +140,6 @@ public class MCThunder {
             //Done Listeners
             playerHashMap = new HashMap<UUID, Player>(conf.getSlots());
 
-
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
             server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
             server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
@@ -161,7 +159,6 @@ public class MCThunder {
                     playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
 
                     Player player = playerHashMap.get(profile.getId());
-
 
                     player.getSession().send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
                     tellConsole("INFO", "User " + player.gameProfile().getName() + " is trying to log in!");
@@ -196,6 +193,7 @@ public class MCThunder {
                         Chunk chunk = new Chunk(blocks, blocklight, skylight);
                         chunks[i] = chunk;
                     }
+
                     for (int x = -5; x <= 5; x++) {
                         for (int z = -5; z <= 5; z++) {
                             player.getSession().send(new ServerChunkDataPacket(x, z, chunks, new byte[256]));
@@ -203,7 +201,6 @@ public class MCThunder {
                     }
 
                     player.getSession().send(new ServerSpawnPositionPacket(new Position(0, 24, 0)));
-
 
                     player.getChatHandler().sendMessage(server, profile.getName() + " has joined " + serverName);
                     playerProfileHandler.checkPlayer(profile);
@@ -213,11 +210,6 @@ public class MCThunder {
                         ServerSpawnPlayerPacket toNewPlayer = new ServerSpawnPlayerPacket(player1.getEntityID(), player1.gameProfile().getId(), player1.getX(), player1.getY(), player1.getZ(), player1.getYaw(), player1.getPitch(), player1.getHeldItem(), player1.getMetadata());
                         player.getSession().send(toNewPlayer);
                     }
-                    for (Player player1 : playerHashMap.values()) {
-
-                    }
-
-
                 }
             });
 
@@ -225,156 +217,40 @@ public class MCThunder {
                 @Override
                 public void sessionAdded(SessionAddedEvent event) {
                     event.getSession().addListener(new SessionAdapter() {
-
-
                         @Override
                         public void packetReceived(PacketReceivedEvent event) {
+							if (event.getPacket() instanceof ClientPlayerMovementPacket) {
+                                for(Packet packet : createUpdatePackets(event.getSession(), event.<ClientPlayerMovementPacket>getPacket())) {
+									for (Player p : playerHashMap.values()) {
+										if(!p.gameProfile().getName().equals(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getName())) {
+											p.getSession().send(packet);
+										}
+									}
+								}
 
-                            if (event.getPacket() instanceof LoginStartPacket) {
-
-
-                            } else if (event.getPacket() instanceof ClientPlayerMovementPacket) {
-                                if (event.getPacket() instanceof ClientPlayerRotationPacket) {
-                                    ClientPlayerRotationPacket packet = event.getPacket();
-                                    GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                                    Player player = playerHashMap.get(profile.getId());
-                                    double newYaw = packet.getYaw();
-                                    double newPitch = packet.getPitch();
-                                    boolean newOnGround = packet.isOnGround();
-
-                                    player.setYaw(packet.getYaw());
-                                    player.setPitch(packet.getPitch());
-                                    player.setOnGround(packet.isOnGround());
-
-
-                                    //ServerPlayerPositionRotationPacket playerPositionRotationPacket = new ServerPlayerPositionRotationPacket(player.getX(),player.getY(),player.getZ(),player.getYaw(),player.getPitch());
-                                    //ServerEntityPositionPacket entityPositionPacket = new ServerEntityPositionPacket(player.getEntityID(),movedX,movedY,movedZ,newOnGround);
-                                    ServerEntityRotationPacket entityRotationPacket = new ServerEntityRotationPacket(player.getEntityID(), player.getYaw(), player.getPitch(), newOnGround);
-                                    //ServerEntityPositionRotationPacket entityPositionRotationPacket = new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, movedYaw, movedPitch, newOnGround);
-                                    for (Player p : playerHashMap.values()) {
-                                        if (p.gameProfile().getName().equals(player.gameProfile().getName())) {
-
-                                        } else {
-                                            p.getSession().send(entityRotationPacket);
-                                            //p.getSession().send(entityRotationPacket);
-                                        }
-
-
-                                    }
-                                } else if (event.getPacket() instanceof ClientPlayerPositionPacket) {
-                                    ClientPlayerPositionPacket packet = event.getPacket();
-                                    GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                                    Player player = playerHashMap.get(profile.getId());
-                                    double newX = packet.getX();
-                                    double newY = packet.getY();
-                                    double newZ = packet.getZ();
-                                    double newYaw = packet.getYaw();
-                                    double newPitch = packet.getPitch();
-                                    boolean newOnGround = packet.isOnGround();
-                                    double movedX = newX - player.getX();
-                                    double movedY = newY - player.getY();
-                                    double movedZ = newZ - player.getZ();
-                                    float movedYaw = (float) (newYaw - player.getYaw());
-                                    float movedPitch = (float) (newPitch - player.getPitch());
-
-                                    player.setX(packet.getX());
-                                    player.setY(packet.getY());
-                                    player.setZ(packet.getZ());
-                                    player.setYaw(packet.getYaw());
-                                    player.setPitch(packet.getPitch());
-                                    player.setOnGround(packet.isOnGround());
-
-
-                                    //ServerPlayerPositionRotationPacket playerPositionRotationPacket = new ServerPlayerPositionRotationPacket(player.getX(),player.getY(),player.getZ(),player.getYaw(),player.getPitch());
-                                    ServerEntityPositionPacket entityPositionPacket = new ServerEntityPositionPacket(player.getEntityID(), movedX, movedY, movedZ, newOnGround);
-                                    //ServerEntityRotationPacket entityRotationPacket = new ServerEntityRotationPacket(player.getEntityID(),player.getYaw(),player.getPitch(),newOnGround);
-                                    //ServerEntityPositionRotationPacket entityPositionRotationPacket = new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, movedYaw, movedPitch, newOnGround);
-                                    for (Player p : playerHashMap.values()) {
-                                        if (p.gameProfile().getName().equals(player.gameProfile().getName())) {
-
-                                        } else {
-                                            p.getSession().send(entityPositionPacket);
-                                            //p.getSession().send(entityRotationPacket);
-                                        }
-
-
-                                    }
-                                } else if (event.getPacket() instanceof ClientPlayerPositionRotationPacket) {
-                                    ClientPlayerPositionRotationPacket packet = event.getPacket();
-                                    GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                                    Player player = playerHashMap.get(profile.getId());
-                                    double newX = packet.getX();
-                                    double newY = packet.getY();
-                                    double newZ = packet.getZ();
-                                    double newYaw = packet.getYaw();
-                                    double newPitch = packet.getPitch();
-                                    boolean newOnGround = packet.isOnGround();
-                                    double movedX = newX - player.getX();
-                                    double movedY = newY - player.getY();
-                                    double movedZ = newZ - player.getZ();
-                                    float movedYaw = (float) (newYaw - player.getYaw());
-                                    float movedPitch = (float) (newPitch - player.getPitch());
-
-                                    player.setX(packet.getX());
-                                    player.setY(packet.getY());
-                                    player.setZ(packet.getZ());
-                                    player.setYaw(packet.getYaw());
-                                    player.setPitch(packet.getPitch());
-                                    player.setOnGround(packet.isOnGround());
-
-
-                                    //ServerPlayerPositionRotationPacket playerPositionRotationPacket = new ServerPlayerPositionRotationPacket(player.getX(),player.getY(),player.getZ(),player.getYaw(),player.getPitch());
-                                    //ServerEntityPositionPacket entityPositionPacket = new ServerEntityPositionPacket(player.getEntityID(),movedX,movedY,movedZ,newOnGround);
-                                    //ServerEntityRotationPacket entityRotationPacket = new ServerEntityRotationPacket(player.getEntityID(),player.getYaw(),player.getPitch(),newOnGround);
-                                    ServerEntityPositionRotationPacket entityPositionRotationPacket = new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, movedYaw, movedPitch, newOnGround);
-                                    for (Player p : playerHashMap.values()) {
-                                        if (p.gameProfile().getName().equals(player.gameProfile().getName())) {
-
-                                        } else {
-                                            p.getSession().send(entityPositionRotationPacket);
-                                            //p.getSession().send(entityRotationPacket);
-                                        }
-
-
-                                    }
-                                }
+								updatePlayerPosition(event.getSession(), event.<ClientPlayerMovementPacket>getPacket());
                             } else if (event.getPacket() instanceof ClientChatPacket) {
-
                                 ClientChatPacket packet = event.getPacket();
                                 GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
                                 Player player = playerHashMap.get(profile.getId());
                                 if (packet.getMessage().startsWith("/")) {
                                     if (packet.getMessage().equals("/")) {
-                                        chatHandler.sendPrivateMessage(event.getSession(), "Command does not exists!");
+                                        chatHandler.sendPrivateMessage(event.getSession(), "Command does not exist!");
                                     } else {
-
                                         try {
                                             playerCommandEventSource.fireEvent(player, packet);
                                         } catch (ClassNotFoundException e) {
                                             player.sendMessageToPlayer("Unknown Command");
                                         }
-
-
                                     }
-
-
-
                                 } else {
                                     playerChatEventSource.fireEvent(server, event.getSession(), packet, server.getSessions());
                                 }
 
-
                                 //chatHandler.handleChat(server, event.getSession(), packet, sessionsList);
-
-
-                            } else if (event.getPacket() instanceof ClientPlayerMovementPacket) {
-
-
                             } else if (event.getPacket() instanceof ClientKeepAlivePacket) {
-
-
+								event.getSession().send(new ServerKeepAlivePacket(event.<ClientKeepAlivePacket>getPacket().getPingId()));
                             } else if (event.getPacket() instanceof ClientSettingsPacket) {
-
 
                             } else if (event.getPacket() instanceof ClientTabCompletePacket) {
                                 ClientTabCompletePacket packet = event.getPacket();
@@ -384,21 +260,14 @@ public class MCThunder {
                             }
                         }
 
-
                         @Override
                         public void packetSent(PacketSentEvent event) {
                             if (event.getPacket() instanceof ServerJoinGamePacket) {
 
-
-
-
-
                             }
-
                         }
-
                     });
-                    }
+                }
 
 
                 @Override
@@ -410,21 +279,65 @@ public class MCThunder {
                         entryListHandler.deleteFromPlayerEntryList(server, event.getSession());
                         playerHashMap.remove(player);
                     }
-
-
                 }
             });
 
             server.bind();
-
-
         }
-
-
     }
 
     public Server getServer() {
         return this.server;
     }
 
+	private static void updatePlayerPosition(Session session, ClientPlayerMovementPacket packet) {
+		GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
+		Player player = playerHashMap.get(profile.getId());
+		if(packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
+			player.setX(packet.getX());
+			player.setY(packet.getY());
+			player.setZ(packet.getZ());
+		}
+
+		if(packet instanceof ClientPlayerRotationPacket || packet instanceof ClientPlayerPositionRotationPacket) {
+			player.setYaw(packet.getYaw());
+			player.setPitch(packet.getPitch());
+		}
+	}
+
+	private static List<Packet> createUpdatePackets(Session session, ClientPlayerMovementPacket packet) {
+		List<Packet> packets = new ArrayList<Packet>();
+		GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
+		Player player = playerHashMap.get(profile.getId());
+		if(packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
+			double movedX = packet.getX() - player.getX();
+			double movedY = packet.getY() - player.getY();
+			double movedZ = packet.getZ() - player.getZ();
+			float yaw = player.getYaw();
+			float pitch = player.getPitch();
+			if(packet instanceof ClientPlayerPositionRotationPacket) {
+				yaw = (float) packet.getYaw();
+				pitch = (float) packet.getPitch();
+			}
+
+			int packedX = (int) (movedX * 32);
+			int packedY = (int) (movedY * 32);
+			int packedZ = (int) (movedZ * 32);
+			if(packedX > Byte.MAX_VALUE || packedY > Byte.MAX_VALUE || packedZ > Byte.MAX_VALUE || packedX < Byte.MIN_VALUE || packedY < Byte.MIN_VALUE || packedZ < Byte.MIN_VALUE) {
+				packets.add(new ServerEntityTeleportPacket(player.getEntityID(), packet.getX(), packet.getY(), packet.getZ(), yaw, pitch, packet.isOnGround()));
+			} else if(packet instanceof ClientPlayerPositionPacket) {
+				packets.add(new ServerEntityPositionPacket(player.getEntityID(), movedX, movedY, movedZ, packet.isOnGround()));
+			} else if(packet instanceof ClientPlayerPositionRotationPacket) {
+				packets.add(new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, yaw, pitch, packet.isOnGround()));
+				packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
+			}
+		} else if(packet instanceof ClientPlayerRotationPacket) {
+			float yaw = (float) packet.getYaw();
+			float pitch = (float) packet.getPitch();
+			packets.add(new ServerEntityRotationPacket(player.getEntityID(), yaw, pitch, packet.isOnGround()));
+			packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
+		}
+
+		return packets;
+	}
 }
