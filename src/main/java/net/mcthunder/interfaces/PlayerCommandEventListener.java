@@ -1,8 +1,7 @@
 package net.mcthunder.interfaces;
 
+import net.mcthunder.apis.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
-import org.spacehq.packetlib.Server;
-import org.spacehq.packetlib.Session;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -10,5 +9,5 @@ import org.spacehq.packetlib.Session;
 public interface PlayerCommandEventListener {
     public boolean removeDefaultListener();
 
-    public void onCommand(Server server, Session session, ClientChatPacket packet);
+    public void onCommand(Player player, ClientChatPacket packet) throws ClassNotFoundException;
 }

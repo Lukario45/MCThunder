@@ -1,8 +1,8 @@
 package net.mcthunder.commands;
 
 import net.mcthunder.apis.Command;
+import net.mcthunder.apis.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
-import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
 import java.util.List;
@@ -16,8 +16,8 @@ public class Stop extends Command {
     }
 
     @Override
-    public boolean execute(Server server, Session session, ClientChatPacket packet) {
-        List<Session> sessions = server.getSessions();
+    public boolean execute(Player player, ClientChatPacket packet) {
+        List<Session> sessions = player.getServer().getSessions();
         String[] wholeMessage = packet.getMessage().split(" ");
 
         if (wholeMessage.length >= 2) {
@@ -29,13 +29,13 @@ public class Stop extends Command {
             for (Session s : sessions) {
                 s.disconnect(args);
             }
-            server.close();
+            player.getServer().close();
 
         } else {
             for (Session s : sessions) {
                 s.disconnect("Server Closed!");
             }
-            server.close();
+            player.getServer().close();
         }
         return true;
     }

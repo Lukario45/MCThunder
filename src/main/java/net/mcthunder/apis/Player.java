@@ -1,5 +1,6 @@
 package net.mcthunder.apis;
 
+import net.mcthunder.handlers.ServerChatHandler;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.packetlib.Server;
@@ -25,11 +26,11 @@ public class Player {
     private double yaw;
     private double pitch;
     private boolean onGround;
+    private ServerChatHandler chatHandler;
 
     public Player(Server server, Session session, GameProfile profile, int entityID, int heldItem, EntityMetadata metadata) {
         this.metadataList = new ArrayList<>();
-
-
+        this.chatHandler = new ServerChatHandler();
         this.server = server;
         this.session = session;
         this.gameProfile = profile;
@@ -128,5 +129,15 @@ public class Player {
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
     }
+
+    public ServerChatHandler getChatHandler() {
+        return this.chatHandler;
+    }
+
+    public void sendMessageToPlayer(String message) {
+        this.chatHandler.sendPrivateMessage(this.session, message);
+
+    }
+
 
 }

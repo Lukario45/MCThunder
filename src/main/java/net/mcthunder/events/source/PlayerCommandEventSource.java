@@ -1,10 +1,9 @@
 package net.mcthunder.events.source;
 
+import net.mcthunder.apis.Player;
 import net.mcthunder.events.PlayerCommandEvent;
 import net.mcthunder.interfaces.PlayerCommandEventListener;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
-import org.spacehq.packetlib.Server;
-import org.spacehq.packetlib.Session;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,11 +26,16 @@ public class PlayerCommandEventSource {
         playerChatEventListeners.remove(listener);
     }
 
-    public synchronized void fireEvent(Server server, Session session, ClientChatPacket packet) {
+    public synchronized void fireEvent(Player player, ClientChatPacket packet) {
         PlayerCommandEvent event = new PlayerCommandEvent(this);
         Iterator iterator = playerChatEventListeners.iterator();
         while (iterator.hasNext()) {
-            ((PlayerCommandEventListener) iterator.next()).onCommand(server, session, packet);
+            try {
+                ((PlayerCommandEventListener) iterator.next()).onCommand(player, packet);
+            } catch (ClassNotFoundException e) {
+                player.sendMessageToPlayer("Unknown Command!");
+
+            }
         }
     }
 }

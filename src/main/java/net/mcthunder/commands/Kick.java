@@ -1,11 +1,11 @@
 package net.mcthunder.commands;
 
 import net.mcthunder.apis.Command;
+import net.mcthunder.apis.Player;
 import net.mcthunder.handlers.ServerChatHandler;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
-import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
 import java.util.List;
@@ -21,8 +21,8 @@ public class Kick extends Command {
     }
 
     @Override
-    public boolean execute(Server server, Session session, ClientChatPacket packet) {
-        List<Session> sessions = server.getSessions();
+    public boolean execute(Player player, ClientChatPacket packet) {
+        List<Session> sessions = player.getServer().getSessions();
         String[] wholeMessage = packet.getMessage().split(" ");
         serverChatHandler = new ServerChatHandler();
         if (wholeMessage.length >= 2) {
@@ -42,7 +42,8 @@ public class Kick extends Command {
                 String sessionName = p.getName();
                 if (sessionName.equalsIgnoreCase(saidName)) {
                     s.disconnect("Kicked: " + args);
-                    serverChatHandler.sendMessage(server, sessionName + " was kicked by " + session.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getName());
+                    player.getChatHandler().sendMessage(player.getServer(), sessionName + " was kicked by " + player.gameProfile().getName() + "!");
+
                     foundName = true;
                     break;
                 }
@@ -50,10 +51,11 @@ public class Kick extends Command {
 
             }
             if (!foundName) {
-                serverChatHandler.sendPrivateMessage(session, "Could Not find player " + saidName + "!");
+                player.sendMessageToPlayer("Could not finde player " + saidName + "!");
+
             }
         } else {
-            serverChatHandler.sendPrivateMessage(session, "Not Enough Arguments!");
+            player.sendMessageToPlayer("Not enough arguments!");
 
 
         }

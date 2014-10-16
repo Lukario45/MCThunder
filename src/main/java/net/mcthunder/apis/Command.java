@@ -1,8 +1,6 @@
 package net.mcthunder.apis;
 
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
-import org.spacehq.packetlib.Server;
-import org.spacehq.packetlib.Session;
 
 /**
  * Based of of Alphabot/Lukabot code that was created by zack6849
@@ -42,7 +40,7 @@ public abstract class Command {
         return this.permissionNode;
     }
 
-    public abstract boolean execute(Server server, Session session, ClientChatPacket packet);
+    public abstract boolean execute(Player player, ClientChatPacket packet);
 
 
 }
