@@ -156,15 +156,19 @@ public class MCThunder {
                 @Override
                 public void loggedIn(Session session) {
                     GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
+                    int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+                    EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
+                    playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
+
                     Player player = playerHashMap.get(profile.getId());
+
+
                     player.getSession().send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
                     tellConsole("INFO", "User " + player.gameProfile().getName() + " is trying to log in!");
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
                     player.getSession().send(new ServerPlayerPositionRotationPacket(0, 24, 0, 0, 0));
-                    int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
-                    EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
-                    playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
+
                     byte[] light = new byte[4096];
                     Arrays.fill(light, (byte) 15);
                     Chunk[] chunks = new Chunk[16];
@@ -237,7 +241,7 @@ public class MCThunder {
                                     double newYaw = packet.getYaw();
                                     double newPitch = packet.getPitch();
                                     boolean newOnGround = packet.isOnGround();
-                                    ;
+
                                     player.setYaw(packet.getYaw());
                                     player.setPitch(packet.getPitch());
                                     player.setOnGround(packet.isOnGround());
