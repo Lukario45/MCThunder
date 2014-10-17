@@ -31,9 +31,10 @@ public class ServerChatHandler {
             String userName = profile.getName();
             String message = packet.getMessage();
             tellConsole("CHAT", userName + ": " + message);
-            Message msg = new TextMessage(userName).setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
-            Message body = new TextMessage(": " + message).setStyle(new MessageStyle().setColor(ChatColor.WHITE));
+            Message msg = new TextMessage(userName).setStyle(new MessageStyle().setColor(ChatColor.WHITE));
+            Message body = new TextMessage(": " + message);
             msg.addExtra(body);
+            msg.setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
             sessionsList = server.getSessions();
             for (Session s : sessionsList) {
                 s.send(new ServerChatPacket(msg));
