@@ -14,11 +14,13 @@ import java.util.List;
  * Created by Kevin on 10/13/2014.
  */
 public class PlayerChatEventSource {
+    private static boolean removeDefault = false;
     private List playerChatEventListeners = new ArrayList();
 
     public synchronized void addEventListener(PlayerChatEventListener listener) {
-        if (listener.removeDefaultListener()) {
+        if (listener.removeDefaultListener() && !playerChatEventListeners.isEmpty() && !removeDefault) {
             playerChatEventListeners.remove(0);
+            removeDefault = true;
         }
         playerChatEventListeners.add(listener);
     }

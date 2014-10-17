@@ -13,22 +13,24 @@ import java.util.List;
  * Created by Kevin on 10/13/2014.
  */
 public class PlayerCommandEventSource {
-    private List playerChatEventListeners = new ArrayList();
+    private static boolean removeDefault = false;
+    private List playerCommandEventListeners = new ArrayList();
 
     public synchronized void addEventListener(PlayerCommandEventListener listener) {
-        if (listener.removeDefaultListener()) {
-            playerChatEventListeners.remove(0);
+        if (listener.removeDefaultListener() && !playerCommandEventListeners.isEmpty() && !removeDefault) {
+            playerCommandEventListeners.remove(0);
+            removeDefault = true;
         }
-        playerChatEventListeners.add(listener);
+        playerCommandEventListeners.add(listener);
     }
 
     public synchronized void removeEventListener(PlayerCommandEventListener listener) {
-        playerChatEventListeners.remove(listener);
+        playerCommandEventListeners.remove(listener);
     }
 
     public synchronized void fireEvent(Player player, ClientChatPacket packet) throws ClassNotFoundException {
         PlayerCommandEvent event = new PlayerCommandEvent(this);
-        Iterator iterator = playerChatEventListeners.iterator();
+        Iterator iterator = playerCommandEventListeners.iterator();
         while (iterator.hasNext()) {
             try {
                 ((PlayerCommandEventListener) iterator.next()).onCommand(player, packet);

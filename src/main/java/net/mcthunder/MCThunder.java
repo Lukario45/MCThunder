@@ -111,8 +111,7 @@ public class MCThunder {
         Reflections reflections = new Reflections("net.mcthunder.commands");
         Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
         for (Class c : subTypes) {
-            Command cmd = null;
-            cmd = CommandRegistry.getCommand(c.getSimpleName(), pkg);
+            Command cmd = CommandRegistry.getCommand(c.getSimpleName(), pkg);
 
             CommandRegistry.register(cmd);
         }
@@ -333,8 +332,10 @@ public class MCThunder {
                             } else if (event.getPacket() instanceof ClientTabCompletePacket) {
                                 ClientTabCompletePacket packet = event.getPacket();
                                 tabHandler.handleTabComplete(server, event.getSession(), packet);
-                            } else {
+                            } else if (event.getPacket() != null) {
                                 tellConsole("DEBUG", event.getPacket().toString());
+                            } else  {
+                                tellConsole("DEBUG", "null packet");
                             }
                         }
 
