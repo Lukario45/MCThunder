@@ -57,10 +57,7 @@ import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
 import java.util.*;
 
-import static net.mcthunder.apis.Utils.createInitialDirs;
-import static net.mcthunder.apis.Utils.getIP;
-import static net.mcthunder.apis.Utils.tellConsole;
-import static net.mcthunder.apis.Utils.tellPublicIpAddress;
+import static net.mcthunder.apis.Utils.*;
 
 //MCPacketLib Imports
 //Java Imports
@@ -174,12 +171,12 @@ public class MCThunder {
                     for (int i = 0; i < chunks.length; i++) {
                         NibbleArray3d blocklight = new NibbleArray3d(light);
                         NibbleArray3d skylight = new NibbleArray3d(light);
-                        ShortArray3d blocks = new ShortArray3d(4096);
+                        ShortArray3d blocks = new ShortArray3d(8192);
                         for (int cY = 0; cY < 24; cY++) {
                             for (int cZ = 0; cZ < 16; cZ++) {
                                 for (int cX = 0; cX < 16; cX++) {
                                     int y = cY - i * 16;
-                                    if ((cY < (i + 1) * 16) && (cY > i * 16)) {
+                                    if ((cY <= (i + 1) * 16) && (cY >= i * 16)) {
                                         if (cY < 1) {
                                             blocks.setBlock(cX, y, cZ, 7);
                                         } else if (cY < 23) {
@@ -339,60 +336,60 @@ public class MCThunder {
         }
     }
 
+    private static void updatePlayerPosition(Session session, ClientPlayerMovementPacket packet) {
+        GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
+        Player player = playerHashMap.get(profile.getId());
+        if (packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
+            player.setX(packet.getX());
+            player.setY(packet.getY());
+            player.setZ(packet.getZ());
+        }
+
+        if (packet instanceof ClientPlayerRotationPacket || packet instanceof ClientPlayerPositionRotationPacket) {
+            player.setYaw(packet.getYaw());
+            player.setPitch(packet.getPitch());
+        }
+
+        player.setOnGround(packet.isOnGround());
+    }
+
+    private static List<Packet> createUpdatePackets(Session session, ClientPlayerMovementPacket packet) {
+        List<Packet> packets = new ArrayList<Packet>();
+        GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
+		Player player = playerHashMap.get(profile.getId());
+		if(packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
+            double movedX = packet.getX() - player.getX();
+            double movedY = packet.getY() - player.getY();
+            double movedZ = packet.getZ() - player.getZ();
+            float yaw = player.getYaw();
+            float pitch = player.getPitch();
+            if (packet instanceof ClientPlayerPositionRotationPacket) {
+                yaw = (float) packet.getYaw();
+                pitch = (float) packet.getPitch();
+            }
+
+            int packedX = (int) (movedX * 32);
+            int packedY = (int) (movedY * 32);
+            int packedZ = (int) (movedZ * 32);
+            if (packedX > Byte.MAX_VALUE || packedY > Byte.MAX_VALUE || packedZ > Byte.MAX_VALUE || packedX < Byte.MIN_VALUE || packedY < Byte.MIN_VALUE || packedZ < Byte.MIN_VALUE) {
+                packets.add(new ServerEntityTeleportPacket(player.getEntityID(), packet.getX(), packet.getY(), packet.getZ(), yaw, pitch, packet.isOnGround()));
+            } else if (packet instanceof ClientPlayerPositionPacket) {
+                packets.add(new ServerEntityPositionPacket(player.getEntityID(), movedX, movedY, movedZ, packet.isOnGround()));
+            } else if (packet instanceof ClientPlayerPositionRotationPacket) {
+                packets.add(new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, yaw, pitch, packet.isOnGround()));
+                packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
+            }
+        } else if (packet instanceof ClientPlayerRotationPacket) {
+            float yaw = (float) packet.getYaw();
+            float pitch = (float) packet.getPitch();
+            packets.add(new ServerEntityRotationPacket(player.getEntityID(), yaw, pitch, packet.isOnGround()));
+            packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
+        }
+
+        return packets;
+    }
+
     public Server getServer() {
         return this.server;
     }
-
-	private static void updatePlayerPosition(Session session, ClientPlayerMovementPacket packet) {
-		GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
-		Player player = playerHashMap.get(profile.getId());
-		if(packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
-			player.setX(packet.getX());
-			player.setY(packet.getY());
-			player.setZ(packet.getZ());
-		}
-
-		if(packet instanceof ClientPlayerRotationPacket || packet instanceof ClientPlayerPositionRotationPacket) {
-			player.setYaw(packet.getYaw());
-			player.setPitch(packet.getPitch());
-		}
-
-		player.setOnGround(packet.isOnGround());
-	}
-
-	private static List<Packet> createUpdatePackets(Session session, ClientPlayerMovementPacket packet) {
-		List<Packet> packets = new ArrayList<Packet>();
-		GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
-		Player player = playerHashMap.get(profile.getId());
-		if(packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
-			double movedX = packet.getX() - player.getX();
-			double movedY = packet.getY() - player.getY();
-			double movedZ = packet.getZ() - player.getZ();
-			float yaw = player.getYaw();
-			float pitch = player.getPitch();
-			if(packet instanceof ClientPlayerPositionRotationPacket) {
-				yaw = (float) packet.getYaw();
-				pitch = (float) packet.getPitch();
-			}
-
-			int packedX = (int) (movedX * 32);
-			int packedY = (int) (movedY * 32);
-			int packedZ = (int) (movedZ * 32);
-			if(packedX > Byte.MAX_VALUE || packedY > Byte.MAX_VALUE || packedZ > Byte.MAX_VALUE || packedX < Byte.MIN_VALUE || packedY < Byte.MIN_VALUE || packedZ < Byte.MIN_VALUE) {
-				packets.add(new ServerEntityTeleportPacket(player.getEntityID(), packet.getX(), packet.getY(), packet.getZ(), yaw, pitch, packet.isOnGround()));
-			} else if(packet instanceof ClientPlayerPositionPacket) {
-				packets.add(new ServerEntityPositionPacket(player.getEntityID(), movedX, movedY, movedZ, packet.isOnGround()));
-			} else if(packet instanceof ClientPlayerPositionRotationPacket) {
-				packets.add(new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, yaw, pitch, packet.isOnGround()));
-				packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
-			}
-		} else if(packet instanceof ClientPlayerRotationPacket) {
-			float yaw = (float) packet.getYaw();
-			float pitch = (float) packet.getPitch();
-			packets.add(new ServerEntityRotationPacket(player.getEntityID(), yaw, pitch, packet.isOnGround()));
-			packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
-		}
-
-		return packets;
-	}
 }
