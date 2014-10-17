@@ -165,26 +165,30 @@ public class MCThunder {
                     //Send World Data
                     player.getSession().send(new ServerPlayerPositionRotationPacket(0, 24, 0, 0, 0));
 
-                    byte[] light = new byte[4096];
+                    /**byte[] light = new byte[4096];
                     Arrays.fill(light, (byte) 15);
                     Chunk[] chunks = new Chunk[16];
                     for (int i = 0; i < chunks.length; i++) {
                         NibbleArray3d blocklight = new NibbleArray3d(light);
                         NibbleArray3d skylight = new NibbleArray3d(light);
-                        ShortArray3d blocks = new ShortArray3d(8192);
+                     ShortArray3d blocks = new ShortArray3d(4098);
                         for (int cY = 0; cY < 24; cY++) {
                             for (int cZ = 0; cZ < 16; cZ++) {
                                 for (int cX = 0; cX < 16; cX++) {
                                     int y = cY - i * 16;
-                                    if ((cY <= (i + 1) * 16) && (cY >= i * 16)) {
+                     if ((cY < (i + 1) * 16) && (cY > i * 16)) {
                                         if (cY < 1) {
                                             blocks.setBlock(cX, y, cZ, 7);
                                         } else if (cY < 23) {
-                                            blocks.setBlock(cX, y, cZ, 3);
-                                        } else {
+                     blocks.setBlock(cX, y, cZ, 3 );
+                     } else if (cY > 23){
+                     blocks.setBlock(cX, y, cZ, 57);
+                     }
+
+                     else{
                                             blocks.setBlock(cX, y, cZ, 2);
                                         }
-                                    }
+                     }
                                 }
                             }
                         }
@@ -193,22 +197,64 @@ public class MCThunder {
                         chunks[i] = chunk;
                     }
 
+
+                     }*/
+                    byte[] light = new byte[4096]; //Create a light array of bytes (actually nibbles) (should this be 2048)
+                    Arrays.fill(light, (byte) 15); //fill up the light array with full light (16 at 0 indexed)
+                    Chunk[] chunks = new Chunk[16];
+
+                    for (int i = 0; i < chunks.length; i++) //Loop through all 16 chunks (verticle fashion)
+                    {
+
+                        NibbleArray3d blocklight = new NibbleArray3d(light); //Create our blocklight array
+                        NibbleArray3d skylight = new NibbleArray3d(light); //Create our skylight array
+                        ShortArray3d blocks = new ShortArray3d(4096); //Array containing the blocks of THIS sub-chunk only!
+
+                        for (int cY = 0; cY < 16; cY++) { //Loop through the Y axis
+                            for (int cZ = 0; cZ < 16; cZ++) { //Loop through z
+                                for (int cX = 0; cX < 16; cX++) //Loop through x
+                                {
+                                    int y = cY + i * 16; //Get our ABSOLUTE y coordinate (used only to check our literal position)
+
+                                    if (y == 0) //lowest point
+                                    {
+                                        blocks.setBlock(cX, cY, cZ, 7); //Adminium
+                                    } else if (y <= 23) //less than 24 but above 0
+                                    {
+                                        blocks.setBlock(cX, cY, cZ, 3); //Dirt
+                                    } else if (y == 24) //Exactly 24
+                                    {
+                                        blocks.setBlock(cX, cY, cZ, 2); //Grass
+                                    }
+
+                                }
+                            }
+                        }
+                        Chunk chunk = new Chunk(blocks, blocklight, skylight);
+                        chunks[i] = chunk;
+                    }
                     for (int x = -5; x <= 5; x++) {
                         for (int z = -5; z <= 5; z++) {
                             player.getSession().send(new ServerChunkDataPacket(x, z, chunks, new byte[256]));
                         }
                     }
-
                     player.getSession().send(new ServerSpawnPositionPacket(new Position(0, 24, 0)));
 
                     player.getChatHandler().sendMessage(server, profile.getName() + " has joined " + serverName);
                     playerProfileHandler.checkPlayer(profile);
                     ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), 0, 24, 0, player.getYaw(), player.getPitch(), player.getHeldItem(), player.getMetadata().getMetadataArray());
                     for (Player player1 : playerHashMap.values()) {
-                        player1.getSession().send(toAllPlayers);
                         ServerSpawnPlayerPacket toNewPlayer = new ServerSpawnPlayerPacket(player1.getEntityID(), player1.gameProfile().getId(), player1.getX(), player1.getY(), player1.getZ(), player1.getYaw(), player1.getPitch(), player1.getHeldItem(), player1.getMetadata().getMetadataArray());
-                        player.getSession().send(toNewPlayer);
+                        if (player1.gameProfile().getName().equals(player.gameProfile().getName())) {
+
+                        } else {
+                            player1.getSession().send(toAllPlayers);
+                            player.getSession().send(toNewPlayer);
+                        }
+
+
                     }
+
                 }
             });
 
@@ -309,6 +355,10 @@ public class MCThunder {
                         Player player = playerHashMap.get(profile.getId());
                         player.getChatHandler().sendMessage(server, profile.getName() + " has left " + conf.getServerName());
                         entryListHandler.deleteFromPlayerEntryList(server, event.getSession());
+                        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(player.getEntityID());
+                        for (Player p : playerHashMap.values()) {
+                            p.getSession().send(destroyEntitiesPacket);
+                        }
                         playerHashMap.remove(player);
                     }
                 }
