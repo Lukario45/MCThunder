@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class Stop extends Command {
     public Stop() {
-        super("Stop", "stop", "Stops the server", 9999, "command.stop");
+        super("stop", "stop", "Stops the server", 9999, "command.stop");
     }
 
     @Override
@@ -22,19 +22,15 @@ public class Stop extends Command {
 
         if (wholeMessage.length >= 2) {
             StringBuilder sb = new StringBuilder();
-            for (int i = 1; i < wholeMessage.length; i++) {
+            for (int i = 1; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");
-            }
             String args = sb.toString().trim();
-            for (Session s : sessions) {
+            for (Session s : sessions)
                 s.disconnect(args);
-            }
             player.getServer().close();
-
         } else {
-            for (Session s : sessions) {
+            for (Session s : sessions)
                 s.disconnect("Server Closed!");
-            }
             player.getServer().close();
         }
         return true;

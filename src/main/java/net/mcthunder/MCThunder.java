@@ -64,7 +64,6 @@ import static net.mcthunder.apis.Utils.*;
 //Misc Library Imports
 //Static Mist Imports
 
-
 /**
  * Created by Kevin on 8/9/2014.
  */
@@ -110,11 +109,8 @@ public class MCThunder {
         final String pkg = "net.mcthunder.commands.";
         Reflections reflections = new Reflections("net.mcthunder.commands");
         Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
-        for (Class c : subTypes) {
-            Command cmd = CommandRegistry.getCommand(c.getSimpleName(), pkg);
-
-            CommandRegistry.register(cmd);
-        }
+        for (Class c : subTypes)
+            CommandRegistry.register(CommandRegistry.getCommand(c.getSimpleName(), pkg));
         //Done
         if (SPAWN_SERVER) {
             server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
@@ -148,9 +144,8 @@ public class MCThunder {
                 @Override
                 public void loggedIn(Session session) {
                     GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
-					if(playerHashMap.containsKey(profile.getId())) {
+					if(playerHashMap.containsKey(profile.getId()))
 						playerHashMap.get(profile.getId()).getSession().disconnect("You logged in from another location!");
-					}
 
                     int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
                     EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
@@ -202,41 +197,29 @@ public class MCThunder {
                     Arrays.fill(light, (byte) 15); //fill up the light array with full light (16 at 0 indexed)
                     Chunk[] chunks = new Chunk[16];
 
-                    for (int i = 0; i < chunks.length; i++) //Loop through all 16 chunks (verticle fashion)
-                    {
-
+                    for (int i = 0; i < chunks.length; i++) { //Loop through all 16 chunks (verticle fashion)
                         NibbleArray3d blocklight = new NibbleArray3d(light); //Create our blocklight array
                         NibbleArray3d skylight = new NibbleArray3d(light); //Create our skylight array
                         ShortArray3d blocks = new ShortArray3d(4096); //Array containing the blocks of THIS sub-chunk only!
 
-                        for (int cY = 0; cY < 16; cY++) { //Loop through the Y axis
-                            for (int cZ = 0; cZ < 16; cZ++) { //Loop through z
-                                for (int cX = 0; cX < 16; cX++) //Loop through x
-                                {
+                        for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
+                            for (int cZ = 0; cZ < 16; cZ++) //Loop through z
+                                for (int cX = 0; cX < 16; cX++) { //Loop through x
                                     int y = cY + i * 16; //Get our ABSOLUTE y coordinate (used only to check our literal position)
 
                                     if (y == 0) //lowest point
-                                    {
                                         blocks.setBlock(cX, cY, cZ, 7); //Adminium
-                                    } else if (y <= 23) //less than 24 but above 0
-                                    {
+                                    else if (y <= 23) //less than 24 but above 0
                                         blocks.setBlock(cX, cY, cZ, 3); //Dirt
-                                    } else if (y == 24) //Exactly 24
-                                    {
+                                    else if (y == 24) //Exactly 24
                                         blocks.setBlock(cX, cY, cZ, 2); //Grass
-                                    }
-
                                 }
-                            }
-                        }
                         Chunk chunk = new Chunk(blocks, blocklight, skylight);
                         chunks[i] = chunk;
                     }
-                    for (int x = -5; x <= 5; x++) {
-                        for (int z = -5; z <= 5; z++) {
+                    for (int x = -5; x <= 5; x++)
+                        for (int z = -5; z <= 5; z++)
                             player.getSession().send(new ServerChunkDataPacket(x, z, chunks, new byte[256]));
-                        }
-                    }
                     player.getSession().send(new ServerSpawnPositionPacket(new Position(0, 24, 0)));
 
                     player.getChatHandler().sendMessage(server, profile.getName() + " has joined " + serverName);
@@ -250,10 +233,7 @@ public class MCThunder {
                             player1.getSession().send(toAllPlayers);
                             player.getSession().send(toNewPlayer);
                         }
-
-
                     }
-
                 }
             });
 
@@ -265,13 +245,10 @@ public class MCThunder {
                         public void packetReceived(PacketReceivedEvent event) {
 							if (event.getPacket() instanceof ClientPlayerMovementPacket) {
 								ClientPlayerMovementPacket pack = event.getPacket();
-								for(Packet packet : createUpdatePackets(event.getSession(), pack)) {
-									for(Player p : playerHashMap.values()) {
-										if(!p.gameProfile().getName().equals(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getName())) {
+								for(Packet packet : createUpdatePackets(event.getSession(), pack))
+									for(Player p : playerHashMap.values())
+										if(!p.gameProfile().getName().equals(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getName()))
 											p.getSession().send(packet);
-										}
-									}
-								}
 
 								updatePlayerPosition(event.getSession(), pack);
 							} else if(event.getPacket() instanceof ClientPlayerStatePacket) {
@@ -301,42 +278,37 @@ public class MCThunder {
 							} else if(event.getPacket() instanceof ClientSwingArmPacket) {
 								GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
 								Player player = playerHashMap.get(profile.getId());
-								for(Player p : playerHashMap.values()) {
-									if(!p.gameProfile().getName().equals(profile.getName())) {
+								for(Player p : playerHashMap.values())
+									if(!p.gameProfile().getName().equals(profile.getName()))
 										p.getSession().send(new ServerAnimationPacket(player.getEntityID(), Animation.SWING_ARM));
-									}
-								}
                             } else if (event.getPacket() instanceof ClientChatPacket) {
                                 ClientChatPacket packet = event.getPacket();
                                 GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
                                 Player player = playerHashMap.get(profile.getId());
                                 if (packet.getMessage().startsWith("/")) {
-                                    if (packet.getMessage().equals("/")) {
+                                    if (packet.getMessage().equals("/"))
                                         chatHandler.sendPrivateMessage(event.getSession(), "Command does not exist!");
-                                    } else {
+                                    else
                                         try {
                                             playerCommandEventSource.fireEvent(player, packet);
                                         } catch (ClassNotFoundException e) {
                                             player.sendMessageToPlayer("Unknown Command");
                                         }
-                                    }
-                                } else {
+                                } else
                                     playerChatEventSource.fireEvent(server, event.getSession(), packet, server.getSessions());
-                                }
 
                                 //chatHandler.handleChat(server, event.getSession(), packet, sessionsList);
-                            } else if (event.getPacket() instanceof ClientKeepAlivePacket) {
+                            } else if (event.getPacket() instanceof ClientKeepAlivePacket)
 								event.getSession().send(new ServerKeepAlivePacket(event.<ClientKeepAlivePacket>getPacket().getPingId()));
-                            } else if (event.getPacket() instanceof ClientSettingsPacket) {
+                            else if (event.getPacket() instanceof ClientSettingsPacket) {
 
                             } else if (event.getPacket() instanceof ClientTabCompletePacket) {
                                 ClientTabCompletePacket packet = event.getPacket();
                                 tabHandler.handleTabComplete(server, event.getSession(), packet);
-                            } else if (event.getPacket() != null) {
+                            } else if (event.getPacket() != null)
                                 tellConsole("DEBUG", event.getPacket().toString());
-                            } else  {
+                            else
                                 tellConsole("DEBUG", "null packet");
-                            }
                         }
 
                         @Override
@@ -357,9 +329,8 @@ public class MCThunder {
                         player.getChatHandler().sendMessage(server, profile.getName() + " has left " + conf.getServerName());
                         entryListHandler.deleteFromPlayerEntryList(server, event.getSession());
                         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(player.getEntityID());
-                        for (Player p : playerHashMap.values()) {
+                        for (Player p : playerHashMap.values())
                             p.getSession().send(destroyEntitiesPacket);
-                        }
                         playerHashMap.remove(player);
                     }
                 }
@@ -369,20 +340,16 @@ public class MCThunder {
 			while(server.isListening()) {
 				for(Player player : playerHashMap.values()) {
 					EntityMetadata changes[] = player.getMetadata().getChanges();
-					if(changes != null) {
-						for(Player p : playerHashMap.values()) {
-							if(!p.gameProfile().getName().equals(player.gameProfile().getName())) {
+					if(changes != null)
+						for(Player p : playerHashMap.values())
+							if(!p.gameProfile().getName().equals(player.gameProfile().getName()))
 								p.getSession().send(new ServerEntityMetadataPacket(player.getEntityID(), changes));
-							}
-						}
-					}
 				}
 
 				// Don't overload CPU with loops.
 				try {
 					Thread.sleep(20);
-				} catch(InterruptedException e) {
-				}
+				} catch(InterruptedException e) { }
 			}
         }
     }
@@ -422,11 +389,11 @@ public class MCThunder {
             int packedX = (int) (movedX * 32);
             int packedY = (int) (movedY * 32);
             int packedZ = (int) (movedZ * 32);
-            if (packedX > Byte.MAX_VALUE || packedY > Byte.MAX_VALUE || packedZ > Byte.MAX_VALUE || packedX < Byte.MIN_VALUE || packedY < Byte.MIN_VALUE || packedZ < Byte.MIN_VALUE) {
+            if (packedX > Byte.MAX_VALUE || packedY > Byte.MAX_VALUE || packedZ > Byte.MAX_VALUE || packedX < Byte.MIN_VALUE || packedY < Byte.MIN_VALUE || packedZ < Byte.MIN_VALUE)
                 packets.add(new ServerEntityTeleportPacket(player.getEntityID(), packet.getX(), packet.getY(), packet.getZ(), yaw, pitch, packet.isOnGround()));
-            } else if (packet instanceof ClientPlayerPositionPacket) {
+            else if (packet instanceof ClientPlayerPositionPacket)
                 packets.add(new ServerEntityPositionPacket(player.getEntityID(), movedX, movedY, movedZ, packet.isOnGround()));
-            } else if (packet instanceof ClientPlayerPositionRotationPacket) {
+            else if (packet instanceof ClientPlayerPositionRotationPacket) {
                 packets.add(new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, yaw, pitch, packet.isOnGround()));
                 packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
             }
@@ -436,7 +403,6 @@ public class MCThunder {
             packets.add(new ServerEntityRotationPacket(player.getEntityID(), yaw, pitch, packet.isOnGround()));
             packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
         }
-
         return packets;
     }
 

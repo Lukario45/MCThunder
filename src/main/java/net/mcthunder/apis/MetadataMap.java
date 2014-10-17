@@ -21,46 +21,39 @@ public class MetadataMap {
 	}
 
 	public void setMetadata(int id, Object value) {
-		if(value == null) {
+		if(value == null)
 			throw new IllegalArgumentException("Cannot set a metadata value to null.");
-		}
 
-		MetadataType type = null;
-		if(value instanceof Byte) {
+		MetadataType type;
+		if(value instanceof Byte)
 			type = MetadataType.BYTE;
-		} else if(value instanceof Short) {
+		else if(value instanceof Short)
 			type = MetadataType.SHORT;
-		} else if(value instanceof Integer) {
+		else if(value instanceof Integer)
 			type = MetadataType.INT;
-		} else if(value instanceof Float) {
+		else if(value instanceof Float)
 			type = MetadataType.FLOAT;
-		} else if(value instanceof String) {
+		else if(value instanceof String)
 			type = MetadataType.STRING;
-		} else if(value instanceof ItemStack) {
+		else if(value instanceof ItemStack)
 			type = MetadataType.ITEM;
-		} else if(value instanceof Position) {
+		else if(value instanceof Position)
 			type = MetadataType.POSITION;
-		} else if(value instanceof Rotation) {
+		else if(value instanceof Rotation)
 			type = MetadataType.ROTATION;
-		} else {
+		else
 			throw new IllegalArgumentException("Metadata value \"" + value + "\" has an unsupported type.");
-		}
 
 		Object old = this.getMetadata(id);
 		EntityMetadata metadata = new EntityMetadata(id, type, value);
 		this.metadata.put(id, metadata);
-		if(!value.equals(old)) {
+		if(!value.equals(old))
 			this.changes.add(metadata);
-		}
 	}
 
 	public Number getNumber(int id) {
 		Object value = this.getMetadata(id);
-		if(value == null) {
-			return 0;
-		}
-
-		return (Number) value;
+		return value == null ? 0 : (Number) value;
 	}
 
 	public boolean getBit(int id, int bit) {
@@ -68,11 +61,7 @@ public class MetadataMap {
 	}
 
 	public void setBit(int id, int bit, boolean value) {
-		if(value) {
-			this.setMetadata(id, (byte) (this.getNumber(id).byteValue() | bit));
-		} else {
-			this.setMetadata(id, (byte) (this.getNumber(id).byteValue() & ~bit));
-		}
+        this.setMetadata(id, (byte) (value ? (this.getNumber(id).byteValue() | bit) : (this.getNumber(id).byteValue() & ~bit)));
 	}
 
 	public EntityMetadata[] getMetadataArray() {
@@ -80,9 +69,8 @@ public class MetadataMap {
 	}
 
 	public EntityMetadata[] getChanges() {
-		if(this.changes.isEmpty()) {
+		if(this.changes.isEmpty())
 			return null;
-		}
 
 		EntityMetadata changes[] = this.changes.toArray(new EntityMetadata[this.changes.size()]);
 		this.changes.clear();

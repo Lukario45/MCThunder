@@ -32,8 +32,7 @@ public class PlayerChatEventSource {
     public synchronized void fireEvent(Server server, Session session, ClientChatPacket packet, List<Session> sessionsList) {
         PlayerChatEvent event = new PlayerChatEvent(this);
         Iterator iterator = playerChatEventListeners.iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext())
             ((PlayerChatEventListener) iterator.next()).onChat(server, session, packet, sessionsList);
-        }
     }
 }

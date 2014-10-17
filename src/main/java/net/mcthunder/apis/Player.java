@@ -106,7 +106,6 @@ public class Player {
 
     public void setPitch(double pitch) {
         this.pitch = pitch;
-
     }
 
     public boolean isOnGround() {
@@ -141,8 +140,5 @@ public class Player {
 
     public void sendMessageToPlayer(String message) {
         this.chatHandler.sendPrivateMessage(this.session, message);
-
     }
-
-
 }

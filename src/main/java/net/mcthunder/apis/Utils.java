@@ -20,17 +20,13 @@ public class Utils {
     private static Config conf;
 
     public static String getIP() {
-
         InetAddress ip = null;
         try {
             ip = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-
-
-        return ip.getHostAddress();
-
+        return ip == null ? null : ip.getHostAddress();
     }
 
     //Based off Of Necessities Code!
@@ -57,12 +53,9 @@ public class Utils {
         makeDir(pluginsDir);
         makeDir(logsDir);
         tellConsole("INFO", "Completed checking directories!");
-
-
     }
 
     public static void tellPublicIpAddress() {
-
         conf = new Config();
         conf.loadConfig();
         try {
@@ -73,7 +66,6 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
     public static void tellConsole(String type, String message) {
         String date = new SimpleDateFormat("HH:mm:ss").format(new Date());
@@ -84,5 +76,4 @@ public class Utils {
         int entityID = 0;
         return entityID;
     }
-
 }

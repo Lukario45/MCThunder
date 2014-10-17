@@ -17,7 +17,6 @@ public class PlayerProfileHandler {
 
     public PlayerProfileHandler(Server server) {
         this.server = server;
-
     }
 
     public void checkPlayer(GameProfile profile) {
@@ -28,9 +27,6 @@ public class PlayerProfileHandler {
         File playerFile = new File("PlayerFiles", playerID + ".yml");
         if (!playerFile.exists()) {
             tellConsole("INFO", "Player: " + playerName + "'s file does not exist yet, creating file!");
-            //chatHandler.sendMessage(server, "Welcome " + playerName + " to the server!");
-            //    playerFile.mkdirs();
-
             try {
                 playerFile.createNewFile();
             } catch (IOException e) {
@@ -38,7 +34,6 @@ public class PlayerProfileHandler {
             }
             tellConsole("INFO", "Done!");
             chatHandler.sendMessage(server, "Welcome " + playerName + " to the server!");
-
         }
     }
 
@@ -61,5 +56,4 @@ public class PlayerProfileHandler {
     public void addMultiAttribute(GameProfile profile, String attribute, String attributeData) {
 
     }
-
 }

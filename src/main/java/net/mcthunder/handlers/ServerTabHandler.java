@@ -25,23 +25,16 @@ public class ServerTabHandler {
         List<String> matches = new ArrayList<String>();
 
         for (Session s : sessions) {
-
             GameProfile p = s.getFlag(ProtocolConstants.PROFILE_KEY);
             String name = p.getName();
-            if (name.toLowerCase().startsWith(word.toLowerCase())) {
+            if (name.toLowerCase().startsWith(word.toLowerCase()))
                 matches.add(name);
-            }
-
         }
         String[] matchArray = StringUtils.join(matches, "  ").split(" ");
         ServerTabCompletePacket serverTabCompletePacket = new ServerTabCompletePacket(matchArray);
         if (matches.size() != 0) {
             //chatHandler.sendPrivateMessage(event.getSession(), StringUtils.join(matches, ", "));
             session.send(serverTabCompletePacket);
-
         }
-
-
     }
-
 }

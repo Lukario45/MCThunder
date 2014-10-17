@@ -28,13 +28,11 @@ public class Kick extends Command {
         if (wholeMessage.length >= 2) {
             StringBuilder sb = new StringBuilder();
             StringBuilder sb2 = new StringBuilder();
-            for (int i = 1; i < wholeMessage.length; i++) {
+            for (int i = 1; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");
-            }
             String saidName = sb.toString().trim().split(" ")[0];
-            for (int i = 2; i < wholeMessage.length; i++) {
+            for (int i = 2; i < wholeMessage.length; i++)
                 sb2.append(wholeMessage[i]).append(" ");
-            }
             String args = sb2.toString().trim();
             Boolean foundName = false;
             for (Session s : sessions) {
@@ -48,17 +46,11 @@ public class Kick extends Command {
                     break;
                 }
 
-
             }
-            if (!foundName) {
+            if (!foundName)
                 player.sendMessageToPlayer("Could not find player " + saidName + "!");
-
-            }
-        } else {
+        } else
             player.sendMessageToPlayer("Not enough arguments!");
-
-
-        }
         return true;
     }
 }

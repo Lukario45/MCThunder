@@ -31,13 +31,11 @@ public class PlayerCommandEventSource {
     public synchronized void fireEvent(Player player, ClientChatPacket packet) throws ClassNotFoundException {
         PlayerCommandEvent event = new PlayerCommandEvent(this);
         Iterator iterator = playerCommandEventListeners.iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext())
             try {
                 ((PlayerCommandEventListener) iterator.next()).onCommand(player, packet);
             } catch (ClassNotFoundException e) {
                 player.sendMessageToPlayer("Unknown Command!");
-
             }
-        }
     }
 }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class Help extends Command {//Ported by pup from Necessities
     public Help() {
-        super("Help", "help", "shows help messages", 9999, "command.help");
+        super("help", "help", "shows help messages", 9999, "command.help");
     }
 
     @Override
@@ -61,15 +61,13 @@ public class Help extends Command {//Ported by pup from Necessities
             message = getHelp(page, time, helpList);
         }
         if (page + 1 < totalpages)
-            player.sendMessageToPlayer("Type " + "/help " + Integer.toString(page + 2) + " to read the next page.");
+            player.sendMessageToPlayer("Type /help " + Integer.toString(page + 2) + " to read the next page.");
         return true;
     }
 
     private String getHelp(int page, int time, ArrayList<String> helpList) {
         page *= 10;
-        if (helpList.size() < time + page + 1 || time == 10)
-            return null;
-        return helpList.get(page + time);
+        return (helpList.size() < time + page + 1 || time == 10) ? null : helpList.get(page + time);
     }
 
     private boolean isLegal(String toCheck) {

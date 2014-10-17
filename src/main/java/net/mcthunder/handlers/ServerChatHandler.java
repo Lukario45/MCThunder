@@ -33,9 +33,8 @@ public class ServerChatHandler {
             Message body = new TextMessage(message).setStyle(new MessageStyle().setColor(ChatColor.WHITE).addFormat(ChatFormat.ITALIC));
             msg.addExtra(body);
             sessionsList = server.getSessions();
-            for (Session s : sessionsList) {
+            for (Session s : sessionsList)
                 s.send(new ServerChatPacket(msg));
-            }
         } catch (IllegalArgumentException e) {
 
         }

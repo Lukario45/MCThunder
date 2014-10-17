@@ -7,14 +7,14 @@ import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
  */
 public abstract class Command {
     private final String name;
-    private final String alisis;
+    private final String alias;
     private final String information;
     private final int rankPoints;
     private final String permissionNode;
 
-    public Command(String name, String alisis, String information, int rankPoints, String permissionNode) {
+    public Command(String name, String alias, String information, int rankPoints, String permissionNode) {
         this.name = name;
-        this.alisis = alisis;
+        this.alias = alias;
         this.information = information;
         this.rankPoints = rankPoints;
         this.permissionNode = permissionNode;
@@ -24,8 +24,8 @@ public abstract class Command {
         return this.name;
     }
 
-    public String getAlisis() {
-        return this.alisis;
+    public String getAlias() {
+        return this.alias;
     }
 
     public String getInformation() {
@@ -41,6 +41,5 @@ public abstract class Command {
     }
 
     public abstract boolean execute(Player player, ClientChatPacket packet);
-
 
 }
