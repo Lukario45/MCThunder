@@ -51,7 +51,7 @@ public class Kick extends Command {
 
             }
             if (!foundName) {
-                player.sendMessageToPlayer("Could not finde player " + saidName + "!");
+                player.sendMessageToPlayer("Could not find player " + saidName + "!");
 
             }
         } else {
