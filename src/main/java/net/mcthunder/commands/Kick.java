@@ -1,20 +1,15 @@
 package net.mcthunder.commands;
 
+import net.mcthunder.MCThunder;
 import net.mcthunder.apis.Command;
 import net.mcthunder.apis.Player;
-import net.mcthunder.handlers.ServerChatHandler;
-import org.spacehq.mc.auth.GameProfile;
-import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
-import org.spacehq.packetlib.Session;
-
-import java.util.List;
 
 /**
  * Created by Kevin on 10/14/2014.
  */
 public class Kick extends Command {
-    private ServerChatHandler serverChatHandler;
+
 
     public Kick() {
         super("kick", "kick", "Kicks a player from the server!", "/kick PLAYERNAME <reason> ", 9999, "command.kick");
@@ -22,9 +17,7 @@ public class Kick extends Command {
 
     @Override
     public boolean execute(Player player, ClientChatPacket packet) {
-        List<Session> sessions = player.getServer().getSessions();
         String[] wholeMessage = packet.getMessage().split(" ");
-        serverChatHandler = new ServerChatHandler();
         if (wholeMessage.length >= 2) {
             StringBuilder sb = new StringBuilder();
             StringBuilder sb2 = new StringBuilder();
@@ -35,11 +28,10 @@ public class Kick extends Command {
                 sb2.append(wholeMessage[i]).append(" ");
             String args = sb2.toString().trim();
             Boolean foundName = false;
-            for (Session s : sessions) {
-                GameProfile p = s.getFlag(ProtocolConstants.PROFILE_KEY);
-                String sessionName = p.getName();
+            for (Player p : MCThunder.playerHashMap.values()) {
+                String sessionName = p.gameProfile().getName();
                 if (sessionName.equalsIgnoreCase(saidName)) {
-                    s.disconnect("Kicked: " + args);
+                    p.getSession().disconnect("Kicked: " + args);
                     player.getChatHandler().sendMessage(player.getServer(), sessionName + " was kicked by " + player.gameProfile().getName() + "!");
 
                     foundName = true;
@@ -50,7 +42,7 @@ public class Kick extends Command {
             if (!foundName)
                 player.sendMessageToPlayer("Could not find player " + saidName + "!");
         } else
-            player.sendMessageToPlayer("Not enough arguments!");
+            player.sendMessageToPlayer(getArguments());
         return true;
     }
 }

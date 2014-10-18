@@ -24,6 +24,7 @@ import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
+import org.spacehq.mc.protocol.data.game.values.world.block.BlockChangeRecord;
 import org.spacehq.mc.protocol.data.message.TextMessage;
 import org.spacehq.mc.protocol.data.status.PlayerInfo;
 import org.spacehq.mc.protocol.data.status.ServerStatusInfo;
@@ -39,6 +40,7 @@ import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.world.ServerBlockChangePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.packetlib.Server;
@@ -267,10 +269,26 @@ public class MCThunder {
                             } else if (event.getPacket() instanceof ClientTabCompletePacket) {
                                 ClientTabCompletePacket packet = event.getPacket();
                                 tabHandler.handleTabComplete(server, event.getSession(), packet);
+
+                            } else if (event.getPacket() instanceof ClientPlayerPlaceBlockPacket) {
+                                // GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+                                // Player player = playerHashMap.get(profile.getId());
+                                ClientPlayerPlaceBlockPacket packet = event.getPacket();
+                                Position position = packet.getPosition();
+                                tellConsole(LoggingLevel.DEBUG, position.getX() + "/" + position.getY() + "/" + position.getZ());
+                                ItemStack heldItem = packet.getHeldItem();
+                                int heldItemId = heldItem.getId();
+                                BlockChangeRecord blockChangeRecord = new BlockChangeRecord(position, heldItemId);
+                                ServerBlockChangePacket serverBlockChangePacket = new ServerBlockChangePacket(blockChangeRecord);
+
+
+                                for (Player p : playerHashMap.values()) {
+                                    p.getSession().send(serverBlockChangePacket);
+                                }
                             } else if (event.getPacket() != null)
                                 tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
-                            else
-                                tellConsole(LoggingLevel.DEBUG, "null packet");
+
+
                         }
 
                         @Override
