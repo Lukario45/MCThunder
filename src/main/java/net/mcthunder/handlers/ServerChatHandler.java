@@ -1,6 +1,7 @@
 package net.mcthunder.handlers;
 
 import net.mcthunder.MCThunder;
+import net.mcthunder.apis.LoggingLevel;
 import net.mcthunder.apis.Player;
 import org.spacehq.mc.protocol.data.message.ChatColor;
 import org.spacehq.mc.protocol.data.message.Message;
@@ -28,7 +29,7 @@ public class ServerChatHandler {
     public void handleChat(Player player, ClientChatPacket packet) {
         try {
             String message = packet.getMessage();
-            tellConsole("CHAT", player.gameProfile().getName() + ": " + message);
+            tellConsole(LoggingLevel.CHAT, player.gameProfile().getName() + ": " + message);
             Message msg = new TextMessage(player.gameProfile().getName() + ": ").setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
             Message body = new TextMessage(message).setStyle(new MessageStyle().setColor(ChatColor.WHITE));
             msg.addExtra(body);
@@ -45,7 +46,7 @@ public class ServerChatHandler {
         for (Session s : sessionList) {
             s.send(new ServerChatPacket(msg));
         }
-        tellConsole("SERVER", message);
+        tellConsole(LoggingLevel.CHAT, "[SERVER] " +  message);
     }
 
     public void sendPrivateMessage(Session session, String privMessage) {

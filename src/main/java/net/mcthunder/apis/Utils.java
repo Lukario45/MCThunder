@@ -11,7 +11,6 @@ import java.util.Date;
 
 /**
  * Created by Kevin on 8/9/2014.
- * import org.jsoup.nodes.Document;
  */
 
 public class Utils {
