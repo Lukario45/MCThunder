@@ -23,7 +23,7 @@ public class PlayerProfileHandler {
 
     public void checkPlayer(Player player) {
         String playerID = player.gameProfile().getIdAsString();
-        String playerName = player.gameProfile().getIdAsString();
+        String playerName = player.gameProfile().getName();
         tellConsole(LoggingLevel.DEBUG, playerName + " has an ID of " + playerID);
         File playerFile = new File("PlayerFiles", playerID + ".yml");
         if (!playerFile.exists()) {
