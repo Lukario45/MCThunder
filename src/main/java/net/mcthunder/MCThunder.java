@@ -3,10 +3,7 @@ package net.mcthunder;
 
 //MCThunder Code Imports 
 
-import net.mcthunder.apis.Command;
-import net.mcthunder.apis.CommandRegistry;
-import net.mcthunder.apis.Config;
-import net.mcthunder.apis.Player;
+import net.mcthunder.apis.*;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
 import net.mcthunder.events.listeners.PlayerCommandEventListener;
 import net.mcthunder.events.source.PlayerChatEventSource;
@@ -98,7 +95,7 @@ public class MCThunder {
         HOST = getIP();
         PORT = conf.getPort();
         //Done Set Server Data
-        tellConsole("INFO", "INTERNAL PORT " + HOST);
+        tellConsole(LoggingLevel.INFO, "INTERNAL PORT " + HOST);
 
         createInitialDirs();
         tellPublicIpAddress();
@@ -152,9 +149,9 @@ public class MCThunder {
                     playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
 
                     Player player = playerHashMap.get(profile.getId());
-
-                    player.getSession().send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
-                    tellConsole("INFO", "User " + player.gameProfile().getName() + " is trying to log in!");
+                    //how about you don't waste time getting an exact copy of a variable you already have stored?
+                    session.send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
+                    tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
                     player.getSession().send(new ServerPlayerPositionRotationPacket(0, 24, 0, 0, 0));
@@ -306,9 +303,9 @@ public class MCThunder {
                                 ClientTabCompletePacket packet = event.getPacket();
                                 tabHandler.handleTabComplete(server, event.getSession(), packet);
                             } else if (event.getPacket() != null)
-                                tellConsole("DEBUG", event.getPacket().toString());
+                                tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
                             else
-                                tellConsole("DEBUG", "null packet");
+                                tellConsole(LoggingLevel.DEBUG, "null packet");
                         }
 
                         @Override

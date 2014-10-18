@@ -1,5 +1,6 @@
 package net.mcthunder.handlers;
 
+import net.mcthunder.apis.LoggingLevel;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.data.message.*;
@@ -28,7 +29,7 @@ public class ServerChatHandler {
             GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
             String userName = profile.getName();
             String message = packet.getMessage();
-            tellConsole("CHAT", userName + ": " + message);
+            tellConsole(LoggingLevel.CHAT, userName + ": " + message);
             Message msg = new TextMessage(userName + ": ").setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
             Message body = new TextMessage(message).setStyle(new MessageStyle().setColor(ChatColor.WHITE).addFormat(ChatFormat.ITALIC));
             msg.addExtra(body);
@@ -46,7 +47,7 @@ public class ServerChatHandler {
         for (Session s : sessionList) {
             s.send(new ServerChatPacket(msg));
         }
-        tellConsole("SERVER", message);
+        tellConsole(LoggingLevel.CHAT, "[SERVER] " + message);
     }
 
     public void sendPrivateMessage(Session session, String privMessage) {

@@ -1,14 +1,12 @@
 package net.mcthunder.apis;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -32,44 +30,40 @@ public class Utils {
     //Based off Of Necessities Code!
     public static void makeDir(String location) {
         File dir = new File(location);
+        if(dir.isFile()){
+            throw new IllegalArgumentException("Location must be a directory!");
+        }
         if (!dir.exists()) {
-            tellConsole("INFO", "Making " + location + " directory.");
-            dir.mkdir();
-            tellConsole("INFO", "Done!");
-        } else {
-
+            dir.mkdirs();
+            tellConsole(LoggingLevel.INFO, "Creating file " + location);
         }
     }
 
     //End
     public static void createInitialDirs() {
-        tellConsole("INFO", "Checking Directories.");
-        String playerFilesDir = "PlayerFiles";
-        String wolrdsDir = "worlds";
-        String pluginsDir = "plugins";
-        String logsDir = "logs";
-        makeDir(playerFilesDir);
-        makeDir(wolrdsDir);
-        makeDir(pluginsDir);
-        makeDir(logsDir);
-        tellConsole("INFO", "Completed checking directories!");
+        tellConsole(LoggingLevel.INFO, "Checking Directories.");
+        makeDir("PlayerFiles");
+        makeDir("worlds");
+        makeDir("plugins");
+        makeDir("logs");
+        tellConsole(LoggingLevel.INFO, "Completed checking directories!");
     }
 
     public static void tellPublicIpAddress() {
         conf = new Config();
         conf.loadConfig();
         try {
-            Document document = Jsoup.connect("http://ipchicken.com").get();
-            Elements ip = document.select("b");
-            String[] publicIp = ip.toString().split(" ");
-            tellConsole("INFO", "People may connect to the server with " + publicIp[1] + ":" + conf.getPort());
+            BufferedReader in = new BufferedReader(new InputStreamReader(new URL("http://icanhazip.com/").openConnection().getInputStream()));
+            String ip = in.readLine();
+            in.close();
+            tellConsole(LoggingLevel.INFO, "People may connect to the server with " + ip + ":" + conf.getPort());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public static void tellConsole(String type, String message) {
-        String date = new SimpleDateFormat("HH:mm:ss").format(new Date());
-        System.out.println(date + " [" + type + "]: " + message);
+
+    public static void tellConsole(LoggingLevel level, String message) {
+        System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n",new Date(), level.getName(), message);
     }
 
     public static int makeRandomEntityID() {

@@ -38,7 +38,7 @@ public class Config {
 
             //See if the Config Exists yet. If not make it
             if (!getConf().getFile().exists()) {
-                Utils.tellConsole("INFO", "Creating Server Configuration at " + path);
+                Utils.tellConsole(LoggingLevel.INFO, "Creating Server Configuration at " + path);
                 getConf().getFile().createNewFile();
             }
             //Make sure it has all fields
@@ -92,10 +92,10 @@ public class Config {
             setCommandBlocks(getConf().getBoolean("USE-COMMAND-BLOCKS"));
 
         } catch (ConfigurationException e) {
-            Utils.tellConsole("ERROR", "Check Config File!");
+            Utils.tellConsole(LoggingLevel.ERROR, "Check Config File!");
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
-            Utils.tellConsole("ERROR", "Change your server location!");
+            Utils.tellConsole(LoggingLevel.ERROR, "Change your server location!");
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
