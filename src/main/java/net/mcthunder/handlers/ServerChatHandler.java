@@ -33,6 +33,7 @@ public class ServerChatHandler {
             Message msg = new TextMessage(player.gameProfile().getName() + ": ").setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
             Message body = new TextMessage(message).setStyle(new MessageStyle().setColor(ChatColor.WHITE));
             msg.addExtra(body);
+            //System.out.println(msg.toJsonString());
             for (Player p : MCThunder.playerHashMap.values())
                 p.getSession().send(new ServerChatPacket(msg));
         } catch (IllegalArgumentException e) {
