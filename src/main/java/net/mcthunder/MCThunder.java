@@ -220,7 +220,8 @@ public class MCThunder {
                     player.getSession().send(new ServerSpawnPositionPacket(new Position(0, 24, 0)));
 
                     player.getChatHandler().sendMessage(server, profile.getName() + " has joined " + serverName);
-                    playerProfileHandler.checkPlayer(profile);
+                    playerProfileHandler.checkPlayer(player);
+
                     ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), 0, 24, 0, player.getYaw(), player.getPitch(), player.getHeldItem(), player.getMetadata().getMetadataArray());
                     for (Player player1 : playerHashMap.values()) {
                         ServerSpawnPlayerPacket toNewPlayer = new ServerSpawnPlayerPacket(player1.getEntityID(), player1.gameProfile().getId(), player1.getX(), player1.getY(), player1.getZ(), player1.getYaw(), player1.getPitch(), player1.getHeldItem(), player1.getMetadata().getMetadataArray());
@@ -292,7 +293,7 @@ public class MCThunder {
                                             player.sendMessageToPlayer("Unknown Command");
                                         }
                                 } else
-                                    playerChatEventSource.fireEvent(server, event.getSession(), packet, server.getSessions());
+                                    playerChatEventSource.fireEvent(player, packet);
 
                                 //chatHandler.handleChat(server, event.getSession(), packet, sessionsList);
                             } else if (event.getPacket() instanceof ClientKeepAlivePacket)

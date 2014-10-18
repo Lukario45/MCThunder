@@ -1,6 +1,6 @@
 package net.mcthunder.handlers;
 
-import net.mcthunder.apis.LoggingLevel;
+import net.mcthunder.apis.Player;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.packetlib.Server;
 
@@ -20,23 +20,20 @@ public class PlayerProfileHandler {
         this.server = server;
     }
 
-    public void checkPlayer(GameProfile profile) {
-        ServerChatHandler chatHandler = new ServerChatHandler();
-        String playerID = profile.getIdAsString();
-        String playerName = profile.getName();
-        tellConsole(LoggingLevel.DEBUG, playerName + " has UUID  " + playerID);
+    public void checkPlayer(Player player) {
+        String playerID = player.gameProfile().getIdAsString();
+        String playerName = player.gameProfile().getIdAsString();
+        tellConsole("DEBUG", playerName + " has an ID of " + playerID);
         File playerFile = new File("PlayerFiles", playerID + ".yml");
         if (!playerFile.exists()) {
-            tellConsole(LoggingLevel.INFO, "Player: " + playerName + "'s file does not exist yet, creating file!");
+            tellConsole("INFO", "Player: " + playerName + "'s file does not exist yet, creating file!");
             try {
                 playerFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            //really, this shouldnt exist, you shouldnt spam console with completion of simple file I/O operations
-            tellConsole(LoggingLevel.INFO, "Done!");
-
-            chatHandler.sendMessage(server, "Welcome " + playerName + " to the server!");
+            tellConsole("INFO", "Done!");
+            player.getChatHandler().sendMessage(server, "Welcome " + playerName + " to the server!");
         }
     }
 

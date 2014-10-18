@@ -1,15 +1,16 @@
 package net.mcthunder.handlers;
 
-import net.mcthunder.apis.LoggingLevel;
-import org.spacehq.mc.auth.GameProfile;
-import org.spacehq.mc.protocol.ProtocolConstants;
-import org.spacehq.mc.protocol.data.message.*;
+import net.mcthunder.MCThunder;
+import net.mcthunder.apis.Player;
+import org.spacehq.mc.protocol.data.message.ChatColor;
+import org.spacehq.mc.protocol.data.message.Message;
+import org.spacehq.mc.protocol.data.message.MessageStyle;
+import org.spacehq.mc.protocol.data.message.TextMessage;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static net.mcthunder.apis.Utils.tellConsole;
@@ -18,24 +19,21 @@ import static net.mcthunder.apis.Utils.tellConsole;
  * Created by Kevin on 10/7/2014.
  */
 public class ServerChatHandler {
-    private String sender;
+
 
     public ServerChatHandler() {
 
     }
 
-    public void handleChat(Server server, Session session, ClientChatPacket packet, List<Session> sessionsList) {
+    public void handleChat(Player player, ClientChatPacket packet) {
         try {
-            GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
-            String userName = profile.getName();
             String message = packet.getMessage();
-            tellConsole(LoggingLevel.CHAT, userName + ": " + message);
-            Message msg = new TextMessage(userName + ": ").setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
-            Message body = new TextMessage(message).setStyle(new MessageStyle().setColor(ChatColor.WHITE).addFormat(ChatFormat.ITALIC));
+            tellConsole("CHAT", player.gameProfile().getName() + ": " + message);
+            Message msg = new TextMessage(player.gameProfile().getName() + ": ").setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
+            Message body = new TextMessage(message).setStyle(new MessageStyle().setColor(ChatColor.WHITE));
             msg.addExtra(body);
-            sessionsList = server.getSessions();
-            for (Session s : sessionsList)
-                s.send(new ServerChatPacket(msg));
+            for (Player p : MCThunder.playerHashMap.values())
+                p.getSession().send(new ServerChatPacket(msg));
         } catch (IllegalArgumentException e) {
 
         }
@@ -47,7 +45,7 @@ public class ServerChatHandler {
         for (Session s : sessionList) {
             s.send(new ServerChatPacket(msg));
         }
-        tellConsole(LoggingLevel.CHAT, "[SERVER] " + message);
+        tellConsole("SERVER", message);
     }
 
     public void sendPrivateMessage(Session session, String privMessage) {

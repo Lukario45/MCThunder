@@ -1,11 +1,8 @@
 package net.mcthunder.events.listeners;
 
+import net.mcthunder.apis.Player;
 import net.mcthunder.handlers.ServerChatHandler;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
-import org.spacehq.packetlib.Server;
-import org.spacehq.packetlib.Session;
-
-import java.util.List;
 
 /**
  * Created by Kevin on 10/13/2014.
@@ -19,8 +16,8 @@ public class PlayerChatEventListener implements net.mcthunder.interfaces.PlayerC
     }
 
     @Override
-    public void onChat(Server server, Session session, ClientChatPacket packet, List<Session> sessionsList) {
+    public void onChat(Player player, ClientChatPacket packet) {
         serverChatHandler = new ServerChatHandler();
-        serverChatHandler.handleChat(server, session, packet, sessionsList);
+        serverChatHandler.handleChat(player, packet);
     }
 }
