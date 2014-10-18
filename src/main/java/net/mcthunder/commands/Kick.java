@@ -17,7 +17,7 @@ public class Kick extends Command {
     private ServerChatHandler serverChatHandler;
 
     public Kick() {
-        super("kick", "kick", "Kicks a player from the server!", 9999, "command.kick");
+        super("kick", "kick", "Kicks a player from the server!", "/kick PLAYERNAME <reason> ", 9999, "command.kick");
     }
 
     @Override

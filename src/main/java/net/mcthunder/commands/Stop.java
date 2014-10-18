@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class Stop extends Command {
     public Stop() {
-        super("stop", "stop", "Stops the server", 9999, "command.stop");
+        super("stop", "stop", "Stops the server", "/stop <message", 9999, "command.stop");
     }
 
     @Override

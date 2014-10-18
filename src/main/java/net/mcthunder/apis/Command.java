@@ -11,13 +11,15 @@ public abstract class Command {
     private final String information;
     private final int rankPoints;
     private final String permissionNode;
+    private final String arguments;
 
-    public Command(String name, String alias, String information, int rankPoints, String permissionNode) {
+    public Command(String name, String alias, String information, String arguments, int rankPoints, String permissionNode) {
         this.name = name;
         this.alias = alias;
         this.information = information;
         this.rankPoints = rankPoints;
         this.permissionNode = permissionNode;
+        this.arguments = arguments;
     }
 
     public String getName() {
@@ -38,6 +40,10 @@ public abstract class Command {
 
     public String getPermissionNode() {
         return this.permissionNode;
+    }
+
+    public String getArguments() {
+        return this.arguments;
     }
 
     public abstract boolean execute(Player player, ClientChatPacket packet);

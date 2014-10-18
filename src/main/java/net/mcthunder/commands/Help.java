@@ -3,14 +3,13 @@ package net.mcthunder.commands;
 import net.mcthunder.apis.Command;
 import net.mcthunder.apis.CommandRegistry;
 import net.mcthunder.apis.Player;
-import org.spacehq.mc.protocol.data.message.ChatColor;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.ArrayList;
 
 public class Help extends Command {//Ported by pup from Necessities
     public Help() {
-        super("help", "help", "shows help messages", 9999, "command.help");
+        super("help", "help", "shows help messages", "/help <commandname>", 0, "command.help");
     }
 
     @Override
