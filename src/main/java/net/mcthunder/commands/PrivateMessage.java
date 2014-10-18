@@ -32,8 +32,10 @@ public class PrivateMessage extends Command {
             for (int i = 2; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");
             String message = sb.toString().trim();
-            player.sendMessageToPlayer("[You] -> " + toPlayer + ": " + message);
+            player.sendMessageToPlayer("[You] -> " + p.gameProfile().getName() + ": " + message);
             p.sendMessageToPlayer("[" + fromPlayer + "] -> You: " + message);
+            player.setLastPmPersion(p);
+            p.setLastPmPersion(player);
         }
         return true;
     }
