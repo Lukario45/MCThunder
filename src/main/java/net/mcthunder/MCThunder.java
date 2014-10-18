@@ -296,7 +296,7 @@ public class MCThunder {
                                             player.sendMessageToPlayer("Unknown Command");
                                         }
                                 } else
-                                    playerChatEventSource.fireEvent(server, event.getSession(), packet, server.getSessions());
+                                    playerChatEventSource.fireEvent(player, packet);
 
                                 //chatHandler.handleChat(server, event.getSession(), packet, sessionsList);
                             } else if (event.getPacket() instanceof ClientKeepAlivePacket)
