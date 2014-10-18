@@ -396,4 +396,18 @@ public class MCThunder {
     public static  Location getSpawnLocation(){
         return new Location(0, 24, 0);
     }
+
+    public static Player getPlayer(String name) {
+        Player partial = null;
+        for (Player p : playerHashMap.values())
+            if (p.gameProfile().getName().equalsIgnoreCase(name))
+                return p;
+            else if (partial == null && p.gameProfile().getName().toLowerCase().contains(name.toLowerCase()))
+                partial = p;
+        return partial;
+    }
+
+    public static Player getPlayer(UUID uuid) {
+        return playerHashMap.get(uuid);
+    }
 }

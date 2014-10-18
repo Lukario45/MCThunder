@@ -2,18 +2,20 @@ package net.mcthunder.apis;
 
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
+import java.util.List;
+
 /**
  * Based of of Alphabot/Lukabot code that was created by zack6849
  */
 public abstract class Command {
     private final String name;
-    private final String alias;
+    private final List<String> alias;
     private final String information;
     private final int rankPoints;
     private final String permissionNode;
     private final String arguments;
 
-    public Command(String name, String alias, String information, String arguments, int rankPoints, String permissionNode) {
+    public Command(String name, List<String> alias, String information, String arguments, int rankPoints, String permissionNode) {
         this.name = name;
         this.alias = alias;
         this.information = information;
@@ -26,7 +28,7 @@ public abstract class Command {
         return this.name;
     }
 
-    public String getAlias() {
+    public List<String> getAlias() {
         return this.alias;
     }
 

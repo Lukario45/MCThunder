@@ -4,12 +4,12 @@ import net.mcthunder.apis.Command;
 import net.mcthunder.apis.CommandRegistry;
 import net.mcthunder.apis.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Help extends Command {//Ported by pup from Necessities
     public Help() {
-        super("help", "help", "shows help messages", "/help <commandname>", 0, "command.help");
+        super("help", Arrays.asList("help"), "Shows help messages", "/help <commandname>", 0, "command.help");
     }
 
     @Override
@@ -22,7 +22,7 @@ public class Help extends Command {//Ported by pup from Necessities
         String search = "";
         if (args.length == 1) {
             if (!isLegal(args[0]))
-                search = args[0];
+                search = args[0].toLowerCase();
             else
                 page = Integer.parseInt(args[0]);
         }
@@ -31,15 +31,20 @@ public class Help extends Command {//Ported by pup from Necessities
                 player.sendMessageToPlayer("Error: You must enter a valid help page.");
                 return true;
             }
-            search = args[0];
+            search = args[0].toLowerCase();
             page = Integer.parseInt(args[1]);
         }
         if (args.length == 0 || page == 0)
             page = 1;
         int time = 0;
-        for (String name : CommandRegistry.commands.keySet())
-            if (name.contains(search) || CommandRegistry.commands.get(name).getInformation().contains(search) || search.equals(""))
-                helpList.add("/" + name + ": " + CommandRegistry.commands.get(name).getInformation());
+        for (String name : CommandRegistry.commands.keySet()) {
+            Command c = CommandRegistry.commands.get(name);
+            if (name.toLowerCase().contains(search) || c.getInformation().toLowerCase().contains(search) || c.getAlias().contains(search) || search.equals("")) {
+                helpList.add("/" + name + ": " + c.getInformation());
+                if (name.equalsIgnoreCase(search) || (c.getAlias().contains(search) && !search.equals("")))
+                    helpList.add("Usage: " + c.getArguments());
+            }
+        }
         int rounder = 0;
         if (helpList.size() % 10 != 0)
             rounder = 1;

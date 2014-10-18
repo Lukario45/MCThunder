@@ -5,6 +5,7 @@ import net.mcthunder.apis.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.packetlib.Session;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public class Stop extends Command {
     public Stop() {
-        super("stop", "stop", "Stops the server", "/stop <message", 9999, "command.stop");
+        super("stop", Arrays.asList("stop"), "Stops the server", "/stop <message>", 9999, "command.stop");
     }
 
     @Override
