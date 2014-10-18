@@ -16,11 +16,7 @@ public class Player {
     private Session session;
     private Server server;
     private MetadataMap metadata;
-    private double x;
-    private double y;
-    private double z;
-    private double yaw;
-    private double pitch;
+    private Location location;
     private boolean onGround;
 	private boolean sneaking;
 	private boolean sprinting;
@@ -68,44 +64,12 @@ public class Player {
         return this.metadata;
     }
 
-    public double getX() {
-        return this.x;
+    public Location getLocation(){
+        return this.location;
     }
 
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return this.y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public double getZ() {
-        return this.z;
-    }
-
-    public void setZ(double z) {
-        this.z = z;
-    }
-
-    public float getYaw() {
-        return (float) this.yaw;
-    }
-
-    public void setYaw(double yaw) {
-        this.yaw = yaw;
-    }
-
-    public float getPitch() {
-        return (float) this.pitch;
-    }
-
-    public void setPitch(double pitch) {
-        this.pitch = pitch;
+    public void setLocation(Location location){
+         this.location = location;
     }
 
     public boolean isOnGround() {
