@@ -327,18 +327,11 @@ public class MCThunder {
             player.getLocation().setX(packet.getX());
             player.getLocation().setY(packet.getY());
             player.getLocation().setZ(packet.getZ());
-        }else{
-            player.getLocation().setYaw(player.getLocation().getYaw());
-            player.getLocation().setPitch(player.getLocation().getPitch());
         }
 
         if (packet instanceof ClientPlayerRotationPacket || packet instanceof ClientPlayerPositionRotationPacket) {
             player.getLocation().setPitch(packet.getPitch());
             player.getLocation().setYaw(packet.getYaw());
-        }else{
-            player.getLocation().setX(player.getLocation().getX());
-            player.getLocation().setY(player.getLocation().getY());
-            player.getLocation().setZ(player.getLocation().getZ());
         }
         player.setOnGround(packet.isOnGround());
     }
