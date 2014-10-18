@@ -1,5 +1,6 @@
 package net.mcthunder.handlers;
 
+import net.mcthunder.apis.Player;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.packetlib.Server;
 
@@ -19,10 +20,9 @@ public class PlayerProfileHandler {
         this.server = server;
     }
 
-    public void checkPlayer(GameProfile profile) {
-        ServerChatHandler chatHandler = new ServerChatHandler();
-        String playerID = profile.getIdAsString();
-        String playerName = profile.getName();
+    public void checkPlayer(Player player) {
+        String playerID = player.gameProfile().getIdAsString();
+        String playerName = player.gameProfile().getIdAsString();
         tellConsole("DEBUG", playerName + " has an ID of " + playerID);
         File playerFile = new File("PlayerFiles", playerID + ".yml");
         if (!playerFile.exists()) {
@@ -33,7 +33,7 @@ public class PlayerProfileHandler {
                 e.printStackTrace();
             }
             tellConsole("INFO", "Done!");
-            chatHandler.sendMessage(server, "Welcome " + playerName + " to the server!");
+            player.getChatHandler().sendMessage(server, "Welcome " + playerName + " to the server!");
         }
     }
 
