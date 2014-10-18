@@ -72,12 +72,9 @@ public class MCThunder {
     private static boolean VERIFY_USERS = false;
     private static String HOST;
     private static int PORT;
-    private static MinecraftProtocol protocol;
-    private static List<Session> sessionsList;
     private static ServerChatHandler chatHandler;
     private static ServerTabHandler tabHandler;
     private static ServerPlayerEntryListHandler entryListHandler;
-
     private static PlayerProfileHandler playerProfileHandler;
     private static Server server;
     private static PlayerChatEventListener defaultPlayerChatEventListener;
@@ -88,7 +85,6 @@ public class MCThunder {
     public static void main(String args[]) {
         conf = new Config();
         conf.loadConfig();
-
         //Set Server data
         serverName = conf.getServerName();
         VERIFY_USERS = conf.getOnlineMode();
@@ -96,7 +92,6 @@ public class MCThunder {
         PORT = conf.getPort();
         //Done Set Server Data
         tellConsole(LoggingLevel.INFO, "INTERNAL PORT " + HOST);
-
         createInitialDirs();
         tellPublicIpAddress();
         //Register Default Commands
@@ -132,8 +127,7 @@ public class MCThunder {
             server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
                 @Override
                 public ServerStatusInfo buildInfo(Session session) {
-                    sessionsList = server.getSessions();
-                    return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), playerHashMap.size(), new GameProfile[0]), new TextMessage("Hello world!"), null);
+                    return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), playerHashMap.size(), new GameProfile[0]), new TextMessage(conf.getServerMOTD()), null);
                 }
             });
 
@@ -154,43 +148,9 @@ public class MCThunder {
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
-                    player.getSession().send(new ServerPlayerPositionRotationPacket(0, 24, 0, 0, 0));
+                    player.getSession().send(new ServerPlayerPositionRotationPacket(0, 25, 0, 0, 0));
                     player.setLocation(getSpawnLocation());
 
-                    /**byte[] light = new byte[4096];
-                    Arrays.fill(light, (byte) 15);
-                    Chunk[] chunks = new Chunk[16];
-                    for (int i = 0; i < chunks.length; i++) {
-                        NibbleArray3d blocklight = new NibbleArray3d(light);
-                        NibbleArray3d skylight = new NibbleArray3d(light);
-                     ShortArray3d blocks = new ShortArray3d(4098);
-                        for (int cY = 0; cY < 24; cY++) {
-                            for (int cZ = 0; cZ < 16; cZ++) {
-                                for (int cX = 0; cX < 16; cX++) {
-                                    int y = cY - i * 16;
-                     if ((cY < (i + 1) * 16) && (cY > i * 16)) {
-                                        if (cY < 1) {
-                                            blocks.setBlock(cX, y, cZ, 7);
-                                        } else if (cY < 23) {
-                     blocks.setBlock(cX, y, cZ, 3 );
-                     } else if (cY > 23){
-                     blocks.setBlock(cX, y, cZ, 57);
-                     }
-
-                     else{
-                                            blocks.setBlock(cX, y, cZ, 2);
-                                        }
-                     }
-                                }
-                            }
-                        }
-
-                        Chunk chunk = new Chunk(blocks, blocklight, skylight);
-                        chunks[i] = chunk;
-                    }
-
-
-                     }*/
                     byte[] light = new byte[4096]; //Create a light array of bytes (actually nibbles) (should this be 2048)
                     Arrays.fill(light, (byte) 15); //fill up the light array with full light (16 at 0 indexed)
                     Chunk[] chunks = new Chunk[16];
@@ -207,7 +167,9 @@ public class MCThunder {
 
                                     if (y == 0) //lowest point
                                         blocks.setBlock(cX, cY, cZ, 7); //Adminium
-                                    else if (y <= 23) //less than 24 but above 0
+                                    else if (y <= 20)
+                                        blocks.setBlock(cX, cY, cZ, 1);//Stone
+                                    else if (y >= 21 && y < 24) //less than 24 but above 0
                                         blocks.setBlock(cX, cY, cZ, 3); //Dirt
                                     else if (y == 24) //Exactly 24
                                         blocks.setBlock(cX, cY, cZ, 2); //Grass
@@ -218,7 +180,7 @@ public class MCThunder {
                     for (int x = -5; x <= 5; x++)
                         for (int z = -5; z <= 5; z++)
                             player.getSession().send(new ServerChunkDataPacket(x, z, chunks, new byte[256]));
-                    player.getSession().send(new ServerSpawnPositionPacket(new Position(0, 24, 0)));
+                    player.getSession().send(new ServerSpawnPositionPacket(new Position(0, 25, 0)));
 
                     player.getChatHandler().sendMessage(server, profile.getName() + " has joined " + serverName);
                     playerProfileHandler.checkPlayer(player);
