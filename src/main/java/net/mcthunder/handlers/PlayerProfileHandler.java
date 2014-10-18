@@ -2,7 +2,6 @@ package net.mcthunder.handlers;
 
 import net.mcthunder.apis.LoggingLevel;
 import net.mcthunder.apis.Player;
-import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.packetlib.Server;
 
 import java.io.File;
@@ -38,23 +37,23 @@ public class PlayerProfileHandler {
         }
     }
 
-    public void addAttribute(GameProfile profile, String attribute, String attributeData) {
+    public void addAttribute(Player player, String attribute, String attributeData) {
 
     }
 
-    public void deleteAttribute(GameProfile profile, String attribute, String attributeData) {
+    public void deleteAttribute(Player player, String attribute) {
 
     }
 
-    public void changeAttribute(GameProfile profile, String attribute, String attributeData) {
+    public void changeAttribute(Player player, String attribute, String attributeData) {
 
     }
 
-    public void getAttribute(GameProfile profile, String attribute, String attributeData) {
+    public void getAttribute(Player player, String attribute, String attributeData) {
 
     }
 
-    public void addMultiAttribute(GameProfile profile, String attribute, String attributeData) {
+    public void addMultiAttribute(Player player, String attribute, String attributeData) {
 
     }
 }
