@@ -23,7 +23,7 @@ public class MessageFormat {
         boolean first = true;
         for (String m : brokenMessage) {
             if (m.equals("")) {
-                if(!first && message.startsWith("&"))
+                if(!first)
                     msg.addExtra(new TextMessage("&").setStyle(new MessageStyle().setColor(prev)));
                 first = false;
                 continue;
