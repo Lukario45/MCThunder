@@ -66,9 +66,9 @@ public class Help extends Command {//Ported by pup from Necessities
             return true;
         }
         if (search.equals(""))
-            player.sendMessage(" &e---- &3Help &e-- &3Page&4 " + Integer.toString(page) + "&3/&4" + Integer.toString(totalpages) + " &e---- ");
+            player.sendMessage("&e---- &3Help &e-- &3Page&4 " + Integer.toString(page) + "&3/&4" + Integer.toString(totalpages) + " &e---- ");
         else
-            player.sendMessage(" &e---- &3Help &e-- &3Page&4 " + Integer.toString(page) + "&3/&4" + Integer.toString(totalpages) + " &e---- ");
+            player.sendMessage("&e---- &3Help &e-- &3Page&4 " + Integer.toString(page) + "&3/&4" + Integer.toString(totalpages) + " &e---- ");
         page = page - 1;
         String message = getHelp(page, time, helpList);
         while (message != null) {

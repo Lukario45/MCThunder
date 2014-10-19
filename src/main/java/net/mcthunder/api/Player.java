@@ -22,6 +22,7 @@ public class Player {
     private boolean sprinting;
     private ServerChatHandler chatHandler;
     private Player lastPmPerson;
+    private World world;
 
     public Player(Server server, Session session, GameProfile profile, int entityID, int heldItem, EntityMetadata metadata) {
         this.chatHandler = new ServerChatHandler();
@@ -113,5 +114,13 @@ public class Player {
 
     public void setLastPmPerson(Player lastPmPerson) {
         this.lastPmPerson = lastPmPerson;
+    }
+
+    public World getWorld() {
+        return this.world;
+    }
+
+    public void setWorld(World w) {
+        this.world = w;
     }
 }

@@ -59,6 +59,7 @@ import static net.mcthunder.api.Utils.*;
  */
 public class MCThunder {
     public static HashMap<UUID, Player> playerHashMap;
+    public static HashMap<String, World> worldHashMap;
     private static Config conf;
     private static String serverName;
     private static boolean SPAWN_SERVER = true;
@@ -114,6 +115,7 @@ public class MCThunder {
             playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
             //Done Listeners
             playerHashMap = new HashMap<UUID, Player>(conf.getSlots());
+            worldHashMap = new HashMap<String, World>();
 
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
             server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
@@ -173,6 +175,9 @@ public class MCThunder {
                     for (int x = -5; x <= 5; x++)
                         for (int z = -5; z <= 5; z++)
                             player.getSession().send(new ServerChunkDataPacket(x, z, chunks, new byte[256]));
+                    if (!worldHashMap.containsKey("world"))
+                        worldHashMap.put("world", new World("world", 0, chunks));
+                    player.setWorld(worldHashMap.get("world"));
                     player.getSession().send(new ServerSpawnPositionPacket(new Position(0, 25, 0)));
 
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
