@@ -3,6 +3,8 @@ package net.mcthunder.api;
 import org.spacehq.mc.protocol.data.message.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Kevin on 10/18/2014.
@@ -11,6 +13,9 @@ public class MessageFormat {
     public Message formatMessage(String message) {
         if(!message.contains("&"))
             return new TextMessage(message);
+        List<String> colors = Arrays.asList("&A","&B","&C","&D","&E","&F","&L","&N","&M","&O","&K","&R");
+        for(String col : colors)
+            message = message.replaceAll(col, col.toLowerCase());
         String[] brokenMessage = message.split("&");
         Message msg = new TextMessage("");
         ChatColor prev = ChatColor.WHITE;
@@ -23,7 +28,6 @@ public class MessageFormat {
                 first = false;
                 continue;
             }
-            first = false;
             Character color = m.charAt(0);
             switch (color) {
                 case 'a':
@@ -115,9 +119,13 @@ public class MessageFormat {
                     msg.addExtra(new TextMessage(m.replaceFirst("r", "")).setStyle(new MessageStyle().setColor(prev = ChatColor.RESET)));
                     break;
                 default:
-                    msg.addExtra(new TextMessage("&" + m).setStyle(new MessageStyle().setColor(prev)));
+                    if(!first)
+                        msg.addExtra(new TextMessage("&" + m).setStyle(new MessageStyle().setColor(prev).setFormats(formats)));
+                    else
+                        msg.addExtra(new TextMessage(m).setStyle(new MessageStyle().setColor(prev).setFormats(formats)));
                     break;
             }
+            first = false;
         }
         return msg;
     }
