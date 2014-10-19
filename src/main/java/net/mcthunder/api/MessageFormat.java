@@ -12,6 +12,8 @@ public class MessageFormat {
         String[] brokenMessage = message.split("&");
         Message msg = new TextMessage("");
         for (int i = 0; i < brokenMessage.length; i++) {
+            if(brokenMessage[i].equals(""))
+                continue;
             Character color = brokenMessage[i].charAt(0);
             switch (color) {
                 case 'a':
@@ -81,7 +83,7 @@ public class MessageFormat {
                     msg.addExtra(new TextMessage(brokenMessage[i].replaceFirst("r", "")).setStyle(new MessageStyle().setColor(ChatColor.RESET)));
                     break;
                 default:
-                    msg.addExtra(new TextMessage("&" + brokenMessage[0]).setStyle(new MessageStyle().setColor(ChatColor.WHITE)));
+                    msg.addExtra(new TextMessage("&" + brokenMessage[i]).setStyle(new MessageStyle().setColor(ChatColor.WHITE)));
                     break;
             }
         }
