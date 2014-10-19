@@ -15,11 +15,14 @@ public class MessageFormat {
         Message msg = new TextMessage("");
         ChatColor prev = ChatColor.WHITE;
         ArrayList<ChatFormat> formats = new ArrayList<ChatFormat>();
+        boolean first = true;
         for (String m : brokenMessage) {
             if (m.equals("")) {
-                msg.addExtra(new TextMessage("&").setStyle(new MessageStyle().setColor(prev)));
+                if(!first && message.startsWith("&"))
+                    msg.addExtra(new TextMessage("&").setStyle(new MessageStyle().setColor(prev)));
                 continue;
             }
+            first = false;
             Character color = m.charAt(0);
             switch (color) {
                 case 'a':
@@ -88,7 +91,7 @@ public class MessageFormat {
                     break;
                 case 'l':
                     formats.add(ChatFormat.BOLD);
-                    msg.addExtra(new TextMessage(m.replaceFirst("l", "")).setStyle(new MessageStyle().setFormats(formats)));
+                    msg.addExtra(new TextMessage(m.replaceFirst("l", "")).setStyle(new MessageStyle().setColor(prev).setFormats(formats)));
                     break;
                 case 'n':
                     formats.add(ChatFormat.UNDERLINED);
