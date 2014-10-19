@@ -20,6 +20,7 @@ public class MessageFormat {
             if (m.equals("")) {
                 if(!first && message.startsWith("&"))
                     msg.addExtra(new TextMessage("&").setStyle(new MessageStyle().setColor(prev)));
+                first = false;
                 continue;
             }
             first = false;
