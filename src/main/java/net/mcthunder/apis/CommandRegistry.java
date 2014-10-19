@@ -11,7 +11,7 @@ public class CommandRegistry {
     public static HashMap<String, Command> commands = new HashMap<>();
 
     public static void register(Command command) {
-        if(command == null)
+        if (command == null)
             return;
         if (!commands.containsKey(command.getName().toLowerCase()))
             commands.put(command.getName().toLowerCase(), command);
@@ -20,7 +20,6 @@ public class CommandRegistry {
     public static void registerCommands() {
 
     }
-
 
     public static void unregister(Command command) {
         commands.remove(command.getName());
@@ -32,9 +31,10 @@ public class CommandRegistry {
         try {
             commands.put(name.toLowerCase(), (Command) Command.class.getClassLoader().loadClass(pkg + StringUtils.capitalize(name)).newInstance());
             return commands.get(name.toLowerCase());
-        } catch (Exception e) { }
-        for(Command c : commands.values())
-            if(c.getAliases().contains(name))
+        } catch (Exception e) {
+        }
+        for (Command c : commands.values())
+            if (c.getAliases().contains(name))
                 return c;
         return null;
     }

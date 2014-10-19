@@ -26,10 +26,9 @@ public class Utils {
         return ip == null ? null : ip.getHostAddress();
     }
 
-    //Based off Of Necessities Code!
     public static void makeDir(String location) {
         File dir = new File(location);
-        if(dir.isFile()){
+        if (dir.isFile()) {
             throw new IllegalArgumentException("Location must be a directory!");
         }
         if (!dir.exists()) {
@@ -38,7 +37,6 @@ public class Utils {
         }
     }
 
-    //End
     public static void createInitialDirs() {
         tellConsole(LoggingLevel.INFO, "Checking Directories.");
         makeDir("PlayerFiles");
@@ -62,11 +60,6 @@ public class Utils {
     }
 
     public static void tellConsole(LoggingLevel level, String message) {
-        System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n",new Date(), level.getName(), message);
-    }
-
-    public static int makeRandomEntityID() {
-        int entityID = 0;
-        return entityID;
+        System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), message);
     }
 }

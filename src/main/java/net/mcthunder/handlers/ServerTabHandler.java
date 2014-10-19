@@ -16,8 +16,6 @@ import java.util.List;
  */
 public class ServerTabHandler {
     public void handleTabComplete(Server server, Session session, ClientTabCompletePacket packet) {
-        //ClientTabCompletePacket packet = event.getPacket();
-
         String[] text = packet.getText().split(" ");
         String word = text[text.length - 1];
         List<Session> sessions = server.getSessions();
@@ -33,7 +31,6 @@ public class ServerTabHandler {
         String[] matchArray = StringUtils.join(matches, "  ").split(" ");
         ServerTabCompletePacket serverTabCompletePacket = new ServerTabCompletePacket(matchArray);
         if (matches.size() != 0) {
-            //chatHandler.sendPrivateMessage(event.getSession(), StringUtils.join(matches, ", "));
             session.send(serverTabCompletePacket);
         }
     }

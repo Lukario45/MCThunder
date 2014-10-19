@@ -20,7 +20,6 @@ public class Stop extends Command {
     public boolean execute(Player player, ClientChatPacket packet) {
         List<Session> sessions = player.getServer().getSessions();
         String[] wholeMessage = packet.getMessage().split(" ");
-
         if (wholeMessage.length >= 2) {
             StringBuilder sb = new StringBuilder();
             for (int i = 1; i < wholeMessage.length; i++)

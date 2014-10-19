@@ -9,13 +9,16 @@ public enum LoggingLevel {
     WARNING("WARNING"),
     ERROR("ERROR"),
     SEVERE("SEVERE"),
-    CHAT("CHAT");
+    CHAT("CHAT"),
+    COMMAND("COMMAND");
 
     String name;
-    LoggingLevel(String name){
+
+    LoggingLevel(String name) {
         this.name = name;
     }
-    public String getName(){
+
+    public String getName() {
         return this.name;
     }
 

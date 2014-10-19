@@ -14,7 +14,6 @@ public class GetUUID extends Command {
 
     public GetUUID() {
         super("getuuid", Arrays.asList("getuuid", "uuid"), "Gets the UUID of a player", "/getuuid PLAYER", 9999, "command.getuuid");
-
     }
 
     @Override
@@ -29,7 +28,6 @@ public class GetUUID extends Command {
             } else {
                 player.sendMessage("&3" + p.gameProfile().getName() + ":&e " + p.gameProfile().getIdAsString());
             }
-
         }
         return false;
     }

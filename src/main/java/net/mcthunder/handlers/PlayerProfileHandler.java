@@ -32,7 +32,6 @@ public class PlayerProfileHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            //we dont need to tell owners about simple file IO completing
             player.getChatHandler().sendMessage(server, "&bWelcome &6" + playerName + " &bto the server!");
         }
     }

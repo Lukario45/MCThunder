@@ -33,7 +33,6 @@ public class ServerPlayerEntryListHandler {
     public void addToPlayerEntryList(Server server, Session session) {
         conf = new Config();
         playerListEntries = new ArrayList<PlayerListEntry>();
-
         GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
         List<Session> sessions = server.getSessions();
         int ping = session.getFlag(ProtocolConstants.PING_KEY);
@@ -44,7 +43,6 @@ public class ServerPlayerEntryListHandler {
         for (Session s : sessions) {
             PlayerListEntry p = new PlayerListEntry(s.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY), GameMode.CREATIVE, ping, Message.fromString(s.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getName()));
             playerListEntries.add(p);
-            //entrySize++;
         }
         PlayerListEntry[] playerListEntriesArray = playerListEntries.toArray(new PlayerListEntry[playerListEntries.size()]);
         ServerPlayerListEntryPacket packet = new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, playerListEntriesArray);
