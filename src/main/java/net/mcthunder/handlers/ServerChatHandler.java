@@ -2,6 +2,7 @@ package net.mcthunder.handlers;
 
 import net.mcthunder.MCThunder;
 import net.mcthunder.apis.LoggingLevel;
+import net.mcthunder.apis.MessageFormat;
 import net.mcthunder.apis.Player;
 import org.spacehq.mc.protocol.data.message.ChatColor;
 import org.spacehq.mc.protocol.data.message.Message;
@@ -28,14 +29,16 @@ public class ServerChatHandler {
 
     public void handleChat(Player player, ClientChatPacket packet) {
         try {
+            MessageFormat formatter = new MessageFormat();
             String message = packet.getMessage();
             tellConsole(LoggingLevel.CHAT, player.gameProfile().getName() + ": " + message);
-            Message msg = new TextMessage(player.gameProfile().getName() + ": ").setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
-            Message body = new TextMessage(message).setStyle(new MessageStyle().setColor(ChatColor.WHITE));
-            msg.addExtra(body);
+            String fullMessage = "&e[" + player.gameProfile().getName() + "]:&r " + message;
+            //Message msg = new TextMessage(player.gameProfile().getName() + ": ").setStyle(new MessageStyle().setColor(ChatColor.YELLOW));
+            //Message body = new TextMessage(message).setStyle(new MessageStyle().setColor(ChatColor.WHITE));
+            //msg.addExtra(body);
             //System.out.println(msg.toJsonString());
             for (Player p : MCThunder.playerHashMap.values())
-                p.getSession().send(new ServerChatPacket(msg));
+                p.getSession().send(new ServerChatPacket(formatter.formatMessage(fullMessage)));
         } catch (IllegalArgumentException e) {
 
         }

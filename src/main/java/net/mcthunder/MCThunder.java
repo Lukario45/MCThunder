@@ -146,7 +146,7 @@ public class MCThunder {
 
                     Player player = playerHashMap.get(profile.getId());
                     //how about you don't waste time getting an exact copy of a variable you already have stored?
-                    session.send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
+                    session.send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 1, Difficulty.PEACEFUL, conf.getSlots(), WorldType.FLAT, false));
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
