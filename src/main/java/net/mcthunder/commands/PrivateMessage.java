@@ -19,23 +19,23 @@ public class PrivateMessage extends Command {
     public boolean execute(Player player, ClientChatPacket packet) {
         String[] wholeMessage = packet.getMessage().split(" ");
         if (wholeMessage.length < 3) {
-            player.sendMessageToPlayer(getArguments());
+            player.sendMessage(getArguments());
         } else {
             String toPlayer = wholeMessage[1];
             String fromPlayer = player.gameProfile().getName();
             Player p = MCThunder.getPlayer(toPlayer);
             if(p == null) {
-                player.sendMessageToPlayer("That player is not online!");
+                player.sendMessage("That player is not online!");
                 return true;
             }
             StringBuilder sb = new StringBuilder();
             for (int i = 2; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");
             String message = sb.toString().trim();
-            player.sendMessageToPlayer("[You] -> " + p.gameProfile().getName() + ": " + message);
-            p.sendMessageToPlayer("[" + fromPlayer + "] -> You: " + message);
-            player.setLastPmPersion(p);
-            p.setLastPmPersion(player);
+            player.sendMessage("[You] -> " + p.gameProfile().getName() + ": " + message);
+            p.sendMessage("[" + fromPlayer + "] -> You: " + message);
+            player.setLastPmPerson(p);
+            p.setLastPmPerson(player);
         }
         return true;
     }

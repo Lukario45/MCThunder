@@ -21,7 +21,7 @@ public class Player {
 	private boolean sneaking;
 	private boolean sprinting;
     private ServerChatHandler chatHandler;
-    private Player lastPmPersion;
+    private Player lastPmPerson;
 
     public Player(Server server, Session session, GameProfile profile, int entityID, int heldItem, EntityMetadata metadata) {
         this.chatHandler = new ServerChatHandler();
@@ -103,15 +103,15 @@ public class Player {
         return this.chatHandler;
     }
 
-    public void sendMessageToPlayer(String message) {
+    public void sendMessage(String message) {
         this.chatHandler.sendPrivateMessage(this.session, message);
     }
 
-    public Player getLastPmPersion() {
-        return this.lastPmPersion;
+    public Player getLastPmPerson() {
+        return this.lastPmPerson;
     }
 
-    public void setLastPmPersion(Player lastPmPersion) {
-        this.lastPmPersion = lastPmPersion;
+    public void setLastPmPerson(Player lastPmPerson) {
+        this.lastPmPerson = lastPmPerson;
     }
 }

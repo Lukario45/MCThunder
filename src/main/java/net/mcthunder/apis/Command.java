@@ -2,6 +2,7 @@ package net.mcthunder.apis;
 
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,15 +10,18 @@ import java.util.List;
  */
 public abstract class Command {
     private final String name;
-    private final List<String> alias;
+    private final List<String> aliases;
     private final String information;
     private final int rankPoints;
     private final String permissionNode;
     private final String arguments;
 
-    public Command(String name, List<String> alias, String information, String arguments, int rankPoints, String permissionNode) {
+    public Command(String name, List<String> aliases, String information, String arguments, int rankPoints, String permissionNode) {
         this.name = name;
-        this.alias = alias;
+        if (aliases == null)
+            this.aliases = new ArrayList<String>();
+        else
+            this.aliases = aliases;
         this.information = information;
         this.rankPoints = rankPoints;
         this.permissionNode = permissionNode;
@@ -28,8 +32,8 @@ public abstract class Command {
         return this.name;
     }
 
-    public List<String> getAlias() {
-        return this.alias;
+    public List<String> getAliases() {
+        return this.aliases;
     }
 
     public String getInformation() {

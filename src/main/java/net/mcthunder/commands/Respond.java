@@ -17,21 +17,21 @@ public class Respond extends Command {
     @Override
     public boolean execute(Player player, ClientChatPacket packet) {
         String[] wholeMessage = packet.getMessage().split(" ");
-        Player p = player.getLastPmPersion();
+        Player p = player.getLastPmPerson();
         if (p == null) {
-            player.sendMessageToPlayer("No one to respond to!");
+            player.sendMessage("No one to respond to!");
             return true;
         }
         if (wholeMessage.length < 2)
-            player.sendMessageToPlayer(getArguments());
+            player.sendMessage(getArguments());
         else {
             StringBuilder sb = new StringBuilder();
             for (int i = 1; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");
             String message = sb.toString().trim();
-            p.sendMessageToPlayer("[" + player.gameProfile().getName() + "] ->  You: " + message);
-            player.sendMessageToPlayer("[You] -> " + p.gameProfile().getName() + ": " + message);
-            p.setLastPmPersion(player);
+            p.sendMessage("[" + player.gameProfile().getName() + "] ->  You: " + message);
+            player.sendMessage("[You] -> " + p.gameProfile().getName() + ": " + message);
+            p.setLastPmPerson(player);
         }
         return true;
     }

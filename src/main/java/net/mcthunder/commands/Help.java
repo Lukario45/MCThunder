@@ -4,12 +4,14 @@ import net.mcthunder.apis.Command;
 import net.mcthunder.apis.CommandRegistry;
 import net.mcthunder.apis.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Help extends Command {//Ported by pup from Necessities
     public Help() {
-        super("help", Arrays.asList("help"), "Shows help messages", "/help <commandname>", 0, "command.help");
+        super("help", Arrays.asList(""), "Shows help messages", "/help <commandname>", 0, "command.help");
     }
 
     @Override
@@ -28,7 +30,7 @@ public class Help extends Command {//Ported by pup from Necessities
         }
         if (args.length > 1) {
             if (!isLegal(args[1])) {
-                player.sendMessageToPlayer("Error: You must enter a valid help page.");
+                player.sendMessage("Error: You must enter a valid help page.");
                 return true;
             }
             search = args[0].toLowerCase();
@@ -37,35 +39,44 @@ public class Help extends Command {//Ported by pup from Necessities
         if (args.length == 0 || page == 0)
             page = 1;
         int time = 0;
+        String searched = "";
+        String usage = "";
         for (String name : CommandRegistry.commands.keySet()) {
             Command c = CommandRegistry.commands.get(name);
-            if (name.toLowerCase().contains(search) || c.getInformation().toLowerCase().contains(search) || c.getAlias().contains(search) || search.equals("")) {
+            if(c == null)
+                continue;
+            if (name.toLowerCase().contains(search) || c.getInformation().toLowerCase().contains(search) || c.getAliases().contains(search) || search.equals("")) {
                 helpList.add("/" + name + ": " + c.getInformation());
-                if (name.equalsIgnoreCase(search) || (c.getAlias().contains(search) && !search.equals("")))
-                    helpList.add("Usage: " + c.getArguments());
+                if (name.equalsIgnoreCase(search) || (c.getAliases().contains(search) && !search.equals(""))) {
+                    usage = /*helpList.add(*/"Usage: " + c.getArguments();//);
+                    searched = "/" + name + ": " + c.getInformation();
+                }
             }
         }
+        Collections.sort(helpList);
+        if(!usage.equals("") && !searched.equals("") && helpList.contains(searched))//should contain it but just in case
+            helpList.add(helpList.indexOf(searched) + 1, usage);
         int rounder = 0;
         if (helpList.size() % 10 != 0)
             rounder = 1;
         int totalpages = (helpList.size() / 10) + rounder;
         if (page > totalpages) {
-            player.sendMessageToPlayer("Error: Input a number from 1 to " + Integer.toString(totalpages));
+            player.sendMessage("Error: Input a number from 1 to " + Integer.toString(totalpages));
             return true;
         }
         if (search.equals(""))
-            player.sendMessageToPlayer(" ---- Help -- Page " + Integer.toString(page) + "/" + Integer.toString(totalpages) + " ---- ");
+            player.sendMessage(" ---- Help -- Page " + Integer.toString(page) + "/" + Integer.toString(totalpages) + " ---- ");
         else
-            player.sendMessageToPlayer(" ---- Help: " + search + " -- Page " + Integer.toString(page) + "/" + Integer.toString(totalpages) + " ---- ");
+            player.sendMessage(" ---- Help: " + search + " -- Page " + Integer.toString(page) + "/" + Integer.toString(totalpages) + " ---- ");
         page = page - 1;
         String message = getHelp(page, time, helpList);
         while (message != null) {
-            player.sendMessageToPlayer(message);
+            player.sendMessage(message);
             time++;
             message = getHelp(page, time, helpList);
         }
         if (page + 1 < totalpages)
-            player.sendMessageToPlayer("Type /help " + Integer.toString(page + 2) + " to read the next page.");
+            player.sendMessage("Type /help " + Integer.toString(page + 2) + " to read the next page.");
         return true;
     }
 

@@ -256,7 +256,7 @@ public class MCThunder {
                                         try {
                                             playerCommandEventSource.fireEvent(player, packet);
                                         } catch (ClassNotFoundException e) {
-                                            player.sendMessageToPlayer("Unknown Command");
+                                            player.sendMessage("Unknown Command");
                                         }
                                 } else
                                     playerChatEventSource.fireEvent(player, packet);

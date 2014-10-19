@@ -11,6 +11,8 @@ public class CommandRegistry {
     public static HashMap<String, Command> commands = new HashMap<>();
 
     public static void register(Command command) {
+        if(command == null)
+            return;
         if (!commands.containsKey(command.getName().toLowerCase()))
             commands.put(command.getName().toLowerCase(), command);
     }
@@ -32,7 +34,7 @@ public class CommandRegistry {
             return commands.get(name.toLowerCase());
         } catch (Exception e) { }
         for(Command c : commands.values())
-            if(c.getAlias().contains(name))
+            if(c.getAliases().contains(name))
                 return c;
         return null;
     }
