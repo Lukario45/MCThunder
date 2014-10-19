@@ -175,7 +175,7 @@ public class MCThunder {
                             player.getSession().send(new ServerChunkDataPacket(x, z, chunks, new byte[256]));
                     player.getSession().send(new ServerSpawnPositionPacket(new Position(0, 25, 0)));
 
-                    player.getChatHandler().sendMessage(server, "&6" + profile.getName() + " &bhas joined &6" + serverName);
+                    player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
                     playerProfileHandler.checkPlayer(player);
 
                     ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), 0, 24, 0, player.getLocation().getYaw(), player.getLocation().getPitch(), player.getHeldItem(), player.getMetadata().getMetadataArray());
@@ -242,12 +242,12 @@ public class MCThunder {
                                 Player player = playerHashMap.get(profile.getId());
                                 if (packet.getMessage().startsWith("/")) {
                                     if (packet.getMessage().equals("/"))
-                                        chatHandler.sendPrivateMessage(event.getSession(), "&4Command does not exist!");
+                                        chatHandler.sendPrivateMessage(event.getSession(), "&cCommand does not exist!");
                                     else
                                         try {
                                             playerCommandEventSource.fireEvent(player, packet);
                                         } catch (ClassNotFoundException e) {
-                                            player.sendMessage("&4Unknown Command");
+                                            player.sendMessage("&cUnknown Command");
                                         }
                                 } else
                                     playerChatEventSource.fireEvent(player, packet);
@@ -282,7 +282,7 @@ public class MCThunder {
                     if (((MinecraftProtocol) event.getSession().getPacketProtocol()).getMode() == ProtocolMode.GAME) {
                         GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
                         Player player = playerHashMap.get(profile.getId());
-                        player.getChatHandler().sendMessage(server, "&6" + profile.getName() + " &bhas left&6 " + conf.getServerName());
+                        player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " disconnected");
                         entryListHandler.deleteFromPlayerEntryList(server, event.getSession());
                         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(player.getEntityID());
                         for (Player p : playerHashMap.values())
