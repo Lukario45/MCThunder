@@ -1,4 +1,4 @@
-package net.mcthunder.apis;
+package net.mcthunder.api;
 
 import net.mcthunder.handlers.ServerChatHandler;
 import org.spacehq.mc.auth.GameProfile;
@@ -18,8 +18,8 @@ public class Player {
     private MetadataMap metadata;
     private Location location;
     private boolean onGround;
-	private boolean sneaking;
-	private boolean sprinting;
+    private boolean sneaking;
+    private boolean sprinting;
     private ServerChatHandler chatHandler;
     private Player lastPmPerson;
 
@@ -30,7 +30,7 @@ public class Player {
         this.gameProfile = profile;
         this.entityID = entityID;
         this.heldItem = heldItem;
-		this.metadata = new MetadataMap();
+        this.metadata = new MetadataMap();
     }
 
     public int getHeldItem() {
@@ -65,12 +65,12 @@ public class Player {
         return this.metadata;
     }
 
-    public Location getLocation(){
+    public Location getLocation() {
         return this.location;
     }
 
-    public void setLocation(Location location){
-         this.location = location;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public boolean isOnGround() {
@@ -81,23 +81,23 @@ public class Player {
         this.onGround = onGround;
     }
 
-	public boolean isSneaking() {
-		return this.sneaking;
-	}
+    public boolean isSneaking() {
+        return this.sneaking;
+    }
 
-	public void setSneaking(boolean sneaking) {
-		this.sneaking = sneaking;
-		this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, sneaking);
-	}
+    public void setSneaking(boolean sneaking) {
+        this.sneaking = sneaking;
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, sneaking);
+    }
 
-	public boolean isSprinting() {
-		return this.sprinting;
-	}
+    public boolean isSprinting() {
+        return this.sprinting;
+    }
 
-	public void setSprinting(boolean sprinting) {
-		this.sprinting = sprinting;
-		this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, sneaking);
-	}
+    public void setSprinting(boolean sprinting) {
+        this.sprinting = sprinting;
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, sneaking);
+    }
 
     public ServerChatHandler getChatHandler() {
         return this.chatHandler;

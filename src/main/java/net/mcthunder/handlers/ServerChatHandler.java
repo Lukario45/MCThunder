@@ -1,9 +1,9 @@
 package net.mcthunder.handlers;
 
 import net.mcthunder.MCThunder;
-import net.mcthunder.apis.LoggingLevel;
-import net.mcthunder.apis.MessageFormat;
-import net.mcthunder.apis.Player;
+import net.mcthunder.api.LoggingLevel;
+import net.mcthunder.api.MessageFormat;
+import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.packetlib.Server;
@@ -11,7 +11,7 @@ import org.spacehq.packetlib.Session;
 
 import java.util.List;
 
-import static net.mcthunder.apis.Utils.tellConsole;
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/7/2014.

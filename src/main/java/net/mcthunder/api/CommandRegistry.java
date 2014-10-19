@@ -1,4 +1,4 @@
-package net.mcthunder.apis;
+package net.mcthunder.api;
 
 import org.apache.commons.lang.StringUtils;
 

@@ -1,6 +1,6 @@
 package net.mcthunder;
 
-import net.mcthunder.apis.*;
+import net.mcthunder.api.*;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
 import net.mcthunder.events.listeners.PlayerCommandEventListener;
 import net.mcthunder.events.source.PlayerChatEventSource;
@@ -52,7 +52,7 @@ import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
 import java.util.*;
 
-import static net.mcthunder.apis.Utils.*;
+import static net.mcthunder.api.Utils.*;
 
 /**
  * Created by Kevin on 8/9/2014.

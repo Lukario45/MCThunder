@@ -1,4 +1,4 @@
-package net.mcthunder.apis;
+package net.mcthunder.api;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -42,35 +42,35 @@ public class Config {
                 getConf().getFile().createNewFile();
             }
             //Make sure it has all fields
-            if(!getConf().containsKey("SERVER-NAME"))
+            if (!getConf().containsKey("SERVER-NAME"))
                 getConf().setProperty("SERVER-NAME", "A MCThunder Minecraft Server");
-            if(!getConf().containsKey("SERVER-HOST"))
+            if (!getConf().containsKey("SERVER-HOST"))
                 getConf().setProperty("SERVER-HOST", "127.0.0.1");
-            if(!getConf().containsKey("SERVER-PORT"))
+            if (!getConf().containsKey("SERVER-PORT"))
                 getConf().setProperty("SERVER-PORT", 25565);
-            if(!getConf().containsKey("PLAYER-SLOTS"))
+            if (!getConf().containsKey("PLAYER-SLOTS"))
                 getConf().setProperty("PLAYER-SLOTS", 20);
-            if(!getConf().containsKey("ENABLE-GLOBAL"))
+            if (!getConf().containsKey("ENABLE-GLOBAL"))
                 getConf().setProperty("ENABLE-GLOBAL", true);
-            if(!getConf().containsKey("GLOBAL-NICK"))
+            if (!getConf().containsKey("GLOBAL-NICK"))
                 getConf().setProperty("GLOBAL-NICK", "CHANGEME");
-            if(!getConf().containsKey("GLOBAL-NICK-REGISTERED"))
+            if (!getConf().containsKey("GLOBAL-NICK-REGISTERED"))
                 getConf().setProperty("GLOBAL-NICK-REGISTERED", false);
-            if(!getConf().containsKey("GLOBAL-NICK-PASSWORD"))
+            if (!getConf().containsKey("GLOBAL-NICK-PASSWORD"))
                 getConf().setProperty("GLOBAL-NICK-PASSWORD", "password");
-            if(!getConf().containsKey("WORLD-NAME"))
+            if (!getConf().containsKey("WORLD-NAME"))
                 getConf().setProperty("WORLD-NAME", "world");
-            if(!getConf().containsKey("SERVER-MOTD"))
+            if (!getConf().containsKey("SERVER-MOTD"))
                 getConf().setProperty("SERVER-MOTD", "A MCThunder Minecraft Server");
-            if(!getConf().containsKey("SERVER-ONLINE-MODE"))
+            if (!getConf().containsKey("SERVER-ONLINE-MODE"))
                 getConf().setProperty("SERVER-ONLINE-MODE", false);
-            if(!getConf().containsKey("ALLOW-FLYING"))
+            if (!getConf().containsKey("ALLOW-FLYING"))
                 getConf().setProperty("ALLOW-FLYING", false);
-            if(!getConf().containsKey("ALLOW-NETHER"))
+            if (!getConf().containsKey("ALLOW-NETHER"))
                 getConf().setProperty("ALLOW-NETHER", true);
-            if(!getConf().containsKey("ALLOW-PVP"))
+            if (!getConf().containsKey("ALLOW-PVP"))
                 getConf().setProperty("ALLOW-PVP", true);
-            if(!getConf().containsKey("USE-COMMAND-BLOCKS"))
+            if (!getConf().containsKey("USE-COMMAND-BLOCKS"))
                 getConf().setProperty("USE-COMMAND-BLOCKS", false);
             getConf().save();
             //Set all of the values from the config

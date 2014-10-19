@@ -1,4 +1,4 @@
-package net.mcthunder.apis;
+package net.mcthunder.api;
 
 /**
  * Created by zack6849 on 10/17/14.

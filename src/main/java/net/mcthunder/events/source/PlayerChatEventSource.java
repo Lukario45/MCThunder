@@ -1,6 +1,6 @@
 package net.mcthunder.events.source;
 
-import net.mcthunder.apis.Player;
+import net.mcthunder.api.Player;
 import net.mcthunder.events.PlayerChatEvent;
 import net.mcthunder.interfaces.PlayerChatEventListener;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;

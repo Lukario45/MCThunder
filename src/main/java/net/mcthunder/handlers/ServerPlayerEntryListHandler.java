@@ -1,6 +1,6 @@
 package net.mcthunder.handlers;
 
-import net.mcthunder.apis.Config;
+import net.mcthunder.api.Config;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;

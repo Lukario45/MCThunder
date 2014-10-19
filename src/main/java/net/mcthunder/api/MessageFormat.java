@@ -1,4 +1,4 @@
-package net.mcthunder.apis;
+package net.mcthunder.api;
 
 import org.spacehq.mc.protocol.data.message.*;
 

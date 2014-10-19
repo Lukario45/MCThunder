@@ -1,4 +1,4 @@
-package net.mcthunder.apis;
+package net.mcthunder.api;
 
 import java.io.BufferedReader;
 import java.io.File;

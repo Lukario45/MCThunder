@@ -1,13 +1,13 @@
 package net.mcthunder.handlers;
 
-import net.mcthunder.apis.LoggingLevel;
-import net.mcthunder.apis.Player;
+import net.mcthunder.api.LoggingLevel;
+import net.mcthunder.api.Player;
 import org.spacehq.packetlib.Server;
 
 import java.io.File;
 import java.io.IOException;
 
-import static net.mcthunder.apis.Utils.tellConsole;
+import static net.mcthunder.api.Utils.tellConsole;
 
 
 /**

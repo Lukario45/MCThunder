@@ -1,7 +1,7 @@
 package net.mcthunder.commands;
 
-import net.mcthunder.apis.Command;
-import net.mcthunder.apis.Player;
+import net.mcthunder.api.Command;
+import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.Arrays;
