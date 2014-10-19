@@ -28,13 +28,13 @@ public class Kick extends Command {
             String args = sb.toString().trim();
             Player p = MCThunder.getPlayer(saidName);
             if (p == null)
-                player.sendMessage("Could not find player " + saidName + "!");
+                player.sendMessage("&6Could not find player &c" + saidName + "&6!");
             else {
-                player.getChatHandler().sendMessage(player.getServer(), p.gameProfile().getName() + " was kicked by " + player.gameProfile().getName() + "!");
+                player.getChatHandler().sendMessage(player.getServer(), "&1" + p.gameProfile().getName() + " &6was kicked by &1" + player.gameProfile().getName() + "&6!");
                 p.getSession().disconnect("Kicked: " + args);
             }
         } else
-            player.sendMessage(getArguments());
+            player.sendMessage("&4" + getArguments());
         return true;
     }
 }

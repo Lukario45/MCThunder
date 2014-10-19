@@ -35,7 +35,7 @@ public class PlayerCommandEventSource {
             try {
                 ((PlayerCommandEventListener) iterator.next()).onCommand(player, packet);
             } catch (ClassNotFoundException e) {
-                player.sendMessage("Unknown Command!");
+                player.sendMessage("&4Unknown Command!");
             }
     }
 }

@@ -19,18 +19,18 @@ public class Respond extends Command {
         String[] wholeMessage = packet.getMessage().split(" ");
         Player p = player.getLastPmPerson();
         if (p == null) {
-            player.sendMessage("No one to respond to!");
+            player.sendMessage("&cNo one to respond to!");
             return true;
         }
         if (wholeMessage.length < 2)
-            player.sendMessage(getArguments());
+            player.sendMessage("&4" + getArguments());
         else {
             StringBuilder sb = new StringBuilder();
             for (int i = 1; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");
             String message = sb.toString().trim();
-            p.sendMessage("[" + player.gameProfile().getName() + "] ->  You: " + message);
-            player.sendMessage("[You] -> " + p.gameProfile().getName() + ": " + message);
+            player.sendMessage("&3[You] &e-> &3" + p.gameProfile().getName() + ":&e " + message);
+            p.sendMessage("&3[" + player.gameProfile().getName() + "] &e-> &3You: &e" + message);
             p.setLastPmPerson(player);
         }
         return true;

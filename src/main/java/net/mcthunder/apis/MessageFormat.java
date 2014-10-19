@@ -108,7 +108,7 @@ public class MessageFormat {
                     //i++;
                     break;
                 default:
-                    msg.addExtra(new TextMessage(brokenMessage[i]));
+                    msg.addExtra(new TextMessage(brokenMessage[0]).setStyle(new MessageStyle().setColor(ChatColor.WHITE)));
                     //i++;
                     break;
 

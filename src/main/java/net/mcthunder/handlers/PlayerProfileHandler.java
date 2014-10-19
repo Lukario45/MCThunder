@@ -33,7 +33,7 @@ public class PlayerProfileHandler {
                 e.printStackTrace();
             }
             //we dont need to tell owners about simple file IO completing
-            player.getChatHandler().sendMessage(server, "Welcome " + playerName + " to the server!");
+            player.getChatHandler().sendMessage(server, "&bWelcome &6" + playerName + " &bto the server!");
         }
     }
 
