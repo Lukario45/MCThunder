@@ -49,8 +49,8 @@ public class Help extends Command {//Ported by pup from Necessities
             if (name.toLowerCase().contains(search) || c.getInformation().toLowerCase().contains(search) || c.getAliases().contains(search) || search.equals("")) {
                 helpList.add("&3/" + name + ": &e" + c.getInformation());
                 if (name.equalsIgnoreCase(search) || (c.getAliases().contains(search) && !search.equals(""))) {
-                    usage = /*helpList.add(*/"&eUsage: &3" + c.getArguments();//);
-                    searched = "&3/" + name + ": &e/" + c.getInformation();
+                    usage = "&eUsage: &3" + c.getArguments();
+                    searched = "&3/" + name + ": &e" + c.getInformation();
                 }
             }
         }
