@@ -28,6 +28,15 @@ public class ServerChatHandler {
     public void handleChat(Player player, ClientChatPacket packet) {
         try {
             String message = packet.getMessage();
+            if(message.endsWith(">") && ! message.equals(">")) {
+                String appended = player.getAppended() + " " + message.substring(0, message.length() - 1);
+                player.setAppended(appended.trim());
+                player.sendMessage("&aMessage appended.");
+                return;
+            } else if (!player.getAppended().equals("")) {
+                message = player.getAppended() + " " + message;
+                player.setAppended("");
+            }
             tellConsole(LoggingLevel.CHAT, player.gameProfile().getName() + ": " + message);
             String fullMessage = "&e[" + player.gameProfile().getName() + "]:&r " + message;
             for (Player p : MCThunder.playerHashMap.values())

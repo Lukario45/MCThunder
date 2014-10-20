@@ -292,6 +292,7 @@ public class MCThunder {
                         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(player.getEntityID());
                         for (Player p : playerHashMap.values())
                             p.getSession().send(destroyEntitiesPacket);
+                        player.setAppended("");
                         playerHashMap.remove(player);
                     }
                 }

@@ -22,6 +22,7 @@ public class Player {
     private boolean sprinting;
     private ServerChatHandler chatHandler;
     private Player lastPmPerson;
+    private String appended = "";
     private World world;
 
     public Player(Server server, Session session, GameProfile profile, int entityID, int heldItem, EntityMetadata metadata) {
@@ -122,5 +123,13 @@ public class Player {
 
     public void setWorld(World w) {
         this.world = w;
+    }
+
+    public String getAppended() {
+        return this.appended;
+    }
+
+    public void setAppended(String toAppend) {
+        this.appended = toAppend;
     }
 }
