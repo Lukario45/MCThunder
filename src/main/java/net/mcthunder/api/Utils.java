@@ -62,4 +62,9 @@ public class Utils {
     public static void tellConsole(LoggingLevel level, String message) {
         System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), message);
     }
+
+    public static long getLong(int x, int z) {
+        long longData = (long) x << 32 | z & 0xFFFFFFFFL;
+        return longData;
+    }
 }

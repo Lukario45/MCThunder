@@ -13,6 +13,7 @@ import org.spacehq.opennbt.tag.builtin.Tag;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static net.mcthunder.api.Utils.tellConsole;
 
@@ -26,6 +27,7 @@ public class World {
     private Chunk[] chunks;
     private Position spawnPosition;
     private int chunkInt;
+    private HashMap<Long, Region> regionHashMap;
 
     public World(String name/*, long seed*/) {
         this.name = name;
@@ -46,16 +48,24 @@ public class World {
         return this.chunks;
     }
 
-    public void loadWorld() throws IOException {
-        // try {
+    public void addRegion(long l) {
+        regionHashMap.put(l, new Region(l));
+    }
 
+    public Region getRegion(long l) {
+        Region r = regionHashMap.get(l);
+        return r;
+    }
+
+
+    public void loadWorld() throws IOException {
         File region = new File("worlds/" + name + "/region/r.0.0.mca");
         if (region.exists()) {
             RegionFile regionFile = new RegionFile(region);
             byte[] light = new byte[4096]; //Create a light array of bytes (actually nibbles) (should this be 2048)
             Arrays.fill(light, (byte) 15); //
             chunks = new Chunk[16];
-            Tag tag = NBTIO.readTag(regionFile.getChunkDataInputStream(1, 0));
+            Tag tag = NBTIO.readTag(regionFile.getChunkDataInputStream(0, 0));
             CompoundTag compoundTag = (CompoundTag) tag;
             CompoundTag level = compoundTag.get("Level");
             ListTag sections = level.get("Sections");

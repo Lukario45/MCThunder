@@ -40,7 +40,6 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerBlockChangePacket;
-import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
@@ -183,11 +182,15 @@ public class MCThunder {
                         Chunk chunk = new Chunk(blocks, blocklight, skylight);
                         chunks[i] = chunk;
                      }*/
-                    for (int x = -1; x <= 1; x++)
-                        for (int z = -1; z <= 1; z++) {
-                            player.getSession().send(new ServerChunkDataPacket(x, z, world.getChunks(), new byte[256]));
-                            tellConsole(LoggingLevel.DEBUG, "Sending Chunks");
-                        }
+                    Column test = new Column(getLong(0, 0), world.getChunks());
+                    Column[] t = new Column[1];
+                    t[0] = test;
+                    test.sendColumns(player, t);
+                    //for (int x = -1; x <= 1; x++)
+                    //for (int z = -1; z <= 1; z++) {
+                    //   player.getSession().send(new ServerChunkDataPacket(x, z, world.getChunks(), new byte[256]));
+                    //  tellConsole(LoggingLevel.DEBUG, "Sending Chunks");
+                    //   }
 
                     // if (!worldHashMap.containsKey("world"))
                     // worldHashMap.put("world", new World("world", 0, chunks));
