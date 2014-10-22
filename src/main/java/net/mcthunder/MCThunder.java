@@ -15,7 +15,9 @@ import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
-import org.spacehq.mc.protocol.data.game.*;
+import org.spacehq.mc.protocol.data.game.EntityMetadata;
+import org.spacehq.mc.protocol.data.game.ItemStack;
+import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
@@ -50,6 +52,7 @@ import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.packet.Packet;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
+import java.io.IOException;
 import java.util.*;
 
 import static net.mcthunder.api.Utils.*;
@@ -116,6 +119,14 @@ public class MCThunder {
             //Done Listeners
             playerHashMap = new HashMap<UUID, Player>(conf.getSlots());
             worldHashMap = new HashMap<String, World>();
+            worldHashMap.put("pvp", new World("pvp"));
+            final World world = worldHashMap.get("pvp");
+            try {
+                world.loadWorld();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
             server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
@@ -139,14 +150,14 @@ public class MCThunder {
 
                     Player player = playerHashMap.get(profile.getId());
                     //how about you don't waste time getting an exact copy of a variable you already have stored?
-                    session.send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 1, Difficulty.PEACEFUL, conf.getSlots(), WorldType.FLAT, false));
+                    session.send(new ServerJoinGamePacket(0, false, GameMode.CREATIVE, 0, Difficulty.PEACEFUL, conf.getSlots(), WorldType.FLAT, false));
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
                     player.getSession().send(new ServerPlayerPositionRotationPacket(0, 25, 0, 0, 0));
                     player.setLocation(getSpawnLocation());
 
-                    byte[] light = new byte[4096]; //Create a light array of bytes (actually nibbles) (should this be 2048)
+                    /**byte[] light = new byte[4096]; //Create a light array of bytes (actually nibbles) (should this be 2048)
                     Arrays.fill(light, (byte) 15); //fill up the light array with full light (16 at 0 indexed)
                     Chunk[] chunks = new Chunk[16];
 
@@ -171,13 +182,16 @@ public class MCThunder {
                                 }
                         Chunk chunk = new Chunk(blocks, blocklight, skylight);
                         chunks[i] = chunk;
-                    }
-                    for (int x = -5; x <= 5; x++)
-                        for (int z = -5; z <= 5; z++)
-                            player.getSession().send(new ServerChunkDataPacket(x, z, chunks, new byte[256]));
-                    if (!worldHashMap.containsKey("world"))
-                        worldHashMap.put("world", new World("world", 0, chunks));
-                    player.setWorld(worldHashMap.get("world"));
+                     }*/
+                    for (int x = -1; x <= 1; x++)
+                        for (int z = -1; z <= 1; z++) {
+                            player.getSession().send(new ServerChunkDataPacket(x, z, world.getChunks(), new byte[256]));
+                            tellConsole(LoggingLevel.DEBUG, "Sending Chunks");
+                        }
+
+                    // if (!worldHashMap.containsKey("world"))
+                    // worldHashMap.put("world", new World("world", 0, chunks));
+                    // player.setWorld(worldHashMap.get("world"));
                     player.getSession().send(new ServerSpawnPositionPacket(new Position(0, 25, 0)));
 
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
