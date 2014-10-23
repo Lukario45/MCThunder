@@ -125,6 +125,9 @@ public class MCThunder {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            final Region r = new Region(world, getLong(0, 0));
+            //world.getRegion(getLong(0,0)).loadRegion();
+            r.loadRegion();
 
 
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
@@ -182,10 +185,12 @@ public class MCThunder {
                         Chunk chunk = new Chunk(blocks, blocklight, skylight);
                         chunks[i] = chunk;
                      }*/
-                    Column test = new Column(getLong(0, 0), world.getChunks());
-                    Column[] t = new Column[1];
-                    t[0] = test;
-                    test.sendColumns(player, t);
+
+                    world.sendColumns(player, world.getAllColumnsAsArray());
+                    //tellConsole(LoggingLevel.DEBUG,  "Coords " + r.getX() + " "+ r.getZ());
+
+
+
                     //for (int x = -1; x <= 1; x++)
                     //for (int z = -1; z <= 1; z++) {
                     //   player.getSession().send(new ServerChunkDataPacket(x, z, world.getChunks(), new byte[256]));
