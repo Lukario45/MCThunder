@@ -1,6 +1,7 @@
 package net.mcthunder.api;
 
 import net.mcthunder.handlers.ServerChatHandler;
+import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.packetlib.Server;

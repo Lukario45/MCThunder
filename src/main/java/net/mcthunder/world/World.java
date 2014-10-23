@@ -1,5 +1,7 @@
-package net.mcthunder.api;
+package net.mcthunder.world;
 
+import net.mcthunder.api.LoggingLevel;
+import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;

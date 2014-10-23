@@ -1,5 +1,6 @@
-package net.mcthunder.api;
+package net.mcthunder.world;
 
+import net.mcthunder.api.LoggingLevel;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.Position;

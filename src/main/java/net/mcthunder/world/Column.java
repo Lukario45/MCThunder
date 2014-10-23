@@ -1,4 +1,4 @@
-package net.mcthunder.api;
+package net.mcthunder.world;
 
 import org.spacehq.mc.protocol.data.game.Chunk;
 

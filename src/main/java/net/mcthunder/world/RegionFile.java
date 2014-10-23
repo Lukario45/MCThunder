@@ -1,4 +1,4 @@
-package net.mcthunder.api;
+package net.mcthunder.world;
 
 /*
  ** 2011 January 5
