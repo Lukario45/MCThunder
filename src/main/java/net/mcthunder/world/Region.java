@@ -1,6 +1,5 @@
 package net.mcthunder.world;
 
-import net.mcthunder.api.LoggingLevel;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.Position;
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import static net.mcthunder.api.Utils.getLong;
-import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/21/2014.
@@ -69,7 +67,7 @@ public class Region {
                 } else {
                     try {
                         tag = NBTIO.readTag(regionFile.getChunkDataInputStream(chunkX, chunkZ));
-                        tellConsole(LoggingLevel.DEBUG, "Ran " + chunkX + " " + chunkZ);
+                        //tellConsole(LoggingLevel.DEBUG, "Ran " + chunkX + " " + chunkZ);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -113,7 +111,7 @@ public class Region {
                     int zPos = zPosTag.getValue();
                     Column c = new Column(getLong(xPos, zPos), chunks);
                     world.addColumn(c);
-                    tellConsole(LoggingLevel.DEBUG, "CONFIRM " + xPos + " " + zPos);
+                    //  tellConsole(LoggingLevel.DEBUG, "CONFIRM " + xPos + " " + zPos);
 
 
                 }
@@ -130,7 +128,7 @@ public class Region {
                 }
 
             }
-            tellConsole(LoggingLevel.DEBUG, "FINNISHED");
+            //tellConsole(LoggingLevel.DEBUG, "FINNISHED");
         }
     }
 }

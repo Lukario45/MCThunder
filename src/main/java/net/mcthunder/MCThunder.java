@@ -9,7 +9,6 @@ import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
-import net.mcthunder.world.Region;
 import net.mcthunder.world.World;
 import org.reflections.Reflections;
 import org.spacehq.mc.auth.GameProfile;
@@ -53,8 +52,6 @@ import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.packet.Packet;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 import static net.mcthunder.api.Utils.*;
@@ -122,7 +119,7 @@ public class MCThunder {
             playerHashMap = new HashMap<UUID, Player>(conf.getSlots());
             worldHashMap = new HashMap<String, World>();
 
-            File dir = new File("worlds");
+            /*File dir = new File("worlds");
             File[] files = dir.listFiles();
             for(File f : files) {
                 worldHashMap.put(f.getName(), new World(f.getName()));
@@ -134,14 +131,15 @@ public class MCThunder {
                 }
                 Region r = new Region(w, getLong(0, 0));
                 r.loadRegion();
-            }
-            /*final World world = worldHashMap.get("pvp");
-            try {
+            }*/
+            // if (!worldHashMap.containsKey("world"))
+            // worldHashMap.put("world", new World("world", 0, chunks));
+            //   player.setWorld(worldHashMap.get("world"));
+            worldHashMap.put(conf.getWorldName(), new World(conf.getWorldName()));
+            final World world = worldHashMap.get(conf.getWorldName());
+
                 world.loadWorld();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            final Region r = new Region(world, getLong(0, 0));*/
+
 
             //world.getRegion(getLong(0,0)).loadRegion();
 
@@ -204,7 +202,7 @@ public class MCThunder {
                         chunks[i] = chunk;
                      }*/
 
-                    World world = worldHashMap.get(worldHashMap.keySet().toArray()[0]);//Will need to make it take default world name or one they logged out in
+                    //World world = worldHashMap.get(worldHashMap.keySet().toArray()[0]);//Will need to make it take default world name or one they logged out in
                     world.sendColumns(player, world.getAllColumnsAsArray());
 
                     //tellConsole(LoggingLevel.DEBUG,  "Coords " + r.getX() + " "+ r.getZ());

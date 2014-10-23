@@ -7,7 +7,6 @@ import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 
 import static net.mcthunder.api.Utils.getLong;
@@ -33,10 +32,30 @@ public class World {
         world = new File("worlds/" + name + "/level.dat");
         //this.chunks = chunks;
         columnHashMap = new HashMap<Long, Column>();
+        regionHashMap = new HashMap<Long, Region>();
     }
 
     public String getName() {
         return this.name;
+    }
+
+    public void addAllRegions() {
+        File regions = new File("worlds/" + name + "/region/");
+        File[] files = regions.listFiles();
+        for (File f : files) {
+            if (f.getName().endsWith(".mca")) {
+                String[] regionName = f.getName().split("\\.");
+                int x = Integer.parseInt(regionName[1]);
+                tellConsole(LoggingLevel.DEBUG, String.valueOf(x));
+                int z = Integer.parseInt(regionName[2]);
+                tellConsole(LoggingLevel.DEBUG, String.valueOf(z));
+                addRegion(getLong(x, z));
+            } else {
+
+            }
+        }
+
+
     }
 
     public long getSeed() {
@@ -73,8 +92,17 @@ public class World {
         return r;
     }
 
+    public void loadAllRegions() {
+        for (Region r : regionHashMap.values()) {
+            r.loadRegion();
+        }
+    }
 
-    public void loadWorld() throws IOException {
+
+    public void loadWorld() {
+        addAllRegions();
+        loadAllRegions();
+        tellConsole(LoggingLevel.INFO, "FNNISHED LOADING WORLD");
 
     }
     public void unloadWorld() {
