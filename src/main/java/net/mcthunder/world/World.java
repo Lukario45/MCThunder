@@ -5,8 +5,12 @@ import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
+import org.spacehq.opennbt.NBTIO;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.IntTag;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 import static net.mcthunder.api.Utils.getLong;
@@ -33,6 +37,20 @@ public class World {
         //this.chunks = chunks;
         columnHashMap = new HashMap<Long, Column>();
         regionHashMap = new HashMap<Long, Region>();
+        try {
+            CompoundTag tag = NBTIO.readFile(world);
+            CompoundTag data = tag.get("Data");
+            IntTag xTag = data.get("SpawnX");
+            IntTag yTag = data.get("SpawnY");
+            IntTag zTag = data.get("SpawnZ");
+            tellConsole(LoggingLevel.DEBUG, String.valueOf(xTag.getValue()) + String.valueOf(yTag.getValue()) + String.valueOf(zTag.getValue()));
+            spawnPosition = new Position(xTag.getValue(), yTag.getValue(), zTag.getValue());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     public String getName() {
@@ -46,9 +64,9 @@ public class World {
             if (f.getName().endsWith(".mca")) {
                 String[] regionName = f.getName().split("\\.");
                 int x = Integer.parseInt(regionName[1]);
-                tellConsole(LoggingLevel.DEBUG, String.valueOf(x));
+                //tellConsole(LoggingLevel.DEBUG, String.valueOf(x));
                 int z = Integer.parseInt(regionName[2]);
-                tellConsole(LoggingLevel.DEBUG, String.valueOf(z));
+                //tellConsole(LoggingLevel.DEBUG, String.valueOf(z));
                 addRegion(getLong(x, z));
             } else {
 
@@ -73,7 +91,7 @@ public class World {
     public void addColumn(Column c) {
         long l = getLong(c.getX(), c.getZ());
         columnHashMap.put(l, c);
-        tellConsole(LoggingLevel.DEBUG, "NEW CHUNK TO COLUMN");
+        //tellConsole(LoggingLevel.DEBUG, "NEW CHUNK TO COLUMN");
     }
 
     public Column[] getAllColumnsAsArray() {
@@ -107,6 +125,10 @@ public class World {
     }
     public void unloadWorld() {
 
+    }
+
+    public Position getSpawnPosition() {
+        return this.spawnPosition;
     }
 
     public void sendColumns(Player p, Column[] columns) {
