@@ -53,6 +53,7 @@ import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.packet.Packet;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -120,16 +121,31 @@ public class MCThunder {
             //Done Listeners
             playerHashMap = new HashMap<UUID, Player>(conf.getSlots());
             worldHashMap = new HashMap<String, World>();
-            worldHashMap.put("pvp", new World("pvp"));
-            final World world = worldHashMap.get("pvp");
+
+            File dir = new File("worlds");
+            File[] files = dir.listFiles();
+            for(File f : files) {
+                worldHashMap.put(f.getName(), new World(f.getName()));
+                World w = worldHashMap.get(f.getName());
+                try {
+                    w.loadWorld();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Region r = new Region(w, getLong(0, 0));
+                r.loadRegion();
+            }
+            /*final World world = worldHashMap.get("pvp");
             try {
                 world.loadWorld();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            final Region r = new Region(world, getLong(0, 0));
+            final Region r = new Region(world, getLong(0, 0));*/
+
             //world.getRegion(getLong(0,0)).loadRegion();
-            r.loadRegion();
+
+            //r.loadRegion();
 
 
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
@@ -188,7 +204,9 @@ public class MCThunder {
                         chunks[i] = chunk;
                      }*/
 
+                    World world = worldHashMap.get(worldHashMap.keySet().toArray()[0]);//Will need to make it take default world name or one they logged out in
                     world.sendColumns(player, world.getAllColumnsAsArray());
+
                     //tellConsole(LoggingLevel.DEBUG,  "Coords " + r.getX() + " "+ r.getZ());
 
 
