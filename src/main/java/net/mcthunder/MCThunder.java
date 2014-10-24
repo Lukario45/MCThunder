@@ -52,6 +52,7 @@ import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.packet.Packet;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
+import java.io.File;
 import java.util.*;
 
 import static net.mcthunder.api.Utils.*;
@@ -415,7 +416,7 @@ public class MCThunder {
     }
 
     public static Location getSpawnLocation() {
-        return new Location(0, 24, 0);
+        return new Location(worldHashMap.get(conf.getWorldName()), 0, 24, 0);
     }
 
     public static Player getPlayer(String name) {

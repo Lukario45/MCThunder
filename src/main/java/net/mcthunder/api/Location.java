@@ -1,5 +1,7 @@
 package net.mcthunder.api;
 
+import net.mcthunder.world.World;
+
 /**
  * Created by zack6849 on 10/17/14.
  */
@@ -9,15 +11,19 @@ public class Location {
     private double z;
     private double yaw;
     private double pitch;
+    private World world;
 
-    public Location(double x, double y, double z) {
-        new Location(x, y, z, 0, 0);
+    public Location(World world, double x, double y, double z) {
+        new Location(world, x, y, z, 0, 0);
     }
 
-    public Location(double x, double y, double z, double yaw, double pitch) {
+    public Location(World world, double x, double y, double z, double yaw, double pitch) {
+        this.world = world;
         this.x = x;
         this.y = y;
         this.z = z;
+        this.yaw = yaw;
+        this.pitch = pitch;
     }
 
     public double getX() {
@@ -59,5 +65,9 @@ public class Location {
 
     public void setPitch(double pitch) {
         this.pitch = pitch;
+    }
+
+    public World getWorld() {
+        return this.world;
     }
 }

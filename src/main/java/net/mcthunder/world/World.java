@@ -1,5 +1,6 @@
 package net.mcthunder.world;
 
+import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.data.game.Chunk;
@@ -25,6 +26,7 @@ public class World {
     private long seed;
     private Chunk[] chunks;
     private Position spawnPosition;
+    private Location spawn;
     private int chunkInt;
     private HashMap<Long, Region> regionHashMap;
     private HashMap<Long, Column> columnHashMap;
@@ -49,8 +51,9 @@ public class World {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        spawn = new Location(this, spawnPosition.getX(), spawnPosition.getY(), spawnPosition.getZ());
 
-
+        loadAround(spawn, 9);
     }
 
     public String getName() {
@@ -74,6 +77,21 @@ public class World {
         }
 
 
+    }
+
+    public void loadAround(Location l, int distance) {
+        int x = (int) l.getX() / 16;
+        int z = (int) l.getZ() / 16;
+        for(int xAdd = -distance; xAdd < distance; xAdd++)
+            for(int zAdd = -distance; zAdd < distance; zAdd++) {
+                File temp = new File("worlds/" + name + "/region/r." + (x + xAdd) + "." + (z + zAdd) + ".mca");
+                if (temp.exists()) {
+                    tellConsole(LoggingLevel.DEBUG, "x: " + (x + xAdd) + ", z: " + (z + zAdd));
+                    addRegion(getLong(x + xAdd, z + zAdd));
+                } else {//Create the chunk
+
+                }
+            }
     }
 
     public long getSeed() {
