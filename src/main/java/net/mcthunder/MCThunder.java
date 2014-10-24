@@ -52,7 +52,6 @@ import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.packet.Packet;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
-import java.io.File;
 import java.util.*;
 
 import static net.mcthunder.api.Utils.*;
@@ -173,7 +172,7 @@ public class MCThunder {
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
-                    player.getSession().send(new ServerPlayerPositionRotationPacket(0, 25, 0, 0, 0));
+                    player.getSession().send(new ServerPlayerPositionRotationPacket(world.getSpawnPosition().getX(), world.getSpawnPosition().getY(), world.getSpawnPosition().getZ(), 0, 0));
                     player.setLocation(getSpawnLocation());
 
                     /**byte[] light = new byte[4096]; //Create a light array of bytes (actually nibbles) (should this be 2048)
@@ -219,7 +218,7 @@ public class MCThunder {
                     // if (!worldHashMap.containsKey("world"))
                     // worldHashMap.put("world", new World("world", 0, chunks));
                     // player.setWorld(worldHashMap.get("world"));
-                    player.getSession().send(new ServerSpawnPositionPacket(new Position(0, 25, 0)));
+                    player.getSession().send(new ServerSpawnPositionPacket(new Position(world.getSpawnPosition().getX(), world.getSpawnPosition().getY(), world.getSpawnPosition().getZ())));
 
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
                     playerProfileHandler.checkPlayer(player);

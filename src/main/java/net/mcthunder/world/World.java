@@ -53,7 +53,7 @@ public class World {
         }
         spawn = new Location(this, spawnPosition.getX(), spawnPosition.getY(), spawnPosition.getZ());
 
-        loadAround(spawn, 9);
+        loadAround(spawnPosition, 9);
     }
 
     public String getName() {
@@ -79,10 +79,18 @@ public class World {
 
     }
 
-    public void loadAround(Location l, int distance) {
-        int x = (int) l.getX() / 16;
-        int z = (int) l.getZ() / 16;
-        for(int xAdd = -distance; xAdd < distance; xAdd++)
+    public boolean checkRegion(Long l) {
+        if (regionHashMap.containsKey(l)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void loadAround(Position p, int distance) {
+        /**int chunkX = p.getX() >> 4;
+         int chunkZ = p.getZ() >>4;
+         /*for(int xAdd = -distance; xAdd < distance; xAdd++)
             for(int zAdd = -distance; zAdd < distance; zAdd++) {
                 File temp = new File("worlds/" + name + "/region/r." + (x + xAdd) + "." + (z + zAdd) + ".mca");
                 if (temp.exists()) {
@@ -91,7 +99,47 @@ public class World {
                 } else {//Create the chunk
 
                 }
+         }*//**
+
+         //Check if regions are loaded
+         int[] data = new int[4];
+         data[0] = chunkX + distance;//topX
+         data [1] = chunkX - distance;//bottomX
+         data [2] = chunkZ + distance;//topZ
+         data [3] = chunkZ - distance;//bottomZ
+         int i = 0;
+         Region[] regions = new Region[4];
+         for (int d: data){
+
+         //for (int i = 0; i==3;i++ ){
+         tellConsole(LoggingLevel.DEBUG, String.valueOf(i));
+         if (i <= 1 ){
+         if (!checkRegion(getLong(d >> 5,chunkZ >> 5))){
+         addRegion(getLong(d >> 5,chunkZ >> 5));
+         regions[i] =regionHashMap.get(getLong(d >> 5,chunkZ >> 5));
+         } else {
+         regions[i] = regionHashMap.get(getLong(d >> 5,chunkZ >> 5));
+         }
+
+         } else if (i >= 2){
+         if (!checkRegion(getLong(chunkX,d))){
+         addRegion(getLong(chunkX,d));
+         regions[i] = regionHashMap.get(getLong(chunkX >> 5, d >> 5));
+         } else {
+         regions[i] = regionHashMap.get(getLong(chunkX >> 5, d >> 5));
+         }
             }
+         i++;
+         regions[0].readChunk(getLong(chunkX,chunkZ));
+         } for (Region r: regions){
+         boolean readingChunks = true;
+         while(readingChunks){
+
+
+         }
+         }
+
+         */
     }
 
     public long getSeed() {
@@ -130,7 +178,7 @@ public class World {
 
     public void loadAllRegions() {
         for (Region r : regionHashMap.values()) {
-            r.loadRegion();
+            //r.loadRegion();
         }
     }
 
