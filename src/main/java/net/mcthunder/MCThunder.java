@@ -172,8 +172,9 @@ public class MCThunder {
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
-                    player.getSession().send(new ServerPlayerPositionRotationPacket(world.getSpawnPosition().getX(), world.getSpawnPosition().getY(), world.getSpawnPosition().getZ(), 0, 0));
-                    player.setLocation(getSpawnLocation());
+                    player.getSession().send(new ServerPlayerPositionRotationPacket(world.getSpawnLocation().getX(), world.getSpawnLocation().getY(), world.getSpawnLocation().getZ(), 0, 0));
+                    player.setLocation(world.getSpawnLocation());
+                    player.loadChunks(9);//Needs to be updated to represent their render distance
 
                     /**byte[] light = new byte[4096]; //Create a light array of bytes (actually nibbles) (should this be 2048)
                     Arrays.fill(light, (byte) 15); //fill up the light array with full light (16 at 0 indexed)
@@ -203,7 +204,7 @@ public class MCThunder {
                      }*/
 
                     //World world = worldHashMap.get(worldHashMap.keySet().toArray()[0]);//Will need to make it take default world name or one they logged out in
-                    world.sendColumns(player, world.getAllColumnsAsArray());
+                    //world.sendColumns(player, world.getAllColumnsAsArray());
 
                     //tellConsole(LoggingLevel.DEBUG,  "Coords " + r.getX() + " "+ r.getZ());
 
@@ -218,7 +219,7 @@ public class MCThunder {
                     // if (!worldHashMap.containsKey("world"))
                     // worldHashMap.put("world", new World("world", 0, chunks));
                     // player.setWorld(worldHashMap.get("world"));
-                    player.getSession().send(new ServerSpawnPositionPacket(new Position(world.getSpawnPosition().getX(), world.getSpawnPosition().getY(), world.getSpawnPosition().getZ())));
+                    player.getSession().send(new ServerSpawnPositionPacket(new Position((int)world.getSpawnLocation().getX(), (int)world.getSpawnLocation().getY(), (int)world.getSpawnLocation().getZ())));
 
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
                     playerProfileHandler.checkPlayer(player);
@@ -358,19 +359,24 @@ public class MCThunder {
     private static void updatePlayerPosition(Session session, ClientPlayerMovementPacket packet) {
         GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
         Player player = playerHashMap.get(profile.getId());
-        if (player.getLocation() == null) {
-            player.setLocation(getSpawnLocation());
-        }
+        if (player.getLocation() == null)
+            player.setLocation(worldHashMap.get(conf.getWorldName()).getSpawnLocation());
 
         if (packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
+            int fromChunkX = (int)player.getLocation().getX() / 16;
+            int fromChunkZ = (int)player.getLocation().getZ() / 16;
+            int toChunkX = (int)packet.getX() / 16;
+            int toChunkZ = (int)packet.getZ() / 16;
             player.getLocation().setX(packet.getX());
             player.getLocation().setY(packet.getY());
             player.getLocation().setZ(packet.getZ());
+            if (fromChunkX != toChunkX || fromChunkZ != toChunkZ)
+                player.loadChunks(9);//This number will need to have ability to vary
         }
 
         if (packet instanceof ClientPlayerRotationPacket || packet instanceof ClientPlayerPositionRotationPacket) {
-            player.getLocation().setPitch(packet.getPitch());
-            player.getLocation().setYaw(packet.getYaw());
+            player.getLocation().setPitch((float) packet.getPitch());
+            player.getLocation().setYaw((float) packet.getYaw());
         }
         player.setOnGround(packet.isOnGround());
     }
@@ -412,11 +418,6 @@ public class MCThunder {
 
     public static Server getServer() {
         return server;
-    }
-
-    public static Location getSpawnLocation() {
-        World w = worldHashMap.get(conf.getWorldName());
-        return new Location(w, w.getSpawnPosition().getX(), w.getSpawnPosition().getY(), w.getSpawnPosition().getZ());
     }
 
     public static Player getPlayer(String name) {

@@ -9,15 +9,21 @@ public class Location {
     private double x;
     private double y;
     private double z;
-    private double yaw;
-    private double pitch;
+    private float yaw;
+    private float pitch;
     private World world;
 
     public Location(World world, double x, double y, double z) {
-        new Location(world, x, y, z, 0, 0);
+        //new Location(world, x, y, z, 0, 0);
+        this.world = world;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = 0;
+        this.pitch = 0;
     }
 
-    public Location(World world, double x, double y, double z, double yaw, double pitch) {
+    public Location(World world, double x, double y, double z, float yaw, float pitch) {
         this.world = world;
         this.x = x;
         this.y = y;
@@ -27,7 +33,7 @@ public class Location {
     }
 
     public double getX() {
-        return x;
+        return this.x;
     }
 
     public void setX(double x) {
@@ -35,7 +41,7 @@ public class Location {
     }
 
     public double getY() {
-        return y;
+        return this.y;
     }
 
     public void setY(double y) {
@@ -43,7 +49,7 @@ public class Location {
     }
 
     public double getZ() {
-        return z;
+        return this.z;
     }
 
     public void setZ(double z) {
@@ -54,20 +60,23 @@ public class Location {
         return (float) this.yaw;
     }
 
-
-    public void setYaw(double yaw) {
+    public void setYaw(float yaw) {
         this.yaw = yaw;
     }
 
     public float getPitch() {
-        return (float) pitch;
+        return (float) this.pitch;
     }
 
-    public void setPitch(double pitch) {
+    public void setPitch(float pitch) {
         this.pitch = pitch;
     }
 
     public World getWorld() {
         return this.world;
+    }
+
+    public void setWorld(World w) {
+        this.world = w;
     }
 }

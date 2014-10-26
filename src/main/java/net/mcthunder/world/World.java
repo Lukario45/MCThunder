@@ -25,7 +25,6 @@ public class World {
     private String name;
     private long seed;
     private Chunk[] chunks;
-    private Position spawnPosition;
     private Location spawn;
     private int chunkInt;
     private HashMap<Long, Region> regionHashMap;
@@ -46,12 +45,10 @@ public class World {
             IntTag yTag = data.get("SpawnY");
             IntTag zTag = data.get("SpawnZ");
             tellConsole(LoggingLevel.DEBUG, String.valueOf(xTag.getValue()) + String.valueOf(yTag.getValue()) + String.valueOf(zTag.getValue()));
-            spawnPosition = new Position(xTag.getValue(), yTag.getValue(), zTag.getValue());
-
+            spawn = new Location(this, xTag.getValue(), yTag.getValue(), zTag.getValue());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        spawn = new Location(this, spawnPosition.getX(), spawnPosition.getY(), spawnPosition.getZ());
     }
 
     public String getName() {
@@ -85,9 +82,9 @@ public class World {
         }
     }
 
-    public void loadAround(Position p, int distance) {
-        int x = p.getX() / 16;
-        int z = p.getZ() / 16;
+    public void loadAround(Location p, int distance) {
+        int x = (int)p.getX() / 16;
+        int z = (int)p.getZ() / 16;
         for(int xAdd = -distance; xAdd < distance; xAdd++)
             for(int zAdd = -distance; zAdd < distance; zAdd++) {
                 int regionX = (x + xAdd) >> 5;
@@ -114,9 +111,12 @@ public class World {
     }
 
     public void addColumn(Column c) {
-        long l = getLong(c.getX(), c.getZ());
-        columnHashMap.put(l, c);
+        columnHashMap.put(getLong(c.getX(), c.getZ()), c);
         //tellConsole(LoggingLevel.DEBUG, "NEW CHUNK TO COLUMN");
+    }
+
+    public boolean isColumnLoaded(long l) {
+        return columnHashMap.containsKey(l);
     }
 
     public Column[] getAllColumnsAsArray() {
@@ -143,7 +143,7 @@ public class World {
     public void loadWorld() {
         addAllRegions();
         //loadAllRegions();
-        loadAround(spawnPosition, 9);
+        loadAround(spawn, 9);
         tellConsole(LoggingLevel.INFO, "FNNISHED LOADING WORLD");
 
     }
@@ -151,14 +151,12 @@ public class World {
 
     }
 
-    public Position getSpawnPosition() {
-        return this.spawnPosition;
+    public Location getSpawnLocation() {
+        return this.spawn;
     }
 
     public void sendColumns(Player p, Column[] columns) {
-        for (Column c : columns) {
-            ServerChunkDataPacket packet = new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), new byte[256]);
-            p.getSession().send(packet);
-        }
+        for (Column c : columns)
+            p.getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), new byte[256]));
     }
 }

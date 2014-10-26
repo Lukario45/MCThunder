@@ -1,16 +1,25 @@
 package net.mcthunder.api;
 
 import net.mcthunder.handlers.ServerChatHandler;
+import net.mcthunder.world.Column;
+import net.mcthunder.world.Region;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
+import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
+import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
+import java.util.HashMap;
+
+import static net.mcthunder.api.Utils.getLong;
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/14/2014.
  */
 public class Player {
+    private HashMap<Long, Column> columnHashMap = new HashMap<>();
     private int entityID;
     private int heldItem;
     private GameProfile gameProfile;
@@ -24,7 +33,6 @@ public class Player {
     private ServerChatHandler chatHandler;
     private Player lastPmPerson;
     private String appended = "";
-    private World world;
 
     public Player(Server server, Session session, GameProfile profile, int entityID, int heldItem, EntityMetadata metadata) {
         this.chatHandler = new ServerChatHandler();
@@ -34,6 +42,29 @@ public class Player {
         this.entityID = entityID;
         this.heldItem = heldItem;
         this.metadata = new MetadataMap();
+    }
+
+    public void loadChunks(int distance) {
+        int x = (int)getLocation().getX() / 16;
+        int z = (int)getLocation().getZ() / 16;
+        for(int xAdd = -distance; xAdd < distance; xAdd++)
+            for(int zAdd = -distance; zAdd < distance; zAdd++) {
+                int regionX = (x + xAdd) >> 5;
+                int regionZ = (z + zAdd) >> 5;
+                long reg = getLong(regionX, regionZ);
+                Region r = getWorld().getRegion(reg);
+                if (r != null)
+                    r.readChunk(getLong(x + xAdd, z + zAdd), this);
+            }
+    }
+
+    public boolean isColumnLoaded(Long l) {
+        return this.columnHashMap.containsKey(l);
+    }
+
+    public void addColumn(Column c) {
+        this.columnHashMap.put(getLong(c.getX(), c.getZ()), c);
+        getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), new byte[256]));
     }
 
     public int getHeldItem() {
@@ -119,11 +150,11 @@ public class Player {
     }
 
     public World getWorld() {
-        return this.world;
+        return this.location.getWorld();
     }
 
     public void setWorld(World w) {
-        this.world = w;
+        this.location.setWorld(w);
     }
 
     public String getAppended() {
