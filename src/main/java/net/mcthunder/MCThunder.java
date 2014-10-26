@@ -415,7 +415,8 @@ public class MCThunder {
     }
 
     public static Location getSpawnLocation() {
-        return new Location(worldHashMap.get(conf.getWorldName()), 0, 24, 0);
+        World w = worldHashMap.get(conf.getWorldName());
+        return new Location(w, w.getSpawnPosition().getX(), w.getSpawnPosition().getY(), w.getSpawnPosition().getZ());
     }
 
     public static Player getPlayer(String name) {
