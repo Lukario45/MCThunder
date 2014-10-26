@@ -58,11 +58,15 @@ package net.mcthunder.world;
 
  */
 
+import net.mcthunder.api.LoggingLevel;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
+
+import static net.mcthunder.api.Utils.tellConsole;
 
 public class RegionFile {
 
@@ -93,39 +97,33 @@ public class RegionFile {
         sizeDelta = 0;
 
         try {
-            if (path.exists()) {
+            if (path.exists())
                 lastModified = path.lastModified();
-            }
 
             file = new RandomAccessFile(path, "rw");
 
             if (file.length() < SECTOR_BYTES) {
                 /* we need to write the chunk offset table */
-                for (int i = 0; i < SECTOR_INTS; ++i) {
+                for (int i = 0; i < SECTOR_INTS; ++i)
                     file.writeInt(0);
-                }
                 // write another sector for the timestamp info
-                for (int i = 0; i < SECTOR_INTS; ++i) {
+                for (int i = 0; i < SECTOR_INTS; ++i)
                     file.writeInt(0);
-                }
 
                 sizeDelta += SECTOR_BYTES * 2;
             }
 
-            if ((file.length() & 0xfff) != 0) {
+            if ((file.length() & 0xfff) != 0)
                 /* the file size is not a multiple of 4KB, grow it */
-                for (int i = 0; i < (file.length() & 0xfff); ++i) {
+                for (int i = 0; i < (file.length() & 0xfff); ++i)
                     file.write((byte) 0);
-                }
-            }
 
             /* set up the available sector map */
             int nSectors = (int) file.length() / SECTOR_BYTES;
-            sectorFree = new ArrayList<Boolean>(nSectors);
+            sectorFree = new ArrayList<>(nSectors);
 
-            for (int i = 0; i < nSectors; ++i) {
+            for (int i = 0; i < nSectors; ++i)
                 sectorFree.add(true);
-            }
 
             sectorFree.set(0, false); // chunk offset table
             sectorFree.set(1, false); // for the last modified info
@@ -134,16 +132,12 @@ public class RegionFile {
             for (int i = 0; i < SECTOR_INTS; ++i) {
                 int offset = file.readInt();
                 offsets[i] = offset;
-                if (offset != 0 && (offset >> 8) + (offset & 0xFF) <= sectorFree.size()) {
-                    for (int sectorNum = 0; sectorNum < (offset & 0xFF); ++sectorNum) {
+                if (offset != 0 && (offset >> 8) + (offset & 0xFF) <= sectorFree.size())
+                    for (int sectorNum = 0; sectorNum < (offset & 0xFF); ++sectorNum)
                         sectorFree.set((offset >> 8) + sectorNum, false);
-                    }
-                }
             }
-            for (int i = 0; i < SECTOR_INTS; ++i) {
-                int lastModValue = file.readInt();
-                chunkTimestamps[i] = lastModValue;
-            }
+            for (int i = 0; i < SECTOR_INTS; ++i)
+                chunkTimestamps[i] = file.readInt();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -235,16 +229,11 @@ public class RegionFile {
         } catch (IOException e) {
             debugln("READ", x, z, "exception");
             return null;
-
-
         }
-
     }
 
     public DataOutputStream getChunkDataOutputStream(int x, int z) {
-        if (outOfBounds(x, z)) return null;
-
-        return new DataOutputStream(new DeflaterOutputStream(new ChunkBuffer(x, z)));
+        return outOfBounds(x, z) ? null : new DataOutputStream(new DeflaterOutputStream(new ChunkBuffer(x, z)));
     }
 
     /* write a chunk at (x,z) with length bytes of data to disk */
@@ -256,9 +245,8 @@ public class RegionFile {
             int sectorsNeeded = (length + CHUNK_HEADER_SIZE) / SECTOR_BYTES + 1;
 
             // maximum chunk size is 1MB
-            if (sectorsNeeded >= 256) {
+            if (sectorsNeeded >= 256)
                 return;
-            }
 
             if (sectorNumber != 0 && sectorsAllocated == sectorsNeeded) {
                 /* we can simply overwrite the old sectors */
@@ -268,36 +256,31 @@ public class RegionFile {
                 /* we need to allocate new sectors */
 
                 /* mark the sectors previously used for this chunk as free */
-                for (int i = 0; i < sectorsAllocated; ++i) {
+                for (int i = 0; i < sectorsAllocated; ++i)
                     sectorFree.set(sectorNumber + i, true);
-                }
 
                 /* scan for a free space large enough to store this chunk */
                 int runStart = sectorFree.indexOf(true);
                 int runLength = 0;
-                if (runStart != -1) {
+                if (runStart != -1)
                     for (int i = runStart; i < sectorFree.size(); ++i) {
-                        if (runLength != 0) {
-                            if (sectorFree.get(i)) runLength++;
-                            else runLength = 0;
-                        } else if (sectorFree.get(i)) {
+                        if (runLength != 0)
+                            runLength += sectorFree.get(i) ? 1 : 0;
+                        else if (sectorFree.get(i)) {
                             runStart = i;
                             runLength = 1;
                         }
-                        if (runLength >= sectorsNeeded) {
+                        if (runLength >= sectorsNeeded)
                             break;
-                        }
                     }
-                }
 
                 if (runLength >= sectorsNeeded) {
                     /* we found a free space large enough */
                     debug("SAVE", x, z, length, "reuse");
                     sectorNumber = runStart;
                     setOffset(x, z, (sectorNumber << 8) | sectorsNeeded);
-                    for (int i = 0; i < sectorsNeeded; ++i) {
+                    for (int i = 0; i < sectorsNeeded; ++i)
                         sectorFree.set(sectorNumber + i, false);
-                    }
                     write(sectorNumber, data, length);
                 } else {
                     /*
@@ -338,7 +321,7 @@ public class RegionFile {
     }
 
     private int getOffset(int x, int z) {
-        return offsets[x + z * 31];
+        return offsets[x + z * 32];
     }
 
     public boolean hasChunk(int x, int z) {

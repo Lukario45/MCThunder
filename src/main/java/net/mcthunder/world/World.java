@@ -52,8 +52,6 @@ public class World {
             e.printStackTrace();
         }
         spawn = new Location(this, spawnPosition.getX(), spawnPosition.getY(), spawnPosition.getZ());
-
-        loadAround(spawnPosition, 9);
     }
 
     public String getName() {
@@ -79,7 +77,7 @@ public class World {
 
     }
 
-    public boolean checkRegion(Long l) {
+    public boolean checkRegion(Long l) {//Why does this not just return the first if statements value
         if (regionHashMap.containsKey(l)) {
             return true;
         } else {
@@ -88,58 +86,19 @@ public class World {
     }
 
     public void loadAround(Position p, int distance) {
-        /**int chunkX = p.getX() >> 4;
-         int chunkZ = p.getZ() >>4;
-         /*for(int xAdd = -distance; xAdd < distance; xAdd++)
+        int x = p.getX() / 16;
+        int z = p.getZ() / 16;
+        for(int xAdd = -distance; xAdd < distance; xAdd++)
             for(int zAdd = -distance; zAdd < distance; zAdd++) {
-                File temp = new File("worlds/" + name + "/region/r." + (x + xAdd) + "." + (z + zAdd) + ".mca");
-                if (temp.exists()) {
-                    tellConsole(LoggingLevel.DEBUG, "x: " + (x + xAdd) + ", z: " + (z + zAdd));
-                    addRegion(getLong(x + xAdd, z + zAdd));
-                } else {//Create the chunk
-
+                int regionX = (x + xAdd) >> 5;
+                int regionZ = (z + zAdd) >> 5;
+                long reg = getLong(regionX, regionZ);
+                //tellConsole(LoggingLevel.DEBUG, "rX: " + regionX + ", rZ: " + regionZ);
+                if (regionHashMap.containsKey(reg)) {
+                    regionHashMap.get(reg).readChunk(getLong(x + xAdd, z + zAdd));
+                    //tellConsole(LoggingLevel.DEBUG, "cX: " + (x + xAdd) + ", cZ: " + (z + zAdd));
                 }
-         }*//**
-
-         //Check if regions are loaded
-         int[] data = new int[4];
-         data[0] = chunkX + distance;//topX
-         data [1] = chunkX - distance;//bottomX
-         data [2] = chunkZ + distance;//topZ
-         data [3] = chunkZ - distance;//bottomZ
-         int i = 0;
-         Region[] regions = new Region[4];
-         for (int d: data){
-
-         //for (int i = 0; i==3;i++ ){
-         tellConsole(LoggingLevel.DEBUG, String.valueOf(i));
-         if (i <= 1 ){
-         if (!checkRegion(getLong(d >> 5,chunkZ >> 5))){
-         addRegion(getLong(d >> 5,chunkZ >> 5));
-         regions[i] =regionHashMap.get(getLong(d >> 5,chunkZ >> 5));
-         } else {
-         regions[i] = regionHashMap.get(getLong(d >> 5,chunkZ >> 5));
-         }
-
-         } else if (i >= 2){
-         if (!checkRegion(getLong(chunkX,d))){
-         addRegion(getLong(chunkX,d));
-         regions[i] = regionHashMap.get(getLong(chunkX >> 5, d >> 5));
-         } else {
-         regions[i] = regionHashMap.get(getLong(chunkX >> 5, d >> 5));
-         }
-            }
-         i++;
-         regions[0].readChunk(getLong(chunkX,chunkZ));
-         } for (Region r: regions){
-         boolean readingChunks = true;
-         while(readingChunks){
-
-
-         }
-         }
-
-         */
+        }
     }
 
     public long getSeed() {
@@ -165,15 +124,13 @@ public class World {
         int i = 0;
         for (Column c : columnHashMap.values()) {
             cArray[i] = c;
-
             i++;
         }
         return cArray;
     }
 
     public Region getRegion(long l) {
-        Region r = regionHashMap.get(l);
-        return r;
+        return regionHashMap.get(l);
     }
 
     public void loadAllRegions() {
@@ -185,7 +142,8 @@ public class World {
 
     public void loadWorld() {
         addAllRegions();
-        loadAllRegions();
+        //loadAllRegions();
+        loadAround(spawnPosition, 9);
         tellConsole(LoggingLevel.INFO, "FNNISHED LOADING WORLD");
 
     }

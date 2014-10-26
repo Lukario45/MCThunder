@@ -42,38 +42,38 @@ public class Region {
     }
 
     public void readChunk(long l) {
-
-
+        File region = new File("worlds/" + world.getName() + "/region/r." + x + "." + z + ".mca");
+        RegionFile regionFile = new RegionFile(region);
         int x = (int) (l >> 32);
         int z = (int) l;
-        File region = new File("worlds/" + world.getName() + "/region/r." + this.x + "." + this.z + ".mca");
-        RegionFile regionFile = new RegionFile(region);
+        while (x < 0)
+            x += 32;
+        while (z < 0)
+            z += 32;
+        if (x > 32 || z > 32)
+            return;
+        byte[] light = new byte[4096];
+        Arrays.fill(light, (byte) 15);
         Tag tag = null;
-        boolean readAllChunks = false;
-        //while (!readAllChunks) {
         chunks = new Chunk[16];
-
         DataInputStream in = regionFile.getChunkDataInputStream(x, z);
-        if (in == null) {
+        if (in == null) {//Chunk needs to be created
 
         } else {
             try {
                 tag = NBTIO.readTag(regionFile.getChunkDataInputStream(x, z));
-                //tellConsole(LoggingLevel.DEBUG, "Ran " + chunkX + " " + chunkZ);
+                //tellConsole(LoggingLevel.DEBUG, "Ran " + x + " " + z);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             CompoundTag compoundTag = (CompoundTag) tag;
-
             CompoundTag level = compoundTag.get("Level");
             ListTag sections = level.get("Sections");
             chunkInt = 0;
             CompoundTag chunkz;
             ByteArrayTag blocks;
             int counterRan = 0;
-            byte[] light = new byte[4096];
-
 
             for (int i = 0; i < sections.size(); i++) { //Loop through all 16 chunks (verticle fashion
                 chunkz = sections.get(chunkInt);
@@ -88,15 +88,12 @@ public class Region {
                             block.setBlock(cX, cY, cZ, blocks.getValue(spot));
                             counterRan++;
                             spot++;
-
                         }
                 Chunk chunk = new Chunk(block, blocklight, skylight);
                 chunks[i] = chunk;
                 chunkInt++;
                 //tellConsole(LoggingLevel.DEBUG, "RAN " + counterRan + " CHUNK INT " + chunkInt);
                 counterRan = 0;
-
-
             }
             IntTag xPosTag = level.get("xPos");
             IntTag zPosTag = level.get("zPos");
@@ -104,11 +101,8 @@ public class Region {
             int zPos = zPosTag.getValue();
             Column c = new Column(getLong(xPos, zPos), chunks);
             world.addColumn(c);
-            tellConsole(LoggingLevel.DEBUG, "CONFIRM " + xPos + " " + zPos);
-
-
+            //tellConsole(LoggingLevel.DEBUG, "CONFIRM " + xPos + " " + zPos);
         }
-
     }
 
     public int getX() {
@@ -132,7 +126,6 @@ public class Region {
             boolean readAllChunks = false;
             while (!readAllChunks) {
                 chunks = new Chunk[16];
-
                 DataInputStream in = regionFile.getChunkDataInputStream(chunkX, chunkZ);
                 if (in == null) {
 
@@ -145,15 +138,12 @@ public class Region {
                     }
 
                     CompoundTag compoundTag = (CompoundTag) tag;
-
                     CompoundTag level = compoundTag.get("Level");
                     ListTag sections = level.get("Sections");
                     chunkInt = 0;
                     CompoundTag chunkz;
                     ByteArrayTag blocks;
                     int counterRan = 0;
-
-
                     for (int i = 0; i < sections.size(); i++) { //Loop through all 16 chunks (verticle fashion
                         chunkz = sections.get(chunkInt);
                         blocks = chunkz.get("Blocks");
@@ -167,15 +157,12 @@ public class Region {
                                     block.setBlock(cX, cY, cZ, blocks.getValue(spot));
                                     counterRan++;
                                     spot++;
-
                                 }
                         Chunk chunk = new Chunk(block, blocklight, skylight);
                         chunks[i] = chunk;
                         chunkInt++;
                         //tellConsole(LoggingLevel.DEBUG, "RAN " + counterRan + " CHUNK INT " + chunkInt);
                         counterRan = 0;
-
-
                     }
                     IntTag xPosTag = level.get("xPos");
                     IntTag zPosTag = level.get("zPos");
@@ -184,21 +171,15 @@ public class Region {
                     Column c = new Column(getLong(xPos, zPos), chunks);
                     world.addColumn(c);
                     tellConsole(LoggingLevel.DEBUG, "CONFIRM " + xPos + " " + zPos);
-
-
                 }
-                if (chunkZ == 31 && chunkX == 31) {
+                if (chunkZ == 31 && chunkX == 31)
                     readAllChunks = true;
-                }
-
 
                 if (chunkX == 31) {
                     chunkX = 0;
                     chunkZ++;
-                } else {
+                } else
                     chunkX++;
-                }
-
             }
             //tellConsole(LoggingLevel.DEBUG, "FINNISHED");
         }

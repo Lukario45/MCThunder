@@ -28,9 +28,8 @@ public class Utils {
 
     public static void makeDir(String location) {
         File dir = new File(location);
-        if (dir.isFile()) {
+        if (dir.isFile())
             throw new IllegalArgumentException("Location must be a directory!");
-        }
         if (!dir.exists()) {
             dir.mkdirs();
             tellConsole(LoggingLevel.INFO, "Creating file " + location);
@@ -64,7 +63,6 @@ public class Utils {
     }
 
     public static long getLong(int x, int z) {
-        long longData = (long) x << 32 | z & 0xFFFFFFFFL;
-        return longData;
+        return (long) x << 32 | z & 0xFFFFFFFFL;
     }
 }
