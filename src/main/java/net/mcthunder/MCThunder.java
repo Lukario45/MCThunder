@@ -223,7 +223,7 @@ public class MCThunder {
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
                     playerProfileHandler.checkPlayer(player);
 
-                    ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), 0, 24, 0, player.getLocation().getYaw(), player.getLocation().getPitch(), player.getHeldItem(), player.getMetadata().getMetadataArray());
+                    ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch(), player.getHeldItem(), player.getMetadata().getMetadataArray());
                     for (Player player1 : playerHashMap.values()) {
                         ServerSpawnPlayerPacket toNewPlayer = new ServerSpawnPlayerPacket(player1.getEntityID(), player1.gameProfile().getId(), player1.getLocation().getX(), player1.getLocation().getY(), player1.getLocation().getZ(), player1.getLocation().getYaw(), player1.getLocation().getPitch(), player1.getHeldItem(), player1.getMetadata().getMetadataArray());
                         if (player1.gameProfile().getName().equals(player.gameProfile().getName())) {
