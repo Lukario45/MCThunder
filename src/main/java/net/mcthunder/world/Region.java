@@ -157,6 +157,10 @@ public class Region {
             int zPos = zPosTag.getValue();
             if (p.isColumnLoaded(getLong(xPos, zPos)))
                 return;
+            if(world.isColumnLoaded(getLong(xPos, zPos))) {
+                p.addColumn(world.getColumn(getLong(xPos, zPos)));
+                return;
+            }
             chunkInt = 0;
             CompoundTag chunkz;
             ByteArrayTag blocks;

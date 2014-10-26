@@ -129,6 +129,10 @@ public class World {
         return cArray;
     }
 
+    public Column getColumn(long l) {
+        return columnHashMap.get(l);
+    }
+
     public Region getRegion(long l) {
         return regionHashMap.get(l);
     }
