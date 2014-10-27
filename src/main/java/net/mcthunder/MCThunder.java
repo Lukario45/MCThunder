@@ -172,9 +172,12 @@ public class MCThunder {
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
-                    player.getSession().send(new ServerPlayerPositionRotationPacket(world.getSpawnLocation().getX(), world.getSpawnLocation().getY(), world.getSpawnLocation().getZ(), 0, 0));
                     player.setLocation(world.getSpawnLocation());
+                    player.getSession().send(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), 0, 0));
+
                     player.loadChunks(9);//Needs to be updated to represent their render distance
+                    //player.getSession().send(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), 0, 0));
+
 
                     /**byte[] light = new byte[4096]; //Create a light array of bytes (actually nibbles) (should this be 2048)
                     Arrays.fill(light, (byte) 15); //fill up the light array with full light (16 at 0 indexed)
@@ -371,7 +374,8 @@ public class MCThunder {
             player.getLocation().setY(packet.getY());
             player.getLocation().setZ(packet.getZ());
             if (fromChunkX != toChunkX || fromChunkZ != toChunkZ)
-                player.loadChunks(9);//This number will need to have ability to vary
+                tellConsole(LoggingLevel.DEBUG, "Player has entered new Chunk");
+            // player.loadChunks(9);//This number will need to have ability to vary
         }
 
         if (packet instanceof ClientPlayerRotationPacket || packet instanceof ClientPlayerPositionRotationPacket) {

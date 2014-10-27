@@ -29,6 +29,7 @@ public class Region {
     private int chunkInt;
     private HashMap<Long, Region> regionHashMap;
     private World world;
+    private Column c;
 
 
     public Region(World w, long region) {
@@ -82,6 +83,7 @@ public class Region {
             ByteArrayTag blocks;
             ByteArrayTag blockLight;
             ByteArrayTag skyLight;
+            ByteArrayTag biomes;
             int counterRan = 0;
 
             for (int i = 0; i < sections.size(); i++) { //Loop through all 16 chunks (verticle fashion
@@ -122,7 +124,7 @@ public class Region {
         }
     }
 
-    public void readChunk(long l, Player p) {
+    public void readColumn(long l, Player p) {
         File region = new File("worlds/" + world.getName() + "/region/r." + x + "." + z + ".mca");
         RegionFile regionFile = new RegionFile(region);
         int x = (int) (l >> 32);
@@ -203,9 +205,14 @@ public class Region {
             Column c = new Column(getLong(xPos, zPos), chunks);
             if (!world.isColumnLoaded(getLong(xPos, zPos)))
                 world.addColumn(c);
+            this.c = c;
             p.addColumn(c);
             //tellConsole(LoggingLevel.DEBUG, "CONFIRM " + xPos + " " + zPos);
         }
+    }
+
+    public Column returnColumn() {
+        return this.c;
     }
 
     public int getX() {

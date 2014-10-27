@@ -9,7 +9,9 @@ import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
+
 import java.util.HashMap;
+
 import static net.mcthunder.api.Utils.getLong;
 
 /**
@@ -44,15 +46,40 @@ public class Player {
     public void loadChunks(int distance) {
         int x = (int)getLocation().getX() / 16;
         int z = (int)getLocation().getZ() / 16;
-        for(int xAdd = -distance; xAdd < distance; xAdd++)
-            for(int zAdd = -distance; zAdd < distance; zAdd++) {
+
+        // Chunk[][] chunk = new Chunk[distance][distance];
+        int counter = 0;
+        for (int xAdd = -(distance + 5); xAdd < distance + 5; xAdd++) {
+            for (int zAdd = -(distance + 5); zAdd < distance + 5; zAdd++) {
                 int regionX = (x + xAdd) >> 5;
                 int regionZ = (z + zAdd) >> 5;
                 long reg = getLong(regionX, regionZ);
                 Region r = getWorld().getRegion(reg);
-                if (r != null)
-                    r.readChunk(getLong(x + xAdd, z + zAdd), this);
+                if (r != null) {
+                    r.readColumn(getLong(x + xAdd, z + zAdd), this);
+                    if (counter > distance) {
+
+                    } else {
+
+
+                        sendColumn(getLong(x + xAdd, z + zAdd));
+                    }
+
+
+                    //Column column = getColumn(getLong(x+xAdd, z + zAdd));
+                    //allX[allX.length + 1] = column.getX();
+                    // allZ[allZ.length + 1] = column.getZ();
+
+
             }
+
+            }
+            //Integer[] allX = (Integer[]) xList.toArray();
+            //int[] intX = (int[])allX;
+            //int[] allZ = new int[distance];
+            // ServerChunkDataPacket[] serverChunkDataPacket = null;
+            // ServerMultiChunkDataPacket multiChunkDataPacket = new ServerMultiChunkDataPacket(allX,allZ);
+        }
     }
 
     public boolean isColumnLoaded(Long l) {
@@ -61,7 +88,17 @@ public class Player {
 
     public void addColumn(Column c) {
         this.columnHashMap.put(getLong(c.getX(), c.getZ()), c);
+        //getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), new byte[256]));
+    }
+
+    public void sendColumn(Long l) {
+        Column c = columnHashMap.get(l);
         getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), new byte[256]));
+
+    }
+
+    public void sendColumn(Column c) {
+        // getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), new byte[256]));
     }
 
     public int getHeldItem() {
