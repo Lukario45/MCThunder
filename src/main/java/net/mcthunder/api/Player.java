@@ -53,20 +53,34 @@ public class Player {
             loadDir(Direction.EAST);
             loadDir(Direction.SOUTH);
             loadDir(Direction.WEST);
+            updateDir(Direction.NORTH);
+            updateDir(Direction.EAST);
+            updateDir(Direction.SOUTH);
+            updateDir(Direction.WEST);
         } else if (d.equals(Direction.NORTH_EAST)) {
             loadDir(Direction.NORTH);
             loadDir(Direction.EAST);
+            updateDir(Direction.NORTH);
+            updateDir(Direction.EAST);
         } else if (d.equals(Direction.SOUTH_EAST)) {
             loadDir(Direction.SOUTH);
             loadDir(Direction.EAST);
+            updateDir(Direction.SOUTH);
+            updateDir(Direction.EAST);
         } else if (d.equals(Direction.SOUTH_WEST)) {
             loadDir(Direction.SOUTH);
             loadDir(Direction.WEST);
+            updateDir(Direction.SOUTH);
+            updateDir(Direction.WEST);
         } else if (d.equals(Direction.NORTH_WEST)) {
             loadDir(Direction.NORTH);
             loadDir(Direction.WEST);
-        } else
+            updateDir(Direction.NORTH);
+            updateDir(Direction.WEST);
+        } else {
             loadDir(d);
+            updateDir(d);
+        }
     }
 
     private void loadDir(Direction d) {
@@ -196,7 +210,6 @@ public class Player {
                     getSession().send(new ServerChunkDataPacket(getWorld().getColumn(key).getX(), getWorld().getColumn(key).getZ(), getWorld().getColumn(key).getChunks(), new byte[256]));
                     this.loadedColumns.add(key);
                 }
-        updateDir(d);
     }
 
     public int getView() {
