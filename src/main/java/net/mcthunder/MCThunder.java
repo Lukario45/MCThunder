@@ -173,56 +173,9 @@ public class MCThunder {
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
                     player.setLocation(world.getSpawnLocation());
+                    player.loadChunks(null);
                     player.getSession().send(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), 0, 0));
-
-                    player.loadChunks(9);//Needs to be updated to represent their render distance
-                    //player.getSession().send(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), 0, 0));
-
-
-                    /**byte[] light = new byte[4096]; //Create a light array of bytes (actually nibbles) (should this be 2048)
-                    Arrays.fill(light, (byte) 15); //fill up the light array with full light (16 at 0 indexed)
-                    Chunk[] chunks = new Chunk[16];
-
-                    for (int i = 0; i < chunks.length; i++) { //Loop through all 16 chunks (verticle fashion)
-                        NibbleArray3d blocklight = new NibbleArray3d(light); //Create our blocklight array
-                        NibbleArray3d skylight = new NibbleArray3d(light); //Create our skylight array
-                        ShortArray3d blocks = new ShortArray3d(4096); //Array containing the blocks of THIS sub-chunk only!
-
-                        for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
-                            for (int cZ = 0; cZ < 16; cZ++) //Loop through z
-                                for (int cX = 0; cX < 16; cX++) { //Loop through x
-                                    int y = cY + i * 16; //Get our ABSOLUTE y coordinate (used only to check our literal position)
-
-                                    if (y == 0) //lowest point
-                                        blocks.setBlock(cX, cY, cZ, 7); //Adminium
-                                    else if (y <= 20)
-                                        blocks.setBlock(cX, cY, cZ, 1);//Stone
-                                    else if (y >= 21 && y < 24) //less than 24 but above 0
-                                        blocks.setBlock(cX, cY, cZ, 3); //Dirt
-                                    else if (y == 24) //Exactly 24
-                                        blocks.setBlock(cX, cY, cZ, 2); //Grass
-                                }
-                        Chunk chunk = new Chunk(blocks, blocklight, skylight);
-                        chunks[i] = chunk;
-                     }*/
-
-                    //World world = worldHashMap.get(worldHashMap.keySet().toArray()[0]);//Will need to make it take default world name or one they logged out in
-                    //world.sendColumns(player, world.getAllColumnsAsArray());
-
-                    //tellConsole(LoggingLevel.DEBUG,  "Coords " + r.getX() + " "+ r.getZ());
-
-
-
-                    //for (int x = -1; x <= 1; x++)
-                    //for (int z = -1; z <= 1; z++) {
-                    //   player.getSession().send(new ServerChunkDataPacket(x, z, world.getChunks(), new byte[256]));
-                    //  tellConsole(LoggingLevel.DEBUG, "Sending Chunks");
-                    //   }
-
-                    // if (!worldHashMap.containsKey("world"))
-                    // worldHashMap.put("world", new World("world", 0, chunks));
-                    // player.setWorld(worldHashMap.get("world"));
-                    player.getSession().send(new ServerSpawnPositionPacket(new Position((int)world.getSpawnLocation().getX(), (int)world.getSpawnLocation().getY(), (int)world.getSpawnLocation().getZ())));
+                    player.getSession().send(new ServerSpawnPositionPacket(new Position((int)player.getLocation().getX(), (int)player.getLocation().getY(), (int)player.getLocation().getZ())));
 
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
                     playerProfileHandler.checkPlayer(player);
@@ -317,9 +270,8 @@ public class MCThunder {
                                 int heldItemId = heldItem.getId();
                                 BlockChangeRecord blockChangeRecord = new BlockChangeRecord(position, heldItemId);
                                 ServerBlockChangePacket serverBlockChangePacket = new ServerBlockChangePacket(blockChangeRecord);
-                                for (Player p : playerHashMap.values()) {
+                                for (Player p : playerHashMap.values())
                                     p.getSession().send(serverBlockChangePacket);
-                                }
                             } else if (event.getPacket() != null)
                                 tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
                         }
@@ -373,9 +325,27 @@ public class MCThunder {
             player.getLocation().setX(packet.getX());
             player.getLocation().setY(packet.getY());
             player.getLocation().setZ(packet.getZ());
-            if (fromChunkX != toChunkX || fromChunkZ != toChunkZ)
-                tellConsole(LoggingLevel.DEBUG, "Player has entered new Chunk");
-            // player.loadChunks(9);//This number will need to have ability to vary
+            if (fromChunkX != toChunkX || fromChunkZ != toChunkZ) {
+                //tellConsole(LoggingLevel.DEBUG, "Player has entered new Chunk");
+                Direction dir = null;
+                if(fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX < 0)
+                    dir = Direction.NORTH_EAST;
+                else if(fromChunkZ - toChunkZ < 0 && fromChunkX - toChunkX < 0)
+                    dir = Direction.SOUTH_EAST;
+                else if(fromChunkZ - toChunkZ < 0 && fromChunkX - toChunkX > 0)
+                    dir = Direction.SOUTH_WEST;
+                else if(fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX > 0)
+                    dir = Direction.NORTH_WEST;
+                else if(fromChunkZ - toChunkZ > 0)
+                    dir = Direction.NORTH;
+                else if(fromChunkX - toChunkX < 0)
+                    dir = Direction.EAST;
+                else if(fromChunkZ - toChunkZ < 0)
+                    dir = Direction.SOUTH;
+                else if(fromChunkX - toChunkX > 0)
+                    dir = Direction.WEST;
+                player.loadChunks(dir);
+            }
         }
 
         if (packet instanceof ClientPlayerRotationPacket || packet instanceof ClientPlayerPositionRotationPacket) {

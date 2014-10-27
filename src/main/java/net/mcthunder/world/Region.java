@@ -1,5 +1,6 @@
 package net.mcthunder.world;
 
+import net.mcthunder.api.Direction;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.data.game.Chunk;
@@ -29,7 +30,6 @@ public class Region {
     private int chunkInt;
     private HashMap<Long, Region> regionHashMap;
     private World world;
-    private Column c;
 
 
     public Region(World w, long region) {
@@ -44,8 +44,6 @@ public class Region {
     }
 
     public void readChunk(long l) {
-        File region = new File("worlds/" + world.getName() + "/region/r." + x + "." + z + ".mca");
-        RegionFile regionFile = new RegionFile(region);
         int x = (int) (l >> 32);
         int z = (int) l;
         while (x < 0)
@@ -54,21 +52,22 @@ public class Region {
             z += 32;
         if (x > 32 || z > 32)
             return;
-        byte[] light = new byte[4096];
-        Arrays.fill(light, (byte) 15);
-        Tag tag = null;
-        chunks = new Chunk[16];
+        File region = new File("worlds/" + world.getName() + "/region/r." + this.x + "." + this.z + ".mca");
+        RegionFile regionFile = new RegionFile(region);
         DataInputStream in = regionFile.getChunkDataInputStream(x, z);
         if (in == null) {//Chunk needs to be created
 
         } else {
+            Tag tag = null;
             try {
                 tag = NBTIO.readTag(regionFile.getChunkDataInputStream(x, z));
                 //tellConsole(LoggingLevel.DEBUG, "Ran " + x + " " + z);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+            byte[] light = new byte[4096];
+            Arrays.fill(light, (byte) 15);
+            chunks = new Chunk[16];
             CompoundTag compoundTag = (CompoundTag) tag;
             CompoundTag level = compoundTag.get("Level");
             ListTag sections = level.get("Sections");
@@ -99,9 +98,8 @@ public class Region {
                 for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
                     for (int cZ = 0; cZ < 16; cZ++) //Loop through z
                         for (int cX = 0; cX < 16; cX++) { //Loop through x
-                            if (ran == 2048) {
+                            if (ran == 2048)
                                 ran = 0;
-                            }
                             //tellConsole(LoggingLevel.DEBUG,"Run " + ran );
                             block.setBlock(cX, cY, cZ, blocks.getValue(spot));
                             blocklight.set(cX, cY, cZ, blockLight.getValue(ran));
@@ -124,9 +122,7 @@ public class Region {
         }
     }
 
-    public void readColumn(long l, Player p) {
-        File region = new File("worlds/" + world.getName() + "/region/r." + x + "." + z + ".mca");
-        RegionFile regionFile = new RegionFile(region);
+    public void readChunk(long l, Player p, Direction dir, boolean removeOld) {
         int x = (int) (l >> 32);
         int z = (int) l;
         while (x < 0)
@@ -135,21 +131,22 @@ public class Region {
             z += 32;
         if (x > 32 || z > 32)
             return;
-        byte[] light = new byte[4096];
-        Arrays.fill(light, (byte) 15);
-        Tag tag = null;
-        chunks = new Chunk[16];
+        File region = new File("worlds/" + world.getName() + "/region/r." + this.x + "." + this.z + ".mca");
+        RegionFile regionFile = new RegionFile(region);
         DataInputStream in = regionFile.getChunkDataInputStream(x, z);
         if (in == null) {//Chunk needs to be created
 
         } else {
+            Tag tag = null;
             try {
                 tag = NBTIO.readTag(regionFile.getChunkDataInputStream(x, z));
                 //tellConsole(LoggingLevel.DEBUG, "Ran " + x + " " + z);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+            byte[] light = new byte[4096];
+            Arrays.fill(light, (byte) 15);
+            chunks = new Chunk[16];
             CompoundTag compoundTag = (CompoundTag) tag;
             CompoundTag level = compoundTag.get("Level");
             ListTag sections = level.get("Sections");
@@ -157,10 +154,10 @@ public class Region {
             IntTag zPosTag = level.get("zPos");
             int xPos = xPosTag.getValue();
             int zPos = zPosTag.getValue();
-            if (p.isColumnLoaded(getLong(xPos, zPos)))
+            if (p.isColumnLoaded(getLong(xPos, zPos)) && !removeOld)
                 return;
-            if(world.isColumnLoaded(getLong(xPos, zPos))) {
-                p.addColumn(world.getColumn(getLong(xPos, zPos)));
+            if (world.isColumnLoaded(getLong(xPos, zPos))) {
+                p.addColumn(getLong(xPos, zPos), dir, removeOld);
                 return;
             }
             chunkInt = 0;
@@ -183,9 +180,8 @@ public class Region {
                 for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
                     for (int cZ = 0; cZ < 16; cZ++) //Loop through z
                         for (int cX = 0; cX < 16; cX++) { //Loop through x
-                            if (ran == 2048) {
+                            if (ran == 2048)
                                 ran = 0;
-                            }
                             //tellConsole(LoggingLevel.DEBUG,"Run " + ran );
                             block.setBlock(cX, cY, cZ, blocks.getValue(spot));
                             blocklight.set(cX, cY, cZ, blockLight.getValue(ran));
@@ -203,16 +199,12 @@ public class Region {
                 counterRan = 0;
             }
             Column c = new Column(getLong(xPos, zPos), chunks);
-            if (!world.isColumnLoaded(getLong(xPos, zPos)))
+            if (!world.isColumnLoaded(getLong(xPos, zPos))) {
                 world.addColumn(c);
-            this.c = c;
-            p.addColumn(c);
+                p.addColumn(getLong(xPos, zPos), dir, removeOld);
+            }
             //tellConsole(LoggingLevel.DEBUG, "CONFIRM " + xPos + " " + zPos);
         }
-    }
-
-    public Column returnColumn() {
-        return this.c;
     }
 
     public int getX() {
