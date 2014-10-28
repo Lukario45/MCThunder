@@ -9,6 +9,7 @@ import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
+import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
 import org.reflections.Reflections;
 import org.spacehq.mc.auth.GameProfile;
@@ -16,15 +17,12 @@ import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
-import org.spacehq.mc.protocol.data.game.EntityMetadata;
-import org.spacehq.mc.protocol.data.game.ItemStack;
-import org.spacehq.mc.protocol.data.game.Position;
+import org.spacehq.mc.protocol.data.game.*;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
-import org.spacehq.mc.protocol.data.game.values.world.block.BlockChangeRecord;
 import org.spacehq.mc.protocol.data.message.TextMessage;
 import org.spacehq.mc.protocol.data.status.PlayerInfo;
 import org.spacehq.mc.protocol.data.status.ServerStatusInfo;
@@ -40,7 +38,6 @@ import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.world.ServerBlockChangePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
@@ -264,14 +261,30 @@ public class MCThunder {
 
                             } else if (event.getPacket() instanceof ClientPlayerPlaceBlockPacket) {
                                 ClientPlayerPlaceBlockPacket packet = event.getPacket();
+                                Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                                 Position position = packet.getPosition();
                                 tellConsole(LoggingLevel.DEBUG, position.getX() + "/" + position.getY() + "/" + position.getZ());
                                 ItemStack heldItem = packet.getHeldItem();
                                 int heldItemId = heldItem.getId();
-                                BlockChangeRecord blockChangeRecord = new BlockChangeRecord(position, heldItemId);
-                                ServerBlockChangePacket serverBlockChangePacket = new ServerBlockChangePacket(blockChangeRecord);
-                                for (Player p : playerHashMap.values())
-                                    p.getSession().send(serverBlockChangePacket);
+                                int columnX = position.getX() >> 4;
+                                int columnZ = position.getZ() >> 4;
+                                int chunkY = position.getY() >> 4;
+                                Column column = player.getWorld().getColumn(getLong(columnX, columnZ));
+                                Chunk[] chunks = column.getChunks();
+                                ShortArray3d blocks = chunks[chunkY].getBlocks();
+                                NibbleArray3d blockLight = chunks[chunkY].getBlockLight();
+                                NibbleArray3d skyLight = chunks[chunkY].getBlockLight();
+                                tellConsole(LoggingLevel.DEBUG, "X " + columnX + " Z " + columnZ + " Y " + chunkY + "Block ID " + heldItemId);
+                                blocks.setBlock(position.getX(), position.getY(), position.getZ(), heldItemId << 4);
+                                chunks[chunkY] = new Chunk(blocks, blockLight, skyLight);
+                                Column c = new Column(getLong(columnX, columnZ), chunks);
+                                player.getWorld().addColumn(c);
+                                for (Player p : playerHashMap.values()) {
+                                    if (p.isColumnLoaded(getLong(columnX, columnZ))) {
+                                        p.addColumn(c);
+                                    }
+                                }
+
                             } else if (event.getPacket() != null)
                                 tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
                         }

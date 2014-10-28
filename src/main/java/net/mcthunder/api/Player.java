@@ -1,6 +1,7 @@
 package net.mcthunder.api;
 
 import net.mcthunder.handlers.ServerChatHandler;
+import net.mcthunder.world.Column;
 import net.mcthunder.world.Region;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
@@ -183,6 +184,11 @@ public class Player {
             this.loadedColumns.remove(l);
             getSession().send(new ServerChunkDataPacket(getWorld().getColumn(l).getX(), getWorld().getColumn(l).getZ()));
         }
+    }
+
+    public void addColumn(Column c) {
+        loadedColumns.add(getLong(c.getX(), c.getZ()));
+        getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks()));
     }
 
     private void sendColumns(Direction d) {
