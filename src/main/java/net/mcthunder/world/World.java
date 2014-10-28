@@ -1,5 +1,6 @@
 package net.mcthunder.world;
 
+import net.mcthunder.MCThunder;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Player;
@@ -82,9 +83,9 @@ public class World {
         }
     }
 
-    public void loadAround(Location p, int distance) {
-        int x = (int)p.getX() / 16;
-        int z = (int)p.getZ() / 16;
+    public void loadAround(Location loc, int distance) {
+        int x = (int)loc.getX() >> 4;
+        int z = (int)loc.getZ() >> 4;
         for(int xAdd = -distance; xAdd < distance; xAdd++)
             for(int zAdd = -distance; zAdd < distance; zAdd++) {
                 int regionX = (x + xAdd) >> 5;
@@ -113,6 +114,21 @@ public class World {
     public void addColumn(Column c) {
         columnHashMap.put(getLong(c.getX(), c.getZ()), c);
         //tellConsole(LoggingLevel.DEBUG, "NEW CHUNK TO COLUMN");
+    }
+
+    public void unloadColumn(Column c) {
+        if (c == null)
+            return;
+        long l = getLong(c.getX(), c.getZ());
+        for (Player p : MCThunder.playerHashMap.values())
+            if (p.isColumnLoaded(l) || p.isColumnPreLoaded(l))
+                return;
+        //Todo: actually unload column if it passes the checks above
+        //tellConsole(LoggingLevel.DEBUG, "Unloaded column x: " + c.getX() + ", z: " + c.getZ());
+    }
+
+    public void unloadColumn(long l) {
+        unloadColumn(getColumn(l));
     }
 
     public boolean isColumnLoaded(long l) {

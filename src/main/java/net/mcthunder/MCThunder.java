@@ -18,9 +18,11 @@ import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
 import org.spacehq.mc.protocol.data.game.*;
+import org.spacehq.mc.protocol.data.game.values.Face;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
+import org.spacehq.mc.protocol.data.game.values.entity.player.PlayerAction;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.mc.protocol.data.message.TextMessage;
@@ -254,7 +256,10 @@ public class MCThunder {
                             } else if (event.getPacket() instanceof ClientKeepAlivePacket)
                                 event.getSession().send(new ServerKeepAlivePacket(event.<ClientKeepAlivePacket>getPacket().getPingId()));
                             else if (event.getPacket() instanceof ClientSettingsPacket) {
-
+                                ClientSettingsPacket packet = event.getPacket();
+                                Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                                //player.setView(packet.getRenderDistance());
+                                //TODO: unload chunks if goes smaller load if goes higher and have a cap
                             } else if (event.getPacket() instanceof ClientTabCompletePacket) {
                                 ClientTabCompletePacket packet = event.getPacket();
                                 tabHandler.handleTabComplete(server, event.getSession(), packet);
@@ -263,19 +268,56 @@ public class MCThunder {
                                 ClientPlayerPlaceBlockPacket packet = event.getPacket();
                                 Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                                 Position position = packet.getPosition();
-                                tellConsole(LoggingLevel.DEBUG, position.getX() + "/" + position.getY() + "/" + position.getZ());
+                                //tellConsole(LoggingLevel.DEBUG, position.getX() + "/" + position.getY() + "/" + position.getZ());
                                 ItemStack heldItem = packet.getHeldItem();
                                 int heldItemId = heldItem.getId();
                                 int columnX = position.getX() >> 4;
                                 int columnZ = position.getZ() >> 4;
                                 int chunkY = position.getY() >> 4;
+                                int blockX = position.getX()%16;
+                                int blockY = position.getY()%16;
+                                int blockZ = position.getZ()%16;
+                                Face clicked = packet.getFace();
+                                if (clicked.equals(Face.NORTH))
+                                    blockX -= 1;
+                                else if (clicked.equals(Face.SOUTH))
+                                    blockX += 1;
+                                else if (clicked.equals(Face.TOP))
+                                    blockY += 1;
+                                else if (clicked.equals(Face.BOTTOM))
+                                    blockY -= 1;
+                                else if (clicked.equals(Face.EAST))
+                                    blockZ -= 1;
+                                else if (clicked.equals(Face.WEST))
+                                    blockZ += 1;
+                                if (blockX < 0)
+                                    blockX += 16;
+                                if (blockX > 15) {
+                                    blockX = blockX % 16;
+                                    columnX++;
+                                }
+                                if (blockY < 0)
+                                    blockY += 16;
+                                if (blockY > 15) {
+                                    blockY = blockY % 16;
+                                    chunkY++;
+                                }
+                                if (blockZ < 0)
+                                    blockZ += 16;
+                                if (blockZ > 15) {
+                                    blockZ = blockZ % 16;
+                                    columnZ++;
+                                }
+                                if (chunkY == -1)//Clicked thin air
+                                    return;
+                                //tellConsole(LoggingLevel.DEBUG, "BX " + blockX + " BY " + blockY + " BZ " + blockZ);
+                                //tellConsole(LoggingLevel.DEBUG, "X " + columnX + " Z " + columnZ + " Y " + chunkY + " Block ID " + heldItemId);
                                 Column column = player.getWorld().getColumn(getLong(columnX, columnZ));
                                 Chunk[] chunks = column.getChunks();
-                                ShortArray3d blocks = chunks[chunkY].getBlocks();
-                                NibbleArray3d blockLight = chunks[chunkY].getBlockLight();
-                                NibbleArray3d skyLight = chunks[chunkY].getBlockLight();
-                                tellConsole(LoggingLevel.DEBUG, "X " + columnX + " Z " + columnZ + " Y " + chunkY + " Block ID " + heldItemId);
-                                blocks.setBlock(position.getX(), position.getY(), position.getZ(), heldItemId << 4);
+                                ShortArray3d blocks = chunks[chunkY] != null ? chunks[chunkY].getBlocks() : new ShortArray3d(4096);
+                                NibbleArray3d blockLight = chunks[chunkY] != null ? chunks[chunkY].getBlockLight() : new NibbleArray3d(4096);
+                                NibbleArray3d skyLight = chunks[chunkY] != null ? chunks[chunkY].getSkyLight() : new NibbleArray3d(4096);
+                                blocks.setBlock(blockX, blockY, blockZ, heldItemId);
                                 chunks[chunkY] = new Chunk(blocks, blockLight, skyLight);
                                 Column c = new Column(getLong(columnX, columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
                                 player.getWorld().addColumn(c);
@@ -283,6 +325,50 @@ public class MCThunder {
                                     if (p.isColumnLoaded(getLong(columnX, columnZ)))
                                         p.refreshColumn(c);
 
+                            } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
+                                ClientPlayerActionPacket packet = event.getPacket();
+                                if (packet.getAction().equals(PlayerAction.FINISH_DIGGING)) {
+                                    Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                                    Position position = packet.getPosition();
+                                    int columnX = position.getX() >> 4;
+                                    int columnZ = position.getZ() >> 4;
+                                    int chunkY = position.getY() >> 4;
+                                    int blockX = position.getX() % 16;
+                                    int blockY = position.getY() % 16;
+                                    int blockZ = position.getZ() % 16;
+                                    if (blockX < 0)
+                                        blockX += 16;
+                                    if (blockX > 15) {
+                                        blockX = blockX % 16;
+                                        columnX++;
+                                    }
+                                    if (blockY < 0)
+                                        blockY += 16;
+                                    if (blockY > 15) {
+                                        blockY = blockY % 16;
+                                        chunkY++;
+                                    }
+                                    if (blockZ < 0)
+                                        blockZ += 16;
+                                    if (blockZ > 15) {
+                                        blockZ = blockZ % 16;
+                                        columnZ++;
+                                    }
+                                    if (chunkY == -1)//Clicked thin air
+                                        return;
+                                    Column column = player.getWorld().getColumn(getLong(columnX, columnZ));
+                                    Chunk[] chunks = column.getChunks();
+                                    ShortArray3d blocks = chunks[chunkY] != null ? chunks[chunkY].getBlocks() : new ShortArray3d(4096);
+                                    NibbleArray3d blockLight = chunks[chunkY] != null ? chunks[chunkY].getBlockLight() : new NibbleArray3d(4096);
+                                    NibbleArray3d skyLight = chunks[chunkY] != null ? chunks[chunkY].getSkyLight() : new NibbleArray3d(4096);
+                                    blocks.setBlock(blockX, blockY, blockZ, 0);
+                                    chunks[chunkY] = new Chunk(blocks, blockLight, skyLight);
+                                    Column c = new Column(getLong(columnX, columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
+                                    player.getWorld().addColumn(c);
+                                    for (Player p : playerHashMap.values())
+                                        if (p.isColumnLoaded(getLong(columnX, columnZ)))
+                                            p.refreshColumn(c);
+                                }
                             } else if (event.getPacket() != null)
                                 tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
                         }
