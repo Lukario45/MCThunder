@@ -4,14 +4,17 @@ import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.world.Region;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
+import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.world.ServerMultiChunkDataPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
 import java.util.ArrayList;
 
 import static net.mcthunder.api.Utils.getLong;
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -186,30 +189,73 @@ public class Player {
     }
 
     private void sendColumns(Direction d) {
+        /*int[] x = null;
+        int[] z = null;
+        Chunk[][] chunks = null;
+        byte[][] biomeData = null;
+        int size = 0;
+        if (d.equals(Direction.NORTH))
+            size = this.northColumns.size();
+        else if (d.equals(Direction.EAST))
+            size = this.eastColumns.size();
+        else if (d.equals(Direction.SOUTH))
+            size = this.southColumns.size();
+        else if (d.equals(Direction.WEST))
+            size = this.westColumns.size();
+        x = new int[size];
+        z = new int[size];
+        chunks = new Chunk[size][];
+        biomeData = new byte[size][];*/
         if (d.equals(Direction.NORTH)) {
-            for (Long key : this.northColumns)
-                if (!isColumnLoaded(key)) {
-                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(key).getX(), getWorld().getColumn(key).getZ(), getWorld().getColumn(key).getChunks(), new byte[256]));
-                    this.loadedColumns.add(key);
+            for (int i = 0; i < this.northColumns.size(); i++) {
+                long pos = this.northColumns.get(i);
+                if (!isColumnLoaded(pos)) {
+                    /*x[i] = getWorld().getColumn(pos).getX();
+                    z[i] = getWorld().getColumn(pos).getZ();
+                    chunks[i] = getWorld().getColumn(pos).getChunks();
+                    biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
+                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    this.loadedColumns.add(pos);
                 }
+            }
         } else if (d.equals(Direction.EAST)) {
-            for (Long key : this.eastColumns)
-                if (!isColumnLoaded(key)) {
-                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(key).getX(), getWorld().getColumn(key).getZ(), getWorld().getColumn(key).getChunks(), new byte[256]));
-                    this.loadedColumns.add(key);
+            for (int i = 0; i < this.eastColumns.size(); i++) {
+                long pos = this.eastColumns.get(i);
+                if (!isColumnLoaded(pos)) {
+                    /*x[i] = getWorld().getColumn(pos).getX();
+                    z[i] = getWorld().getColumn(pos).getZ();
+                    chunks[i] = getWorld().getColumn(pos).getChunks();
+                    biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
+                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    this.loadedColumns.add(pos);
                 }
+            }
         } else if (d.equals(Direction.SOUTH)) {
-            for (Long key : this.southColumns)
-                if (!isColumnLoaded(key)) {
-                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(key).getX(), getWorld().getColumn(key).getZ(), getWorld().getColumn(key).getChunks(), new byte[256]));
-                    this.loadedColumns.add(key);
+            for (int i = 0; i < this.southColumns.size(); i++) {
+                long pos = this.southColumns.get(i);
+                if (!isColumnLoaded(pos)) {
+                    /*x[i] = getWorld().getColumn(pos).getX();
+                    z[i] = getWorld().getColumn(pos).getZ();
+                    chunks[i] = getWorld().getColumn(pos).getChunks();
+                    biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
+                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    this.loadedColumns.add(pos);
                 }
-        } else if (d.equals(Direction.WEST))
-            for (Long key : this.westColumns)
-                if (!isColumnLoaded(key)) {
-                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(key).getX(), getWorld().getColumn(key).getZ(), getWorld().getColumn(key).getChunks(), new byte[256]));
-                    this.loadedColumns.add(key);
+            }
+        } else if (d.equals(Direction.WEST)) {
+            for (int i = 0; i < this.westColumns.size(); i++) {
+                long pos = this.westColumns.get(i);
+                if (!isColumnLoaded(pos)) {
+                    /*x[i] = getWorld().getColumn(pos).getX();
+                    z[i] = getWorld().getColumn(pos).getZ();
+                    chunks[i] = getWorld().getColumn(pos).getChunks();
+                    biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
+                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    this.loadedColumns.add(pos);
                 }
+            }
+        }
+        //getSession().send(new ServerMultiChunkDataPacket(x, z, chunks, biomeData));
     }
 
     public int getView() {
