@@ -271,23 +271,17 @@ public class MCThunder {
                                 int chunkY = position.getY() >> 4;
                                 Column column = player.getWorld().getColumn(getLong(columnX, columnZ));
                                 Chunk[] chunks = column.getChunks();
-                                tellConsole(LoggingLevel.DEBUG, String.valueOf(chunks.length));
                                 ShortArray3d blocks = chunks[chunkY].getBlocks();
-
                                 NibbleArray3d blockLight = chunks[chunkY].getBlockLight();
-                                NibbleArray3d skyLight = chunks[chunkY].getSkyLight();
-                                tellConsole(LoggingLevel.DEBUG, "X " + columnX + " Z " + columnZ + " Y " + chunkY + "Block ID " + heldItemId);
-                                blocks.setBlock(position.getX(), position.getY(), position.getZ(), heldItemId);
+                                NibbleArray3d skyLight = chunks[chunkY].getBlockLight();
+                                tellConsole(LoggingLevel.DEBUG, "X " + columnX + " Z " + columnZ + " Y " + chunkY + " Block ID " + heldItemId);
+                                blocks.setBlock(position.getX(), position.getY(), position.getZ(), heldItemId << 4);
                                 chunks[chunkY] = new Chunk(blocks, blockLight, skyLight);
-                                tellConsole(LoggingLevel.DEBUG, String.valueOf(chunks.length));
-
-                                Column c = new Column(getLong(columnX, columnZ), chunks, column.getBiomes());
+                                Column c = new Column(getLong(columnX, columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
                                 player.getWorld().addColumn(c);
-                                for (Player p : playerHashMap.values()) {
-                                    if (p.isColumnLoaded(getLong(columnX, columnZ))) {
-                                        p.addColumn(c);
-                                    }
-                                }
+                                for (Player p : playerHashMap.values())
+                                    if (p.isColumnLoaded(getLong(columnX, columnZ)))
+                                        p.refreshColumn(c);
 
                             } else if (event.getPacket() != null)
                                 tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());

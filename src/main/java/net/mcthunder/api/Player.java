@@ -189,8 +189,7 @@ public class Player {
         }
     }
 
-    public void addColumn(Column c) {
-        loadedColumns.add(getLong(c.getX(), c.getZ()));
+    public void refreshColumn(Column c) {
         getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks()));
     }
 
