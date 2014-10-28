@@ -22,6 +22,7 @@ import org.spacehq.mc.protocol.data.game.values.Face;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
+import org.spacehq.mc.protocol.data.game.values.entity.player.PlayerAction;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.mc.protocol.data.message.TextMessage;
@@ -321,6 +322,50 @@ public class MCThunder {
                                     if (p.isColumnLoaded(getLong(columnX, columnZ)))
                                         p.refreshColumn(c);
 
+                            } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
+                                ClientPlayerActionPacket packet = event.getPacket();
+                                if (packet.getAction().equals(PlayerAction.FINISH_DIGGING)) {
+                                    Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                                    Position position = packet.getPosition();
+                                    int columnX = position.getX() >> 4;
+                                    int columnZ = position.getZ() >> 4;
+                                    int chunkY = position.getY() >> 4;
+                                    int blockX = position.getX() % 16;
+                                    int blockY = position.getY() % 16;
+                                    int blockZ = position.getZ() % 16;
+                                    if (blockX < 0)
+                                        blockX += 16;
+                                    if (blockX > 15) {
+                                        blockX = blockX % 16;
+                                        columnX++;
+                                    }
+                                    if (blockY < 0)
+                                        blockY += 16;
+                                    if (blockY > 15) {
+                                        blockY = blockY % 16;
+                                        chunkY++;
+                                    }
+                                    if (blockZ < 0)
+                                        blockZ += 16;
+                                    if (blockZ > 15) {
+                                        blockZ = blockZ % 16;
+                                        columnZ++;
+                                    }
+                                    if (chunkY == -1)//Clicked thin air
+                                        return;
+                                    Column column = player.getWorld().getColumn(getLong(columnX, columnZ));
+                                    Chunk[] chunks = column.getChunks();
+                                    ShortArray3d blocks = chunks[chunkY] != null ? chunks[chunkY].getBlocks() : new ShortArray3d(4096);
+                                    NibbleArray3d blockLight = chunks[chunkY] != null ? chunks[chunkY].getBlockLight() : new NibbleArray3d(4096);
+                                    NibbleArray3d skyLight = chunks[chunkY] != null ? chunks[chunkY].getSkyLight() : new NibbleArray3d(4096);
+                                    blocks.setBlock(blockX, blockY, blockZ, 0);
+                                    chunks[chunkY] = new Chunk(blocks, blockLight, skyLight);
+                                    Column c = new Column(getLong(columnX, columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
+                                    player.getWorld().addColumn(c);
+                                    for (Player p : playerHashMap.values())
+                                        if (p.isColumnLoaded(getLong(columnX, columnZ)))
+                                            p.refreshColumn(c);
+                                }
                             } else if (event.getPacket() != null)
                                 tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
                         }

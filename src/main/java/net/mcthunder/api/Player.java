@@ -99,8 +99,8 @@ public class Player {
                 zMod = 1;
             else if (d.equals(Direction.WEST))
                 xMod = -1;
-            int x = (int) getLocation().getX() / 16;
-            int z = (int) getLocation().getZ() / 16;
+            int x = (int) getLocation().getX() >> 4;
+            int z = (int) getLocation().getZ() >> 4;
             for (int xAdd = -getView() + xMod; xAdd < getView() + xMod; xAdd++)
                 for (int zAdd = -getView() + zMod; zAdd < getView() + zMod; zAdd++) {
                     Region r = getWorld().getRegion(getLong((x + xAdd) >> 5, (z + zAdd) >> 5));
@@ -124,8 +124,8 @@ public class Player {
     }
 
     private void updateDir(Direction d) {
-        int x = (int)getLocation().getX() / 16;
-        int z = (int)getLocation().getZ() / 16;
+        int x = (int)getLocation().getX() >> 4;
+        int z = (int)getLocation().getZ() >> 4;
         if (d.equals(Direction.NORTH)) {
             for (long l : this.southColumns)
                 getWorld().unloadColumn(l);

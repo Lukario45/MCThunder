@@ -83,9 +83,9 @@ public class World {
         }
     }
 
-    public void loadAround(Location p, int distance) {
-        int x = (int)p.getX() / 16;
-        int z = (int)p.getZ() / 16;
+    public void loadAround(Location loc, int distance) {
+        int x = (int)loc.getX() >> 4;
+        int z = (int)loc.getZ() >> 4;
         for(int xAdd = -distance; xAdd < distance; xAdd++)
             for(int zAdd = -distance; zAdd < distance; zAdd++) {
                 int regionX = (x + xAdd) >> 5;
