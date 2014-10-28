@@ -44,6 +44,8 @@ public class Region {
     public void readChunk(long l) {
         int x = (int) (l >> 32);
         int z = (int) l;
+        if (world.isColumnLoaded(getLong(16*x >> 4, 16*z >> 4)))
+            return;
         while (x < 0)
             x += 32;
         while (z < 0)
@@ -123,6 +125,12 @@ public class Region {
     public void readChunk(long l, Player p, Direction dir, boolean removeOld) {
         int x = (int) (l >> 32);
         int z = (int) l;
+        if (p.isColumnLoaded(getLong(16*x >> 4, 16*z >> 4)) && !removeOld)
+            return;
+        if (world.isColumnLoaded(getLong(16*x >> 4, 16*z >> 4))) {
+            p.addColumn(getLong(16*x >> 4, 16*z >> 4), dir, removeOld);
+            return;
+        }
         while (x < 0)
             x += 32;
         while (z < 0)
