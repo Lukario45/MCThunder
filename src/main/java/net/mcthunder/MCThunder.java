@@ -264,40 +264,55 @@ public class MCThunder {
                                 ClientPlayerPlaceBlockPacket packet = event.getPacket();
                                 Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                                 Position position = packet.getPosition();
-                                tellConsole(LoggingLevel.DEBUG, position.getX() + "/" + position.getY() + "/" + position.getZ());
+                                //tellConsole(LoggingLevel.DEBUG, position.getX() + "/" + position.getY() + "/" + position.getZ());
                                 ItemStack heldItem = packet.getHeldItem();
                                 int heldItemId = heldItem.getId();
                                 int columnX = position.getX() >> 4;
                                 int columnZ = position.getZ() >> 4;
                                 int chunkY = position.getY() >> 4;
-                                tellConsole(LoggingLevel.DEBUG, "X " + columnX + " Z " + columnZ + " Y " + chunkY + " Block ID " + heldItemId);
-                                Column column = player.getWorld().getColumn(getLong(columnX, columnZ));
-                                Chunk[] chunks = column.getChunks();
-                                ShortArray3d blocks = chunks[chunkY].getBlocks();
-                                NibbleArray3d blockLight = chunks[chunkY].getBlockLight();
-                                NibbleArray3d skyLight = chunks[chunkY].getSkyLight();
                                 int blockX = position.getX()%16;
                                 int blockY = position.getY()%16;
                                 int blockZ = position.getZ()%16;
                                 Face clicked = packet.getFace();
                                 if (clicked.equals(Face.NORTH))
-                                    blockX += 1;
-                                else if (clicked.equals(Face.SOUTH))
                                     blockX -= 1;
+                                else if (clicked.equals(Face.SOUTH))
+                                    blockX += 1;
                                 else if (clicked.equals(Face.TOP))
                                     blockY += 1;
                                 else if (clicked.equals(Face.BOTTOM))
                                     blockY -= 1;
                                 else if (clicked.equals(Face.EAST))
-                                    blockZ += 1;
-                                else if (clicked.equals(Face.WEST))
                                     blockZ -= 1;
+                                else if (clicked.equals(Face.WEST))
+                                    blockZ += 1;
                                 if (blockX < 0)
                                     blockX += 16;
+                                if (blockX > 15) {
+                                    blockX = blockX % 16;
+                                    columnX++;
+                                }
                                 if (blockY < 0)
                                     blockY += 16;
+                                if (blockY > 15) {
+                                    blockY = blockY % 16;
+                                    chunkY++;
+                                }
                                 if (blockZ < 0)
                                     blockZ += 16;
+                                if (blockZ > 15) {
+                                    blockZ = blockZ % 16;
+                                    columnZ++;
+                                }
+                                if (chunkY == -1)//Clicked thin air
+                                    return;
+                                //tellConsole(LoggingLevel.DEBUG, "BX " + blockX + " BY " + blockY + " BZ " + blockZ);
+                                //tellConsole(LoggingLevel.DEBUG, "X " + columnX + " Z " + columnZ + " Y " + chunkY + " Block ID " + heldItemId);
+                                Column column = player.getWorld().getColumn(getLong(columnX, columnZ));
+                                Chunk[] chunks = column.getChunks();
+                                ShortArray3d blocks = chunks[chunkY] != null ? chunks[chunkY].getBlocks() : new ShortArray3d(4096);
+                                NibbleArray3d blockLight = chunks[chunkY] != null ? chunks[chunkY].getBlockLight() : new NibbleArray3d(4096);
+                                NibbleArray3d skyLight = chunks[chunkY] != null ? chunks[chunkY].getSkyLight() : new NibbleArray3d(4096);
                                 blocks.setBlock(blockX, blockY, blockZ, heldItemId);
                                 chunks[chunkY] = new Chunk(blocks, blockLight, skyLight);
                                 Column c = new Column(getLong(columnX, columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
