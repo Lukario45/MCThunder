@@ -24,7 +24,6 @@ public class Region {
     private int x;
     private int z;
     private Chunk[] chunks;
-    private Position spawnPosition;
     private int chunkInt;
     private HashMap<Long, Region> regionHashMap;
     private World world;
@@ -42,10 +41,10 @@ public class Region {
     }
 
     public void readChunk(long l) {
+        if (world.isColumnLoaded(l))
+            return;
         int x = (int) (l >> 32);
         int z = (int) l;
-        if (world.isColumnLoaded(getLong(16*x >> 4, 16*z >> 4)))
-            return;
         while (x < 0)
             x += 32;
         while (z < 0)
@@ -75,8 +74,6 @@ public class Region {
             IntTag zPosTag = level.get("zPos");
             int xPos = xPosTag.getValue();
             int zPos = zPosTag.getValue();
-            if (world.isColumnLoaded(getLong(xPos, zPos)))
-                return;
             chunkInt = 0;
             CompoundTag chunkz;
             ByteArrayTag blocks;
@@ -123,14 +120,14 @@ public class Region {
     }
 
     public void readChunk(long l, Player p, Direction dir, boolean removeOld) {
-        int x = (int) (l >> 32);
-        int z = (int) l;
-        if (p.isColumnLoaded(getLong(16*x >> 4, 16*z >> 4)) && !removeOld)
+        if (p.isColumnLoaded(l) && !removeOld)
             return;
-        if (world.isColumnLoaded(getLong(16*x >> 4, 16*z >> 4))) {
-            p.addColumn(getLong(16*x >> 4, 16*z >> 4), dir, removeOld);
+        if (world.isColumnLoaded(l)) {
+            p.addColumn(l, dir, removeOld);
             return;
         }
+        int x = (int) (l >> 32);
+        int z = (int) l;
         while (x < 0)
             x += 32;
         while (z < 0)
@@ -160,12 +157,6 @@ public class Region {
             IntTag zPosTag = level.get("zPos");
             int xPos = xPosTag.getValue();
             int zPos = zPosTag.getValue();
-            if (p.isColumnLoaded(getLong(xPos, zPos)) && !removeOld)
-                return;
-            if (world.isColumnLoaded(getLong(xPos, zPos))) {
-                p.addColumn(getLong(xPos, zPos), dir, removeOld);
-                return;
-            }
             chunkInt = 0;
             CompoundTag chunkz;
             ByteArrayTag blocks;

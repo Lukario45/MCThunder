@@ -127,6 +127,8 @@ public class Player {
         int x = (int)getLocation().getX() / 16;
         int z = (int)getLocation().getZ() / 16;
         if (d.equals(Direction.NORTH)) {
+            for (long l : this.southColumns)
+                getWorld().unloadColumn(l);
             this.northColumns.clear();
             this.southColumns.clear();
             for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
@@ -138,40 +140,53 @@ public class Player {
                     rOld.readChunk(getLong(x + xAdd, z + getView()), this, Direction.SOUTH, true);
             }
         } else if (d.equals(Direction.EAST)) {
+            for (long l : this.westColumns)
+                getWorld().unloadColumn(l);
             this.eastColumns.clear();
+            this.westColumns.clear();
             for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
                 Region r = getWorld().getRegion(getLong((x + getView() + 1) >> 5, (z + zAdd) >> 5));
                 if (r != null)
                     r.readChunk(getLong(x + getView() + 1, z + zAdd), this, d, false);
                 Region rOld = getWorld().getRegion(getLong((x - getView()) >> 5, (z + zAdd) >> 5));
                 if (rOld != null)
-                    rOld.readChunk(getLong(x - getView(), z + zAdd), this, Direction.SOUTH, true);
+                    rOld.readChunk(getLong(x - getView(), z + zAdd), this, Direction.WEST, true);
             }
         } else if (d.equals(Direction.SOUTH)) {
+            for (long l : this.northColumns)
+                getWorld().unloadColumn(l);
             this.southColumns.clear();
+            this.northColumns.clear();
             for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
                 Region r = getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView() + 1) >> 5));
                 if (r != null)
                     r.readChunk(getLong(x + xAdd, z - getView() - 1), this, d, false);
                 Region rOld = getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView()) >> 5));
                 if (rOld != null)
-                    rOld.readChunk(getLong(x + xAdd, z - getView()), this, Direction.SOUTH, true);
+                    rOld.readChunk(getLong(x + xAdd, z - getView()), this, Direction.NORTH, true);
             }
         } else if (d.equals(Direction.WEST)) {
+            for (long l : this.eastColumns)
+                getWorld().unloadColumn(l);
             this.westColumns.clear();
+            this.eastColumns.clear();
             for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
                 Region r = getWorld().getRegion(getLong((x - getView() - 1) >> 5, (z + zAdd) >> 5));
                 if (r != null)
                     r.readChunk(getLong(x - getView() - 1, z + zAdd), this, d, false);
                 Region rOld = getWorld().getRegion(getLong((x + getView()) >> 5, (z + zAdd) >> 5));
                 if (rOld != null)
-                    rOld.readChunk(getLong(x + getView(), z + zAdd), this, Direction.SOUTH, true);
+                    rOld.readChunk(getLong(x + getView(), z + zAdd), this, Direction.EAST, true);
             }
         }
     }
 
-    public boolean isColumnLoaded(Long l) {
+    public boolean isColumnLoaded(long l) {
         return this.loadedColumns.contains(l);
+    }
+
+    public boolean isColumnPreLoaded(long l) {
+        return this.northColumns.contains(l) || this.eastColumns.contains(l) || this.southColumns.contains(l) || this.westColumns.contains(l);
     }
 
     public void addColumn(long l, Direction d, boolean removeOld) {
