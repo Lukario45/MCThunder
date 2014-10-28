@@ -282,6 +282,10 @@ public class Player {
         return this.viewDistance;
     }
 
+    public void setView(int distance) {
+        this.viewDistance = distance;
+    }
+
     public int getHeldItem() {
         return this.heldItem;
     }

@@ -256,7 +256,10 @@ public class MCThunder {
                             } else if (event.getPacket() instanceof ClientKeepAlivePacket)
                                 event.getSession().send(new ServerKeepAlivePacket(event.<ClientKeepAlivePacket>getPacket().getPingId()));
                             else if (event.getPacket() instanceof ClientSettingsPacket) {
-
+                                ClientSettingsPacket packet = event.getPacket();
+                                Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                                //player.setView(packet.getRenderDistance());
+                                //TODO: unload chunks if goes smaller load if goes higher and have a cap
                             } else if (event.getPacket() instanceof ClientTabCompletePacket) {
                                 ClientTabCompletePacket packet = event.getPacket();
                                 tabHandler.handleTabComplete(server, event.getSession(), packet);
