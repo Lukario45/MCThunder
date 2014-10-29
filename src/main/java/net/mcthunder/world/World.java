@@ -5,7 +5,8 @@ import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.data.game.Chunk;
-import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
+import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
+import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;
@@ -27,28 +28,50 @@ public class World {
     private Chunk[] chunks;
     private Location spawn;
     private int chunkInt;
+    private Difficulty difficulty;
     private HashMap<Long, Region> regionHashMap;
     private HashMap<Long, Column> columnHashMap;
+    private WorldType worldType;
 
-
-    public World(String name/*, long seed*/) {
+    public World(String name) {
         this.name = name;
-        //this.seed = seed;
-        world = new File("worlds/" + name + "/level.dat");
+        this.world = new File("worlds/" + name + "/level.dat");
         //this.chunks = chunks;
-        columnHashMap = new HashMap<Long, Column>();
-        regionHashMap = new HashMap<Long, Region>();
+        this.columnHashMap = new HashMap<>();
+        this.regionHashMap = new HashMap<>();
         try {
             CompoundTag tag = NBTIO.readFile(world);
             CompoundTag data = tag.get("Data");
             IntTag xTag = data.get("SpawnX");
             IntTag yTag = data.get("SpawnY");
             IntTag zTag = data.get("SpawnZ");
-            tellConsole(LoggingLevel.DEBUG, String.valueOf(xTag.getValue()) + String.valueOf(yTag.getValue()) + String.valueOf(zTag.getValue()));
-            spawn = new Location(this, xTag.getValue(), yTag.getValue(), zTag.getValue());
+            IntTag dif = data.get("Difficulty");
+            //tellConsole(LoggingLevel.DEBUG, String.valueOf(xTag.getValue()) + String.valueOf(yTag.getValue()) + String.valueOf(zTag.getValue()));
+            this.worldType = fromName(data.get("generatorName").getValue().toString());
+            this.seed = (long) data.get("RandomSeed").getValue();
+            this.difficulty = difFromName(dif != null ? dif.getValue() : 2);
+            this.spawn = new Location(this, xTag.getValue(), yTag.getValue(), zTag.getValue());
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private WorldType fromName(String name) {
+        if (name.equals("largeBiomes"))
+            return WorldType.LARGE_BIOMES;
+        return WorldType.valueOf(name.toUpperCase());
+    }
+
+    private Difficulty difFromName(int dif) {
+        if (dif == 0)
+            return Difficulty.PEACEFUL;
+        if (dif == 1)
+            return Difficulty.EASY;
+        if (dif == 2)
+            return Difficulty.NORMAL;
+        if (dif == 3)
+            return Difficulty.HARD;
+        return Difficulty.NORMAL;
     }
 
     public String getName() {
@@ -56,16 +79,11 @@ public class World {
     }
 
     public void addAllRegions() {
-        File regions = new File("worlds/" + name + "/region/");
-        File[] files = regions.listFiles();
+        File[] files = new File("worlds/" + this.name + "/region/").listFiles();
         for (File f : files) {
             if (f.getName().endsWith(".mca")) {
                 String[] regionName = f.getName().split("\\.");
-                int x = Integer.parseInt(regionName[1]);
-                //tellConsole(LoggingLevel.DEBUG, String.valueOf(x));
-                int z = Integer.parseInt(regionName[2]);
-                //tellConsole(LoggingLevel.DEBUG, String.valueOf(z));
-                addRegion(getLong(x, z));
+                addRegion(getLong(Integer.parseInt(regionName[1]), Integer.parseInt(regionName[2])));
             } else {
 
             }
@@ -75,7 +93,7 @@ public class World {
     }
 
     public boolean checkRegion(Long l) {//Why does this not just return the first if statements value
-        if (regionHashMap.containsKey(l)) {
+        if (this.regionHashMap.containsKey(l)) {
             return true;
         } else {
             return false;
@@ -90,11 +108,8 @@ public class World {
                 int regionX = (x + xAdd) >> 5;
                 int regionZ = (z + zAdd) >> 5;
                 long reg = getLong(regionX, regionZ);
-                //tellConsole(LoggingLevel.DEBUG, "rX: " + regionX + ", rZ: " + regionZ);
-                if (regionHashMap.containsKey(reg)) {
-                    regionHashMap.get(reg).readChunk(getLong(x + xAdd, z + zAdd));
-                    //tellConsole(LoggingLevel.DEBUG, "cX: " + (x + xAdd) + ", cZ: " + (z + zAdd));
-                }
+                if (this.regionHashMap.containsKey(reg))
+                    this.regionHashMap.get(reg).readChunk(getLong(x + xAdd, z + zAdd));
         }
     }
 
@@ -107,12 +122,11 @@ public class World {
     }
 
     public void addRegion(long l) {
-        regionHashMap.put(l, new Region(this, l));
+        this.regionHashMap.put(l, new Region(this, l));
     }
 
     public void addColumn(Column c) {
-        columnHashMap.put(getLong(c.getX(), c.getZ()), c);
-        //tellConsole(LoggingLevel.DEBUG, "NEW CHUNK TO COLUMN");
+        this.columnHashMap.put(getLong(c.getX(), c.getZ()), c);
     }
 
     public void unloadColumn(Column c) {
@@ -131,13 +145,13 @@ public class World {
     }
 
     public boolean isColumnLoaded(long l) {
-        return columnHashMap.containsKey(l);
+        return this.columnHashMap.containsKey(l);
     }
 
     public Column[] getAllColumnsAsArray() {
-        Column[] cArray = new Column[columnHashMap.size()];
+        Column[] cArray = new Column[this.columnHashMap.size()];
         int i = 0;
-        for (Column c : columnHashMap.values()) {
+        for (Column c : this.columnHashMap.values()) {
             cArray[i] = c;
             i++;
         }
@@ -145,24 +159,16 @@ public class World {
     }
 
     public Column getColumn(long l) {
-        return columnHashMap.get(l);
+        return this.columnHashMap.get(l);
     }
 
     public Region getRegion(long l) {
-        return regionHashMap.get(l);
+        return this.regionHashMap.get(l);
     }
-
-    public void loadAllRegions() {
-        for (Region r : regionHashMap.values()) {
-            //r.loadRegion();
-        }
-    }
-
 
     public void loadWorld() {
         addAllRegions();
-        //loadAllRegions();
-        loadAround(spawn, 9);
+        loadAround(this.spawn, 9);
         tellConsole(LoggingLevel.INFO, "FNNISHED LOADING WORLD");
 
     }
@@ -175,8 +181,11 @@ public class World {
         return this.spawn;
     }
 
-    public void sendColumns(Player p, Column[] columns) {
-        for (Column c : columns)
-            p.getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), new byte[256]));
+    public Difficulty getDifficulty() {
+        return this.difficulty;
+    }
+
+    public WorldType getWorldType() {
+        return this.worldType;
     }
 }

@@ -119,32 +119,9 @@ public class MCThunder {
             playerHashMap = new HashMap<UUID, Player>(conf.getSlots());
             worldHashMap = new HashMap<String, World>();
 
-            /*File dir = new File("worlds");
-            File[] files = dir.listFiles();
-            for(File f : files) {
-                worldHashMap.put(f.getName(), new World(f.getName()));
-                World w = worldHashMap.get(f.getName());
-                try {
-                    w.loadWorld();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Region r = new Region(w, getLong(0, 0));
-                r.loadRegion();
-            }*/
-            // if (!worldHashMap.containsKey("world"))
-            // worldHashMap.put("world", new World("world", 0, chunks));
-            //   player.setWorld(worldHashMap.get("world"));
             worldHashMap.put(conf.getWorldName(), new World(conf.getWorldName()));
             final World world = worldHashMap.get(conf.getWorldName());
-
-                world.loadWorld();
-
-
-            //world.getRegion(getLong(0,0)).loadRegion();
-
-            //r.loadRegion();
-
+            world.loadWorld();
 
             server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
             server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
@@ -167,12 +144,12 @@ public class MCThunder {
                     playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
 
                     Player player = playerHashMap.get(profile.getId());
+                    player.setLocation(world.getSpawnLocation());
                     //how about you don't waste time getting an exact copy of a variable you already have stored?
-                    session.send(new ServerJoinGamePacket(0, false, player.getGameMode(), 0, Difficulty.PEACEFUL, conf.getSlots(), WorldType.FLAT, false));
+                    session.send(new ServerJoinGamePacket(0, false, player.getGameMode(), 0, player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
-                    player.setLocation(world.getSpawnLocation());
                     player.loadChunks(null);
                     player.getSession().send(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), 0, 0));
                     player.getSession().send(new ServerSpawnPositionPacket(new Position((int)player.getLocation().getX(), (int)player.getLocation().getY(), (int)player.getLocation().getZ())));
