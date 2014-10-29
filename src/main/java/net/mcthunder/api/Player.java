@@ -38,6 +38,7 @@ public class Player {
     private Server server;
     private MetadataMap metadata;
     private Location location;
+    private boolean moveable;
     private boolean onGround;
     private boolean sneaking;
     private boolean sprinting;
@@ -57,6 +58,7 @@ public class Player {
         this.heldItem = heldItem;
         this.metadata = new MetadataMap();
         this.gamemode = GameMode.CREATIVE;
+        this.moveable = true;
     }
 
     public void loadChunks(Direction d) {
@@ -354,6 +356,14 @@ public class Player {
 
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
+    }
+
+    public void toggleMoveable() {
+        this.moveable = !this.moveable;
+    }
+
+    public boolean isMoveable() {
+        return this.moveable;
     }
 
     public boolean isSneaking() {

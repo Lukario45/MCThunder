@@ -161,6 +161,7 @@ public class MCThunder {
                     playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
 
                     Player player = playerHashMap.get(profile.getId());
+                    player.toggleMoveable();
                     player.setLocation(world.getSpawnLocation());
 
                     session.send(new ServerJoinGamePacket(0, player.getWorld().isHardcore(), player.getGameMode(), 0, player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
@@ -170,7 +171,7 @@ public class MCThunder {
                     player.loadChunks(null);
                     player.getSession().send(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
                     player.getSession().send(new ServerSpawnPositionPacket(new Position((int)player.getLocation().getX(), (int)player.getLocation().getY(), (int)player.getLocation().getZ())));
-
+                    player.toggleMoveable();
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
                     playerProfileHandler.checkPlayer(player);
 
@@ -199,6 +200,8 @@ public class MCThunder {
                             if (event.getPacket() instanceof ClientPlayerMovementPacket) {
                                 ClientPlayerMovementPacket pack = event.getPacket();
                                 Player mover = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                                if (!mover.isMoveable())
+                                    return;//Also will need to cancel on their end somehow
                                 for (Packet packet : createUpdatePackets(event.getSession(), pack))
                                     for (Player p : playerHashMap.values()) {
                                         if (!p.getWorld().equals(mover.getWorld()))
