@@ -50,6 +50,9 @@ import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.packet.Packet;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.*;
 
 import static net.mcthunder.api.Utils.*;
@@ -132,7 +135,17 @@ public class MCThunder {
             server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
                 @Override
                 public ServerStatusInfo buildInfo(Session session) {
-                    return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), playerHashMap.size(), new GameProfile[0]), new TextMessage(conf.getServerMOTD()), null);
+                    GameProfile[] gameProfiles = new GameProfile[playerHashMap.size()];
+                    int i = 0;
+                    for(UUID uuid : playerHashMap.keySet()) {
+                        gameProfiles[i] = playerHashMap.get(uuid).gameProfile();
+                        i++;
+                    }
+                    BufferedImage icon = null;
+                    try {
+                        icon = ImageIO.read(new File("server-icon.png"));
+                    } catch (Exception e) { }//When there is no icon set
+                    return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), playerHashMap.size(), gameProfiles), new TextMessage(conf.getServerMOTD()), icon);
                 }
             });
 
@@ -150,7 +163,6 @@ public class MCThunder {
                     Player player = playerHashMap.get(profile.getId());
                     player.setLocation(world.getSpawnLocation());
 
-                    //how about you don't waste time getting an exact copy of a variable you already have stored?
                     session.send(new ServerJoinGamePacket(0, player.getWorld().isHardcore(), player.getGameMode(), 0, player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(server, session);
@@ -266,8 +278,6 @@ public class MCThunder {
                                 ItemStack heldItem = packet.getHeldItem();
                                 if (heldItem == null)
                                     return;
-                                int heldItemId = heldItem.getId();
-                                short heldItemData = (short) heldItem.getData();
                                 Block b = new Block(new Location(player.getLocation().getWorld(), position.getX(), position.getY(), position.getZ()));
                                 int columnX = position.getX() >> 4;
                                 int columnZ = position.getZ() >> 4;
@@ -316,7 +326,7 @@ public class MCThunder {
                                 ShortArray3d blocks = chunks[chunkY] != null ? chunks[chunkY].getBlocks() : new ShortArray3d(4096);
                                 NibbleArray3d blockLight = chunks[chunkY] != null ? chunks[chunkY].getBlockLight() : new NibbleArray3d(4096);
                                 NibbleArray3d skyLight = chunks[chunkY] != null ? chunks[chunkY].getSkyLight() : new NibbleArray3d(4096);
-                                blocks.setBlockAndData(blockX, blockY, blockZ, heldItemId, heldItemData);
+                                blocks.setBlockAndData(blockX, blockY, blockZ, heldItem.getId(), (short) heldItem.getData());
                                 chunks[chunkY] = new Chunk(blocks, blockLight, skyLight);
                                 Column c = new Column(getLong(columnX, columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
                                 player.getWorld().addColumn(c);
@@ -326,14 +336,13 @@ public class MCThunder {
                                     if (p.isColumnLoaded(getLong(columnX, columnZ)))
                                         p.refreshColumn(c);
                                 }
-
                             } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
                                 ClientPlayerActionPacket packet = event.getPacket();
                                 Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                                 if ((packet.getAction().equals(PlayerAction.START_DIGGING) && player.getGameMode().equals(GameMode.CREATIVE)) ||
                                     (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
                                     Block b = new Block(new Location(player.getLocation().getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ()));
-                                    b.setType(0);
+                                    b.setType(0);//Set it as air
                                 }
                             } else if (event.getPacket() != null)
                                 tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
@@ -352,7 +361,7 @@ public class MCThunder {
                         for (Player p : playerHashMap.values())
                             p.getSession().send(destroyEntitiesPacket);
                         player.setAppended("");
-                        playerHashMap.remove(player);
+                        playerHashMap.remove(player.getUniqueID());
                     }
                 }
             });
@@ -460,9 +469,9 @@ public class MCThunder {
     public static Player getPlayer(String name) {
         Player partial = null;
         for (Player p : playerHashMap.values())
-            if (p.gameProfile().getName().equalsIgnoreCase(name))
+            if (p.getName().equalsIgnoreCase(name))
                 return p;
-            else if (partial == null && p.gameProfile().getName().toLowerCase().contains(name.toLowerCase()))
+            else if (partial == null && p.getName().toLowerCase().contains(name.toLowerCase()))
                 partial = p;
         return partial;
     }

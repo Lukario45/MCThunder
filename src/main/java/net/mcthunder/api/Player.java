@@ -30,6 +30,9 @@ public class Player {
     private int entityID;
     private int heldItem;
     private GameProfile gameProfile;
+    private final UUID uuid;
+    private final String name;
+    private String displayName;
     private GameMode gamemode;
     private Session session;
     private Server server;
@@ -47,6 +50,9 @@ public class Player {
         this.server = server;
         this.session = session;
         this.gameProfile = profile;
+        this.uuid = this.gameProfile.getId();
+        this.name = this.gameProfile.getName();
+        this.displayName = this.name;
         this.entityID = entityID;
         this.heldItem = heldItem;
         this.metadata = new MetadataMap();
@@ -323,7 +329,15 @@ public class Player {
     }
 
     public UUID getUniqueID() {
-        return this.gameProfile.getId();
+        return this.uuid;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getDisplayName() {
+        return this.displayName;
     }
 
     public Location getLocation() {
