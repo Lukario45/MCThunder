@@ -5,7 +5,6 @@ import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.data.game.Chunk;
-import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -167,6 +166,7 @@ public class World {
         tellConsole(LoggingLevel.INFO, "FNNISHED LOADING WORLD");
 
     }
+
     public void unloadWorld() {
 
     }

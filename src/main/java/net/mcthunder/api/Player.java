@@ -7,6 +7,7 @@ import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
+import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerMultiChunkDataPacket;
 import org.spacehq.packetlib.Server;
@@ -30,6 +31,7 @@ public class Player {
     private int entityID;
     private int heldItem;
     private GameProfile gameProfile;
+    private GameMode gamemode;
     private Session session;
     private Server server;
     private MetadataMap metadata;
@@ -49,6 +51,7 @@ public class Player {
         this.entityID = entityID;
         this.heldItem = heldItem;
         this.metadata = new MetadataMap();
+        this.gamemode = GameMode.CREATIVE;
     }
 
     public void loadChunks(Direction d) {//TODO: unload from world if no players have it loaded or preloaded
@@ -350,6 +353,10 @@ public class Player {
     public void setSprinting(boolean sprinting) {
         this.sprinting = sprinting;
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, sneaking);
+    }
+
+    public GameMode getGameMode() {
+        return this.gamemode;
     }
 
     public ServerChatHandler getChatHandler() {
