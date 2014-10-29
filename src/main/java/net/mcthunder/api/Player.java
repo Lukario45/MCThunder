@@ -13,6 +13,7 @@ import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import static net.mcthunder.api.Utils.*;
 
@@ -319,6 +320,10 @@ public class Player {
 
     public MetadataMap getMetadata() {
         return this.metadata;
+    }
+
+    public UUID getUniqueID() {
+        return this.gameProfile.getId();
     }
 
     public Location getLocation() {
