@@ -94,11 +94,15 @@ public class MCThunder {
         /**
          * Based of of Alphabot/Lukabot code that was created by zack6849
          */
+        Reflections.log = null;
         final String pkg = "net.mcthunder.commands.";
         Reflections reflections = new Reflections("net.mcthunder.commands");
         Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
+        int commands = 0;
         for (Class c : subTypes)
-            CommandRegistry.register(CommandRegistry.getCommand(c.getSimpleName(), pkg));
+            if (CommandRegistry.getCommand(c.getSimpleName(), pkg) != null)//getCommand attempts to load anyways
+                commands++;
+        tellConsole(LoggingLevel.INFO, commands + " command" + (commands != 1 ? "s " : "") + "were loaded.");
         //Done
         if (SPAWN_SERVER) {
             server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
@@ -152,7 +156,7 @@ public class MCThunder {
                     entryListHandler.addToPlayerEntryList(server, session);
                     //Send World Data
                     player.loadChunks(null);
-                    player.getSession().send(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), 0, 0));
+                    player.getSession().send(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
                     player.getSession().send(new ServerSpawnPositionPacket(new Position((int)player.getLocation().getX(), (int)player.getLocation().getY(), (int)player.getLocation().getZ())));
 
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
