@@ -24,8 +24,6 @@ import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.entity.player.PlayerAction;
-import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
-import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.mc.protocol.data.message.TextMessage;
 import org.spacehq.mc.protocol.data.status.PlayerInfo;
 import org.spacehq.mc.protocol.data.status.ServerStatusInfo;
@@ -68,6 +66,7 @@ public class MCThunder {
     private static boolean VERIFY_USERS = false;
     private static String HOST;
     private static int PORT;
+    private static int RENDER_DISTANCE;
     private static ServerChatHandler chatHandler;
     private static ServerTabHandler tabHandler;
     private static ServerPlayerEntryListHandler entryListHandler;
@@ -86,6 +85,7 @@ public class MCThunder {
         VERIFY_USERS = conf.getOnlineMode();
         HOST = getIP();
         PORT = conf.getPort();
+        RENDER_DISTANCE = conf.getRenderDistance();
         //Done Set Server Data
         tellConsole(LoggingLevel.INFO, "INTERNAL PORT " + HOST);
         createInitialDirs();
@@ -116,8 +116,8 @@ public class MCThunder {
             playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
             playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
             //Done Listeners
-            playerHashMap = new HashMap<UUID, Player>(conf.getSlots());
-            worldHashMap = new HashMap<String, World>();
+            playerHashMap = new HashMap<>(conf.getSlots());
+            worldHashMap = new HashMap<>();
 
             worldHashMap.put(conf.getWorldName(), new World(conf.getWorldName()));
             final World world = worldHashMap.get(conf.getWorldName());
@@ -237,8 +237,8 @@ public class MCThunder {
                                 ClientSettingsPacket packet = event.getPacket();
                                 Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                                 if (player.getView() != packet.getRenderDistance()) {
-                                    //player.setView(packet.getRenderDistance());
-                                    //TODO: unload chunks if goes smaller load if goes higher and have a cap
+                                    player.setView(packet.getRenderDistance());
+                                    //TODO: unload chunks if goes smaller load if goes higher also have it check during login what their distance is
                                 }
                             } else if (event.getPacket() instanceof ClientTabCompletePacket) {
                                 ClientTabCompletePacket packet = event.getPacket();
@@ -364,10 +364,10 @@ public class MCThunder {
             player.setLocation(worldHashMap.get(conf.getWorldName()).getSpawnLocation());
 
         if (packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
-            int fromChunkX = (int)player.getLocation().getX() / 16;
-            int fromChunkZ = (int)player.getLocation().getZ() / 16;
-            int toChunkX = (int)packet.getX() / 16;
-            int toChunkZ = (int)packet.getZ() / 16;
+            int fromChunkX = (int)player.getLocation().getX() >> 4;
+            int fromChunkZ = (int)player.getLocation().getZ() >> 4;
+            int toChunkX = (int)packet.getX() >> 4;
+            int toChunkZ = (int)packet.getZ() >> 4;
             player.getLocation().setX(packet.getX());
             player.getLocation().setY(packet.getY());
             player.getLocation().setZ(packet.getZ());
@@ -452,5 +452,17 @@ public class MCThunder {
 
     public static Player getPlayer(UUID uuid) {
         return playerHashMap.get(uuid);
+    }
+
+    public static int maxRenderDistance() {
+        return RENDER_DISTANCE;
+    }
+
+    public static int getPort() {
+        return PORT;
+    }
+
+    public static String getIp() {
+        return HOST;
     }
 }

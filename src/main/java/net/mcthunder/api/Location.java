@@ -14,7 +14,6 @@ public class Location {
     private World world;
 
     public Location(World world, double x, double y, double z) {
-        //new Location(world, x, y, z, 0, 0);
         this.world = world;
         this.x = x;
         this.y = y;

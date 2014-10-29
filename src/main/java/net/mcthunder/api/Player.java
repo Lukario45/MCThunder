@@ -1,22 +1,20 @@
 package net.mcthunder.api;
 
+import net.mcthunder.MCThunder;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.Region;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
-import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.world.ServerMultiChunkDataPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
 import java.util.ArrayList;
 
-import static net.mcthunder.api.Utils.getLong;
-import static net.mcthunder.api.Utils.tellConsole;
+import static net.mcthunder.api.Utils.*;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -54,7 +52,7 @@ public class Player {
         this.gamemode = GameMode.CREATIVE;
     }
 
-    public void loadChunks(Direction d) {//TODO: unload from world if no players have it loaded or preloaded
+    public void loadChunks(Direction d) {
         if(d == null) {
             loadDir(Direction.NORTH);
             loadDir(Direction.EAST);
@@ -286,6 +284,8 @@ public class Player {
     }
 
     public void setView(int distance) {
+        if (MCThunder.maxRenderDistance() < distance)
+            distance = MCThunder.maxRenderDistance();
         this.viewDistance = distance;
     }
 

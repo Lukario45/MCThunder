@@ -25,6 +25,7 @@ public class Config {
     private String host;
     private String globalChatNick;
     private String globalNickPassword;
+    private int renderDistance;
     private int slots;
     private int port;
 
@@ -70,6 +71,8 @@ public class Config {
                 getConf().setProperty("ALLOW-NETHER", true);
             if (!getConf().containsKey("ALLOW-PVP"))
                 getConf().setProperty("ALLOW-PVP", true);
+            if (!getConf().containsKey("MAX-REBDER-DISTANCE"))
+                getConf().setProperty("MAX-REBDER-DISTANCE", 9);
             if (!getConf().containsKey("USE-COMMAND-BLOCKS"))
                 getConf().setProperty("USE-COMMAND-BLOCKS", false);
             getConf().save();
@@ -89,6 +92,7 @@ public class Config {
             setAllowFlying(getConf().getBoolean("ALLOW-FLYING"));
             setAllowNether(getConf().getBoolean("ALLOW-NETHER"));
             setAllowPVP(getConf().getBoolean("ALLOW-PVP"));
+            setMaxRenderDistance(getConf().getInt("MAX-REBDER-DISTANCE"));
             setCommandBlocks(getConf().getBoolean("USE-COMMAND-BLOCKS"));
 
         } catch (ConfigurationException e) {
@@ -126,6 +130,14 @@ public class Config {
 
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public void setMaxRenderDistance(int distance) {
+        this.renderDistance = distance;
+    }
+
+    public int getRenderDistance() {
+        return this.renderDistance;
     }
 
     public int getPort() {

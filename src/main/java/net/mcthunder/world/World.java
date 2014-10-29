@@ -88,8 +88,6 @@ public class World {
 
             }
         }
-
-
     }
 
     public boolean checkRegion(Long l) {//Why does this not just return the first if statements value
@@ -168,7 +166,7 @@ public class World {
 
     public void loadWorld() {
         addAllRegions();
-        loadAround(this.spawn, 9);
+        loadAround(this.spawn, MCThunder.maxRenderDistance());
         tellConsole(LoggingLevel.INFO, "FNNISHED LOADING WORLD");
 
     }
