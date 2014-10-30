@@ -24,7 +24,6 @@ public class Region {
         this.x = (int) (region >> 32);
         this.z = (int) region;
         this.world = w;
-
     }
 
     public void readChunk(long l) {
@@ -46,7 +45,7 @@ public class Region {
         } else {
             Tag tag = null;
             try {
-                tag = NBTIO.readTag(regionFile.getChunkDataInputStream(x, z));
+                tag = NBTIO.readTag(in);
             } catch (IOException e) {
                 e.printStackTrace();
             }
