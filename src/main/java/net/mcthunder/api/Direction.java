@@ -1,5 +1,7 @@
 package net.mcthunder.api;
 
+import org.spacehq.mc.protocol.data.game.values.Face;
+
 public enum Direction {
     NORTH("NORTH"),
     NORTH_EAST("NORTH_EAST"),
@@ -12,7 +14,7 @@ public enum Direction {
     UP("UP"),
     DOWN("DOWN");
 
-    public Direction fromString(String name) {
+    public static Direction fromString(String name) {
         if(name.equalsIgnoreCase("north"))
             return NORTH;
         if(name.equalsIgnoreCase("north_east"))
@@ -32,6 +34,22 @@ public enum Direction {
         if(name.equalsIgnoreCase("up"))
             return UP;
         return DOWN;
+    }
+
+    public static Direction fromFace(Face side) {
+        if (side.equals(Face.NORTH))
+            return NORTH;
+        if (side.equals(Face.EAST))
+            return EAST;
+        if (side.equals(Face.SOUTH))
+            return SOUTH;
+        if (side.equals(Face.WEST))
+            return WEST;
+        if (side.equals(Face.TOP))
+            return UP;
+        if (side.equals(Face.BOTTOM))
+            return DOWN;
+        return null;
     }
 
     private String name;

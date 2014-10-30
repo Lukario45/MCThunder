@@ -10,7 +10,6 @@ import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
-import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
 import org.reflections.Reflections;
 import org.spacehq.mc.auth.GameProfile;
@@ -19,7 +18,6 @@ import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
 import org.spacehq.mc.protocol.data.game.*;
-import org.spacehq.mc.protocol.data.game.values.Face;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
@@ -282,63 +280,9 @@ public class MCThunder {
                                 if (heldItem == null)
                                     return;
                                 Block b = new Block(new Location(player.getLocation().getWorld(), position.getX(), position.getY(), position.getZ()));
-                                int columnX = position.getX() >> 4;
-                                int columnZ = position.getZ() >> 4;
-                                int chunkY = position.getY() >> 4;
-                                int blockX = position.getX()%16;
-                                int blockY = position.getY()%16;
-                                int blockZ = position.getZ()%16;
-                                boolean replaceClicked = b.isLiquid() || b.getType() == 78 || b.isLongGrass();
-                                Face clicked = packet.getFace();
-                                if (clicked.equals(Face.NORTH) && !replaceClicked)
-                                    blockX -= 1;
-                                else if (clicked.equals(Face.SOUTH) && !replaceClicked)
-                                    blockX += 1;
-                                else if (clicked.equals(Face.TOP) && !replaceClicked)
-                                    blockY += 1;
-                                else if (clicked.equals(Face.BOTTOM) && !replaceClicked)
-                                    blockY -= 1;
-                                else if (clicked.equals(Face.EAST) && !replaceClicked)
-                                    blockZ -= 1;
-                                else if (clicked.equals(Face.WEST) && !replaceClicked)
-                                    blockZ += 1;
-                                if (blockX < 0)
-                                    blockX += 16;
-                                if (blockX > 15) {
-                                    blockX = blockX % 16;
-                                    columnX++;
-                                }
-                                if (blockY < 0)
-                                    blockY += 16;
-                                if (blockY > 15) {
-                                    blockY = blockY % 16;
-                                    chunkY++;
-                                }
-                                if (blockZ < 0)
-                                    blockZ += 16;
-                                if (blockZ > 15) {
-                                    blockZ = blockZ % 16;
-                                    columnZ++;
-                                }
-                                if (chunkY == -1)//Clicked thin air
-                                    return;
-                                //tellConsole(LoggingLevel.DEBUG, "BX " + blockX + " BY " + blockY + " BZ " + blockZ);
-                                //tellConsole(LoggingLevel.DEBUG, "X " + columnX + " Z " + columnZ + " Y " + chunkY + " Block ID " + heldItemId);
-                                Column column = player.getWorld().getColumn(getLong(columnX, columnZ));
-                                Chunk[] chunks = column.getChunks();
-                                ShortArray3d blocks = chunks[chunkY] != null ? chunks[chunkY].getBlocks() : new ShortArray3d(4096);
-                                NibbleArray3d blockLight = chunks[chunkY] != null ? chunks[chunkY].getBlockLight() : new NibbleArray3d(4096);
-                                NibbleArray3d skyLight = chunks[chunkY] != null ? chunks[chunkY].getSkyLight() : new NibbleArray3d(4096);
-                                blocks.setBlockAndData(blockX, blockY, blockZ, heldItem.getId(), (short) heldItem.getData());
-                                chunks[chunkY] = new Chunk(blocks, blockLight, skyLight);
-                                Column c = new Column(getLong(columnX, columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
-                                player.getWorld().addColumn(c);
-                                for (Player p : playerHashMap.values()) {
-                                    if (!p.getWorld().equals(player.getWorld()))
-                                        continue;//If they are not in the world why give them chunks from it
-                                    if (p.isColumnLoaded(getLong(columnX, columnZ)))
-                                        p.refreshColumn(c);
-                                }
+                                if (!b.isLiquid() && b.getType() != 78 && !b.isLongGrass())
+                                    b = b.getRelative(Direction.fromFace(packet.getFace()));
+                                b.setType(heldItem.getId(), (short) heldItem.getData());
                             } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
                                 ClientPlayerActionPacket packet = event.getPacket();
                                 Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());

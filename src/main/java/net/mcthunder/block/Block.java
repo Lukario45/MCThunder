@@ -1,13 +1,13 @@
 package net.mcthunder.block;
 
 import net.mcthunder.MCThunder;
+import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.Player;
 import net.mcthunder.world.Column;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
-
 import static net.mcthunder.api.Utils.getLong;
 
 public class Block {
@@ -61,6 +61,31 @@ public class Block {
         this.data = (short) blocks.getData(this.blockX, this.blockY, this.blockZ);
     }
 
+    public Block getRelative(Direction d, int distance) {
+        if (distance <= 0 || d == null)
+            return this;
+        int tempX = (int)this.loc.getX();
+        int tempY = (int)this.loc.getY();
+        int tempZ = (int)this.loc.getZ();
+        if (d.equals(Direction.NORTH))
+            tempX -= distance;
+        else if (d.equals(Direction.SOUTH))
+            tempX += distance;
+        else if (d.equals(Direction.UP))
+            tempY += distance;
+        else if (d.equals(Direction.DOWN))
+            tempY -= distance;
+        else if (d.equals(Direction.EAST))
+            tempZ -= distance;
+        else if (d.equals(Direction.WEST))
+            tempZ += distance;
+        return new Block(new Location(this.loc.getWorld(), tempX, tempY, tempZ));
+    }
+
+    public Block getRelative(Direction d) {
+        return getRelative(d, 1);
+    }
+
     public int getType() {
         return this.type;
     }
@@ -72,18 +97,35 @@ public class Block {
     public void setType(int type, short data) {
         this.type = type;
         this.data = data;
-        Column column = loc.getWorld().getColumn(getLong(this.columnX, this.columnZ));
+        if (chunkY == -1)
+            return;
+        Column column = this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ));
         Chunk[] chunks = column.getChunks();
         ShortArray3d blocks = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlocks() : new ShortArray3d(4096);
         NibbleArray3d blockLight = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlockLight() : new NibbleArray3d(4096);
         NibbleArray3d skyLight = chunks[this.chunkY] != null ? chunks[this.chunkY].getSkyLight() : new NibbleArray3d(4096);
-        blocks.setBlockAndData((int)this.blockX, (int)this.blockY, (int)this.blockZ, this.type, this.data);
+        blocks.setBlockAndData(this.blockX, this.blockY, this.blockZ, this.type, this.data);
+        Block above = getRelative(Direction.UP);
+        blockLight.set(this.blockX, this.blockY, this.blockZ, above.getLightLevel());
+        skyLight.set(this.blockX, this.blockY, this.blockZ, above.getSkyLight());
         chunks[this.chunkY] = new Chunk(blocks, blockLight, skyLight);
         Column c = new Column(getLong(this.columnX, this.columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
         this.loc.getWorld().addColumn(c);
         for (Player p : MCThunder.playerHashMap.values())
-            if (p.isColumnLoaded(getLong(this.columnX, this.columnZ)))
+            if (p.getWorld().equals(this.loc.getWorld()) && p.isColumnLoaded(getLong(this.columnX, this.columnZ)))
                 p.refreshColumn(c);
+    }
+
+    public int getSkyLight() {
+        if (chunkY == -1)
+            return 0;
+        return this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY].getSkyLight().get(this.blockX, this.blockY, this.blockZ);
+    }
+
+    public int getLightLevel() {//Todo actually calculate light level
+        if (chunkY == -1)
+            return 0;
+        return this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY].getBlockLight().get(this.blockX, this.blockY, this.blockZ);
     }
 
     public void setType(int type) {

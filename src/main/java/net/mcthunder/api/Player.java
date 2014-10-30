@@ -215,7 +215,7 @@ public class Player {
     }
 
     public void refreshColumn(Column c) {
-        getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks()));
+        getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
     }
 
     private void sendColumns(Direction d) {
