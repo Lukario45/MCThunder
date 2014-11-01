@@ -179,13 +179,7 @@ public class World {
     }
 
     public Column[] getAllColumnsAsArray() {
-        Column[] cArray = new Column[this.columnHashMap.size()];
-        int i = 0;
-        for (Column c : this.columnHashMap.values()) {
-            cArray[i] = c;
-            i++;
-        }
-        return cArray;
+        return (Column[]) this.columnHashMap.values().toArray();
     }
 
     public Column getColumn(long l) {
@@ -199,7 +193,7 @@ public class World {
     public void loadWorld() {
         addAllRegions();
         loadAround(this.spawn, MCThunder.maxRenderDistance());
-        tellConsole(LoggingLevel.INFO, "FNNISHED LOADING WORLD");
+        tellConsole(LoggingLevel.INFO, this.name + " loaded.");
     }
 
     public void unloadWorld() {

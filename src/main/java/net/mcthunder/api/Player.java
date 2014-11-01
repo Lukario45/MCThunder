@@ -7,6 +7,7 @@ import net.mcthunder.world.Region;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
+import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.packetlib.Server;
@@ -26,9 +27,10 @@ public class Player {
     private ArrayList<Long> eastColumns = new ArrayList<>();
     private ArrayList<Long> southColumns = new ArrayList<>();
     private ArrayList<Long> westColumns = new ArrayList<>();
+    private Inventory inv;
     private int viewDistance = 9;
     private int entityID;
-    private int heldItem;
+    private int slot;
     private GameProfile gameProfile;
     private final UUID uuid;
     private final String name;
@@ -46,19 +48,20 @@ public class Player {
     private Player lastPmPerson;
     private String appended = "";
 
-    public Player(Server server, Session session, GameProfile profile, int entityID, int heldItem, EntityMetadata metadata) {
+    public Player(Server server, Session session, GameProfile profile, int entityID, int slot, EntityMetadata metadata) {
         this.chatHandler = new ServerChatHandler();
         this.server = server;
         this.session = session;
         this.gameProfile = profile;
         this.uuid = this.gameProfile.getId();
         this.name = this.gameProfile.getName();
+        this.slot = slot;
         this.displayName = this.name;
         this.entityID = entityID;
-        this.heldItem = heldItem;
         this.metadata = new MetadataMap();
         this.gamemode = GameMode.CREATIVE;
         this.moveable = true;
+        this.inv = new Inventory(36, this.name);
     }
 
     public void loadChunks(Direction d) {
@@ -298,12 +301,12 @@ public class Player {
         this.viewDistance = distance;
     }
 
-    public int getHeldItem() {
-        return this.heldItem;
+    public ItemStack getHeldItem() {
+        return this.inv.getItemAt(this.slot);
     }
 
-    public void setHeldItem(int newItem) {
-        this.heldItem = newItem;
+    public void setSlot(int slot) {
+        this.slot = slot;
     }
 
     public int getEntityID() {
@@ -350,6 +353,10 @@ public class Player {
         this.location = location;
     }
 
+    public Inventory getInventory() {
+        return this.inv;
+    }
+
     public boolean isOnGround() {
         return this.onGround;
     }
@@ -373,6 +380,10 @@ public class Player {
     public void setSneaking(boolean sneaking) {
         this.sneaking = sneaking;
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, sneaking);
+    }
+
+    public int getSlot() {
+        return this.slot;
     }
 
     public boolean isSprinting() {

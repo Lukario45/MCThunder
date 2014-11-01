@@ -32,6 +32,8 @@ import org.spacehq.mc.protocol.packet.ingame.client.ClientKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientSettingsPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientTabCompletePacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.*;
+import org.spacehq.mc.protocol.packet.ingame.client.window.ClientCreativeInventoryActionPacket;
+import org.spacehq.mc.protocol.packet.ingame.client.window.ClientWindowActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
@@ -142,7 +144,7 @@ public class MCThunder {
                     BufferedImage icon = null;
                     try {
                         icon = ImageIO.read(new File("server-icon.png"));
-                    } catch (Exception e) { }//When there is no icon set
+                    } catch (Exception ignored) { }//When there is no icon set
                     return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), playerHashMap.size(), gameProfiles), new TextMessage(conf.getServerMOTD()), icon);
                 }
             });
@@ -173,14 +175,12 @@ public class MCThunder {
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
                     playerProfileHandler.checkPlayer(player);
 
-                    ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch(), player.getHeldItem(), player.getMetadata().getMetadataArray());
+                    ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch(), player.getHeldItem().getId(), player.getMetadata().getMetadataArray());
                     for (Player player1 : playerHashMap.values()) {
                         if (!player1.getWorld().equals(player.getWorld()))
                             continue;//Also will need to check if out of range ,_,
-                        ServerSpawnPlayerPacket toNewPlayer = new ServerSpawnPlayerPacket(player1.getEntityID(), player1.gameProfile().getId(), player1.getLocation().getX(), player1.getLocation().getY(), player1.getLocation().getZ(), player1.getLocation().getYaw(), player1.getLocation().getPitch(), player1.getHeldItem(), player1.getMetadata().getMetadataArray());
-                        if (player1.getUniqueID().equals(player.getUniqueID())) {
-
-                        } else {
+                        ServerSpawnPlayerPacket toNewPlayer = new ServerSpawnPlayerPacket(player1.getEntityID(), player1.gameProfile().getId(), player1.getLocation().getX(), player1.getLocation().getY(), player1.getLocation().getZ(), player1.getLocation().getYaw(), player1.getLocation().getPitch(), player1.getHeldItem().getId(), player1.getMetadata().getMetadataArray());
+                        if (!player1.getUniqueID().equals(player.getUniqueID())) {
                             player1.getSession().send(toAllPlayers);
                             player.getSession().send(toNewPlayer);
                         }
@@ -270,19 +270,54 @@ public class MCThunder {
                             } else if (event.getPacket() instanceof ClientTabCompletePacket) {
                                 ClientTabCompletePacket packet = event.getPacket();
                                 tabHandler.handleTabComplete(server, event.getSession(), packet);
-
+                            } else if (event.getPacket() instanceof ClientCreativeInventoryActionPacket) {
+                                ClientCreativeInventoryActionPacket packet = event.getPacket();
+                                Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                                ItemStack old = player.getHeldItem();
+                                ItemStack i = packet.getClickedItem();
+                                player.getInventory().setSlot(packet.getSlot(), i);
+                                if(packet.getSlot() == player.getSlot() && !old.equals(player.getHeldItem())) {
+                                    Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem());
+                                    for (Player p : playerHashMap.values())
+                                        if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
+                                            p.getSession().send(pack);
+                                }
+                            } else if (event.getPacket() instanceof ClientWindowActionPacket) {
+                                ClientWindowActionPacket packet = event.getPacket();
+                                Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                                //tellConsole(LoggingLevel.DEBUG, packet.getSlot() + " " + packet.getAction().name() + " " + packet.getWindowId());
+                                //0 = click craft output
+                                //1-4 = craft input
+                                //5-8 = helm to boots
+                                //9-35 = inventory
+                                //36-44 = hotbar
+                                //-999 = outside of inventory for dropping items
+                                //TODO: logic for this as well as for when they hit like a number over the item to move the item
+                            } else if (event.getPacket() instanceof ClientChangeHeldItemPacket) {
+                                ClientChangeHeldItemPacket packet = event.getPacket();
+                                Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                                ItemStack old = player.getHeldItem();
+                                player.setSlot(packet.getSlot() + 36);
+                                if (!old.equals(player.getHeldItem())) {
+                                    Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem());
+                                    for (Player p : playerHashMap.values())
+                                        if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
+                                            p.getSession().send(pack);
+                                }
                             } else if (event.getPacket() instanceof ClientPlayerPlaceBlockPacket) {
                                 ClientPlayerPlaceBlockPacket packet = event.getPacket();
                                 Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                                 Position position = packet.getPosition();
-                                //tellConsole(LoggingLevel.DEBUG, position.getX() + "/" + position.getY() + "/" + position.getZ());
                                 ItemStack heldItem = packet.getHeldItem();
                                 if (heldItem == null)
                                     return;
+                                //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
+                                int type = heldItem.getId();
+                                short data = (short) heldItem.getData();
                                 Block b = new Block(new Location(player.getLocation().getWorld(), position.getX(), position.getY(), position.getZ()));
                                 if (!b.isLiquid() && b.getType() != 78 && !b.isLongGrass())
                                     b = b.getRelative(Direction.fromFace(packet.getFace()));
-                                b.setType(heldItem.getId(), (short) heldItem.getData());
+                                b.setType(type, data);
                             } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
                                 ClientPlayerActionPacket packet = event.getPacket();
                                 Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
@@ -324,8 +359,7 @@ public class MCThunder {
                 }
                 try {
                     Thread.sleep(20);
-                } catch (InterruptedException e) {
-                }
+                } catch (InterruptedException ignored) { }
             }
         }
     }
@@ -375,7 +409,7 @@ public class MCThunder {
     }
 
     private static List<Packet> createUpdatePackets(Session session, ClientPlayerMovementPacket packet) {
-        List<Packet> packets = new ArrayList<Packet>();
+        List<Packet> packets = new ArrayList<>();
         GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
         Player player = playerHashMap.get(profile.getId());
         if (packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
@@ -396,7 +430,7 @@ public class MCThunder {
                 packets.add(new ServerEntityTeleportPacket(player.getEntityID(), packet.getX(), packet.getY(), packet.getZ(), yaw, pitch, packet.isOnGround()));
             else if (packet instanceof ClientPlayerPositionPacket)
                 packets.add(new ServerEntityPositionPacket(player.getEntityID(), movedX, movedY, movedZ, packet.isOnGround()));
-            else if (packet instanceof ClientPlayerPositionRotationPacket) {
+            else {//if (packet instanceof ClientPlayerPositionRotationPacket)
                 packets.add(new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, yaw, pitch, packet.isOnGround()));
                 packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
             }
@@ -437,5 +471,9 @@ public class MCThunder {
 
     public static String getIp() {
         return HOST;
+    }
+
+    public static String getServerName() {
+        return serverName;
     }
 }

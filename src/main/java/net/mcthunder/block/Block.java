@@ -44,7 +44,7 @@ public class Block {
             blockZ = blockZ % 16;
             columnZ++;
         }
-        if (chunkY == -1) {
+        if (isInvalid()) {
             this.type = 0;
             this.data = 0;
             return;
@@ -97,7 +97,7 @@ public class Block {
     public void setType(int type, short data) {
         this.type = type;
         this.data = data;
-        if (chunkY == -1)
+        if (isInvalid())
             return;
         Column column = this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ));
         Chunk[] chunks = column.getChunks();
@@ -117,13 +117,13 @@ public class Block {
     }
 
     public int getSkyLight() {
-        if (chunkY == -1)
+        if (isInvalid())
             return 0;
         return this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY].getSkyLight().get(this.blockX, this.blockY, this.blockZ);
     }
 
     public int getLightLevel() {//Todo actually calculate light level
-        if (chunkY == -1)
+        if (isInvalid())
             return 0;
         return this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY].getBlockLight().get(this.blockX, this.blockY, this.blockZ);
     }
@@ -148,5 +148,10 @@ public class Block {
         return this.type == 6 || this.type == 37 || this.type == 38 || this.type == 39 || this.type == 40 || this.type == 59 ||
                 this.type == 81 || this.type == 83 || this.type == 86 || this.type == 103 || this.type == 104 || this.type == 105 ||
                 this.type == 141 || this.type == 142 || this.type == 175 || this.type == 251 || isLongGrass();
+    }
+
+    private boolean isInvalid() {
+        return this.loc == null || this.chunkY < 0 || this.chunkY > 15 || this.blockX < 0 || this.blockX > 15 || this.blockY < 0 ||
+                this.blockY > 15 || this.blockZ < 0 || this.blockZ > 15;
     }
 }

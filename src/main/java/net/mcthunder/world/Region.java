@@ -33,9 +33,13 @@ public class Region {
         int z = (int) l;
         while (x < 0)
             x += 32;
+        while (x > 32)
+            x -= 32;
         while (z < 0)
             z += 32;
-        if (x > 32 || z > 32)
+        while (z > 32)
+            z -= 32;
+        if (x > 32 || z > 32 || x < 0 || z < 0)
             return;
         File region = new File("worlds/" + world.getName() + "/region/r." + this.x + "." + this.z + ".mca");
         RegionFile regionFile = new RegionFile(region);

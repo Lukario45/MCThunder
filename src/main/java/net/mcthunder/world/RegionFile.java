@@ -283,10 +283,7 @@ public class RegionFile {
                         sectorFree.set(sectorNumber + i, false);
                     write(sectorNumber, data, length);
                 } else {
-                    /*
-                     * no free space large enough found -- we need to grow the
-                     * file
-                     */
+                    /* no free space large enough found -- we need to grow the file */
                     debug("SAVE", x, z, length, "grow");
                     file.seek(file.length());
                     sectorNumber = sectorFree.size();

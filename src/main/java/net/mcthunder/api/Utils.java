@@ -32,17 +32,17 @@ public class Utils {
             throw new IllegalArgumentException("Location must be a directory!");
         if (!dir.exists()) {
             dir.mkdirs();
-            tellConsole(LoggingLevel.INFO, "Creating file " + location);
+            tellConsole(LoggingLevel.INFO, "Creating directory " + location);
         }
     }
 
     public static void createInitialDirs() {
-        tellConsole(LoggingLevel.INFO, "Checking Directories.");
+        tellConsole(LoggingLevel.INFO, "Checking directories.");
         makeDir("PlayerFiles");
         makeDir("worlds");
         makeDir("plugins");
         makeDir("logs");
-        tellConsole(LoggingLevel.INFO, "Completed checking directories!");
+        tellConsole(LoggingLevel.INFO, "Checking directories complete!");
     }
 
     public static void tellPublicIpAddress() {
