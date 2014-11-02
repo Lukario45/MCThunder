@@ -8,9 +8,7 @@ import org.spacehq.mc.protocol.data.game.ShortArray3d;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.*;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Created by Kevin on 10/21/2014.
@@ -19,11 +17,35 @@ public class Region {
     private int x;
     private int z;
     private World world;
+    private RegionFile regionFile = null;
 
     public Region(World w, long region) {
         this.x = (int) (region >> 32);
         this.z = (int) region;
         this.world = w;
+        File f = new File("worlds/" + this.world.getName() + "/region/r." + this.x + "." + this.z + ".mca");
+        if (!f.exists()) {
+            //Create the region file
+        }
+        this.regionFile = new RegionFile(f);
+    }
+
+    public void saveChunk(long l) {
+        //TODO: actually save chunk
+        int x = (int) (l >> 32);
+        int z = (int) l;
+        while (x < 0)
+            x += 32;
+        while (x > 32)
+            x -= 32;
+        while (z < 0)
+            z += 32;
+        while (z > 32)
+            z -= 32;
+        if (x > 32 || z > 32 || x < 0 || z < 0)
+            return;
+        //byte[] data = new byte[3];//Actually calculate this
+        //regionFile.write(x, z, data, data.length);
     }
 
     public void readChunk(long l) {
@@ -41,10 +63,8 @@ public class Region {
             z -= 32;
         if (x > 32 || z > 32 || x < 0 || z < 0)
             return;
-        File region = new File("worlds/" + world.getName() + "/region/r." + this.x + "." + this.z + ".mca");
-        RegionFile regionFile = new RegionFile(region);
-        DataInputStream in = regionFile.getChunkDataInputStream(x, z);
-        if (in == null) {//Chunk needs to be created
+        DataInputStream in = this.regionFile.getChunkDataInputStream(x, z);
+        if (in == null) {//Chunk needs to be created or is corrupted and should be regenerated
 
         } else {
             Tag tag = null;
@@ -60,7 +80,7 @@ public class Region {
             ListTag sections = level.get("Sections");
             ByteArrayTag biomes = level.get("Biomes");
             Chunk[] chunks = new Chunk[16];
-            for (int i = 0; i < sections.size(); i++) { //Loop through all 16 chunks verticle fashion
+            for (int i = 0; i < sections.size(); i++) {//Loop through all 16 chunks in a verticle fashion
                 CompoundTag chunkz = sections.get(i);
                 ByteArrayTag blocks = chunkz.get("Blocks");
                 ByteArrayTag blockLight = chunkz.get("BlockLight");
@@ -80,8 +100,7 @@ public class Region {
                         }
                 chunks[i] = new Chunk(block, blocklight, skylight);
             }
-            Column c = new Column(l, chunks, biomes.getValue());
-            world.addColumn(c);
+            this.world.addColumn(new Column(l, chunks, biomes.getValue()));
         }
     }
 

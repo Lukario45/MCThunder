@@ -61,7 +61,7 @@ public class Player {
         this.metadata = new MetadataMap();
         this.gamemode = GameMode.CREATIVE;
         this.moveable = true;
-        this.inv = new Inventory(36, this.name);
+        this.inv = new PlayerInventory(44, this.name);
     }
 
     public void loadChunks(Direction d) {

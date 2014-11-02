@@ -4,7 +4,6 @@ import net.mcthunder.MCThunder;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Player;
-import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.opennbt.NBTIO;
@@ -26,7 +25,6 @@ public class World {
     private long seed;
     private boolean hardcore;
     private boolean generateStructures;
-    private Chunk[] chunks;
     private Location spawn;
     private Difficulty difficulty;
     private HashMap<Long, Region> regionHashMap;
@@ -35,12 +33,10 @@ public class World {
 
     public World(String name) {
         this.name = name;
-        File world = new File("worlds/" + name + "/level.dat");
-        //this.chunks = chunks;
         this.columnHashMap = new HashMap<>();
         this.regionHashMap = new HashMap<>();
         try {
-            CompoundTag tag = NBTIO.readFile(world);
+            CompoundTag tag = NBTIO.readFile(new File("worlds/" + this.name + "/level.dat"));
             CompoundTag data = tag.get("Data");
             IntTag xTag = data.get("SpawnX");
             IntTag yTag = data.get("SpawnY");
@@ -50,9 +46,9 @@ public class World {
             //tellConsole(LoggingLevel.DEBUG, String.valueOf(xTag.getValue()) + String.valueOf(yTag.getValue()) + String.valueOf(zTag.getValue()));
             this.worldType = fromName(data.get("generatorName").getValue().toString());
             this.seed = (long) data.get("RandomSeed").getValue();
-            this.hardcore = data.get("hardcore").getValue() == 1;
+            this.hardcore = (byte) data.get("hardcore").getValue() == 1;
             this.difficulty = difFromName(dif != null ? dif.getValue() : 2);
-            this.generateStructures = data.get("MapFeatures").getValue() == 1;
+            this.generateStructures = (byte) data.get("MapFeatures").getValue() == 1;
             if (gamerules.get("commandBlockOutput") != null)
                 GameRule.commandBlockOutput.setEnabled(Boolean.valueOf(gamerules.get("commandBlockOutput").getValue().toString()));
             if (gamerules.get("doDaylightCycle") != null)
@@ -109,17 +105,16 @@ public class World {
 
     public void addAllRegions() {
         File dir = new File("worlds/" + this.name + "/region/");
-        if (!dir.exists() || dir.listFiles() == null)
+        if (!dir.exists())
             return;
         File[] files = dir.listFiles();
-        for (File f : files) {
+        if (files == null)
+            return;
+        for (File f : files)
             if (f.getName().endsWith(".mca")) {
                 String[] regionName = f.getName().split("\\.");
                 addRegion(getLong(Integer.parseInt(regionName[1]), Integer.parseInt(regionName[2])));
-            } else {
-
             }
-        }
     }
 
     public boolean checkRegion(Long l) {//Why does this not just return the first if statements value
@@ -135,11 +130,12 @@ public class World {
         int z = (int)loc.getZ() >> 4;
         for(int xAdd = -distance; xAdd < distance; xAdd++)
             for(int zAdd = -distance; zAdd < distance; zAdd++) {
-                int regionX = (x + xAdd) >> 5;
-                int regionZ = (z + zAdd) >> 5;
-                long reg = getLong(regionX, regionZ);
+                long reg = getLong((x + xAdd) >> 5, (z + zAdd) >> 5);
                 if (this.regionHashMap.containsKey(reg))
                     this.regionHashMap.get(reg).readChunk(getLong(x + xAdd, z + zAdd));
+                else {
+                    //Create the region file and index it
+                }
         }
     }
 
@@ -147,27 +143,29 @@ public class World {
         return this.seed;
     }
 
-    public Chunk[] getChunks() {
-        return this.chunks;
-    }
-
     public void addRegion(long l) {
         this.regionHashMap.put(l, new Region(this, l));
     }
 
     public void addColumn(Column c) {
-        this.columnHashMap.put(getLong(c.getX(), c.getZ()), c);
+        this.columnHashMap.put(c.getLong(), c);
     }
 
     public void unloadColumn(Column c) {
         if (c == null)
             return;
-        long l = getLong(c.getX(), c.getZ());
+        long l = c.getLong();
+        if (!isColumnLoaded(l))
+            return;//Already unloaded
         for (Player p : MCThunder.playerHashMap.values())
             if (p.isColumnLoaded(l) || p.isColumnPreLoaded(l))
                 return;
-        //Todo: actually unload column if it passes the checks above
-        //tellConsole(LoggingLevel.DEBUG, "Unloaded column x: " + c.getX() + ", z: " + c.getZ());
+        long reg = getLong(c.getX() >> 5, c.getZ() >> 5);
+        if (this.regionHashMap.containsKey(reg)) {
+            this.regionHashMap.get(reg).saveChunk(l);
+            this.columnHashMap.remove(l);
+            //tellConsole(LoggingLevel.DEBUG, "Unloaded column x: " + c.getX() + ", z: " + c.getZ());
+        }
     }
 
     public void unloadColumn(long l) {
@@ -193,7 +191,7 @@ public class World {
     public void loadWorld() {
         addAllRegions();
         loadAround(this.spawn, MCThunder.maxRenderDistance());
-        tellConsole(LoggingLevel.INFO, this.name + " loaded.");
+        tellConsole(LoggingLevel.INFO, "Finished loading " + this.name + ".");
     }
 
     public void unloadWorld() {
