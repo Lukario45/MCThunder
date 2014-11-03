@@ -48,19 +48,19 @@ public class Player {
     private Player lastPmPerson;
     private String appended = "";
 
-    public Player(Server server, Session session, GameProfile profile, int entityID, int slot, EntityMetadata metadata) {
+    public Player(Server server, Session session, GameProfile profile, int entityID, EntityMetadata metadata) {
         this.chatHandler = new ServerChatHandler();
         this.server = server;
         this.session = session;
         this.gameProfile = profile;
         this.uuid = this.gameProfile.getId();
         this.name = this.gameProfile.getName();
-        this.slot = slot;
+        this.slot = 36;
         this.displayName = this.name;
         this.entityID = entityID;
         this.metadata = new MetadataMap();
         this.gamemode = GameMode.CREATIVE;
-        this.moveable = true;
+        this.moveable = false;
         this.inv = new PlayerInventory(44, this.name);
     }
 

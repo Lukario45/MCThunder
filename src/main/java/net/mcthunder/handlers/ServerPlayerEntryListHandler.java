@@ -30,13 +30,13 @@ public class ServerPlayerEntryListHandler {
             s.send(serverPlayerListEntryPacket);
     }
 
-    public void addToPlayerEntryList(Server server, Session session) {
+    public void addToPlayerEntryList(Server server, Session session, GameMode g) {
         conf = new Config();
-        playerListEntries = new ArrayList<PlayerListEntry>();
+        playerListEntries = new ArrayList<>();
         GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
         List<Session> sessions = server.getSessions();
         int ping = session.getFlag(ProtocolConstants.PING_KEY);
-        PlayerListEntry newPlayer = new PlayerListEntry(profile, GameMode.CREATIVE, ping, Message.fromString(profile.getName()));
+        PlayerListEntry newPlayer = new PlayerListEntry(profile, g, ping, Message.fromString(profile.getName()));
         ServerPlayerListEntryPacket serverPlayerListEntryPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, new PlayerListEntry[]{newPlayer});
         for (Session s : sessions)
             s.send(serverPlayerListEntryPacket);

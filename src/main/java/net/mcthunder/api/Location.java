@@ -113,4 +113,8 @@ public class Location {
     public void setWorld(World w) {
         this.world = w;
     }
+
+    public Location clone() {
+        return new Location(this.world, this.x, this.y, this.z, this.yaw, this.pitch);
+    }
 }
