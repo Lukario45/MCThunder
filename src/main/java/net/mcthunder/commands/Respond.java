@@ -16,12 +16,12 @@ public class Respond extends Command {
 
     @Override
     public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().split(" ");
         Player p = player.getLastPmPerson();
         if (p == null) {
             player.sendMessage("&cNo one to respond to!");
             return true;
         }
+        String[] wholeMessage = packet.getMessage().split(" ");
         if (wholeMessage.length < 2)
             player.sendMessage("&4" + getArguments());
         else {
@@ -29,8 +29,8 @@ public class Respond extends Command {
             for (int i = 1; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");
             String message = sb.toString().trim();
-            player.sendMessage("&3[You] &e-> &3" + p.gameProfile().getName() + ":&e " + message);
-            p.sendMessage("&3[" + player.gameProfile().getName() + "] &e-> &3You: &e" + message);
+            player.sendMessage("&3[You &e---> &3" + p.getName() + "]:&r " + message);
+            p.sendMessage("&3[" + player.getName() + " &e---> &3You]:&r " + message);
             p.setLastPmPerson(player);
         }
         return true;

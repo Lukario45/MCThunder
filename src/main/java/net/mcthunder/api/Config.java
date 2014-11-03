@@ -33,13 +33,11 @@ public class Config {
     public void loadConfig() {
         try {
             //Make Config
-            String path = "config.yml";
-            //String pathDecoded = URLDecoder.decode(path, "UTF-8");
-            setConf(new PropertiesConfiguration(new File(path)));
+            setConf(new PropertiesConfiguration(new File("config.yml")));
 
             //See if the Config Exists yet. If not make it
             if (!getConf().getFile().exists()) {
-                Utils.tellConsole(LoggingLevel.INFO, "Creating Server Configuration at " + path);
+                Utils.tellConsole(LoggingLevel.INFO, "Creating server config file.");
                 getConf().getFile().createNewFile();
             }
             //Make sure it has all fields

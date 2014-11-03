@@ -17,21 +17,16 @@ import java.util.List;
 public class ServerTabHandler {
     public void handleTabComplete(Server server, Session session, ClientTabCompletePacket packet) {
         String[] text = packet.getText().split(" ");
-        String word = text[text.length - 1];
+        String search = text[text.length - 1];
         List<Session> sessions = server.getSessions();
-        List<String> names = new ArrayList<String>();
-        List<String> matches = new ArrayList<String>();
+        List<String> matches = new ArrayList<>();
 
         for (Session s : sessions) {
-            GameProfile p = s.getFlag(ProtocolConstants.PROFILE_KEY);
-            String name = p.getName();
-            if (name.toLowerCase().startsWith(word.toLowerCase()))
+            String name = s.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getName();
+            if (name.toLowerCase().startsWith(search.toLowerCase()))
                 matches.add(name);
         }
-        String[] matchArray = StringUtils.join(matches, "  ").split(" ");
-        ServerTabCompletePacket serverTabCompletePacket = new ServerTabCompletePacket(matchArray);
-        if (matches.size() != 0) {
-            session.send(serverTabCompletePacket);
-        }
+        if (!matches.isEmpty())
+            session.send(new ServerTabCompletePacket(StringUtils.join(matches, "  ").split(" ")));
     }
 }

@@ -50,9 +50,8 @@ public class Utils {
         conf.loadConfig();
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new URL("http://icanhazip.com/").openConnection().getInputStream()));
-            String ip = in.readLine();
+            tellConsole(LoggingLevel.INFO, "People may connect to the server with " + in.readLine() + ":" + conf.getPort());
             in.close();
-            tellConsole(LoggingLevel.INFO, "People may connect to the server with " + ip + ":" + conf.getPort());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -31,8 +31,7 @@ public class CommandRegistry {
         try {
             commands.put(name.toLowerCase(), (Command) Command.class.getClassLoader().loadClass(pkg + StringUtils.capitalize(name)).newInstance());
             return commands.get(name.toLowerCase());
-        } catch (Exception e) {
-        }
+        } catch (Exception ignored) { }
         for (Command c : commands.values())
             if (c.getAliases().contains(name))
                 return c;

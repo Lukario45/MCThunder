@@ -9,6 +9,10 @@ import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.*;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Kevin on 10/21/2014.
@@ -44,8 +48,64 @@ public class Region {
             z -= 32;
         if (x > 32 || z > 32 || x < 0 || z < 0)
             return;
-        //byte[] data = new byte[3];//Actually calculate this
-        //regionFile.write(x, z, data, data.length);
+        DataOutputStream out = regionFile.getChunkDataOutputStream(x, z);
+        if(out != null) {
+            DataInputStream in = this.regionFile.getChunkDataInputStream(x, z);
+            Tag tag = null;
+            if (in != null) {
+                try {
+                    tag = NBTIO.readTag(in);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                CompoundTag compoundTag = (CompoundTag) tag;
+                if (compoundTag == null)
+                    return;
+                CompoundTag level = compoundTag.get("Level");
+                ListTag sections = level.get("Sections");
+                //ByteArrayTag biomes = level.get("Biomes");
+                Column c = this.world.getColumn(l);
+                Chunk[] chunks = c.getChunks();
+                Map<String,Tag> values = compoundTag.getValue();
+                Map<String,Tag> levelInfo = level.getValue();
+                ArrayList<Tag> newSections = new ArrayList<>();
+                for (int i = 0; i < chunks.length; i++) {//Loop through all 16 chunks in a verticle fashion
+                    CompoundTag chunkz = sections.get(i);
+                    ByteArrayTag blocks = chunkz.get("Blocks");
+                    ByteArrayTag blockLight = chunkz.get("BlockLight");
+                    ByteArrayTag skyLight = chunkz.get("SkyLight");
+                    ByteArrayTag data = chunkz.get("Data");
+                    //ByteArrayTag add = chunkz.get("Add");
+                    for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
+                        for (int cZ = 0; cZ < 16; cZ++) //Loop through z
+                            for (int cX = 0; cX < 16; cX++) { //Loop through x
+                                int index = 256*cY + 16*cZ + cX;
+                                blocks.setValue(index, (byte) chunks[i].getBlocks().getBlock(cX, cY, cZ));
+                                data.setValue(index/2, (byte) chunks[i].getBlocks().getData(cX, cY, cZ));
+                                blockLight.setValue(index/2, (byte) chunks[i].getBlockLight().get(cX, cY, cZ));
+                                skyLight.setValue(index/2, (byte) chunks[i].getSkyLight().get(cX, cY, cZ));
+                            }
+                    Map<String,Tag> cv = chunkz.getValue();
+                    cv.put("Blocks", blocks);
+                    cv.put("BlockLight", blockLight);
+                    cv.put("SkyLight", skyLight);
+                    cv.put("Data", data);
+                    //cv.put("Add", add);
+                    chunkz.setValue(cv);
+                    newSections.add(chunkz);
+                }
+                sections.setValue(newSections);
+                levelInfo.put("Sections", sections);
+                level.setValue(levelInfo);
+                values.put("Level", level);
+                compoundTag.setValue(values);
+                try {
+                    NBTIO.writeTag(out, compoundTag);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public void readChunk(long l) {

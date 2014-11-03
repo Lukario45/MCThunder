@@ -18,14 +18,11 @@ public abstract class Command {
 
     public Command(String name, List<String> aliases, String information, String arguments, int rankPoints, String permissionNode) {
         this.name = name;
-        if (aliases == null)
-            this.aliases = new ArrayList<String>();
-        else
-            this.aliases = aliases;
+        this.aliases = (aliases == null ? new ArrayList<String>() : aliases);
         this.information = information;
+        this.arguments = arguments;
         this.rankPoints = rankPoints;
         this.permissionNode = permissionNode;
-        this.arguments = arguments;
     }
 
     public String getName() {
@@ -53,5 +50,4 @@ public abstract class Command {
     }
 
     public abstract boolean execute(Player player, ClientChatPacket packet);
-
 }

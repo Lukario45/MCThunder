@@ -22,7 +22,6 @@ public class PrivateMessage extends Command {
             player.sendMessage("&4" + getArguments());
         } else {
             String toPlayer = wholeMessage[1];
-            String fromPlayer = player.gameProfile().getName();
             Player p = MCThunder.getPlayer(toPlayer);
             if(p == null) {
                 player.sendMessage("&cThat player is not online!");
@@ -32,8 +31,8 @@ public class PrivateMessage extends Command {
             for (int i = 2; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");
             String message = sb.toString().trim();
-            player.sendMessage("&3[You] &e-> &3" + p.gameProfile().getName() + ":&e " + message);
-            p.sendMessage("&3[" + fromPlayer + "] &e-> &3You: &e" + message);
+            player.sendMessage("&3[You &e---> &3" + p.getName() + "]&e:&r " + message);
+            p.sendMessage("&3[" + player.getName() + " &e---> &3You]&e:&r " + message);
             player.setLastPmPerson(p);
             p.setLastPmPerson(player);
         }

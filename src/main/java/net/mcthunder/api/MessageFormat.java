@@ -130,4 +130,9 @@ public class MessageFormat {
         msg.addExtra(new TextMessage("").setStyle(new MessageStyle().setColor(prev).setFormats(formats)));
         return msg;
     }
+
+    public String toConsole(Message message) {
+        //TODO: actually format color codes perhaps using jline for now it just removes them
+        return message.toString();
+    }
 }

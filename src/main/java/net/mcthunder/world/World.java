@@ -23,6 +23,7 @@ import static net.mcthunder.api.Utils.tellConsole;
 public class World {
     private String name;
     private long seed;
+    private int dimension;
     private boolean hardcore;
     private boolean generateStructures;
     private Location spawn;
@@ -33,6 +34,7 @@ public class World {
 
     public World(String name) {
         this.name = name;
+        this.dimension = 0;
         this.columnHashMap = new HashMap<>();
         this.regionHashMap = new HashMap<>();
         try {
@@ -217,6 +219,10 @@ public class World {
 
     public WorldType getWorldType() {
         return this.worldType;
+    }
+
+    public int getDimension() {
+        return this.dimension;
     }
 
     public boolean isHardcore() {
