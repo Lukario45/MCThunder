@@ -158,15 +158,14 @@ public class MCThunder {
 
                     int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
                     EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
-                    playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, 0, metadata));
+                    playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, metadata));
 
                     Player player = playerHashMap.get(profile.getId());
-                    player.toggleMoveable();
-                    player.setLocation(world.getSpawnLocation());
+                    player.setLocation(world.getSpawnLocation().clone());
 
                     session.send(new ServerJoinGamePacket(0, player.getWorld().isHardcore(), player.getGameMode(), 0, player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
-                    entryListHandler.addToPlayerEntryList(server, session);
+                    entryListHandler.addToPlayerEntryList(server, session, player.getGameMode());
                     //Send World Data
                     player.loadChunks(null);
                     player.getSession().send(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
@@ -175,7 +174,7 @@ public class MCThunder {
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
                     playerProfileHandler.checkPlayer(player);
 
-                    ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.gameProfile().getId(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch(), player.getHeldItem().getId(), player.getMetadata().getMetadataArray());
+                    ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.getUniqueID(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch(), player.getHeldItem().getId(), player.getMetadata().getMetadataArray());
                     for (Player player1 : playerHashMap.values()) {
                         if (!player1.getWorld().equals(player.getWorld()))
                             continue;//Also will need to check if out of range ,_,
@@ -314,7 +313,7 @@ public class MCThunder {
                                 //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
                                 int type = heldItem.getId();
                                 short data = (short) heldItem.getData();
-                                Block b = new Block(new Location(player.getLocation().getWorld(), position.getX(), position.getY(), position.getZ()));
+                                Block b = new Block(new Location(player.getWorld(), position.getX(), position.getY(), position.getZ()));
                                 if (!b.isLiquid() && b.getType() != 78 && !b.isLongGrass())
                                     b = b.getRelative(Direction.fromFace(packet.getFace()));
                                 b.setType(type, data);
@@ -323,7 +322,7 @@ public class MCThunder {
                                 Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                                 if ((packet.getAction().equals(PlayerAction.START_DIGGING) && player.getGameMode().equals(GameMode.CREATIVE)) ||
                                     (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
-                                    Block b = new Block(new Location(player.getLocation().getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ()));
+                                    Block b = new Block(new Location(player.getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ()));
                                     b.setType(0);//Set it as air
                                 }
                             } else if (event.getPacket() != null)
