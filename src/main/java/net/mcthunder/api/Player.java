@@ -1,21 +1,22 @@
 package net.mcthunder.api;
 
+import net.mcthunder.MCThunder;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.Region;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
-import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
+import org.spacehq.mc.protocol.data.game.ItemStack;
+import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.world.ServerMultiChunkDataPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
-import static net.mcthunder.api.Utils.getLong;
-import static net.mcthunder.api.Utils.tellConsole;
+import static net.mcthunder.api.Utils.*;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -26,14 +27,20 @@ public class Player {
     private ArrayList<Long> eastColumns = new ArrayList<>();
     private ArrayList<Long> southColumns = new ArrayList<>();
     private ArrayList<Long> westColumns = new ArrayList<>();
+    private Inventory inv;
     private int viewDistance = 9;
     private int entityID;
-    private int heldItem;
+    private int slot;
     private GameProfile gameProfile;
+    private final UUID uuid;
+    private final String name;
+    private String displayName;
+    private GameMode gamemode;
     private Session session;
     private Server server;
     private MetadataMap metadata;
     private Location location;
+    private boolean moveable;
     private boolean onGround;
     private boolean sneaking;
     private boolean sprinting;
@@ -41,17 +48,23 @@ public class Player {
     private Player lastPmPerson;
     private String appended = "";
 
-    public Player(Server server, Session session, GameProfile profile, int entityID, int heldItem, EntityMetadata metadata) {
+    public Player(Server server, Session session, GameProfile profile, int entityID, int slot, EntityMetadata metadata) {
         this.chatHandler = new ServerChatHandler();
         this.server = server;
         this.session = session;
         this.gameProfile = profile;
+        this.uuid = this.gameProfile.getId();
+        this.name = this.gameProfile.getName();
+        this.slot = slot;
+        this.displayName = this.name;
         this.entityID = entityID;
-        this.heldItem = heldItem;
         this.metadata = new MetadataMap();
+        this.gamemode = GameMode.CREATIVE;
+        this.moveable = true;
+        this.inv = new PlayerInventory(44, this.name);
     }
 
-    public void loadChunks(Direction d) {//TODO: unload from world if no players have it loaded or preloaded
+    public void loadChunks(Direction d) {
         if(d == null) {
             loadDir(Direction.NORTH);
             loadDir(Direction.EAST);
@@ -205,7 +218,7 @@ public class Player {
     }
 
     public void refreshColumn(Column c) {
-        getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks()));
+        getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
     }
 
     private void sendColumns(Direction d) {
@@ -283,15 +296,17 @@ public class Player {
     }
 
     public void setView(int distance) {
+        if (MCThunder.maxRenderDistance() < distance)
+            distance = MCThunder.maxRenderDistance();
         this.viewDistance = distance;
     }
 
-    public int getHeldItem() {
-        return this.heldItem;
+    public ItemStack getHeldItem() {
+        return this.inv.getItemAt(this.slot);
     }
 
-    public void setHeldItem(int newItem) {
-        this.heldItem = newItem;
+    public void setSlot(int slot) {
+        this.slot = slot;
     }
 
     public int getEntityID() {
@@ -318,6 +333,18 @@ public class Player {
         return this.metadata;
     }
 
+    public UUID getUniqueID() {
+        return this.uuid;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
     public Location getLocation() {
         return this.location;
     }
@@ -326,12 +353,24 @@ public class Player {
         this.location = location;
     }
 
+    public Inventory getInventory() {
+        return this.inv;
+    }
+
     public boolean isOnGround() {
         return this.onGround;
     }
 
     public void setOnGround(boolean onGround) {
         this.onGround = onGround;
+    }
+
+    public void toggleMoveable() {
+        this.moveable = !this.moveable;
+    }
+
+    public boolean isMoveable() {
+        return this.moveable;
     }
 
     public boolean isSneaking() {
@@ -343,6 +382,10 @@ public class Player {
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, sneaking);
     }
 
+    public int getSlot() {
+        return this.slot;
+    }
+
     public boolean isSprinting() {
         return this.sprinting;
     }
@@ -350,6 +393,10 @@ public class Player {
     public void setSprinting(boolean sprinting) {
         this.sprinting = sprinting;
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, sneaking);
+    }
+
+    public GameMode getGameMode() {
+        return this.gamemode;
     }
 
     public ServerChatHandler getChatHandler() {

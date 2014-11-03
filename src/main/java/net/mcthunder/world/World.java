@@ -4,9 +4,8 @@ import net.mcthunder.MCThunder;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Player;
-import org.spacehq.mc.protocol.data.game.Chunk;
-import org.spacehq.mc.protocol.data.game.Position;
-import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
+import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
+import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;
@@ -22,34 +21,82 @@ import static net.mcthunder.api.Utils.tellConsole;
  * Created by Kevin on 10/19/2014.
  */
 public class World {
-    private File world;
     private String name;
     private long seed;
-    private Chunk[] chunks;
+    private boolean hardcore;
+    private boolean generateStructures;
     private Location spawn;
-    private int chunkInt;
+    private Difficulty difficulty;
     private HashMap<Long, Region> regionHashMap;
     private HashMap<Long, Column> columnHashMap;
+    private WorldType worldType;
 
-
-    public World(String name/*, long seed*/) {
+    public World(String name) {
         this.name = name;
-        //this.seed = seed;
-        world = new File("worlds/" + name + "/level.dat");
-        //this.chunks = chunks;
-        columnHashMap = new HashMap<Long, Column>();
-        regionHashMap = new HashMap<Long, Region>();
+        this.columnHashMap = new HashMap<>();
+        this.regionHashMap = new HashMap<>();
         try {
-            CompoundTag tag = NBTIO.readFile(world);
+            CompoundTag tag = NBTIO.readFile(new File("worlds/" + this.name + "/level.dat"));
             CompoundTag data = tag.get("Data");
             IntTag xTag = data.get("SpawnX");
             IntTag yTag = data.get("SpawnY");
             IntTag zTag = data.get("SpawnZ");
-            tellConsole(LoggingLevel.DEBUG, String.valueOf(xTag.getValue()) + String.valueOf(yTag.getValue()) + String.valueOf(zTag.getValue()));
-            spawn = new Location(this, xTag.getValue(), yTag.getValue(), zTag.getValue());
+            IntTag dif = data.get("Difficulty");
+            CompoundTag gamerules = data.get("GameRules");
+            //tellConsole(LoggingLevel.DEBUG, String.valueOf(xTag.getValue()) + String.valueOf(yTag.getValue()) + String.valueOf(zTag.getValue()));
+            this.worldType = fromName(data.get("generatorName").getValue().toString());
+            this.seed = (long) data.get("RandomSeed").getValue();
+            this.hardcore = (byte) data.get("hardcore").getValue() == 1;
+            this.difficulty = difFromName(dif != null ? dif.getValue() : 2);
+            this.generateStructures = (byte) data.get("MapFeatures").getValue() == 1;
+            if (gamerules.get("commandBlockOutput") != null)
+                GameRule.commandBlockOutput.setEnabled(Boolean.valueOf(gamerules.get("commandBlockOutput").getValue().toString()));
+            if (gamerules.get("doDaylightCycle") != null)
+                GameRule.doDaylightCycle.setEnabled(Boolean.valueOf(gamerules.get("doDaylightCycle").getValue().toString()));
+            if (gamerules.get("doFireTick") != null)
+                GameRule.doFireTick.setEnabled(Boolean.valueOf(gamerules.get("doFireTick").getValue().toString()));
+            if (gamerules.get("doMobLoot") != null)
+                GameRule.doMobLoot.setEnabled(Boolean.valueOf(gamerules.get("doMobLoot").getValue().toString()));
+            if (gamerules.get("doMobSpawning") != null)
+                GameRule.doMobSpawning.setEnabled(Boolean.valueOf(gamerules.get("doMobSpawning").getValue().toString()));
+            if (gamerules.get("doTileDrops") != null)
+                GameRule.doTileDrops.setEnabled(Boolean.valueOf(gamerules.get("doTileDrops").getValue().toString()));
+            if (gamerules.get("keepInventory") != null)
+                GameRule.keepInventory.setEnabled(Boolean.valueOf(gamerules.get("keepInventory").getValue().toString()));
+            if (gamerules.get("logAdminCommands") != null)
+                GameRule.logAdminCommands.setEnabled(Boolean.valueOf(gamerules.get("logAdminCommands").getValue().toString()));
+            if (gamerules.get("mobGriefing") != null)
+                GameRule.mobGriefing.setEnabled(Boolean.valueOf(gamerules.get("mobGriefing").getValue().toString()));
+            if (gamerules.get("naturalRegeneration") != null)
+                GameRule.naturalRegeneration.setEnabled(Boolean.valueOf(gamerules.get("naturalRegeneration").getValue().toString()));
+            if (gamerules.get("randomTickSpeed") != null)
+                GameRule.randomTickSpeed.setTickSpeed((Integer) gamerules.get("randomTickSpeed").getValue());
+            if (gamerules.get("sendCommandFeedback") != null)
+                GameRule.sendCommandFeedback.setEnabled(Boolean.valueOf(gamerules.get("sendCommandFeedback").getValue().toString()));
+            if (gamerules.get("showDeathMessages") != null)
+                GameRule.showDeathMessages.setEnabled(Boolean.valueOf(gamerules.get("showDeathMessages").getValue().toString()));
+            this.spawn = new Location(this, xTag.getValue(), yTag.getValue(), zTag.getValue());
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private WorldType fromName(String name) {
+        if (name.equals("largeBiomes"))
+            return WorldType.LARGE_BIOMES;
+        return WorldType.valueOf(name.toUpperCase());
+    }
+
+    private Difficulty difFromName(int dif) {
+        if (dif == 0)
+            return Difficulty.PEACEFUL;
+        if (dif == 1)
+            return Difficulty.EASY;
+        if (dif == 2)
+            return Difficulty.NORMAL;
+        if (dif == 3)
+            return Difficulty.HARD;
+        return Difficulty.NORMAL;
     }
 
     public String getName() {
@@ -57,26 +104,21 @@ public class World {
     }
 
     public void addAllRegions() {
-        File regions = new File("worlds/" + name + "/region/");
-        File[] files = regions.listFiles();
-        for (File f : files) {
+        File dir = new File("worlds/" + this.name + "/region/");
+        if (!dir.exists())
+            return;
+        File[] files = dir.listFiles();
+        if (files == null)
+            return;
+        for (File f : files)
             if (f.getName().endsWith(".mca")) {
                 String[] regionName = f.getName().split("\\.");
-                int x = Integer.parseInt(regionName[1]);
-                //tellConsole(LoggingLevel.DEBUG, String.valueOf(x));
-                int z = Integer.parseInt(regionName[2]);
-                //tellConsole(LoggingLevel.DEBUG, String.valueOf(z));
-                addRegion(getLong(x, z));
-            } else {
-
+                addRegion(getLong(Integer.parseInt(regionName[1]), Integer.parseInt(regionName[2])));
             }
-        }
-
-
     }
 
     public boolean checkRegion(Long l) {//Why does this not just return the first if statements value
-        if (regionHashMap.containsKey(l)) {
+        if (this.regionHashMap.containsKey(l)) {
             return true;
         } else {
             return false;
@@ -88,13 +130,11 @@ public class World {
         int z = (int)loc.getZ() >> 4;
         for(int xAdd = -distance; xAdd < distance; xAdd++)
             for(int zAdd = -distance; zAdd < distance; zAdd++) {
-                int regionX = (x + xAdd) >> 5;
-                int regionZ = (z + zAdd) >> 5;
-                long reg = getLong(regionX, regionZ);
-                //tellConsole(LoggingLevel.DEBUG, "rX: " + regionX + ", rZ: " + regionZ);
-                if (regionHashMap.containsKey(reg)) {
-                    regionHashMap.get(reg).readChunk(getLong(x + xAdd, z + zAdd));
-                    //tellConsole(LoggingLevel.DEBUG, "cX: " + (x + xAdd) + ", cZ: " + (z + zAdd));
+                long reg = getLong((x + xAdd) >> 5, (z + zAdd) >> 5);
+                if (this.regionHashMap.containsKey(reg))
+                    this.regionHashMap.get(reg).readChunk(getLong(x + xAdd, z + zAdd));
+                else {
+                    //Create the region file and index it
                 }
         }
     }
@@ -103,28 +143,29 @@ public class World {
         return this.seed;
     }
 
-    public Chunk[] getChunks() {
-        return this.chunks;
-    }
-
     public void addRegion(long l) {
-        regionHashMap.put(l, new Region(this, l));
+        this.regionHashMap.put(l, new Region(this, l));
     }
 
     public void addColumn(Column c) {
-        columnHashMap.put(getLong(c.getX(), c.getZ()), c);
-        //tellConsole(LoggingLevel.DEBUG, "NEW CHUNK TO COLUMN");
+        this.columnHashMap.put(c.getLong(), c);
     }
 
     public void unloadColumn(Column c) {
         if (c == null)
             return;
-        long l = getLong(c.getX(), c.getZ());
+        long l = c.getLong();
+        if (!isColumnLoaded(l))
+            return;//Already unloaded
         for (Player p : MCThunder.playerHashMap.values())
             if (p.isColumnLoaded(l) || p.isColumnPreLoaded(l))
                 return;
-        //Todo: actually unload column if it passes the checks above
-        //tellConsole(LoggingLevel.DEBUG, "Unloaded column x: " + c.getX() + ", z: " + c.getZ());
+        long reg = getLong(c.getX() >> 5, c.getZ() >> 5);
+        if (this.regionHashMap.containsKey(reg)) {
+            this.regionHashMap.get(reg).saveChunk(l);
+            this.columnHashMap.remove(l);
+            //tellConsole(LoggingLevel.DEBUG, "Unloaded column x: " + c.getX() + ", z: " + c.getZ());
+        }
     }
 
     public void unloadColumn(long l) {
@@ -132,51 +173,133 @@ public class World {
     }
 
     public boolean isColumnLoaded(long l) {
-        return columnHashMap.containsKey(l);
+        return this.columnHashMap.containsKey(l);
     }
 
     public Column[] getAllColumnsAsArray() {
-        Column[] cArray = new Column[columnHashMap.size()];
-        int i = 0;
-        for (Column c : columnHashMap.values()) {
-            cArray[i] = c;
-            i++;
-        }
-        return cArray;
+        return (Column[]) this.columnHashMap.values().toArray();
     }
 
     public Column getColumn(long l) {
-        return columnHashMap.get(l);
+        return this.columnHashMap.get(l);
     }
 
     public Region getRegion(long l) {
-        return regionHashMap.get(l);
+        return this.regionHashMap.get(l);
     }
-
-    public void loadAllRegions() {
-        for (Region r : regionHashMap.values()) {
-            //r.loadRegion();
-        }
-    }
-
 
     public void loadWorld() {
         addAllRegions();
-        //loadAllRegions();
-        loadAround(spawn, 9);
-        tellConsole(LoggingLevel.INFO, "FNNISHED LOADING WORLD");
-
+        loadAround(this.spawn, MCThunder.maxRenderDistance());
+        tellConsole(LoggingLevel.INFO, "Finished loading " + this.name + ".");
     }
+
     public void unloadWorld() {
 
+    }
+
+    public boolean getGameRuleValue(String gameRule) {
+        GameRule r = GameRule.fromString(gameRule);
+        return r != null && r.isEnabled();
+    }
+
+    public int getTickSpeed() {
+        return GameRule.randomTickSpeed.getTickSpeed();
     }
 
     public Location getSpawnLocation() {
         return this.spawn;
     }
 
-    public void sendColumns(Player p, Column[] columns) {
-        for (Column c : columns)
-            p.getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), new byte[256]));
+    public Difficulty getDifficulty() {
+        return this.difficulty;
+    }
+
+    public WorldType getWorldType() {
+        return this.worldType;
+    }
+
+    public boolean isHardcore() {
+        return this.hardcore;
+    }
+
+    public boolean canGenerateStructures() {
+        return this.generateStructures;
+    }
+
+    private enum GameRule {
+        commandBlockOutput(true),
+        doDaylightCycle(true),
+        doFireTick(true),
+        doMobLoot(true),
+        doMobSpawning(true),
+        doTileDrops(true),
+        keepInventory(false),
+        logAdminCommands(true),
+        mobGriefing(true),
+        naturalRegeneration(true),
+        randomTickSpeed(3),
+        sendCommandFeedback(true),
+        showDeathMessages(true);
+
+        private boolean enabled;
+        private int tickSpeed;
+
+        public static GameRule fromString(String name) {
+            if (name.equals("commandBlockOutput"))
+                return commandBlockOutput;
+            if (name.equals("doDaylightCycle"))
+                return doDaylightCycle;
+            if (name.equals("doFireTick"))
+                return doFireTick;
+            if (name.equals("doMobLoot"))
+                return doMobLoot;
+            if (name.equals("doMobSpawning"))
+                return doMobSpawning;
+            if (name.equals("doTileDrops"))
+                return doTileDrops;
+            if (name.equals("keepInventory"))
+                return keepInventory;
+            if (name.equals("logAdminCommands"))
+                return logAdminCommands;
+            if (name.equals("mobGriefing"))
+                return mobGriefing;
+            if (name.equals("naturalRegeneration"))
+                return naturalRegeneration;
+            if (name.equals("randomTickSpeed"))
+                return randomTickSpeed;
+            if (name.equals("sendCommandFeedback"))
+                return sendCommandFeedback;
+            if (name.equals("showDeathMessages"))
+                return showDeathMessages;
+            return null;
+        }
+
+        private GameRule(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        private GameRule(int tickSpeed) {
+            this.tickSpeed = tickSpeed;
+            this.enabled = true;
+        }
+
+        public void setEnabled(boolean enabled) {
+            if (!this.equals(GameRule.randomTickSpeed))
+                this.enabled = enabled;
+        }
+
+        public boolean isEnabled() {
+            return this.enabled;
+        }
+
+        public int getTickSpeed() {
+            return this.tickSpeed;
+        }
+
+        public void setTickSpeed(int speed) {
+            if (this.equals(GameRule.randomTickSpeed))
+                this.tickSpeed = speed;
+        }
     }
 }

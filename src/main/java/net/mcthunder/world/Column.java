@@ -1,5 +1,6 @@
 package net.mcthunder.world;
 
+import net.mcthunder.api.Utils;
 import org.spacehq.mc.protocol.data.game.Chunk;
 
 /**
@@ -32,5 +33,9 @@ public class Column {
 
     public byte[] getBiomes() {
         return this.biomeData;
+    }
+
+    public long getLong() {
+        return Utils.getLong(this.x, this.z);
     }
 }
