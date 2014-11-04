@@ -23,20 +23,24 @@ public class Region {
     private int z;
     private World world;
     private RegionFile regionFile = null;
+    private boolean invalid;
 
     public Region(World w, long region) {
         this.x = (int) (region >> 32);
         this.z = (int) region;
         this.world = w;
         File f = new File("worlds/" + this.world.getName() + "/region/r." + this.x + "." + this.z + ".mca");
-        if (!f.exists()) {
+        this.invalid = !f.exists();
+        if (this.invalid) {
             //Create the region file
+            //Once this if statement actually does things the invalid boolean can be removed
         }
         this.regionFile = new RegionFile(f);
     }
 
     public void saveChunk(long l) {
-        //TODO: actually save chunk
+        if (this.invalid)
+            return;
         int x = (int) (l >> 32);
         int z = (int) l;
         while (x < 0)
@@ -116,7 +120,7 @@ public class Region {
     }
 
     public void readChunk(long l) {
-        if (world.isColumnLoaded(l))
+        if (this.invalid || this.world.isColumnLoaded(l))
             return;
         int x = (int) (l >> 32);
         int z = (int) l;
@@ -170,14 +174,16 @@ public class Region {
     }
 
     public void readChunk(long l, Player p, Direction dir, boolean removeOld) {
+        if (this.invalid)
+            return;
         if (p.isColumnLoaded(l) && !removeOld)
             return;
-        if (world.isColumnLoaded(l)) {
+        if (this.world.isColumnLoaded(l)) {
             p.addColumn(l, dir, removeOld);
             return;
         }
         readChunk(l);
-        if (world.isColumnLoaded(l))
+        if (this.world.isColumnLoaded(l))
             p.addColumn(l, dir, removeOld);
     }
 

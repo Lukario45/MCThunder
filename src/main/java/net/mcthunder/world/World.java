@@ -105,20 +105,6 @@ public class World {
         return this.name;
     }
 
-    public void addAllRegions() {
-        File dir = new File("worlds/" + this.name + "/region/");
-        if (!dir.exists())
-            return;
-        File[] files = dir.listFiles();
-        if (files == null)
-            return;
-        for (File f : files)
-            if (f.getName().endsWith(".mca")) {
-                String[] regionName = f.getName().split("\\.");
-                addRegion(getLong(Integer.parseInt(regionName[1]), Integer.parseInt(regionName[2])));
-            }
-    }
-
     public boolean checkRegion(Long l) {//Why does this not just return the first if statements value
         if (this.regionHashMap.containsKey(l)) {
             return true;
@@ -131,14 +117,8 @@ public class World {
         int x = (int)loc.getX() >> 4;
         int z = (int)loc.getZ() >> 4;
         for(int xAdd = -distance; xAdd < distance; xAdd++)
-            for(int zAdd = -distance; zAdd < distance; zAdd++) {
-                long reg = getLong((x + xAdd) >> 5, (z + zAdd) >> 5);
-                if (this.regionHashMap.containsKey(reg))
-                    this.regionHashMap.get(reg).readChunk(getLong(x + xAdd, z + zAdd));
-                else {
-                    //Create the region file and index it
-                }
-        }
+            for(int zAdd = -distance; zAdd < distance; zAdd++)
+                getRegion(getLong((x + xAdd) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + xAdd, z + zAdd));
     }
 
     public long getSeed() {
@@ -187,17 +167,20 @@ public class World {
     }
 
     public Region getRegion(long l) {
+        if (!this.regionHashMap.containsKey(l))
+            addRegion(l);
         return this.regionHashMap.get(l);
     }
 
     public void loadWorld() {
-        addAllRegions();
         loadAround(this.spawn, MCThunder.maxRenderDistance());
         tellConsole(LoggingLevel.INFO, "Finished loading " + this.name + ".");
     }
 
-    public void unloadWorld() {
-
+    public void unloadWorld() {//TODO: call this when server closes
+        HashMap<Long, Column> temp = (HashMap<Long, Column>) this.columnHashMap.clone();
+        for(long l : temp.keySet())
+            unloadColumn(l);
     }
 
     public boolean getGameRuleValue(String gameRule) {
