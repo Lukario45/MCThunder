@@ -58,11 +58,15 @@ package net.mcthunder.world;
 
  */
 
+import net.mcthunder.api.LoggingLevel;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
+
+import static net.mcthunder.api.Utils.tellConsole;
 
 public class RegionFile {
     static final int CHUNK_HEADER_SIZE = 5;
