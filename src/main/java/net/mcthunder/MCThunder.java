@@ -480,4 +480,17 @@ public class MCThunder {
     public static String getServerName() {
         return serverName;
     }
+
+    public static void shutdown(String args) {
+        for (Session s : server.getSessions())
+            s.disconnect(args);
+        for(World w : worldHashMap.values())
+            w.unloadWorld();
+        AnsiConsole.systemUninstall();
+        server.close();
+    }
+
+    public static void shutdown() {
+        shutdown("Server Closed.");
+    }
 }
