@@ -37,7 +37,7 @@ public class ServerChatHandler {
         ServerChatPacket packet = new ServerChatPacket(format.formatMessage(message));//Only create packet once
         for (Session s : sessionList)
             s.send(packet);
-        tellConsole(LoggingLevel.CHAT, format.toConsole(message));
+        tellConsole(LoggingLevel.CHAT, message);
     }
 
     public void sendPrivateMessage(Session session, String privMessage) {

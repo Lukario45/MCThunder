@@ -15,6 +15,7 @@ import java.util.Date;
 
 public class Utils {
     private static Config conf;
+    private static MessageFormat format = new MessageFormat();
 
     public static String getIP() {
         InetAddress ip = null;
@@ -58,7 +59,7 @@ public class Utils {
     }
 
     public static void tellConsole(LoggingLevel level, String message) {
-        System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), message);
+        System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), format.toConsole(message));
     }
 
     public static long getLong(int x, int z) {
