@@ -3,7 +3,6 @@ package net.mcthunder.api;
 import net.mcthunder.MCThunder;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.world.Column;
-import net.mcthunder.world.Region;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
@@ -16,7 +15,7 @@ import org.spacehq.packetlib.Session;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import static net.mcthunder.api.Utils.*;
+import static net.mcthunder.api.Utils.getLong;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -115,11 +114,8 @@ public class Player {
             int x = (int) getLocation().getX() >> 4;
             int z = (int) getLocation().getZ() >> 4;
             for (int xAdd = -getView() + xMod; xAdd < getView() + xMod; xAdd++)
-                for (int zAdd = -getView() + zMod; zAdd < getView() + zMod; zAdd++) {
-                    Region r = getWorld().getRegion(getLong((x + xAdd) >> 5, (z + zAdd) >> 5));
-                    if (r != null)
-                        r.readChunk(getLong(x + xAdd, z + zAdd), this, d, false);
-                }
+                for (int zAdd = -getView() + zMod; zAdd < getView() + zMod; zAdd++)
+                    getWorld().getRegion(getLong((x + xAdd) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + xAdd, z + zAdd), this, d, false);
         }
         sendColumns(d);
     }
@@ -140,56 +136,44 @@ public class Player {
         int x = (int)getLocation().getX() >> 4;
         int z = (int)getLocation().getZ() >> 4;
         if (d.equals(Direction.NORTH)) {
-            for (long l : this.southColumns)
-                getWorld().unloadColumn(l);
+            ArrayList<Long> temp = (ArrayList<Long>) this.southColumns.clone();
             this.northColumns.clear();
             this.southColumns.clear();
+            for (long l : temp)
+                getWorld().unloadColumn(l);
             for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
-                Region r = getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView() - 1) >> 5));
-                if (r != null)
-                    r.readChunk(getLong(x + xAdd, z - getView() - 1), this, d, false);
-                Region rOld = getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView()) >> 5));
-                if (rOld != null)
-                    rOld.readChunk(getLong(x + xAdd, z + getView()), this, Direction.SOUTH, true);
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView() - 1) >> 5)).readChunk(getLong(x + xAdd, z - getView() - 1), this, d, false);
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView()) >> 5)).readChunk(getLong(x + xAdd, z + getView()), this, Direction.SOUTH, true);
             }
         } else if (d.equals(Direction.EAST)) {
-            for (long l : this.westColumns)
-                getWorld().unloadColumn(l);
+            ArrayList<Long> temp = (ArrayList<Long>) this.westColumns.clone();
             this.eastColumns.clear();
             this.westColumns.clear();
+            for (long l : temp)
+                getWorld().unloadColumn(l);
             for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
-                Region r = getWorld().getRegion(getLong((x + getView() + 1) >> 5, (z + zAdd) >> 5));
-                if (r != null)
-                    r.readChunk(getLong(x + getView() + 1, z + zAdd), this, d, false);
-                Region rOld = getWorld().getRegion(getLong((x - getView()) >> 5, (z + zAdd) >> 5));
-                if (rOld != null)
-                    rOld.readChunk(getLong(x - getView(), z + zAdd), this, Direction.WEST, true);
+                getWorld().getRegion(getLong((x + getView() + 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView() + 1, z + zAdd), this, d, false);
+                getWorld().getRegion(getLong((x - getView()) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView(), z + zAdd), this, Direction.WEST, true);
             }
         } else if (d.equals(Direction.SOUTH)) {
-            for (long l : this.northColumns)
-                getWorld().unloadColumn(l);
+            ArrayList<Long> temp = (ArrayList<Long>) this.northColumns.clone();
             this.southColumns.clear();
             this.northColumns.clear();
+            for (long l : temp)
+                getWorld().unloadColumn(l);
             for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
-                Region r = getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView() + 1) >> 5));
-                if (r != null)
-                    r.readChunk(getLong(x + xAdd, z - getView() - 1), this, d, false);
-                Region rOld = getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView()) >> 5));
-                if (rOld != null)
-                    rOld.readChunk(getLong(x + xAdd, z - getView()), this, Direction.NORTH, true);
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView() + 1) >> 5)).readChunk(getLong(x + xAdd, z + getView() + 1), this, d, false);
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView()) >> 5)).readChunk(getLong(x + xAdd, z - getView()), this, Direction.NORTH, true);
             }
         } else if (d.equals(Direction.WEST)) {
-            for (long l : this.eastColumns)
-                getWorld().unloadColumn(l);
+            ArrayList<Long> temp = (ArrayList<Long>) this.eastColumns.clone();
             this.westColumns.clear();
             this.eastColumns.clear();
+            for (long l : temp)
+                getWorld().unloadColumn(l);
             for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
-                Region r = getWorld().getRegion(getLong((x - getView() - 1) >> 5, (z + zAdd) >> 5));
-                if (r != null)
-                    r.readChunk(getLong(x - getView() - 1, z + zAdd), this, d, false);
-                Region rOld = getWorld().getRegion(getLong((x + getView()) >> 5, (z + zAdd) >> 5));
-                if (rOld != null)
-                    rOld.readChunk(getLong(x + getView(), z + zAdd), this, Direction.EAST, true);
+                getWorld().getRegion(getLong((x - getView() - 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView() - 1, z + zAdd), this, d, false);
+                getWorld().getRegion(getLong((x + getView()) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView(), z + zAdd), this, Direction.EAST, true);
             }
         }
     }

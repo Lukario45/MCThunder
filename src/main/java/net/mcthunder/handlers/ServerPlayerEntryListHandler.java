@@ -40,12 +40,9 @@ public class ServerPlayerEntryListHandler {
         ServerPlayerListEntryPacket serverPlayerListEntryPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, new PlayerListEntry[]{newPlayer});
         for (Session s : sessions)
             s.send(serverPlayerListEntryPacket);
-        for (Session s : sessions) {
-            PlayerListEntry p = new PlayerListEntry(s.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY), GameMode.CREATIVE, ping, Message.fromString(s.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getName()));
-            playerListEntries.add(p);
-        }
+        for (Session s : sessions)
+            playerListEntries.add(new PlayerListEntry(s.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY), g, ping, Message.fromString(s.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getName())));
         PlayerListEntry[] playerListEntriesArray = playerListEntries.toArray(new PlayerListEntry[playerListEntries.size()]);
-        ServerPlayerListEntryPacket packet = new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, playerListEntriesArray);
-        session.send(packet);
+        session.send(new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, playerListEntriesArray));
     }
 }

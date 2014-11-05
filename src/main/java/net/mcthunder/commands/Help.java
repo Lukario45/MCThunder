@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class Help extends Command {//Ported by pup from Necessities
-
     public Help() {
         super("help", Arrays.asList(""), "Shows help messages", "/help <commandname>", 0, "command.help");
     }
@@ -57,24 +56,18 @@ public class Help extends Command {//Ported by pup from Necessities
         Collections.sort(helpList);
         if (!usage.equals("") && !searched.equals("") && helpList.contains(searched))//should contain it but just in case
             helpList.add(helpList.indexOf(searched) + 1, usage);
-        int rounder = 0;
-        if (helpList.size() % 10 != 0)
-            rounder = 1;
-        int totalpages = (helpList.size() / 10) + rounder;
+        int totalpages = (helpList.size() / 10) + (helpList.size() % 10 != 0 ? 1 : 0);
         if (page > totalpages) {
             player.sendMessage("&cError: Input a number from 1 to " + Integer.toString(totalpages));
             return true;
         }
-        if (search.equals(""))
-            player.sendMessage("&e---- &3Help &e-- &3Page&4 " + Integer.toString(page) + "&3/&4" + Integer.toString(totalpages) + " &e---- ");
-        else
-            player.sendMessage("&e---- &3Help &e-- &3Page&4 " + Integer.toString(page) + "&3/&4" + Integer.toString(totalpages) + " &e---- ");
+        player.sendMessage("&e---- &3Help" + (search.equals("") ? "" : ": " + search) + " &e-- &3Page&4 " + Integer.toString(page) + "&3/&4" + Integer.toString(totalpages) + " &e----");
         page = page - 1;
         String message = getHelp(page, time, helpList);
         while (message != null) {
             player.sendMessage(message);
             time++;
-            message = getHelp(page, time, helpList);
+            message = getHelp(page, time++, helpList);
         }
         if (page + 1 < totalpages)
             player.sendMessage("&eType &3/help&4 " + Integer.toString(page + 2) + "&e to read the next page.");
@@ -90,8 +83,7 @@ public class Help extends Command {//Ported by pup from Necessities
         try {
             Double.parseDouble(toCheck);
             return true;
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) { }
         return false;
     }
 }

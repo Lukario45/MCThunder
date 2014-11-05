@@ -15,6 +15,7 @@ import java.util.Date;
 
 public class Utils {
     private static Config conf;
+    private static MessageFormat format = new MessageFormat();
 
     public static String getIP() {
         InetAddress ip = null;
@@ -50,16 +51,15 @@ public class Utils {
         conf.loadConfig();
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new URL("http://icanhazip.com/").openConnection().getInputStream()));
-            String ip = in.readLine();
+            tellConsole(LoggingLevel.INFO, "People may connect to the server with " + in.readLine() + ":" + conf.getPort());
             in.close();
-            tellConsole(LoggingLevel.INFO, "People may connect to the server with " + ip + ":" + conf.getPort());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public static void tellConsole(LoggingLevel level, String message) {
-        System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), message);
+        System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), format.toConsole(message));
     }
 
     public static long getLong(int x, int z) {

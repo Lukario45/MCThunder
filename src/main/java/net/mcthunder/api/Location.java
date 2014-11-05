@@ -114,6 +114,7 @@ public class Location {
         this.world = w;
     }
 
+    @Override
     public Location clone() {
         return new Location(this.world, this.x, this.y, this.z, this.yaw, this.pitch);
     }

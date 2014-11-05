@@ -185,7 +185,6 @@ public class RegionFile {
 
             file.seek(sectorNumber * SECTOR_BYTES);
             int length = file.readInt();
-
             if (length > SECTOR_BYTES * numSectors) {
                 debug("READ", x, z, "invalid length: " + length + " > 4096 * " + numSectors);
                 return null;

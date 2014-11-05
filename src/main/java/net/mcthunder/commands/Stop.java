@@ -20,19 +20,16 @@ public class Stop extends Command {
     public boolean execute(Player player, ClientChatPacket packet) {
         List<Session> sessions = player.getServer().getSessions();
         String[] wholeMessage = packet.getMessage().split(" ");
+        String args = "Server Closed!";
         if (wholeMessage.length >= 2) {
             StringBuilder sb = new StringBuilder();
             for (int i = 1; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");
-            String args = sb.toString().trim();
-            for (Session s : sessions)
-                s.disconnect(args);
-            player.getServer().close();
-        } else {
-            for (Session s : sessions)
-                s.disconnect("Server Closed!");
-            player.getServer().close();
+            args = sb.toString().trim();
         }
+        for (Session s : sessions)
+            s.disconnect(args);
+        player.getServer().close();
         return true;
     }
 }

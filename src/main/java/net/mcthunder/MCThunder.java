@@ -11,13 +11,16 @@ import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
 import net.mcthunder.world.World;
+import org.fusesource.jansi.AnsiConsole;
 import org.reflections.Reflections;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
-import org.spacehq.mc.protocol.data.game.*;
+import org.spacehq.mc.protocol.data.game.EntityMetadata;
+import org.spacehq.mc.protocol.data.game.ItemStack;
+import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
@@ -81,6 +84,7 @@ public class MCThunder {
     private static PlayerCommandEventListener defaultPlayerCommandEventListener;
 
     public static void main(String args[]) {
+        AnsiConsole.systemInstall();//AnsiConsole.systemUninstall(); on server close
         conf = new Config();
         conf.loadConfig();
         //Set Server data
@@ -90,7 +94,7 @@ public class MCThunder {
         PORT = conf.getPort();
         RENDER_DISTANCE = conf.getRenderDistance();
         //Done Set Server Data
-        tellConsole(LoggingLevel.INFO, "INTERNAL PORT " + HOST);
+        tellConsole(LoggingLevel.INFO, "INTERNAL IP " + HOST);
         createInitialDirs();
         tellPublicIpAddress();
         //Register Default Commands
@@ -163,14 +167,13 @@ public class MCThunder {
                     Player player = playerHashMap.get(profile.getId());
                     player.setLocation(world.getSpawnLocation().clone());
 
-                    session.send(new ServerJoinGamePacket(0, player.getWorld().isHardcore(), player.getGameMode(), 0, player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
+                    session.send(new ServerJoinGamePacket(player.getEntityID(), player.getWorld().isHardcore(), player.getGameMode(), player.getWorld().getDimension(), player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(server, session, player.getGameMode());
                     //Send World Data
                     player.loadChunks(null);
                     player.getSession().send(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
                     player.getSession().send(new ServerSpawnPositionPacket(new Position((int)player.getLocation().getX(), (int)player.getLocation().getY(), (int)player.getLocation().getZ())));
-                    player.toggleMoveable();
                     player.getChatHandler().sendMessage(server, "&7&o" + profile.getName() + " connected");
                     playerProfileHandler.checkPlayer(player);
 
@@ -184,7 +187,7 @@ public class MCThunder {
                             player.getSession().send(toNewPlayer);
                         }
                     }
-
+                    player.toggleMoveable();
                 }
             });
 
@@ -197,7 +200,7 @@ public class MCThunder {
                             if (event.getPacket() instanceof ClientPlayerMovementPacket) {
                                 ClientPlayerMovementPacket pack = event.getPacket();
                                 Player mover = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                                if (!mover.isMoveable())
+                                if (mover == null || !mover.isMoveable())
                                     return;//Also will need to cancel on their end somehow
                                 for (Packet packet : createUpdatePackets(event.getSession(), pack))
                                     for (Player p : playerHashMap.values()) {
@@ -308,7 +311,7 @@ public class MCThunder {
                                 Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                                 Position position = packet.getPosition();
                                 ItemStack heldItem = packet.getHeldItem();
-                                if (heldItem == null)
+                                if (heldItem == null || (position.getY() >> 4) < 0)
                                     return;
                                 //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
                                 int type = heldItem.getId();
@@ -351,10 +354,12 @@ public class MCThunder {
             while (server.isListening()) {
                 for (Player player : playerHashMap.values()) {
                     EntityMetadata changes[] = player.getMetadata().getChanges();
-                    if (changes != null)
+                    if (changes != null) {
+                        ServerEntityMetadataPacket pack = new ServerEntityMetadataPacket(player.getEntityID(), changes);
                         for (Player p : playerHashMap.values())
                             if (!p.gameProfile().getName().equals(player.gameProfile().getName()))
-                                p.getSession().send(new ServerEntityMetadataPacket(player.getEntityID(), changes));
+                                p.getSession().send(pack);
+                    }
                 }
                 try {
                     Thread.sleep(20);
