@@ -4,7 +4,6 @@ import net.mcthunder.MCThunder;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.MessageFormat;
 import net.mcthunder.api.Player;
-import org.spacehq.mc.protocol.data.message.Message;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.packetlib.Server;
@@ -35,11 +34,10 @@ public class ServerChatHandler {
 
     public void sendMessage(Server server, String message) {
         List<Session> sessionList = server.getSessions();
-        Message msg = format.formatMessage(message);
-        ServerChatPacket packet = new ServerChatPacket(msg);//Only create packet once
+        ServerChatPacket packet = new ServerChatPacket(format.formatMessage(message));//Only create packet once
         for (Session s : sessionList)
             s.send(packet);
-        tellConsole(LoggingLevel.CHAT, format.toConsole(msg));
+        tellConsole(LoggingLevel.CHAT, format.toConsole(message));
     }
 
     public void sendPrivateMessage(Session session, String privMessage) {

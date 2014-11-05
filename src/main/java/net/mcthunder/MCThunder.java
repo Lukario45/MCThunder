@@ -11,6 +11,8 @@ import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
 import net.mcthunder.world.World;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
 import org.reflections.Reflections;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.MinecraftProtocol;
@@ -81,6 +83,7 @@ public class MCThunder {
     private static PlayerCommandEventListener defaultPlayerCommandEventListener;
 
     public static void main(String args[]) {
+        AnsiConsole.systemInstall();//AnsiConsole.systemUninstall(); on server close
         conf = new Config();
         conf.loadConfig();
         //Set Server data
@@ -90,7 +93,7 @@ public class MCThunder {
         PORT = conf.getPort();
         RENDER_DISTANCE = conf.getRenderDistance();
         //Done Set Server Data
-        tellConsole(LoggingLevel.INFO, "INTERNAL PORT " + HOST);
+        tellConsole(LoggingLevel.INFO, "INTERNAL IP " + HOST);
         createInitialDirs();
         tellPublicIpAddress();
         //Register Default Commands
@@ -196,7 +199,7 @@ public class MCThunder {
                             if (event.getPacket() instanceof ClientPlayerMovementPacket) {
                                 ClientPlayerMovementPacket pack = event.getPacket();
                                 Player mover = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                                if (!mover.isMoveable())
+                                if (mover == null || !mover.isMoveable())
                                     return;//Also will need to cancel on their end somehow
                                 for (Packet packet : createUpdatePackets(event.getSession(), pack))
                                     for (Player p : playerHashMap.values()) {

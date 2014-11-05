@@ -1,5 +1,6 @@
 package net.mcthunder.api;
 
+import org.fusesource.jansi.Ansi;
 import org.spacehq.mc.protocol.data.message.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,10 +11,10 @@ import java.util.List;
  */
 public class MessageFormat {
     public Message formatMessage(String message) {
-        if(!message.contains("&"))
+        if (!message.contains("&"))
             return new TextMessage(message);
-        List<String> colors = Arrays.asList("&A","&B","&C","&D","&E","&F","&L","&N","&M","&O","&K","&R");
-        for(String col : colors)
+        List<String> colors = Arrays.asList("&A", "&B", "&C", "&D", "&E", "&F", "&L", "&N", "&M", "&O", "&K", "&R");
+        for (String col : colors)
             message = message.replaceAll(col, col.toLowerCase());
         message += " ";//Sneaky work around to get it to show if only &s
         String[] brokenMessage = message.split("&");
@@ -23,7 +24,7 @@ public class MessageFormat {
         boolean first = true;
         for (String m : brokenMessage) {
             if (m.equals("")) {
-                if(!first)
+                if (!first)
                     msg.addExtra(new TextMessage("&").setStyle(new MessageStyle().setColor(prev).setFormats(formats)));
                 first = false;
                 continue;
@@ -119,7 +120,7 @@ public class MessageFormat {
                     msg.addExtra(new TextMessage(m.replaceFirst("r", "")).setStyle(new MessageStyle().setColor(prev = ChatColor.RESET)));
                     break;
                 default:
-                    if(!first)
+                    if (!first)
                         msg.addExtra(new TextMessage("&" + m).setStyle(new MessageStyle().setColor(prev).setFormats(formats)));
                     else
                         msg.addExtra(new TextMessage(m).setStyle(new MessageStyle().setColor(prev).setFormats(formats)));
@@ -131,8 +132,26 @@ public class MessageFormat {
         return msg;
     }
 
-    public String toConsole(Message message) {
-        //TODO: actually format color codes perhaps using jline for now it just removes them
-        return message.toString();
+    public String toConsole(String message) {
+        message = message + "&r";
+        message = message.replaceAll("&r", "\u001B[0m");
+        message = message.replaceAll("&0", "\u001B[30m");//Possibly should replace with a lighter version or with white so it is visible
+        message = message.replaceAll("&1", "\u001B[34m");
+        message = message.replaceAll("&2", "\u001B[32m");
+        message = message.replaceAll("&3", "\u001B[36m");
+        message = message.replaceAll("&4", "\u001B[31m");
+        message = message.replaceAll("&5", "\u001B[35m");
+        message = message.replaceAll("&6", "\u001B[33m");
+        message = message.replaceAll("&7", "\u001B[37m");
+        message = message.replaceAll("&8", "\u001B[30;1m");
+        message = message.replaceAll("&9", "\u001B[34;1m");
+        message = message.replaceAll("&a", "\u001B[32;1m");
+        message = message.replaceAll("&b", "\u001B[36;1m");
+        message = message.replaceAll("&c", "\u001B[31;1m");
+        message = message.replaceAll("&d", "\u001B[35;1m");
+        message = message.replaceAll("&e", "\u001B[33;1m");
+        message = message.replaceAll("&f", "\u001B[37;1m");
+        message = message.replaceAll("&l", "").replaceAll("&n", "").replaceAll("&o", "").replaceAll("&k", "").replaceAll("&m", "");
+        return message;
     }
 }

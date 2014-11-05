@@ -143,7 +143,7 @@ public class World {
             if (p.isColumnLoaded(l) || p.isColumnPreLoaded(l))
                 return;
         long reg = getLong(c.getX() >> 5, c.getZ() >> 5);
-        if (this.regionHashMap.containsKey(reg)) {
+        if (this.regionHashMap.containsKey(reg)) {//Should contain... given how else would it have been loaded
             this.regionHashMap.get(reg).saveChunk(l);
             this.columnHashMap.remove(l);
             //tellConsole(LoggingLevel.DEBUG, "Unloaded column x: " + c.getX() + ", z: " + c.getZ());
