@@ -7,8 +7,12 @@ import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.ItemStack;
+import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
@@ -21,6 +25,8 @@ import static net.mcthunder.api.Utils.getLong;
  * Created by Kevin on 10/14/2014.
  */
 public class Player {
+    private final UUID uuid;
+    private final String name;
     private ArrayList<Long> loadedColumns = new ArrayList<>();
     private ArrayList<Long> northColumns = new ArrayList<>();
     private ArrayList<Long> eastColumns = new ArrayList<>();
@@ -31,8 +37,6 @@ public class Player {
     private int entityID;
     private int slot;
     private GameProfile gameProfile;
-    private final UUID uuid;
-    private final String name;
     private String displayName;
     private GameMode gamemode;
     private Session session;
@@ -130,6 +134,19 @@ public class Player {
         else if (d.equals(Direction.WEST))
             return !this.westColumns.isEmpty();
         return false;
+    }
+
+    public void teleport(Location l) {
+        ServerSpawnPlayerPacket spawnPlayerPacket = new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), getHeldItem().getId(), getMetadata().getMetadataArray());
+        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+        for (Player p : MCThunder.playerHashMap.values()) {
+            p.getSession().send(destroyEntitiesPacket);
+            p.getSession().send(spawnPlayerPacket);
+        }
+        ServerSpawnPositionPacket serverSpawnPositionPacket = new ServerSpawnPositionPacket(new Position((int) l.getX(), (int) l.getY(), (int) l.getZ()));
+        getSession().send(serverSpawnPositionPacket);
+        setLocation(new Location(l.getWorld(), l.getX(), l.getY(), l.getZ()));
+
     }
 
     private void updateDir(Direction d) {
@@ -289,10 +306,6 @@ public class Player {
         return this.inv.getItemAt(this.slot);
     }
 
-    public void setSlot(int slot) {
-        this.slot = slot;
-    }
-
     public int getEntityID() {
         return this.entityID;
     }
@@ -368,6 +381,10 @@ public class Player {
 
     public int getSlot() {
         return this.slot;
+    }
+
+    public void setSlot(int slot) {
+        this.slot = slot;
     }
 
     public boolean isSprinting() {
