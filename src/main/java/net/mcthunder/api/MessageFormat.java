@@ -13,8 +13,7 @@ public class MessageFormat {
     public Message formatMessage(String message) {
         if (!message.contains("&"))
             return new TextMessage(message);
-        List<String> colors = Arrays.asList("&A", "&B", "&C", "&D", "&E", "&F", "&L", "&N", "&M", "&O", "&K", "&R");
-        for (String col : colors)
+        for (String col : Arrays.asList("&A", "&B", "&C", "&D", "&E", "&F", "&L", "&N", "&M", "&O", "&K", "&R"))
             message = message.replaceAll(col, col.toLowerCase());
         message += " ";//Sneaky work around to get it to show if only &s
         String[] brokenMessage = message.split("&");
@@ -133,6 +132,8 @@ public class MessageFormat {
     }
 
     public String toConsole(String message) {
+        for (String col : Arrays.asList("&A", "&B", "&C", "&D", "&E", "&F", "&L", "&N", "&M", "&O", "&K", "&R"))
+            message = message.replaceAll(col, col.toLowerCase());
         message = message + "&r";
         message = message.replaceAll("&r", "\u001B[0m");
         message = message.replaceAll("&0", "\u001B[30m");//Possibly should replace with a lighter version or with white so it is visible
