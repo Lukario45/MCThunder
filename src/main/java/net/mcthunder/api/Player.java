@@ -139,14 +139,14 @@ public class Player {
     public void teleport(Location l) {
         ServerSpawnPlayerPacket spawnPlayerPacket = new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), getHeldItem().getId(), getMetadata().getMetadataArray());
         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
-        for (Player p : MCThunder.playerHashMap.values()) {
-            p.getSession().send(destroyEntitiesPacket);
-            p.getSession().send(spawnPlayerPacket);
-        }
-        ServerSpawnPositionPacket serverSpawnPositionPacket = new ServerSpawnPositionPacket(new Position((int) l.getX(), (int) l.getY(), (int) l.getZ()));
-        getSession().send(serverSpawnPositionPacket);
-        setLocation(new Location(l.getWorld(), l.getX(), l.getY(), l.getZ()));
-
+        for (Player p : MCThunder.playerHashMap.values())
+            if (!p.getUniqueID().equals(getUniqueID())) {
+                p.getSession().send(destroyEntitiesPacket);
+                if (p.getWorld().equals(l.getWorld()))//If they are in the new world
+                    p.getSession().send(spawnPlayerPacket);
+            }
+        getSession().send(new ServerSpawnPositionPacket(new Position((int) l.getX(), (int) l.getY(), (int) l.getZ())));
+        setLocation(l);
     }
 
     private void updateDir(Direction d) {
@@ -347,7 +347,7 @@ public class Player {
     }
 
     public void setLocation(Location location) {
-        this.location = location;
+        this.location = location.clone();
     }
 
     public Inventory getInventory() {

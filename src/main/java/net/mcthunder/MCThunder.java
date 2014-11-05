@@ -165,7 +165,7 @@ public class MCThunder {
                     playerHashMap.put(profile.getId(), new Player(server, session, profile, entityID, metadata));
 
                     Player player = playerHashMap.get(profile.getId());
-                    player.setLocation(world.getSpawnLocation().clone());
+                    player.setLocation(world.getSpawnLocation());
 
                     session.send(new ServerJoinGamePacket(player.getEntityID(), player.getWorld().isHardcore(), player.getGameMode(), player.getWorld().getDimension(), player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.gameProfile().getName(), session.getHost(), session.getPort()));
