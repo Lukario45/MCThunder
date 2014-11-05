@@ -177,7 +177,7 @@ public class World {
         tellConsole(LoggingLevel.INFO, "Finished loading " + this.name + ".");
     }
 
-    public void unloadWorld() {//TODO: call this when server closes
+    public void unloadWorld() {
         HashMap<Long, Column> temp = (HashMap<Long, Column>) this.columnHashMap.clone();
         for(long l : temp.keySet())
             unloadColumn(l);

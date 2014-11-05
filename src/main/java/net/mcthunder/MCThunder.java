@@ -84,7 +84,7 @@ public class MCThunder {
     private static PlayerCommandEventListener defaultPlayerCommandEventListener;
 
     public static void main(String args[]) {
-        AnsiConsole.systemInstall();//AnsiConsole.systemUninstall(); on server close
+        AnsiConsole.systemInstall();
         conf = new Config();
         conf.loadConfig();
         //Set Server data
@@ -94,7 +94,7 @@ public class MCThunder {
         PORT = conf.getPort();
         RENDER_DISTANCE = conf.getRenderDistance();
         //Done Set Server Data
-        tellConsole(LoggingLevel.INFO, "INTERNAL IP " + HOST);
+        tellConsole(LoggingLevel.INFO, "Internal IP " + HOST);
         createInitialDirs();
         tellPublicIpAddress();
         //Register Default Commands
@@ -479,5 +479,18 @@ public class MCThunder {
 
     public static String getServerName() {
         return serverName;
+    }
+
+    public static void shutdown(String args) {
+        for (Session s : server.getSessions())
+            s.disconnect(args);
+        for(World w : worldHashMap.values())
+            w.unloadWorld();
+        AnsiConsole.systemUninstall();
+        server.close();
+    }
+
+    public static void shutdown() {
+        shutdown("Server Closed.");
     }
 }

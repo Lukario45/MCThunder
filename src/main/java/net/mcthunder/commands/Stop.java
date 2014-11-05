@@ -1,5 +1,6 @@
 package net.mcthunder.commands;
 
+import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
@@ -27,9 +28,7 @@ public class Stop extends Command {
                 sb.append(wholeMessage[i]).append(" ");
             args = sb.toString().trim();
         }
-        for (Session s : sessions)
-            s.disconnect(args);
-        player.getServer().close();
+        MCThunder.shutdown(args);
         return true;
     }
 }

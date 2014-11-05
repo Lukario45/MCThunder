@@ -62,12 +62,11 @@ public class Help extends Command {//Ported by pup from Necessities
             return true;
         }
         player.sendMessage("&e---- &3Help" + (search.equals("") ? "" : ": " + search) + " &e-- &3Page&4 " + Integer.toString(page) + "&3/&4" + Integer.toString(totalpages) + " &e----");
-        page = page - 1;
+        page -= 1;
         String message = getHelp(page, time, helpList);
         while (message != null) {
             player.sendMessage(message);
-            time++;
-            message = getHelp(page, time++, helpList);
+            message = getHelp(page, ++time, helpList);
         }
         if (page + 1 < totalpages)
             player.sendMessage("&eType &3/help&4 " + Integer.toString(page + 2) + "&e to read the next page.");
