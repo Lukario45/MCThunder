@@ -3,7 +3,6 @@ package net.mcthunder.api;
 import net.mcthunder.MCThunder;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.world.Column;
-import net.mcthunder.world.Region;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
@@ -16,7 +15,7 @@ import org.spacehq.packetlib.Session;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import static net.mcthunder.api.Utils.*;
+import static net.mcthunder.api.Utils.getLong;
 
 /**
  * Created by Kevin on 10/14/2014.

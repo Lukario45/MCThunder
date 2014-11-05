@@ -1,7 +1,7 @@
 package net.mcthunder.api;
 
-import org.fusesource.jansi.Ansi;
 import org.spacehq.mc.protocol.data.message.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
