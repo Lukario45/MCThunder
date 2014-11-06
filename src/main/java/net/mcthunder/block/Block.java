@@ -4,6 +4,7 @@ import net.mcthunder.MCThunder;
 import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.Player;
+import net.mcthunder.material.Material;
 import net.mcthunder.world.Column;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
@@ -87,8 +88,12 @@ public class Block {
         return getRelative(d, 1);
     }
 
-    public int getType() {
+    public int getTypeID() {
         return this.type;
+    }
+
+    public Material getType() {
+        return Material.fromID(this.type);
     }
 
     public Location getLocation(){
@@ -107,7 +112,7 @@ public class Block {
         NibbleArray3d skyLight = chunks[this.chunkY] != null ? chunks[this.chunkY].getSkyLight() : new NibbleArray3d(4096);
         blocks.setBlockAndData(this.blockX, this.blockY, this.blockZ, this.type, this.data);
         Block above = getRelative(Direction.UP);
-        blockLight.set(this.blockX, this.blockY, this.blockZ, above.getLightLevel());
+        blockLight.set(this.blockX, this.blockY, this.blockZ, Material.fromID(this.type).getLightLevel());
         skyLight.set(this.blockX, this.blockY, this.blockZ, above.getSkyLight());
         chunks[this.chunkY] = new Chunk(blocks, blockLight, skyLight);
         Column c = new Column(getLong(this.columnX, this.columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
@@ -120,10 +125,14 @@ public class Block {
     public int getSkyLight() {
         if (isInvalid())
             return 0;
+        //15 sun
+        //12 sun during rain or snow
+        //10 sun during thunderstorm
+        //4 moon
         return this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY].getSkyLight().get(this.blockX, this.blockY, this.blockZ);
     }
 
-    public int getLightLevel() {//Todo actually calculate light level
+    public int getLightLevel() {
         if (isInvalid())
             return 0;
         return this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY].getBlockLight().get(this.blockX, this.blockY, this.blockZ);

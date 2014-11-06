@@ -10,6 +10,7 @@ import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
+import net.mcthunder.material.Material;
 import net.mcthunder.world.World;
 import org.fusesource.jansi.AnsiConsole;
 import org.reflections.Reflections;
@@ -21,6 +22,7 @@ import org.spacehq.mc.protocol.ServerLoginHandler;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.Position;
+import org.spacehq.mc.protocol.data.game.values.Face;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
@@ -97,6 +99,7 @@ public class MCThunder {
         tellConsole(LoggingLevel.INFO, "Internal IP " + HOST);
         createInitialDirs();
         tellPublicIpAddress();
+        Material.mapMaterials();
         //Register Default Commands
         /**
          * Based of of Alphabot/Lukabot code that was created by zack6849
@@ -317,8 +320,22 @@ public class MCThunder {
                                 int type = heldItem.getId();
                                 short data = (short) heldItem.getData();
                                 Block b = new Block(new Location(player.getWorld(), position.getX(), position.getY(), position.getZ()));
-                                if (!b.isLiquid() && b.getType() != 78 && !b.isLongGrass())
+                                if (!b.isLiquid() && b.getTypeID() != 78 && !b.isLongGrass())
                                     b = b.getRelative(Direction.fromFace(packet.getFace()));
+                                if (b.getType().equals(Material.AIR))
+                                    return;
+                                if(Material.fromID(type).equals(Material.TORCH)) {//Still need to check if is a valid torch position
+                                    if(packet.getFace().equals(Face.SOUTH))
+                                        data = 1;
+                                    else if(packet.getFace().equals(Face.NORTH))
+                                        data = 2;
+                                    else if(packet.getFace().equals(Face.WEST))
+                                        data = 3;
+                                    else if(packet.getFace().equals(Face.EAST))
+                                        data = 4;
+                                    else
+                                        data = 5;
+                                }
                                 b.setType(type, data);
                             } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
                                 ClientPlayerActionPacket packet = event.getPacket();
