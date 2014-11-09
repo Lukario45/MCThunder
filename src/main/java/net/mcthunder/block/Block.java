@@ -14,7 +14,7 @@ import static net.mcthunder.api.Utils.getLong;
 
 public class Block {
     private Location loc;
-    private int type;
+    private Material type;
     private short data;
     private int columnX, columnZ, chunkY, blockX, blockY, blockZ;
 
@@ -47,7 +47,7 @@ public class Block {
             columnZ++;
         }
         if (isInvalid()) {
-            this.type = 0;
+            this.type = null;
             this.data = 0;
             return;
         }
@@ -59,7 +59,7 @@ public class Block {
         this.blockZ = blockZ;
         Chunk[] chunks = loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks();
         ShortArray3d blocks = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlocks() : new ShortArray3d(4096);
-        this.type = blocks.getBlock(this.blockX, this.blockY, this.blockZ);
+        this.type = Material.fromID(blocks.getBlock(this.blockX, this.blockY, this.blockZ));
         this.data = (short) blocks.getData(this.blockX, this.blockY, this.blockZ);
     }
 
@@ -88,21 +88,19 @@ public class Block {
         return getRelative(d, 1);
     }
 
-    public int getTypeID() {
-        return this.type;
-    }
-
     public Material getType() {
-        return Material.fromID(this.type);
+        return this.type;
     }
 
     public Location getLocation(){
         return this.loc;
     }
 
-    public void setType(int type, short data) {
-        this.type = type;
+    public void setType(Material type, short data) {
+        if (type == null)
+            type = Material.AIR;
         this.data = data;
+        this.type = type;
         if (isInvalid())
             return;
         Column column = this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ));
@@ -110,9 +108,9 @@ public class Block {
         ShortArray3d blocks = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlocks() : new ShortArray3d(4096);
         NibbleArray3d blockLight = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlockLight() : new NibbleArray3d(4096);
         NibbleArray3d skyLight = chunks[this.chunkY] != null ? chunks[this.chunkY].getSkyLight() : new NibbleArray3d(4096);
-        blocks.setBlockAndData(this.blockX, this.blockY, this.blockZ, this.type, this.data);
+        blocks.setBlockAndData(this.blockX, this.blockY, this.blockZ, this.type.getID(), this.data);
         Block above = getRelative(Direction.UP);
-        blockLight.set(this.blockX, this.blockY, this.blockZ, Material.fromID(this.type).getLightLevel());
+        blockLight.set(this.blockX, this.blockY, this.blockZ, this.type.getLightLevel());
         skyLight.set(this.blockX, this.blockY, this.blockZ, above.getSkyLight());
         chunks[this.chunkY] = new Chunk(blocks, blockLight, skyLight);
         Column c = new Column(getLong(this.columnX, this.columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
@@ -138,26 +136,16 @@ public class Block {
         return this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY].getBlockLight().get(this.blockX, this.blockY, this.blockZ);
     }
 
-    public void setType(int type) {
+    public void setTypeID(int id) {
+        setType(Material.fromID(id), (short)0);
+    }
+
+    public void setType(Material type) {
         setType(type, (short)0);
     }
 
     public short getData() {
         return this.data;
-    }
-
-    public boolean isLiquid() {
-        return this.type == 8 || this.type == 9 || this.type == 10 || this.type == 11;
-    }
-
-    public boolean isLongGrass() {
-        return this.type == 31 || this.type == 175;
-    }
-
-    public boolean isPlant() {
-        return this.type == 6 || this.type == 37 || this.type == 38 || this.type == 39 || this.type == 40 || this.type == 59 ||
-                this.type == 81 || this.type == 83 || this.type == 86 || this.type == 103 || this.type == 104 || this.type == 105 ||
-                this.type == 141 || this.type == 142 || this.type == 175 || this.type == 251 || isLongGrass();
     }
 
     private boolean isInvalid() {

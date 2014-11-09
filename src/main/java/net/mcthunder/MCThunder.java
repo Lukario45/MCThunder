@@ -100,6 +100,7 @@ public class MCThunder {
         createInitialDirs();
         tellPublicIpAddress();
         Material.mapMaterials();
+        Enchantment.mapEnchantments();
         //Register Default Commands
         /**
          * Based of of Alphabot/Lukabot code that was created by zack6849
@@ -320,11 +321,12 @@ public class MCThunder {
                                 int type = heldItem.getId();
                                 short data = (short) heldItem.getData();
                                 Block b = new Block(new Location(player.getWorld(), position.getX(), position.getY(), position.getZ()));
-                                if (!b.isLiquid() && b.getTypeID() != 78 && !b.isLongGrass())
+                                if (!b.getType().isLiquid() && !b.getType().equals(Material.SNOW_LAYER) && !b.getType().isLongGrass())
                                     b = b.getRelative(Direction.fromFace(packet.getFace()));
-                                if (b.getType().equals(Material.AIR))
+                                if (!b.getType().equals(Material.AIR))
                                     return;
-                                if(Material.fromID(type).equals(Material.TORCH)) {//Still need to check if is a valid torch position
+                                Material setType = Material.fromID(type);
+                                if(setType.equals(Material.TORCH)) {//Still need to check if is a valid torch position
                                     if(packet.getFace().equals(Face.SOUTH))
                                         data = 1;
                                     else if(packet.getFace().equals(Face.NORTH))
@@ -336,14 +338,16 @@ public class MCThunder {
                                     else
                                         data = 5;
                                 }
-                                b.setType(type, data);
+                                if (Material.fromString(setType.getName() + "_BLOCK") != null)
+                                    setType = Material.fromString(setType.getName() + "_BLOCK");
+                                b.setType(setType, data);
                             } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
                                 ClientPlayerActionPacket packet = event.getPacket();
                                 Player player = playerHashMap.get(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                                 if ((packet.getAction().equals(PlayerAction.START_DIGGING) && player.getGameMode().equals(GameMode.CREATIVE)) ||
                                     (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
                                     Block b = new Block(new Location(player.getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ()));
-                                    b.setType(0);//Set it as air
+                                    b.setType(Material.AIR);
                                 }
                             } else if (event.getPacket() != null)
                                 tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());

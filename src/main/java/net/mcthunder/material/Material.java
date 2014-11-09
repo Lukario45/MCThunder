@@ -65,7 +65,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     DIAMOND_ORE("DIAMOND_ORE", 56),
     DIAMOND_BLOCK("DIAMOND_BLOCK", 57),
     CRAFTING_TABLE("CRAFTING_TABLE", 58),
-    CROPS("CROPS", 59),//Unobtainable
+    WHEAT_BLOCK("WHEAT_BLOCK", 59, Arrays.asList("CROPS")),//Unobtainable
     FARMLAND("FARMLAND", 60),
     FURNACE("FURNACE", 61),
     LIT_FURNACE("LIT_FURNACE", 62),
@@ -147,8 +147,8 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     BEACON("BEACON", 138),
     COBBLESTONE_WALL("COBBLESTONE_WALL", 139),
     FLOWER_POT_BLOCK("FLOWER_POT_BLOCK", 140),
-    CARROTS_BLOCK("CARROTS_BLOCK", 141),
-    POTATOES_BLOCK("POTATOES_BLOCK", 142),
+    CARROT_BLOCK("CARROT_BLOCK", 141),
+    POTATO_BLOCK("POTATO_BLOCK", 142),
     WOODEN_BUTTON("WOODEN_BUTTON", 143),
     SKULL_BLOCK("SKULL_BLOCK", 144),//Unobtainable
     ANVIL("ANVIL", 145),
@@ -203,35 +203,225 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     BIRCH_DOOR_BLOCK("BIRCH_DOOR_BLOCK", 194),//Unobtainable
     JUGNLE_DOOR_BLOCK("JUGNLE_DOOR_BLOCK", 195),//Unobtainable
     ACACIA_DOOR_BLOCK("ACACIA_DOOR_BLOCK", 196),//Unobtainable
-    DARK_OAK_DOOR_BLOCK("DARK_OAK_DOOR_BLOCK", 197);//Unobtainable
-    //TODO: Add item ids as well as fill in rest of info for them
+    DARK_OAK_DOOR_BLOCK("DARK_OAK_DOOR_BLOCK", 197),//Unobtainable
+    //ITEM IDS
+    IRON_SHOVEL("IRON_SHOVEL", 256),
+    IRON_PICKAXE("IRON_PICKAXE", 257),
+    IRON_AXE("IRON_AXE", 258),
+    FLINT_AND_STEEL("FLINT_AND_STEEL", 259),
+    APPLE("APPLE", 260),
+    BOW("BOW", 261),
+    ARROW("ARROW", 262),
+    COAL("COAL", 263),
+    DIAMOND("DIAMOND", 264),
+    IRON_INGOT("IRON_INGOT", 265),
+    GOLD_INGOT("GOLD_INGOT", 266),
+    IRON_SWORD("IRON_SWORD", 267),
+    WOODEN_SWORD("WOODEN_SWORD", 268),
+    WOODEN_SHOVEL("WOODEN_SHOVEL", 269),
+    WOODEN_PICKAXE("WOODEN_PICKAXE", 270),
+    WOODEN_AXE("WOODEN_AXE", 271),
+    STONE_SWORD("STONE_SWORD", 272),
+    STONE_SHOVEL("STONE_SHOVEL", 273),
+    STONE_PICKAXE("STONE_PICKAXE", 274),
+    STONE_AXE("STONE_AXE", 275),
+    DIAMOND_SWORD("DIAMOND_SWORD", 276),
+    DIAMOND_SHOVEL("DIAMOND_SHOVEL", 277),
+    DIAMOND_PICKAXE("DIAMOND_PICKAXE", 278),
+    DIAMOND_AXE("DIAMOND_AXE", 279),
+    STICK("STICK", 280),
+    BOWL("BOWL", 281),
+    MUSHROOM_STEW("MUSHROOM_STEW", 282),
+    GOLDEN_SWORD("GOLDEN_SWORD", 283),
+    GOLDEN_SHOVEL("GOLDEN_SHOVEL", 284),
+    GOLDEN_PICKAXE("GOLDEN_PICKAXE", 285),
+    GOLDEN_AXE("GOLDEN_AXE", 286),
+    STRING("STRING", 287),
+    FEATHER("FEATHER", 288),
+    GUNPOWDER("GUNPOWDER", 289),
+    WOODEN_HOE("WOODEN_HOE", 290),
+    STONE_HOE("STONE_HOE", 291),
+    IRON_HOE("IRON_HOE", 292),
+    DIAMOND_HOE("DIAMOND_HOE", 293),
+    GOLDEN_HOE("GOLDEN_HOE", 294),
+    WHEAT_SEEDS("WHEAT_SEEDS", 295),
+    WHEAT("WHEAT", 296),
+    BREAD("BREAD", 297),
+    LEATHER_HELMET("LEATHER_HELMET", 298),
+    LEATHER_CHESTPLATE("LEATHER_CHESTPLATE", 299),
+    LEATHER_LEGGINGS("LEATHER_LEGGINGS", 300),
+    LEATHER_BOOTS("LEATHER_BOOTS", 301),
+    CHAINMAIL_HELMET("CHAINMAIL_HELMET", 302),
+    CHAINMAIL_CHESTPLATE("CHAINMAIL_CHESTPLATE", 303),
+    CHAINMAIL_LEGGINGS("CHAINMAIL_LEGGINGS", 304),
+    CHAINMAIL_BOOTS("CHAINMAIL_BOOTS", 305),
+    IRON_HELMET("IRON_HELMET", 306),
+    IRON_CHESTPLATE("IRON_CHESTPLATE", 307),
+    IRON_LEGGINGS("IRON_LEGGINGS", 308),
+    IRON_BOOTS("IRON_BOOTS", 309),
+    DIAMOND_HELMET("DIAMOND_HELMET", 310),
+    DIAMOND_CHESTPLATE("DIAMOND_CHESTPLATE", 311),
+    DIAMOND_LEGGINGS("DIAMOND_LEGGINGS", 312),
+    DIAMOND_BOOTS("DIAMOND_BOOTS", 313),
+    GOLDEN_HELMET("GOLDEN_HELMET", 314),
+    GOLDEN_CHESTPLATE("GOLDEN_CHESTPLATE", 315),
+    GOLDEN_LEGGINGS("GOLDEN_LEGGINGS", 316),
+    GOLDEN_BOOTS("GOLDEN_BOOTS", 317),
+    FLINT("FLINT", 318),
+    PORKCHOP("PORKCHOP", 319),
+    COOKED_PORKCHOP("COOKED_PORKCHOP", 320),
+    PAINTING("PAINTING", 321),
+    GOLDEN_APPLE("GOLDEN_APPLE", 322),
+    SIGN("SIGN", 323),
+    WOODEN_DOOR("WOODEN_DOOR", 324),
+    BUCKET("BUCKET", 325),
+    WATER_BUCKET("WATER_BUCKET", 326),
+    LAVA_BUCKET("LAVA_BUCKET", 327),
+    MINECART("MINECART", 328),
+    SADDLE("SADDLE", 329),
+    IRON_DOOR("IRON_DOOR", 330),
+    REDSTONE("REDSTONE", 331),
+    SNOWBALL("SNOWBALL", 332),
+    BOAT("BOAT", 333),
+    LEATHER("LEATHER", 334),
+    MILK_BUCKET("MILK_BUCKET", 335),
+    BRICK("BRICK", 336),
+    CLAY_BALL("CLAY_BALL", 337),
+    REEDS("REEDS", 338),
+    PAPER("PAPER", 339),
+    BOOK("BOOK", 340),
+    SLIME_BALL("SLIME_BALL", 341),
+    CHEST_MINECART("CHEST_MINECART", 342),
+    FURNACE_MINECART("FURNACE_MINECART", 343),
+    EGG("EGG", 344),
+    COMPASS("COMPASS", 345),
+    FISHING_ROD("FISHING_ROD", 346),
+    CLOCK("CLOCK", 347),
+    GLOWSTONE_DUST("GLOWSTONE_DUST", 348),
+    FISH("FISH", 349),
+    COOKED_FISH("COOKED_FISH", 350),
+    DYE("DYE", 351),
+    BONE("BONE", 352),
+    SUGAR("SUGAR", 353),
+    CAKE("CAKE", 354),
+    BED("BED", 355),
+    REPEATER("REPEATER", 356),
+    COOKIE("COOKIE", 357),
+    FILLED_MAP("FILLED_MAP", 358),
+    SHEARS("SHEARS", 359),
+    MELON("MELON", 360),
+    PUMPKIN_SEEDS("PUMPKIN_SEEDS", 361),
+    MELON_SEEDS("MELON_SEEDS", 362),
+    BEEF("BEEF", 363),
+    COOKED_BEEF("COOKED_BEEF", 364),
+    CHICKEN("CHICKEN", 365),
+    COOKED_CHICKEN("COOKED_CHICKEN", 366),
+    ROTTEN_FLESH("ROTTEN_FLESH", 367),
+    ENDER_PEARL("ENDER_PEARL", 368),
+    BLAZE_ROD("BLAZE_ROD", 369),
+    GHAST_TEAR("GHAST_TEAR", 370),
+    GOLD_NUGGET("GOLD_NUGGET", 371),
+    NETHER_WART("NETHER_WART", 372),
+    POTION("POTION", 373),
+    GLASS_BOTTLE("GLASS_BOTTLE", 374),
+    SPIDER_EYE("SPIDER_EYE", 375),
+    FERMENTED_SPIDER_EYE("FERMENTED_SPIDER_EYE", 376),
+    BLAZE_POWDER("BLAZE_POWDER", 377),
+    MAGMA_CREAM("MAGMA_CREAM", 378),
+    BREWING_STAND("BREWING_STAND", 379),
+    CAULDRON("CAULDRON", 380),
+    ENDER_EYE("ENDER_EYE", 381),
+    SPECKLED_MELON("SPECKLED_MELON", 382),
+    SPAWN_EGG("SPAWN_EGG", 383),
+    EXPERIENCE_BOTTLE("EXPERIENCE_BOTTLE", 384),
+    FIRE_CHARGE("FIRE_CHARGE", 385),
+    WRITABLE_BOOK("WRITABLE_BOOK", 386),
+    WRITTEN_BOOK("WRITTEN_BOOK", 387),
+    EMERALD("EMERALD", 388),
+    ITEM_FRAME("ITEM_FRAME", 389),
+    FLOWER_POT("FLOWER_POT", 390),
+    CARROT("CARROT", 391),
+    POTATO("POTATO", 392),
+    BAKED_POTATO("BAKED_POTATO", 393),
+    POISONOUS_POTATO("POISONOUS_POTATO", 394),
+    MAP("MAP", 395),
+    GOLDEN_CARROT("GOLDEN_CARROT", 396),
+    SKULL("SKULL", 397),
+    CARROT_ON_A_STICK("CARROT_ON_A_STICK", 398),
+    NETHER_STAR("NETHER_STAR", 399),
+    PUMPKIN_PIE("PUMPKIN_PIE", 400),
+    FIREWORKS("FIREWORKS", 401),
+    FIREWORK_CHARGE("FIREWORK_CHARGE", 402),
+    ENCHANTED_BOOK("ENCHANTED_BOOK", 403),
+    COMPARATOR("COMPARATOR", 404),
+    NETHERBRICK("NETHERBRICK", 405),
+    QUARTZ("QUARTZ", 406),
+    TNT_MINECART("TNT_MINECART", 407),
+    HOPPER_MINECART("HOPPER_MINECART", 408),
+    PRISMARINE_SHARD("PRISMARINE_SHARD", 409),
+    PRISMARINE_CRYSTALS("PRISMARINE_CRYSTALS", 410),
+    RABBIT("RABBIT", 411),
+    COOKED_RABBIT("COOKED_RABBIT", 412),
+    RABBIT_STEW("RABBIT_STEW", 413),
+    RABBIT_FOOT("RABBIT_FOOT", 414),
+    RABBIT_HIDE("RABBIT_HIDE", 415),
+    ARMOR_STAND("ARMOR_STAND", 416),
+    IRON_HORSE_ARMOR("IRON_HORSE_ARMOR", 417),
+    GOLDEN_HORSE_ARMOR("GOLDEN_HORSE_ARMOR", 418),
+    DIAMOND_HORSE_ARMOR("DIAMOND_HORSE_ARMOR", 419),
+    LEAD("LEAD", 420),
+    NAME_TAG("NAME_TAG", 421),
+    COMMAND_BLOCK_MINECART("COMMAND_BLOCK_MINECART", 422),
+    MUTTON("MUTTON", 423),
+    COOKED_MUTTON("COOKED_MUTTON", 424),
+    BANNER("BANNER", 425),
+    //426 unused
+    SPRUCE_DOOR("SPRUCE_DOOR", 427),
+    BIRCH_DOOR("BIRCH_DOOR", 428),
+    JUNGLE_DOOR("JUNGLE_DOOR", 429),
+    ACACIA_DOOR("ACACIA_DOOR", 430),
+    DARK_OAK_DOOR("DARK_OAK_DOOR", 431),
+    //Music Discs
+    RECORD_13("RECORD_13", 2256),
+    RECORD_CAT("RECORD_CAT", 2257),
+    RECORD_BLOCKS("RECORD_BLOCKS", 2258),
+    RECORD_CHIRP("RECORD_CHIRP", 2259),
+    RECORD_FAR("RECORD_FAR", 2260),
+    RECORD_MALL("RECORD_MALL", 2261),
+    RECORD_MELLOHI("RECORD_MELLOHI", 2262),
+    RECORD_STAL("RECORD_STAL", 2263),
+    RECORD_STRAD("RECORD_STRAD", 2264),
+    RECORD_WARD("RECORD_WARD", 2265),
+    RECORD_11("RECORD_11", 2266),
+    RECORD_WAIT("RECORD_WAIT", 2267);
+    //TODO: Add in aliases for all as well as the data value ones
 
     private static HashMap<Integer,Material> idMap = new HashMap<>();
     private static HashMap<String,Material> nameMap = new HashMap<>();
+    private static HashMap<String,String> aliasMap = new HashMap<>();
+    private static List<Material> armorList;
+    private static List<Material> bootsList;
+    private static List<Material> helmetsList;
+    private static List<Material> axesList;
+    private static List<Material> pickaxeList;
+    private static List<Material> shovelList;
+    private static List<Material> swordsList;
+    private static List<Material> hoeList;
     private final String name;
     private final int id;
     private final short data;
     private List<String> aliases;
 
     private Material(String name, int id) {
-        this.name = name;
-        this.id = id;
-        this.data = 0;
-        this.aliases = new ArrayList<>();
+        this(name, id, (short) 0, new ArrayList<String>());
     }
 
     private Material(String name, int id, List<String> aliases) {
-        this.name = name;
-        this.id = id;
-        this.data = 0;
-        this.aliases = aliases;
+        this(name, id, (short) 0, aliases);
     }
 
     private Material(String name, int id, short data) {
-        this.name = name;
-        this.id = id;
-        this.data = data;
-        this.aliases = new ArrayList<>();
+        this(name, id, data, new ArrayList<String>());
     }
 
     private Material(String name, int id, short data, List<String> aliases) {
@@ -258,42 +448,110 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     }
 
     public boolean isBlock() {
-        return this.id < 200;
+        return this.id < 256;
+    }
+
+    public boolean isRecord() {
+        return this.id > 2255;
+    }
+
+    public boolean isLiquid() {
+        return this.equals(WATER) || this.equals(FLOWING_WATER) || this.equals(LAVA) || this.equals(FLOWING_LAVA);
+    }
+
+    public boolean isLongGrass() {
+        return this.equals(TALLGRASS) || this.equals(DOUBLE_PLANT);
     }
 
     public int getLightLevel() {
-        if (this.equals(FIRE) || this.equals(GLOWSTONE) || this.equals(LIT_PUMPKIN) || this.equals(LAVA) || this.equals(FLOWING_LAVA) ||
-                this.equals(BEACON) || this.equals(END_PORTAL) || this.equals(LIT_REDSTONE_LAMP) || this.equals(SEA_LANTERN))
-            return 15;
-        else if (this.equals(TORCH))
-            return 14;
-        else if (this.equals(LIT_FURNACE))
-            return 13;
-        else if (this.equals(PORTAL))
-            return 11;
-        else if (this.equals(LIT_REDSTONE_ORE))
-            return 9;
-        else if (this.equals(REDSTONE_TORCH) || this.equals(ENDER_CHEST))
-            return 7;
-        else if (this.equals(BROWN_MUSHROOM) || this.equals(BREWING_STAND_BLOCK) || this.equals(DRAGON_EGG) || this.equals(END_PORTAL_FRAME))
-            return 1;
-        return 0;
+        switch(this) {
+            case FIRE: case GLOWSTONE: case LIT_PUMPKIN: case LAVA: case FLOWING_LAVA: case BEACON: case END_PORTAL: case LIT_REDSTONE_LAMP: case SEA_LANTERN:
+                return 15;
+            case TORCH:
+                return 14;
+            case LIT_FURNACE:
+                return 13;
+            case PORTAL:
+                return 11;
+            case LIT_REDSTONE_ORE:
+                return 9;
+            case REDSTONE_TORCH: case ENDER_CHEST:
+                return 7;
+            case BROWN_MUSHROOM: case BREWING_STAND_BLOCK: case DRAGON_EGG: case END_PORTAL_FRAME:
+                return 1;
+            default:
+                return 0;
+        }
     }
 
     public static Material fromID(int id) {
-        Material m = idMap.get(id);
-        return m == null ? AIR : m;
+        return idMap.get(id);
     }
 
-    public static Material fromString(String name) {
-        Material m = nameMap.get(name);
-        return m == null ? AIR : m;
+    public static Material fromString(String name) {//Tries to get based on alias and then on exact name if no alias
+        String n = aliasMap.get(name);
+        return n == null ? nameMap.get(name) : nameMap.get(n);
     }
 
     public static void mapMaterials() {
         for(Material m : values()) {
             idMap.put(m.getID(), m);
             nameMap.put(m.getName(), m);
+            for(String alias : m.getAliases())
+                aliasMap.put(alias, m.getName());
         }
+        armorList = Arrays.asList(LEATHER_BOOTS, LEATHER_CHESTPLATE, LEATHER_HELMET, LEATHER_LEGGINGS, IRON_BOOTS, IRON_CHESTPLATE, IRON_HELMET, IRON_LEGGINGS, GOLDEN_BOOTS, GOLDEN_CHESTPLATE, GOLDEN_HELMET,
+                GOLDEN_LEGGINGS, DIAMOND_BOOTS, DIAMOND_CHESTPLATE, DIAMOND_HELMET, DIAMOND_LEGGINGS, CHAINMAIL_BOOTS, CHAINMAIL_CHESTPLATE, CHAINMAIL_HELMET, CHAINMAIL_LEGGINGS);
+        bootsList = Arrays.asList(LEATHER_BOOTS, IRON_BOOTS, GOLDEN_BOOTS, DIAMOND_BOOTS, CHAINMAIL_BOOTS);
+        helmetsList = Arrays.asList(LEATHER_HELMET, IRON_HELMET, GOLDEN_HELMET, DIAMOND_HELMET, CHAINMAIL_HELMET);
+        axesList = Arrays.asList(WOODEN_AXE, STONE_AXE, IRON_AXE, GOLDEN_AXE, DIAMOND_AXE);
+        swordsList = Arrays.asList(WOODEN_SWORD, STONE_SWORD, IRON_SWORD, GOLDEN_SWORD, DIAMOND_SWORD);
+        pickaxeList = Arrays.asList(WOODEN_PICKAXE, STONE_PICKAXE, IRON_PICKAXE, GOLDEN_PICKAXE, DIAMOND_PICKAXE);
+        shovelList = Arrays.asList(WOODEN_SHOVEL, STONE_SHOVEL, IRON_SHOVEL, GOLDEN_SHOVEL, DIAMOND_SHOVEL);
+        hoeList = Arrays.asList(WOODEN_HOE, STONE_HOE, IRON_HOE, GOLDEN_HOE, DIAMOND_HOE);
+    }
+
+    public static List<Material> armorList() {
+        return armorList;
+    }
+
+    public static List<Material> bootsList() {
+        return bootsList;
+    }
+
+    public static List<Material> helmetsList() {
+        return helmetsList;
+    }
+
+    public static List<Material> axesList() {
+        return axesList;
+    }
+
+    public static List<Material> swordsList() {
+        return swordsList;
+    }
+
+    public static List<Material> pickaxeList() {
+        return pickaxeList;
+    }
+
+    public static List<Material> shovelList() {
+        return shovelList;
+    }
+
+    public static List<Material> unbreakingList() {
+        List<Material> r = new ArrayList<>();
+        r.addAll(armorList);
+        r.addAll(axesList);
+        r.addAll(swordsList);
+        r.addAll(pickaxeList);
+        r.addAll(shovelList);
+        r.addAll(hoeList);
+        r.add(FISHING_ROD);
+        r.add(FLINT_AND_STEEL);
+        r.add(SHEARS);
+        r.add(BOW);
+        r.add(CARROT_ON_A_STICK);
+        return r;
     }
 }
