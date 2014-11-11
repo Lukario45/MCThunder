@@ -1,5 +1,25 @@
 package net.mcthunder.api;
 
-public enum PotionEffect {//http://minecraft.gamepedia.com/Id#Status_effects
-    //TODO: index potion effect ids and names
+public class PotionEffect {
+    private PotionEffectType type;
+    private int duration;
+    private int amplifier;
+
+    public PotionEffect(PotionEffectType type, int duration, int amplifier) {
+        this.type = type;
+        this.duration = duration;
+        this.amplifier = amplifier;
+    }
+
+    public PotionEffectType getType() {
+        return this.type;
+    }
+
+    public int getDuration() {
+        return this.duration;
+    }
+
+    public int getAmplifier() {
+        return this.amplifier;
+    }
 }

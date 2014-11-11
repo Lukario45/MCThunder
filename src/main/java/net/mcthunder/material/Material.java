@@ -8,7 +8,7 @@ import java.util.List;
 public enum Material {//http://minecraft.gamepedia.com/Id
     AIR("AIR", 0),
     STONE("STONE", 1),
-    GRASS("GRASS", 2),
+    GRASS("GRASS", 2, Arrays.asList("GRASS_BLOCK")),
     DIRT("DIRT", 3),
     COBBLESTONE("COBBLESTONE", 4, Arrays.asList("COBBLE")),
     PLANKS("PLANKS", 5),
@@ -382,19 +382,19 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     ACACIA_DOOR("ACACIA_DOOR", 430),
     DARK_OAK_DOOR("DARK_OAK_DOOR", 431),
     //Music Discs
-    RECORD_13("RECORD_13", 2256),
-    RECORD_CAT("RECORD_CAT", 2257),
-    RECORD_BLOCKS("RECORD_BLOCKS", 2258),
-    RECORD_CHIRP("RECORD_CHIRP", 2259),
-    RECORD_FAR("RECORD_FAR", 2260),
-    RECORD_MALL("RECORD_MALL", 2261),
-    RECORD_MELLOHI("RECORD_MELLOHI", 2262),
-    RECORD_STAL("RECORD_STAL", 2263),
-    RECORD_STRAD("RECORD_STRAD", 2264),
-    RECORD_WARD("RECORD_WARD", 2265),
-    RECORD_11("RECORD_11", 2266),
-    RECORD_WAIT("RECORD_WAIT", 2267);
-    //TODO: Add in aliases for all as well as the data value ones
+    RECORD_13("RECORD_13", 2256, Arrays.asList("13", "MUSIC_DISC_13", "MUSIC_13", "C418_13")),
+    RECORD_CAT("RECORD_CAT", 2257, Arrays.asList("CAT", "MUSIC_DISC_CAT", "MUSIC_CAT", "C418_CAT")),
+    RECORD_BLOCKS("RECORD_BLOCKS", 2258, Arrays.asList("BLOCKS", "MUSIC_DISC_BLOCKS", "MUSIC_BLOCKS", "C418_BLOCKS")),
+    RECORD_CHIRP("RECORD_CHIRP", 2259, Arrays.asList("CHIRP", "MUSIC_DISC_CHIRP", "MUSIC_CHIRP", "C418_CHIRP")),
+    RECORD_FAR("RECORD_FAR", 2260, Arrays.asList("FAR", "MUSIC_DISC_FAR", "MUSIC_FAR", "C418_FAR")),
+    RECORD_MALL("RECORD_MALL", 2261, Arrays.asList("MALL", "MUSIC_DISC_MALL", "MUSIC_MALL", "C418_MALL")),
+    RECORD_MELLOHI("RECORD_MELLOHI", 2262, Arrays.asList("MELLOHI", "MUSIC_DISC_MELLOHI", "MUSIC_MELLOHI", "C418_MELLOHI")),
+    RECORD_STAL("RECORD_STAL", 2263, Arrays.asList("STAL", "MUSIC_DISC_STAL", "MUSIC_STAL", "C418_STAL")),
+    RECORD_STRAD("RECORD_STRAD", 2264, Arrays.asList("STRAD", "MUSIC_DISC_STRAD", "MUSIC_STRAD", "C418_STRAD")),
+    RECORD_WARD("RECORD_WARD", 2265, Arrays.asList("WARD", "MUSIC_DISC_WARD", "MUSIC_WARD", "C418_WARD")),
+    RECORD_11("RECORD_11", 2266, Arrays.asList("11", "MUSIC_DISC_11", "MUSIC_11", "C418_11")),
+    RECORD_WAIT("RECORD_WAIT", 2267, Arrays.asList("WAIT", "MUSIC_DISC_WAIT", "MUSIC_WAIT", "C418_WAIT"));
+    //TODO: Add in aliases for all as well as the data value ones materials
 
     private static HashMap<Integer,Material> idMap = new HashMap<>();
     private static HashMap<String,Material> nameMap = new HashMap<>();
@@ -489,6 +489,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     }
 
     public static Material fromString(String name) {//Tries to get based on alias and then on exact name if no alias
+        name = name.toUpperCase().replaceAll(" ", "_");
         String n = aliasMap.get(name);
         return n == null ? nameMap.get(name) : nameMap.get(n);
     }

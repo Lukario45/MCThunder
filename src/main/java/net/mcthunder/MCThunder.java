@@ -11,6 +11,7 @@ import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
 import net.mcthunder.material.Material;
+import net.mcthunder.world.Biome;
 import net.mcthunder.world.World;
 import org.fusesource.jansi.AnsiConsole;
 import org.reflections.Reflections;
@@ -70,8 +71,7 @@ public class MCThunder {
     public static HashMap<String, World> worldHashMap;
     private static Config conf;
     private static String serverName;
-    private static boolean SPAWN_SERVER = true;
-    private static boolean VERIFY_USERS = false;
+    private static boolean SPAWN_SERVER = true;//What is this variable for anyways
     private static String HOST;
     private static int PORT;
     private static int RENDER_DISTANCE;
@@ -91,16 +91,18 @@ public class MCThunder {
         conf.loadConfig();
         //Set Server data
         serverName = conf.getServerName();
-        VERIFY_USERS = conf.getOnlineMode();
         HOST = getIP();
         PORT = conf.getPort();
         RENDER_DISTANCE = conf.getRenderDistance();
         //Done Set Server Data
         tellConsole(LoggingLevel.INFO, "Internal IP " + HOST);
         createInitialDirs();
-        tellPublicIpAddress();
+        Biome.mapBiomes();
         Material.mapMaterials();
         Enchantment.mapEnchantments();
+        PotionEffectType.mapPotionEffects();
+        EntityType.mapEntityTypes();
+        tellPublicIpAddress();
         //Register Default Commands
         /**
          * Based of of Alphabot/Lukabot code that was created by zack6849
@@ -111,7 +113,7 @@ public class MCThunder {
         Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
         int commands = 0;
         for (Class c : subTypes)
-            if (CommandRegistry.getCommand(c.getSimpleName(), pkg) != null)//getCommand attempts to load anyways
+            if (CommandRegistry.getCommand(c.getSimpleName(), pkg) != null)
                 commands++;
         tellConsole(LoggingLevel.INFO, commands + " command" + (commands != 1 ? "s " : "") + "were loaded.");
         //Done
@@ -138,7 +140,7 @@ public class MCThunder {
             final World world = worldHashMap.get(conf.getWorldName());
             world.loadWorld();
 
-            server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, VERIFY_USERS);
+            server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
             server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
             server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
                 @Override

@@ -69,7 +69,7 @@ public enum Enchantment {
     }
 
     public static Enchantment fromString(String name) {
-        return nameMap.get(name);
+        return nameMap.get(name.toUpperCase().replaceAll(" ", "_"));
     }
 
     public static void mapEnchantments() {

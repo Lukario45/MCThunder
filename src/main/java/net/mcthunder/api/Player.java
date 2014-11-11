@@ -17,6 +17,7 @@ import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
@@ -25,6 +26,7 @@ import static net.mcthunder.api.Utils.getLong;
  * Created by Kevin on 10/14/2014.
  */
 public class Player {
+    private HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
     private final UUID uuid;
     private final String name;
     private ArrayList<Long> loadedColumns = new ArrayList<>();
@@ -430,5 +432,22 @@ public class Player {
 
     public void setAppended(String toAppend) {
         this.appended = toAppend;
+    }
+
+    public void addPotionEffect(PotionEffect p) {
+        this.activeEffects.put(p.getType(), p);
+        //TODO: Have the duration tick down and then run out also for all potion effect stuff have it actually send effects and things to player
+    }
+
+    public void removePotionEffect(PotionEffectType p) {
+        this.activeEffects.remove(p);
+    }
+
+    public void clearPotionEffects() {
+        this.activeEffects.clear();
+    }
+
+    public PotionEffect[] getActiveEffects() {
+        return (PotionEffect[]) this.activeEffects.values().toArray();
     }
 }
