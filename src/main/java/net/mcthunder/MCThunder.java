@@ -399,9 +399,9 @@ public class MCThunder {
             int fromChunkZ = (int)player.getLocation().getZ() >> 4;
             int toChunkX = (int)packet.getX() >> 4;
             int toChunkZ = (int)packet.getZ() >> 4;
-            player.getLocation().setX(packet.getX());
-            player.getLocation().setY(packet.getY());
-            player.getLocation().setZ(packet.getZ());
+            player.setX(packet.getX());
+            player.setY(packet.getY());
+            player.setZ(packet.getZ());
             if (fromChunkX != toChunkX || fromChunkZ != toChunkZ) {
                 //tellConsole(LoggingLevel.DEBUG, "Player has entered new Chunk");
                 Direction dir = null;
@@ -426,8 +426,8 @@ public class MCThunder {
         }
 
         if (packet instanceof ClientPlayerRotationPacket || packet instanceof ClientPlayerPositionRotationPacket) {
-            player.getLocation().setPitch((float) packet.getPitch());
-            player.getLocation().setYaw((float) packet.getYaw());
+            player.setPitch((float) packet.getPitch());
+            player.setYaw((float) packet.getYaw());
         }
         player.setOnGround(packet.isOnGround());
     }

@@ -274,7 +274,7 @@ public class Player {
                 }
             }
         }
-        //getSession().send(new ServerMultiChunkDataPacket(x, z, chunks, biomeData));
+        //sendPacket(new ServerMultiChunkDataPacket(x, z, chunks, biomeData));
     }
 
     public void teleport(Location l) {
@@ -332,6 +332,26 @@ public class Player {
 
     public Location getLocation() {
         return this.location.clone();
+    }
+
+    public void setX(double x) {
+        this.location.setX(x);
+    }
+
+    public void setY(double y) {
+        this.location.setY(y);
+    }
+
+    public void setZ(double z) {
+        this.location.setZ(z);
+    }
+
+    public void setYaw(float yaw) {
+        this.location.setYaw(yaw);
+    }
+
+    public void setPitch(float pitch) {
+        this.location.setPitch(pitch);
     }
 
     public void setLocation(Location location) {
@@ -402,7 +422,7 @@ public class Player {
     }
 
     public World getWorld() {
-        return getLocation().getWorld();
+        return this.location.getWorld();
     }
 
     public void setWorld(World w) {
