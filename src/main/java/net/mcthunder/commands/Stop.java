@@ -4,10 +4,8 @@ import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
-import org.spacehq.packetlib.Session;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by Kevin on 10/13/2014.
@@ -19,7 +17,6 @@ public class Stop extends Command {
 
     @Override
     public boolean execute(Player player, ClientChatPacket packet) {
-        List<Session> sessions = player.getServer().getSessions();
         String[] wholeMessage = packet.getMessage().split(" ");
         String args = "Server Closed!";
         if (wholeMessage.length >= 2) {

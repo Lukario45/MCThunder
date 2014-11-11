@@ -1,8 +1,8 @@
 package net.mcthunder.handlers;
 
+import net.mcthunder.MCThunder;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Player;
-import org.spacehq.packetlib.Server;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,15 +14,9 @@ import static net.mcthunder.api.Utils.tellConsole;
  * Created by Kevin on 10/13/2014.
  */
 public class PlayerProfileHandler {
-    private final Server server;
-
-    public PlayerProfileHandler(Server server) {
-        this.server = server;
-    }
-
     public void checkPlayer(Player player) {
-        String playerID = player.gameProfile().getIdAsString();
-        String playerName = player.gameProfile().getName();
+        String playerID = player.getUniqueID().toString();
+        String playerName = player.getName();
         tellConsole(LoggingLevel.DEBUG, playerName + " has an ID of " + playerID);
         File playerFile = new File("PlayerFiles", playerID + ".yml");
         if (!playerFile.exists()) {
@@ -32,7 +26,7 @@ public class PlayerProfileHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            player.getChatHandler().sendMessage(server, "&bWelcome &6" + playerName + " &bto the server!");
+            MCThunder.broadcast("&bWelcome &6" + playerName + " &bto the server!");
         }
     }
 

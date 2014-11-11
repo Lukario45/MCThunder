@@ -193,7 +193,7 @@ public class World {
     }
 
     public Location getSpawnLocation() {
-        return this.spawn;
+        return this.spawn.clone();
     }
 
     public Difficulty getDifficulty() {

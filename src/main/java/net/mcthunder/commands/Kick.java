@@ -18,20 +18,19 @@ public class Kick extends Command {
     @Override
     public boolean execute(Player player, ClientChatPacket packet) {
         String[] wholeMessage = packet.getMessage().split(" ");
-        if (wholeMessage.length > 1) {
-            String saidName = wholeMessage[1];
-            Player p = MCThunder.getPlayer(saidName);
-            if (p == null)
-                player.sendMessage("&6Could not find player &c" + saidName + "&6!");
-            else {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 2; i < wholeMessage.length; i++)
-                    sb.append(wholeMessage[i]).append(" ");
-                player.getChatHandler().sendMessage(player.getServer(), "&1" + p.gameProfile().getName() + " &6was kicked by &1" + player.gameProfile().getName() + "&6!");
-                p.getSession().disconnect("Kicked: " + sb.toString().trim());
-            }
-        } else
-            player.sendMessage("&4" + getArguments());
+        if (wholeMessage.length <= 1)
+            return false;
+        String saidName = wholeMessage[1];
+        Player p = MCThunder.getPlayer(saidName);
+        if (p == null)
+            player.sendMessage("&6Could not find player &c" + saidName + "&6!");
+        else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 2; i < wholeMessage.length; i++)
+                sb.append(wholeMessage[i]).append(" ");
+            MCThunder.broadcast("&1" + p.getName() + " &6was kicked by &1" + player.getName() + "&6!");
+            p.getSession().disconnect("Kicked: " + sb.toString().trim());
+        }
         return true;
     }
 }

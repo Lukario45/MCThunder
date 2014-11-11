@@ -23,16 +23,14 @@ public class Respond extends Command {
         }
         String[] wholeMessage = packet.getMessage().split(" ");
         if (wholeMessage.length < 2)
-            player.sendMessage("&4" + getArguments());
-        else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 1; i < wholeMessage.length; i++)
-                sb.append(wholeMessage[i]).append(" ");
-            String message = sb.toString().trim();
-            player.sendMessage("&3[You &e---> &3" + p.getName() + "]:&r " + message);
-            p.sendMessage("&3[" + player.getName() + " &e---> &3You]:&r " + message);
-            p.setLastPmPerson(player);
-        }
+            return false;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i < wholeMessage.length; i++)
+            sb.append(wholeMessage[i]).append(" ");
+        String message = sb.toString().trim();
+        player.sendMessage("&3[You &e---> &3" + p.getName() + "]:&r " + message);
+        p.sendMessage("&3[" + player.getName() + " &e---> &3You]:&r " + message);
+        p.setLastPmPerson(player);
         return true;
     }
 }

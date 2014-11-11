@@ -6,7 +6,6 @@ import net.mcthunder.api.MessageFormat;
 import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
-import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
 import java.util.List;
@@ -30,18 +29,19 @@ public class ServerChatHandler {
             message = player.getAppended() + " " + message;
             player.setAppended("");
         }
-        sendMessage(MCThunder.getServer(), "&e" + player.gameProfile().getName() + ":&r " + message);
+        sendMessage("&e" + player.getName() + ":&r " + message);
     }
 
-    public void sendMessage(Server server, String message) {
-        List<Session> sessionList = server.getSessions();
+    public void sendMessage(String message) {
+        List<Session> sessionList = MCThunder.getServer().getSessions();
         ServerChatPacket packet = new ServerChatPacket(format.formatMessage(message));//Only create packet once
         for (Session s : sessionList)
             s.send(packet);
         tellConsole(LoggingLevel.CHAT, message);
     }
 
-    public void sendPrivateMessage(Session session, String privMessage) {
-        session.send(new ServerChatPacket(format.formatMessage(privMessage)));
+    public void sendMessage(Session session, String message) {
+        session.send(new ServerChatPacket(format.formatMessage(message)));
+        tellConsole(LoggingLevel.CHAT, message);
     }
 }

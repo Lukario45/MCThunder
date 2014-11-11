@@ -1,10 +1,10 @@
 package net.mcthunder.api;
 
 import net.mcthunder.MCThunder;
-import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
+import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.Position;
@@ -13,7 +13,6 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntities
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
-import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
 import java.util.ArrayList;
@@ -38,28 +37,22 @@ public class Player {
     private int viewDistance = 9;
     private int entityID;
     private int slot;
-    private GameProfile gameProfile;
     private String displayName;
     private GameMode gamemode;
     private Session session;
-    private Server server;
     private MetadataMap metadata;
     private Location location;
     private boolean moveable;
     private boolean onGround;
     private boolean sneaking;
     private boolean sprinting;
-    private ServerChatHandler chatHandler;
     private Player lastPmPerson;
     private String appended = "";
 
-    public Player(Server server, Session session, GameProfile profile, int entityID, EntityMetadata metadata) {
-        this.chatHandler = new ServerChatHandler();
-        this.server = server;
+    public Player(Session session, int entityID, EntityMetadata metadata) {
         this.session = session;
-        this.gameProfile = profile;
-        this.uuid = this.gameProfile.getId();
-        this.name = this.gameProfile.getName();
+        this.uuid = getGameProfile().getId();
+        this.name = getGameProfile().getName();
         this.slot = 36;
         this.displayName = this.name;
         this.entityID = entityID;
@@ -136,19 +129,6 @@ public class Player {
         else if (d.equals(Direction.WEST))
             return !this.westColumns.isEmpty();
         return false;
-    }
-
-    public void teleport(Location l) {
-        ServerSpawnPlayerPacket spawnPlayerPacket = new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), getHeldItem().getId(), getMetadata().getMetadataArray());
-        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
-        for (Player p : MCThunder.playerHashMap.values())
-            if (!p.getUniqueID().equals(getUniqueID())) {
-                p.getSession().send(destroyEntitiesPacket);
-                if (p.getWorld().equals(l.getWorld()))//If they are in the new world
-                    p.getSession().send(spawnPlayerPacket);
-            }
-        getSession().send(new ServerSpawnPositionPacket(new Position((int) l.getX(), (int) l.getY(), (int) l.getZ())));
-        setLocation(l);
     }
 
     private void updateDir(Direction d) {
@@ -294,14 +274,25 @@ public class Player {
         //getSession().send(new ServerMultiChunkDataPacket(x, z, chunks, biomeData));
     }
 
+    public void teleport(Location l) {
+        ServerSpawnPlayerPacket spawnPlayerPacket = new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), getHeldItem().getId(), getMetadata().getMetadataArray());
+        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+        for (Player p : MCThunder.playerHashMap.values())
+            if (!p.getUniqueID().equals(getUniqueID())) {
+                p.getSession().send(destroyEntitiesPacket);
+                if (p.getWorld().equals(l.getWorld()))//If they are in the new world
+                    p.getSession().send(spawnPlayerPacket);
+            }
+        getSession().send(new ServerSpawnPositionPacket(new Position((int) l.getX(), (int) l.getY(), (int) l.getZ())));
+        setLocation(l);
+    }
+
     public int getView() {
         return this.viewDistance;
     }
 
     public void setView(int distance) {
-        if (MCThunder.maxRenderDistance() < distance)
-            distance = MCThunder.maxRenderDistance();
-        this.viewDistance = distance;
+        this.viewDistance = MCThunder.maxRenderDistance() < distance ? MCThunder.maxRenderDistance() : distance;
     }
 
     public ItemStack getHeldItem() {
@@ -312,20 +303,12 @@ public class Player {
         return this.entityID;
     }
 
-    public void setEntityID(int newID) {
-        this.entityID = newID;
-    }
-
-    public Server getServer() {
-        return this.server;
-    }
-
     public Session getSession() {
         return this.session;
     }
 
-    public GameProfile gameProfile() {
-        return this.gameProfile;
+    public GameProfile getGameProfile() {
+        return getSession().getFlag(ProtocolConstants.PROFILE_KEY);
     }
 
     public MetadataMap getMetadata() {
@@ -345,7 +328,7 @@ public class Player {
     }
 
     public Location getLocation() {
-        return this.location;
+        return this.location.clone();
     }
 
     public void setLocation(Location location) {
@@ -402,12 +385,8 @@ public class Player {
         return this.gamemode;
     }
 
-    public ServerChatHandler getChatHandler() {
-        return this.chatHandler;
-    }
-
     public void sendMessage(String message) {
-        this.chatHandler.sendPrivateMessage(this.session, message);
+        MCThunder.getChatHandler().sendMessage(this.session, message);
     }
 
     public Player getLastPmPerson() {
@@ -419,7 +398,7 @@ public class Player {
     }
 
     public World getWorld() {
-        return this.location.getWorld();
+        return getLocation().getWorld();
     }
 
     public void setWorld(World w) {

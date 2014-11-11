@@ -19,14 +19,12 @@ public class GetUUID extends Command {
     public boolean execute(Player player, ClientChatPacket packet) {
         String[] wholeMessage = packet.getMessage().split(" ");
         if (wholeMessage.length != 2)
-            player.sendMessage("&4" + getArguments());
-        else {
-            Player p = MCThunder.getPlayer(wholeMessage[1]);
-            if (p == null)
-                player.sendMessage("&6Could not find player &c" + wholeMessage[1] + "&6!");
-            else
-                player.sendMessage("&3" + p.getName() + ":&e " + p.getUniqueID());//Auto casts UUID to string
-        }
+            return false;
+        Player p = MCThunder.getPlayer(wholeMessage[1]);
+        if (p == null)
+            player.sendMessage("&6Could not find player &c" + wholeMessage[1] + "&6!");
+        else
+            player.sendMessage("&3" + p.getName() + ":&e " + p.getUniqueID());
         return true;
     }
 }

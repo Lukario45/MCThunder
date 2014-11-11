@@ -19,14 +19,12 @@ public class Teleport extends Command {
     public boolean execute(Player player, ClientChatPacket packet) {
         String[] wholeMessage = packet.getMessage().split(" ");
         if (wholeMessage.length < 2)
-            player.sendMessage("&4" + getArguments());
-        else if (wholeMessage.length == 2) {
-            Player p = MCThunder.getPlayer(wholeMessage[1]);
-            if (p == null)
-                player.sendMessage("&cThat player is not online!");
-            else
-                player.teleport(p.getLocation());
-        }
+            return false;
+        Player p = MCThunder.getPlayer(wholeMessage[1]);
+        if (p == null)
+            player.sendMessage("&cThat player is not online!");
+        else
+            player.teleport(p.getLocation());
         return true;
     }
 }

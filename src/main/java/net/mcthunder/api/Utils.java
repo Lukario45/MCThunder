@@ -1,5 +1,7 @@
 package net.mcthunder.api;
 
+import net.mcthunder.MCThunder;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +16,6 @@ import java.util.Date;
  */
 
 public class Utils {
-    private static Config conf;
     private static MessageFormat format = new MessageFormat();
 
     public static String getIP() {
@@ -47,11 +48,9 @@ public class Utils {
     }
 
     public static void tellPublicIpAddress() {
-        conf = new Config();
-        conf.loadConfig();
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new URL("http://icanhazip.com/").openConnection().getInputStream()));
-            tellConsole(LoggingLevel.INFO, "People may connect to the server with " + in.readLine() + ":" + conf.getPort());
+            tellConsole(LoggingLevel.INFO, "People may connect to the server with " + in.readLine() + ":" + MCThunder.getPort());
             in.close();
         } catch (IOException e) {
             e.printStackTrace();
