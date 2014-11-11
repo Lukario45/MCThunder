@@ -8,8 +8,6 @@ import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.packetlib.Session;
 
-import java.util.List;
-
 import static net.mcthunder.api.Utils.tellConsole;
 
 /**
@@ -33,15 +31,13 @@ public class ServerChatHandler {
     }
 
     public void sendMessage(String message) {
-        List<Session> sessionList = MCThunder.getServer().getSessions();
         ServerChatPacket packet = new ServerChatPacket(format.formatMessage(message));//Only create packet once
-        for (Session s : sessionList)
-            s.send(packet);
+        for (Player p : MCThunder.getPlayers())
+            p.sendPacket(packet);
         tellConsole(LoggingLevel.CHAT, message);
     }
 
     public void sendMessage(Session session, String message) {
         session.send(new ServerChatPacket(format.formatMessage(message)));
-        tellConsole(LoggingLevel.CHAT, message);
     }
 }

@@ -115,7 +115,7 @@ public class Block {
         chunks[this.chunkY] = new Chunk(blocks, blockLight, skyLight);
         Column c = new Column(getLong(this.columnX, this.columnZ), chunks, column.getBiomes());//Should be correct biomes ;_;
         this.loc.getWorld().addColumn(c);
-        for (Player p : MCThunder.playerHashMap.values())
+        for (Player p : MCThunder.getPlayers())
             if (p.getWorld().equals(this.loc.getWorld()) && p.isColumnLoaded(getLong(this.columnX, this.columnZ)))
                 p.refreshColumn(c);
     }

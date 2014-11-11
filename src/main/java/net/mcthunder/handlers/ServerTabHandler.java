@@ -18,7 +18,7 @@ public class ServerTabHandler {
         String[] text = packet.getText().split(" ");
         String search = text[text.length - 1].toLowerCase();
         List<String> matches = new ArrayList<>();
-        for (Player p : MCThunder.playerHashMap.values())
+        for (Player p : MCThunder.getPlayers())
             if (p.getName().toLowerCase().startsWith(search))
                 matches.add(p.getName());
         if (!matches.isEmpty())

@@ -139,7 +139,7 @@ public class World {
         long l = c.getLong();
         if (!isColumnLoaded(l))
             return;//Already unloaded
-        for (Player p : MCThunder.playerHashMap.values())
+        for (Player p : MCThunder.getPlayers())
             if (p.isColumnLoaded(l) || p.isColumnPreLoaded(l))
                 return;
         long reg = getLong(c.getX() >> 5, c.getZ() >> 5);

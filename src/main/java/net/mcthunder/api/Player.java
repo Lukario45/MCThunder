@@ -9,17 +9,20 @@ import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
+import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.packetlib.Session;
+import org.spacehq.packetlib.packet.Packet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -196,12 +199,12 @@ public class Player {
             this.westColumns.add(l);
         if (removeOld && isColumnLoaded(l)) {
             this.loadedColumns.remove(l);
-            getSession().send(new ServerChunkDataPacket(getWorld().getColumn(l).getX(), getWorld().getColumn(l).getZ()));
+            sendPacket(new ServerChunkDataPacket(getWorld().getColumn(l).getX(), getWorld().getColumn(l).getZ()));
         }
     }
 
     public void refreshColumn(Column c) {
-        getSession().send(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
+        sendPacket(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
     }
 
     private void sendColumns(Direction d) {
@@ -230,7 +233,7 @@ public class Player {
                     z[i] = getWorld().getColumn(pos).getZ();
                     chunks[i] = getWorld().getColumn(pos).getChunks();
                     biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
-                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
                     this.loadedColumns.add(pos);
                 }
             }
@@ -242,7 +245,7 @@ public class Player {
                     z[i] = getWorld().getColumn(pos).getZ();
                     chunks[i] = getWorld().getColumn(pos).getChunks();
                     biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
-                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
                     this.loadedColumns.add(pos);
                 }
             }
@@ -254,7 +257,7 @@ public class Player {
                     z[i] = getWorld().getColumn(pos).getZ();
                     chunks[i] = getWorld().getColumn(pos).getChunks();
                     biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
-                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
                     this.loadedColumns.add(pos);
                 }
             }
@@ -266,7 +269,7 @@ public class Player {
                     z[i] = getWorld().getColumn(pos).getZ();
                     chunks[i] = getWorld().getColumn(pos).getChunks();
                     biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
-                    getSession().send(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
                     this.loadedColumns.add(pos);
                 }
             }
@@ -277,13 +280,13 @@ public class Player {
     public void teleport(Location l) {
         ServerSpawnPlayerPacket spawnPlayerPacket = new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), getHeldItem().getId(), getMetadata().getMetadataArray());
         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
-        for (Player p : MCThunder.playerHashMap.values())
+        for (Player p : MCThunder.getPlayers())
             if (!p.getUniqueID().equals(getUniqueID())) {
-                p.getSession().send(destroyEntitiesPacket);
+                p.sendPacket(destroyEntitiesPacket);
                 if (p.getWorld().equals(l.getWorld()))//If they are in the new world
-                    p.getSession().send(spawnPlayerPacket);
+                    p.sendPacket(spawnPlayerPacket);
             }
-        getSession().send(new ServerSpawnPositionPacket(new Position((int) l.getX(), (int) l.getY(), (int) l.getZ())));
+        sendPacket(new ServerSpawnPositionPacket(new Position((int) l.getX(), (int) l.getY(), (int) l.getZ())));
         setLocation(l);
     }
 
@@ -386,7 +389,8 @@ public class Player {
     }
 
     public void sendMessage(String message) {
-        MCThunder.getChatHandler().sendMessage(this.session, message);
+        sendPacket(new ServerChatPacket(new MessageFormat().formatMessage(message)));
+        tellConsole(LoggingLevel.CHAT, message);
     }
 
     public Player getLastPmPerson() {
@@ -428,5 +432,9 @@ public class Player {
 
     public PotionEffect[] getActiveEffects() {
         return (PotionEffect[]) this.activeEffects.values().toArray();
+    }
+
+    public void sendPacket(Packet p) {
+        getSession().send(p);
     }
 }
