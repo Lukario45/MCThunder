@@ -164,7 +164,7 @@ public class MCThunder {
                 @Override
                 public void loggedIn(Session session) {
                     try {
-                        loggingInEventSource.fireEvent(session, server, getRawPlayerHashmap(), getEntryListHandler(), playerProfileHandler, world);
+                        loggingInEventSource.fireEvent(session, getEntryListHandler(), playerProfileHandler, world);
                     } catch (ClassNotFoundException e) {
                         e.printStackTrace();
                     }

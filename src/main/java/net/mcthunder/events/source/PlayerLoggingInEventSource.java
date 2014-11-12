@@ -25,10 +25,9 @@ public class PlayerLoggingInEventSource {
         playerLoggingInEventListeners.remove(listener);
     }
 
-    public synchronized void fireEvent(Session session, Server server, HashMap<UUID, Player> playerHashMap, ServerPlayerEntryListHandler entryListHandler, PlayerProfileHandler playerProfileHandler, World world) throws ClassNotFoundException {
+    public synchronized void fireEvent(Session session, ServerPlayerEntryListHandler entryListHandler, PlayerProfileHandler playerProfileHandler, World world) throws ClassNotFoundException {
         PlayerLoggingInEvent event = new PlayerLoggingInEvent(this);
-        Iterator iterator = playerLoggingInEventListeners.iterator();
-        while (iterator.hasNext())
-            ((PlayerLoggingInEventListener) iterator.next()).onLogin(session, server, playerHashMap, entryListHandler, playerProfileHandler, world);
+        for (Object playerLoggingInEventListener : playerLoggingInEventListeners)
+            ((PlayerLoggingInEventListener) playerLoggingInEventListener).onLogin(session, entryListHandler, playerProfileHandler);
     }
 }

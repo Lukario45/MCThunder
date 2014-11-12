@@ -346,7 +346,7 @@ public class Player {
         getSession().disconnect(reason);
     }
 
-    public int getPing() {
+    public long getPing() {
         return getSession().getFlag(ProtocolConstants.PING_KEY);
     }
 

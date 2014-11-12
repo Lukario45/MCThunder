@@ -14,5 +14,5 @@ import java.util.UUID;
  * Created by Kevin on 11/12/2014.
  */
 public interface PlayerLoggingInEventListener {
-    public void onLogin(Session session, Server server, HashMap<UUID, Player> playerHashMap, ServerPlayerEntryListHandler entryListHandler, PlayerProfileHandler playerProfileHandler, World world) throws ClassNotFoundException;
+    public void onLogin(Session session, ServerPlayerEntryListHandler entryListHandler, PlayerProfileHandler playerProfileHandler) throws ClassNotFoundException;
 }

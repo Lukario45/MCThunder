@@ -30,22 +30,21 @@ import static net.mcthunder.api.Utils.tellConsole;
  */
 public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.PlayerLoggingInEventListener {
     @Override
-    public void onLogin(Session session, Server server, HashMap<UUID, Player> playerHashMap, ServerPlayerEntryListHandler entryListHandler, PlayerProfileHandler playerProfileHandler, World world) throws ClassNotFoundException {
-        //TODO fire event with session server playerhashmap entryListGabdker playerProfileHandler
+    public void onLogin(Session session, ServerPlayerEntryListHandler entryListHandler, PlayerProfileHandler playerProfileHandler) throws ClassNotFoundException {
+        //TODO fire event with session entryListGabdker playerProfileHandler
         GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
-        if (playerHashMap.containsKey(profile.getId()))
+        if (MCThunder.getPlayer(profile.getId()) != null)
             MCThunder.getPlayer(profile.getId()).disconnect("You logged in from another location!");
 
         int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
         EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
         Player player = new Player(session, entityID, metadata);
-        playerHashMap.put(profile.getId(), player);
         MCThunder.addPlayer(player);
         CompoundTag c = (CompoundTag) playerProfileHandler.getAttribute(player, "SpawnPosition");
         Location l = null;
         if (c != null)
             l = new Location(MCThunder.getWorld((String) c.get("World").getValue()), (double) c.get("X").getValue(), (double) c.get("Y").getValue(), (double) c.get("Z").getValue(), (float) c.get("Yaw").getValue(), (float) c.get("Pitch").getValue());
-        player.setLocation(l == null ? world.getSpawnLocation() : l);
+        player.setLocation(l == null ? MCThunder.getWorld(MCThunder.getConfig().getWorldName()).getSpawnLocation() : l);
         player.sendPacket(new ServerJoinGamePacket(player.getEntityID(), player.getWorld().isHardcore(), player.getGameMode(), player.getWorld().getDimension(), player.getWorld().getDifficulty(), MCThunder.getConfig().getSlots(), player.getWorld().getWorldType(), false));
         tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.getGameProfile().getName(), session.getHost(), session.getPort()));
         entryListHandler.addToPlayerEntryList(player);
