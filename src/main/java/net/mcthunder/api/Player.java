@@ -14,11 +14,14 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntities
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
+import org.spacehq.opennbt.tag.builtin.Tag;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.packet.Packet;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
@@ -28,9 +31,10 @@ import static net.mcthunder.api.Utils.tellConsole;
  * Created by Kevin on 10/14/2014.
  */
 public class Player {
-    private HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
     private final UUID uuid;
     private final String name;
+    private File playerFile;
+    private HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
     private ArrayList<Long> loadedColumns = new ArrayList<>();
     private ArrayList<Long> northColumns = new ArrayList<>();
     private ArrayList<Long> eastColumns = new ArrayList<>();
@@ -51,6 +55,7 @@ public class Player {
     private boolean sprinting;
     private Player lastPmPerson;
     private String appended = "";
+    private Map<String, Tag> tagMap;
 
     public Player(Session session, int entityID, EntityMetadata metadata) {
         this.session = session;
@@ -63,6 +68,22 @@ public class Player {
         this.gamemode = GameMode.CREATIVE;
         this.moveable = false;
         this.inv = new PlayerInventory(44, this.name);
+        playerFile = new File("PlayerFiles", this.uuid + ".dat");
+        tagMap = new HashMap<String, Tag>();
+
+
+    }
+
+    public File getPlayerFile() {
+        return this.playerFile;
+    }
+
+    public Map getTagMap() {
+        return this.tagMap;
+    }
+
+    public void addTagToMap(String name, Tag t) {
+        tagMap.put(name, t);
     }
 
     public void loadChunks(Direction d) {
@@ -334,6 +355,10 @@ public class Player {
         return this.location.clone();
     }
 
+    public void setLocation(Location location) {
+        this.location = location.clone();
+    }
+
     public void setX(double x) {
         this.location.setX(x);
     }
@@ -352,10 +377,6 @@ public class Player {
 
     public void setPitch(float pitch) {
         this.location.setPitch(pitch);
-    }
-
-    public void setLocation(Location location) {
-        this.location = location.clone();
     }
 
     public Inventory getInventory() {
