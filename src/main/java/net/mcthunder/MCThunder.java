@@ -4,8 +4,10 @@ import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
 import net.mcthunder.events.listeners.PlayerCommandEventListener;
+import net.mcthunder.events.listeners.PlayerLoggingInEventListener;
 import net.mcthunder.events.source.PlayerChatEventSource;
 import net.mcthunder.events.source.PlayerCommandEventSource;
+import net.mcthunder.events.source.PlayerLoggingInEventSource;
 import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
@@ -24,7 +26,6 @@ import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.Face;
-import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.entity.player.PlayerAction;
@@ -40,12 +41,8 @@ import org.spacehq.mc.protocol.packet.ingame.client.ClientTabCompletePacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.*;
 import org.spacehq.mc.protocol.packet.ingame.client.window.ClientCreativeInventoryActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.window.ClientWindowActionPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
@@ -85,6 +82,8 @@ public class MCThunder {
     private static PlayerChatEventSource playerChatEventSource;
     private static PlayerCommandEventSource playerCommandEventSource;
     private static PlayerCommandEventListener defaultPlayerCommandEventListener;
+    private static PlayerLoggingInEventSource loggingInEventSource;
+    private static PlayerLoggingInEventListener loggingInEventListener;
 
     public static void main(String args[]) {
         AnsiConsole.systemInstall();
@@ -127,10 +126,13 @@ public class MCThunder {
             //Listeners
             defaultPlayerChatEventListener = new PlayerChatEventListener();
             defaultPlayerCommandEventListener = new PlayerCommandEventListener();
+            loggingInEventListener = new PlayerLoggingInEventListener();
             playerChatEventSource = new PlayerChatEventSource();
             playerCommandEventSource = new PlayerCommandEventSource();
+            loggingInEventSource = new PlayerLoggingInEventSource();
             playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
             playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
+            loggingInEventSource.addEventListener(loggingInEventListener);
 
             playerHashMap = new HashMap<>(conf.getSlots());
             worldHashMap = new HashMap<>();
@@ -161,43 +163,12 @@ public class MCThunder {
             server.setGlobalFlag(ProtocolConstants.SERVER_LOGIN_HANDLER_KEY, new ServerLoginHandler() {
                 @Override
                 public void loggedIn(Session session) {
-                    GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
-                    if (playerHashMap.containsKey(profile.getId()))
-                        getPlayer(profile.getId()).disconnect("You logged in from another location!");
-
-                    int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
-                    EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
-                    Player player = new Player(session, entityID, metadata);
-                    playerHashMap.put(profile.getId(), player);
-                    CompoundTag c = (CompoundTag) playerProfileHandler.getAttribute(player, "SpawnPosition");
-                    Location l = null;
-                    if(c != null)
-                        l = new Location(getWorld((String) c.get("World").getValue()), (double) c.get("X").getValue(), (double) c.get("Y").getValue(), (double) c.get("Z").getValue(), (float) c.get("Yaw").getValue(), (float) c.get("Pitch").getValue());
-                    player.setLocation(l == null ? world.getSpawnLocation() : l);
-                    player.sendPacket(new ServerJoinGamePacket(player.getEntityID(), player.getWorld().isHardcore(), player.getGameMode(), player.getWorld().getDimension(), player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
-                    tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.getGameProfile().getName(), session.getHost(), session.getPort()));
-                    entryListHandler.addToPlayerEntryList(player);
-                    //Send World Data
-                    player.loadChunks(null);
-                    player.sendPacket(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
-                    player.sendPacket(new ServerSpawnPositionPacket(new Position((int) player.getLocation().getX(), (int) player.getLocation().getY(), (int) player.getLocation().getZ())));
-                    broadcast("&7&o" + profile.getName() + " connected");
-                    playerProfileHandler.checkPlayer(player);
-                    //StringTag test = (StringTag) playerProfileHandler.getAttribute(player,"test");
-                    // tellConsole(LoggingLevel.DEBUG,test.getValue());
-
-
-                    ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.getUniqueID(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch(), player.getHeldItem().getId(), player.getMetadata().getMetadataArray());
-                    for (Player player1 : getPlayers()) {
-                        if (!player1.getWorld().equals(player.getWorld()))
-                            continue;//Also will need to check if out of range ,_,
-                        ServerSpawnPlayerPacket toNewPlayer = new ServerSpawnPlayerPacket(player1.getEntityID(), player1.getGameProfile().getId(), player1.getLocation().getX(), player1.getLocation().getY(), player1.getLocation().getZ(), player1.getLocation().getYaw(), player1.getLocation().getPitch(), player1.getHeldItem().getId(), player1.getMetadata().getMetadataArray());
-                        if (!player1.getUniqueID().equals(player.getUniqueID())) {
-                            player1.sendPacket(toAllPlayers);
-                            player.sendPacket(toNewPlayer);
-                        }
+                    try {
+                        loggingInEventSource.fireEvent(session, server, getRawPlayerHashmap(), getEntryListHandler(), playerProfileHandler, world);
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
                     }
-                    player.toggleMoveable();
+
                 }
             });
 
@@ -542,6 +513,23 @@ public class MCThunder {
         return playerHashMap.values();
     }
 
+    public static void addPlayer(Player player) {
+        playerHashMap.put(player.getUniqueID(), player);
+    }
+
+    public static HashMap getRawPlayerHashmap() {
+        return playerHashMap;
+    }
+
+    public static ServerPlayerEntryListHandler getEntryListHandler() {
+        return entryListHandler;
+    }
+
+    public static void updateEntryList(ServerPlayerEntryListHandler serverPlayerEntryListHandler) {
+        entryListHandler = serverPlayerEntryListHandler;
+    }
+
+
     public static World getWorld(String name) {
         return worldHashMap.get(name);
     }
@@ -550,7 +538,7 @@ public class MCThunder {
         return worldHashMap.values();
     }
 
-    public Config getConfig() {
+    public static Config getConfig() {
         return conf;
     }
 }
