@@ -69,9 +69,7 @@ public class Player {
         this.moveable = false;
         this.inv = new PlayerInventory(44, this.name);
         playerFile = new File("PlayerFiles", this.uuid + ".dat");
-        tagMap = new HashMap<String, Tag>();
-
-
+        tagMap = new HashMap<>();
     }
 
     public File getPlayerFile() {

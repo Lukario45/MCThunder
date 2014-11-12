@@ -169,16 +169,16 @@ public class MCThunder {
                     EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
                     Player player = new Player(session, entityID, metadata);
                     playerHashMap.put(profile.getId(), player);
-                    player.setLocation(world.getSpawnLocation());
-
-                    session.send(new ServerJoinGamePacket(player.getEntityID(), player.getWorld().isHardcore(), player.getGameMode(), player.getWorld().getDimension(), player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
+                    CompoundTag c = (CompoundTag) playerProfileHandler.getAttribute(player, "SpawnPosition");
+                    Location l = null;
+                    if(c != null)
+                        l = new Location(getWorld((String) c.get("World").getValue()), (double) c.get("X").getValue(), (double) c.get("Y").getValue(), (double) c.get("Z").getValue(), (float) c.get("Yaw").getValue(), (float) c.get("Pitch").getValue());
+                    player.setLocation(l == null ? world.getSpawnLocation() : l);
+                    player.sendPacket(new ServerJoinGamePacket(player.getEntityID(), player.getWorld().isHardcore(), player.getGameMode(), player.getWorld().getDimension(), player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.getGameProfile().getName(), session.getHost(), session.getPort()));
                     entryListHandler.addToPlayerEntryList(session, player.getGameMode());
                     //Send World Data
                     player.loadChunks(null);
-                    CompoundTag c = (CompoundTag) playerProfileHandler.getAttribute(player, "SpawnPosition");
-                    Location l = new Location(getWorld(new String(c.get("World").getValue().toString())), new Double(String.valueOf(c.get("X").getValue())), new Double(String.valueOf(c.get("Y").getValue())), new Double(String.valueOf(c.get("Z").getValue())), new Float(String.valueOf(c.get("Yaw").getValue())), new Float(String.valueOf(c.get("Pitch").getValue())));
-                    player.setLocation(l);
                     player.sendPacket(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
                     player.sendPacket(new ServerSpawnPositionPacket(new Position((int) player.getLocation().getX(), (int) player.getLocation().getY(), (int) player.getLocation().getZ())));
                     broadcast("&7&o" + profile.getName() + " connected");
@@ -389,7 +389,6 @@ public class MCThunder {
                         map.put(yaw.getName(), yaw);
                         CompoundTag c = new CompoundTag("SpawnPosition", map);
                         playerProfileHandler.changeCompundAttribute(player, c);
-
                         playerHashMap.remove(player.getUniqueID());
                     }
                 }

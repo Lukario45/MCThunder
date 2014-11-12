@@ -93,7 +93,7 @@ public class Block {
     }
 
     public Location getLocation(){
-        return this.loc;
+        return this.loc == null ? null : this.loc.clone();
     }
 
     public void setType(Material type, short data) {
