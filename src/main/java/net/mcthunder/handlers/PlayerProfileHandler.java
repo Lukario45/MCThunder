@@ -160,7 +160,124 @@ public class PlayerProfileHandler {
 
     }
 
-    public void changeAttribute(Player player, String attribute, String attributeData) {
+    public void changeAttribute(Player player, String attribute, byte attributeData) {//Byte Tag
+        ByteTag tag = new ByteTag(attribute, attributeData);
+        player.addTagToMap(attribute, tag);
+        CompoundTag compundTag = new CompoundTag("Player", player.getTagMap());
+        try {
+            NBTIO.writeFile(compundTag, player.getPlayerFile());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeAttribute(Player player, String attribute, byte[] attributeData) {//Byte Array Tag
+        ByteArrayTag tag = new ByteArrayTag(attribute, attributeData);
+        player.addTagToMap(attribute, tag);
+        CompoundTag compundTag = new CompoundTag("Player", player.getTagMap());
+        try {
+            NBTIO.writeFile(compundTag, player.getPlayerFile());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeAttribute(Player player, String attribute) {//Compund Tag
+        CompoundTag tag = new CompoundTag(attribute);
+        player.addTagToMap(attribute, tag);
+        CompoundTag compundTag = new CompoundTag("Player", player.getTagMap());
+        try {
+            NBTIO.writeFile(compundTag, player.getPlayerFile());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeAttribute(Player player, String attribute, double attributeData) {//Double Tag
+        DoubleTag tag = new DoubleTag(attribute, attributeData);
+        player.addTagToMap(attribute, tag);
+        CompoundTag compundTag = new CompoundTag("Player", player.getTagMap());
+        try {
+            NBTIO.writeFile(compundTag, player.getPlayerFile());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeAttribute(Player player, String attribute, float attributeData) {//Float Tag
+        FloatTag tag = new FloatTag(attribute, attributeData);
+        player.addTagToMap(attribute, tag);
+        CompoundTag compundTag = new CompoundTag("Player", player.getTagMap());
+        try {
+            NBTIO.writeFile(compundTag, player.getPlayerFile());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeAttribute(Player player, String attribute, int[] attributeData) {//Int Array Tag
+        IntArrayTag tag = new IntArrayTag(attribute, attributeData);
+        player.addTagToMap(attribute, tag);
+        CompoundTag compundTag = new CompoundTag("Player", player.getTagMap());
+        try {
+            NBTIO.writeFile(compundTag, player.getPlayerFile());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeAttribute(Player player, String attribute, int attributeData) {//Int Tag
+        IntTag tag = new IntTag(attribute, attributeData);
+        player.addTagToMap(attribute, tag);
+        CompoundTag compundTag = new CompoundTag("Player", player.getTagMap());
+        try {
+            NBTIO.writeFile(compundTag, player.getPlayerFile());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeAttribute(Player player, String attribute, List attributeData) {//List Tag
+        ListTag tag = new ListTag(attribute, attributeData);
+        player.addTagToMap(attribute, tag);
+        CompoundTag compundTag = new CompoundTag("Player", player.getTagMap());
+        try {
+            NBTIO.writeFile(compundTag, player.getPlayerFile());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeAttribute(Player player, String attribute, short attributeData) {//
+        ShortTag tag = new ShortTag(attribute, attributeData);
+        player.addTagToMap(attribute, tag);
+        CompoundTag compundTag = new CompoundTag("Player", player.getTagMap());
+        try {
+            NBTIO.writeFile(compundTag, player.getPlayerFile());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void changeAttribute(Player player, String attribute, String attributeData) {//String Tag
+        StringTag tag = new StringTag(attribute, attributeData);
+        player.addTagToMap(attribute, tag);
+        CompoundTag compundTag = new CompoundTag("Player", player.getTagMap());
+        try {
+            NBTIO.writeFile(compundTag, player.getPlayerFile());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -168,7 +285,5 @@ public class PlayerProfileHandler {
 
     }
 
-    public void addMultiAttribute(Player player, String attribute, String attributeData) {
 
-    }
 }
