@@ -46,6 +46,7 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
+import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.event.server.ServerAdapter;
@@ -175,10 +176,16 @@ public class MCThunder {
                     entryListHandler.addToPlayerEntryList(session, player.getGameMode());
                     //Send World Data
                     player.loadChunks(null);
+                    CompoundTag c = (CompoundTag) playerProfileHandler.getAttribute(player, "SpawnPosition");
+                    Location l = new Location(getWorld(new String(c.get("World").getValue().toString())), new Double(String.valueOf(c.get("X").getValue())), new Double(String.valueOf(c.get("Y").getValue())), new Double(String.valueOf(c.get("Z").getValue())), new Float(String.valueOf(c.get("Yaw").getValue())), new Float(String.valueOf(c.get("Pitch").getValue())));
+                    player.setLocation(l);
                     player.sendPacket(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
                     player.sendPacket(new ServerSpawnPositionPacket(new Position((int) player.getLocation().getX(), (int) player.getLocation().getY(), (int) player.getLocation().getZ())));
                     broadcast("&7&o" + profile.getName() + " connected");
                     playerProfileHandler.checkPlayer(player);
+                    //StringTag test = (StringTag) playerProfileHandler.getAttribute(player,"test");
+                    // tellConsole(LoggingLevel.DEBUG,test.getValue());
+
 
                     ServerSpawnPlayerPacket toAllPlayers = new ServerSpawnPlayerPacket(player.getEntityID(), player.getUniqueID(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch(), player.getHeldItem().getId(), player.getMetadata().getMetadataArray());
                     for (Player player1 : getPlayers()) {
@@ -365,6 +372,24 @@ public class MCThunder {
                         for (Player p : getPlayers())
                             p.sendPacket(destroyEntitiesPacket);
                         player.setAppended("");
+                        Map<String, Tag> map = new HashMap<String, Tag>();
+                        StringTag worldName = new StringTag("World", player.getWorld().getName());
+                        map.put(worldName.getName(), worldName);
+                        IntTag dim = new IntTag("Dimension", 0);
+                        map.put(dim.getName(), dim);
+                        DoubleTag x = new DoubleTag("X", player.getLocation().getX());
+                        map.put(x.getName(), x);
+                        DoubleTag y = new DoubleTag("Y", player.getLocation().getY());
+                        map.put(y.getName(), y);
+                        DoubleTag z = new DoubleTag("Z", player.getLocation().getZ());
+                        map.put(z.getName(), z);
+                        FloatTag pitch = new FloatTag("Pitch", player.getLocation().getPitch());
+                        map.put(pitch.getName(), pitch);
+                        FloatTag yaw = new FloatTag("Yaw", player.getLocation().getYaw());
+                        map.put(yaw.getName(), yaw);
+                        CompoundTag c = new CompoundTag("SpawnPosition", map);
+                        playerProfileHandler.changeCompundAttribute(player, c);
+
                         playerHashMap.remove(player.getUniqueID());
                     }
                 }
@@ -522,10 +547,6 @@ public class MCThunder {
         shutdown("Server Closed.");
     }
 
-    public Config getConfig() {
-        return conf;
-    }
-
     public static Collection<Player> getPlayers() {
         return playerHashMap.values();
     }
@@ -536,5 +557,9 @@ public class MCThunder {
 
     public static Collection<World> getWorlds() {
         return worldHashMap.values();
+    }
+
+    public Config getConfig() {
+        return conf;
     }
 }
