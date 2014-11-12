@@ -163,7 +163,7 @@ public class MCThunder {
                 public void loggedIn(Session session) {
                     GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
                     if (playerHashMap.containsKey(profile.getId()))
-                        getPlayer(profile.getId()).getSession().disconnect("You logged in from another location!");
+                        getPlayer(profile.getId()).disconnect("You logged in from another location!");
 
                     int entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
                     EntityMetadata metadata = new EntityMetadata(2, MetadataType.STRING, profile.getName());
@@ -176,7 +176,7 @@ public class MCThunder {
                     player.setLocation(l == null ? world.getSpawnLocation() : l);
                     player.sendPacket(new ServerJoinGamePacket(player.getEntityID(), player.getWorld().isHardcore(), player.getGameMode(), player.getWorld().getDimension(), player.getWorld().getDifficulty(), conf.getSlots(), player.getWorld().getWorldType(), false));
                     tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.getGameProfile().getName(), session.getHost(), session.getPort()));
-                    entryListHandler.addToPlayerEntryList(session, player.getGameMode());
+                    entryListHandler.addToPlayerEntryList(player);
                     //Send World Data
                     player.loadChunks(null);
                     player.sendPacket(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
@@ -366,29 +366,21 @@ public class MCThunder {
                     if (((MinecraftProtocol) event.getSession().getPacketProtocol()).getMode() == ProtocolMode.GAME) {
                         GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
                         Player player = getPlayer(profile.getId());
-                        broadcast("&7&o" + profile.getName() + " disconnected");
-                        entryListHandler.deleteFromPlayerEntryList(event.getSession());
+                        broadcast("&7&o" + player.getName() + " disconnected");
+                        entryListHandler.deleteFromPlayerEntryList(player);
                         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(player.getEntityID());
                         for (Player p : getPlayers())
                             p.sendPacket(destroyEntitiesPacket);
                         player.setAppended("");
-                        Map<String, Tag> map = new HashMap<String, Tag>();
-                        StringTag worldName = new StringTag("World", player.getWorld().getName());
-                        map.put(worldName.getName(), worldName);
-                        IntTag dim = new IntTag("Dimension", 0);
-                        map.put(dim.getName(), dim);
-                        DoubleTag x = new DoubleTag("X", player.getLocation().getX());
-                        map.put(x.getName(), x);
-                        DoubleTag y = new DoubleTag("Y", player.getLocation().getY());
-                        map.put(y.getName(), y);
-                        DoubleTag z = new DoubleTag("Z", player.getLocation().getZ());
-                        map.put(z.getName(), z);
-                        FloatTag pitch = new FloatTag("Pitch", player.getLocation().getPitch());
-                        map.put(pitch.getName(), pitch);
-                        FloatTag yaw = new FloatTag("Yaw", player.getLocation().getYaw());
-                        map.put(yaw.getName(), yaw);
-                        CompoundTag c = new CompoundTag("SpawnPosition", map);
-                        playerProfileHandler.changeCompundAttribute(player, c);
+                        Map<String, Tag> map = new HashMap<>();
+                        map.put("World", new StringTag("World", player.getWorld().getName()));
+                        map.put("Dimension", new IntTag("Dimension", player.getWorld().getDimension()));
+                        map.put("X", new DoubleTag("X", player.getLocation().getX()));
+                        map.put("Y", new DoubleTag("Y", player.getLocation().getY()));
+                        map.put("Z", new DoubleTag("Z", player.getLocation().getZ()));
+                        map.put("Yaw", new FloatTag("Yaw", player.getLocation().getYaw()));
+                        map.put("Pitch", new FloatTag("Pitch", player.getLocation().getPitch()));
+                        playerProfileHandler.changeCompundAttribute(player, new CompoundTag("SpawnPosition", map));
                         playerHashMap.remove(player.getUniqueID());
                     }
                 }
@@ -527,7 +519,7 @@ public class MCThunder {
 
     public static void shutdown(String args) {
         for (Player p : getPlayers())
-            p.getSession().disconnect(args);
+            p.disconnect(args);
         for (World w : getWorlds())
             w.unloadWorld();
         AnsiConsole.systemUninstall();

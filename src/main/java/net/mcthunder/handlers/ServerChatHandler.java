@@ -27,7 +27,7 @@ public class ServerChatHandler {
             message = player.getAppended() + " " + message;
             player.setAppended("");
         }
-        sendMessage("&e" + player.getName() + ":&r " + message);
+        sendMessage("&e" + player.getDisplayName() + ":&r " + message);
     }
 
     public void sendMessage(String message) {

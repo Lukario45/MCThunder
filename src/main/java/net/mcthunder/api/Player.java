@@ -14,11 +14,14 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntities
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
+import org.spacehq.opennbt.NBTIO;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.Tag;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.packet.Packet;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,8 +71,8 @@ public class Player {
         this.gamemode = GameMode.CREATIVE;
         this.moveable = false;
         this.inv = new PlayerInventory(44, this.name);
-        playerFile = new File("PlayerFiles", this.uuid + ".dat");
-        tagMap = new HashMap<>();
+        this.playerFile = new File("PlayerFiles", this.uuid + ".dat");
+        this.tagMap = new HashMap<>();
     }
 
     public File getPlayerFile() {
@@ -81,7 +84,13 @@ public class Player {
     }
 
     public void addTagToMap(String name, Tag t) {
-        tagMap.put(name, t);
+        this.tagMap.put(name, t);
+        CompoundTag compundTag = new CompoundTag("Player", this.tagMap);
+        try {
+            NBTIO.writeFile(compundTag, getPlayerFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void loadChunks(Direction d) {
@@ -333,6 +342,14 @@ public class Player {
         return getSession().getFlag(ProtocolConstants.PROFILE_KEY);
     }
 
+    public void disconnect(String reason) {
+        getSession().disconnect(reason);
+    }
+
+    public int getPing() {
+        return getSession().getFlag(ProtocolConstants.PING_KEY);
+    }
+
     public MetadataMap getMetadata() {
         return this.metadata;
     }
@@ -429,7 +446,6 @@ public class Player {
 
     public void sendMessage(String message) {
         sendPacket(new ServerChatPacket(new MessageFormat().formatMessage(message)));
-        tellConsole(LoggingLevel.CHAT, message);
     }
 
     public Player getLastPmPerson() {

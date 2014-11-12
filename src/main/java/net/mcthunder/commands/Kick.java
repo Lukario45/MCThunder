@@ -28,8 +28,8 @@ public class Kick extends Command {
             StringBuilder sb = new StringBuilder();
             for (int i = 2; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");
-            MCThunder.broadcast("&1" + p.getName() + " &6was kicked by &1" + player.getName() + "&6!");
-            p.getSession().disconnect("Kicked: " + sb.toString().trim());
+            MCThunder.broadcast("&1" + p.getDisplayName() + " &6was kicked by &1" + player.getDisplayName() + "&6!");
+            p.disconnect("Kicked: " + sb.toString().trim());
         }
         return true;
     }
