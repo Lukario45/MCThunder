@@ -1,5 +1,7 @@
 package net.mcthunder;
 
+import com.Lukario45.NBTFile.NBTFile;
+import com.Lukario45.NBTFile.Utilitys;
 import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
@@ -13,6 +15,7 @@ import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
 import net.mcthunder.material.Material;
+import net.mcthunder.rankmanager.RankManager;
 import net.mcthunder.world.Biome;
 import net.mcthunder.world.World;
 import org.fusesource.jansi.AnsiConsole;
@@ -57,6 +60,7 @@ import org.spacehq.packetlib.tcp.TcpSessionFactory;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static net.mcthunder.api.Utils.*;
@@ -133,6 +137,19 @@ public class MCThunder {
             playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
             playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
             loggingInEventSource.addEventListener(loggingInEventListener);
+            if (conf.getUseRankManager()) {
+                RankManager rankManager = new RankManager();
+                rankManager.load();
+                NBTFile nbtFile = new NBTFile("/test.nbt", "test");
+
+                try {
+                    nbtFile.createFile();
+                    nbtFile.write(Utilitys.makeStringTag("tests", "test"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
 
             playerHashMap = new HashMap<>(conf.getSlots());
             worldHashMap = new HashMap<>();
@@ -148,14 +165,15 @@ public class MCThunder {
                 public ServerStatusInfo buildInfo(Session session) {
                     GameProfile[] gameProfiles = new GameProfile[playerHashMap.size()];
                     int i = 0;
-                    for(Player p : getPlayers()) {
+                    for (Player p : getPlayers()) {
                         gameProfiles[i] = p.getGameProfile();
                         i++;
                     }
                     BufferedImage icon = null;
                     try {
                         icon = ImageIO.read(new File("server-icon.png"));
-                    } catch (Exception ignored) { }//When there is no icon set
+                    } catch (Exception ignored) {
+                    }//When there is no icon set
                     return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), playerHashMap.size(), gameProfiles), new TextMessage(conf.getServerMOTD()), icon);
                 }
             });
@@ -259,7 +277,7 @@ public class MCThunder {
                                 ItemStack old = player.getHeldItem();
                                 ItemStack i = packet.getClickedItem();
                                 player.getInventory().setSlot(packet.getSlot(), i);
-                                if(packet.getSlot() == player.getSlot() && !old.equals(player.getHeldItem())) {
+                                if (packet.getSlot() == player.getSlot() && !old.equals(player.getHeldItem())) {
                                     Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem());
                                     for (Player p : getPlayers())
                                         if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
@@ -303,14 +321,14 @@ public class MCThunder {
                                 if (!b.getType().equals(Material.AIR))
                                     return;
                                 Material setType = Material.fromID(type);
-                                if(setType.equals(Material.TORCH)) {//Still need to check if is a valid torch position
-                                    if(packet.getFace().equals(Face.SOUTH))
+                                if (setType.equals(Material.TORCH)) {//Still need to check if is a valid torch position
+                                    if (packet.getFace().equals(Face.SOUTH))
                                         data = 1;
-                                    else if(packet.getFace().equals(Face.NORTH))
+                                    else if (packet.getFace().equals(Face.NORTH))
                                         data = 2;
-                                    else if(packet.getFace().equals(Face.WEST))
+                                    else if (packet.getFace().equals(Face.WEST))
                                         data = 3;
-                                    else if(packet.getFace().equals(Face.EAST))
+                                    else if (packet.getFace().equals(Face.EAST))
                                         data = 4;
                                     else
                                         data = 5;
@@ -322,7 +340,7 @@ public class MCThunder {
                                 ClientPlayerActionPacket packet = event.getPacket();
                                 Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                                 if ((packet.getAction().equals(PlayerAction.START_DIGGING) && player.getGameMode().equals(GameMode.CREATIVE)) ||
-                                    (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
+                                        (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
                                     Block b = new Block(new Location(player.getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ()));
                                     b.setType(Material.AIR);
                                 }
@@ -366,11 +384,13 @@ public class MCThunder {
                         for (Player p : getPlayers())
                             if (!p.getUniqueID().equals(player.getUniqueID()))
                                 p.sendPacket(pack);
+
                     }
                 }
                 try {
                     Thread.sleep(20);
-                } catch (InterruptedException ignored) { }
+                } catch (InterruptedException ignored) {
+                }
             }
         }
     }
@@ -382,31 +402,31 @@ public class MCThunder {
             player.setLocation(getWorld(conf.getWorldName()).getSpawnLocation());
 
         if (packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
-            int fromChunkX = (int)player.getLocation().getX() >> 4;
-            int fromChunkZ = (int)player.getLocation().getZ() >> 4;
-            int toChunkX = (int)packet.getX() >> 4;
-            int toChunkZ = (int)packet.getZ() >> 4;
+            int fromChunkX = (int) player.getLocation().getX() >> 4;
+            int fromChunkZ = (int) player.getLocation().getZ() >> 4;
+            int toChunkX = (int) packet.getX() >> 4;
+            int toChunkZ = (int) packet.getZ() >> 4;
             player.setX(packet.getX());
             player.setY(packet.getY());
             player.setZ(packet.getZ());
             if (fromChunkX != toChunkX || fromChunkZ != toChunkZ) {
                 //tellConsole(LoggingLevel.DEBUG, "Player has entered new Chunk");
                 Direction dir = null;
-                if(fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX < 0)
+                if (fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX < 0)
                     dir = Direction.NORTH_EAST;
-                else if(fromChunkZ - toChunkZ < 0 && fromChunkX - toChunkX < 0)
+                else if (fromChunkZ - toChunkZ < 0 && fromChunkX - toChunkX < 0)
                     dir = Direction.SOUTH_EAST;
-                else if(fromChunkZ - toChunkZ < 0 && fromChunkX - toChunkX > 0)
+                else if (fromChunkZ - toChunkZ < 0 && fromChunkX - toChunkX > 0)
                     dir = Direction.SOUTH_WEST;
-                else if(fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX > 0)
+                else if (fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX > 0)
                     dir = Direction.NORTH_WEST;
-                else if(fromChunkZ - toChunkZ > 0)
+                else if (fromChunkZ - toChunkZ > 0)
                     dir = Direction.NORTH;
-                else if(fromChunkX - toChunkX < 0)
+                else if (fromChunkX - toChunkX < 0)
                     dir = Direction.EAST;
-                else if(fromChunkZ - toChunkZ < 0)
+                else if (fromChunkZ - toChunkZ < 0)
                     dir = Direction.SOUTH;
-                else if(fromChunkX - toChunkX > 0)
+                else if (fromChunkX - toChunkX > 0)
                     dir = Direction.WEST;
                 player.loadChunks(dir);
             }
@@ -540,5 +560,10 @@ public class MCThunder {
 
     public static Config getConfig() {
         return conf;
+    }
+
+    public static void addLoginEventListener(net.mcthunder.interfaces.PlayerLoggingInEventListener listener) {
+        loggingInEventSource.addEventListener(listener);
+
     }
 }

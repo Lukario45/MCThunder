@@ -26,6 +26,7 @@ public class PlayerProfileHandler {
             tellConsole(LoggingLevel.DEBUG, "Player: " + player.getName() + "'s file does not exist yet, creating file!");
             try {
                 playerFile.createNewFile();
+                player.writePlayerTag();
                 Map<String, Tag> map = new HashMap<>();
                 map.put("World", new StringTag("World", player.getWorld().getName()));
                 map.put("Dimension", new IntTag("Dimension", player.getWorld().getDimension()));

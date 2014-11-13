@@ -19,6 +19,7 @@ public class Config {
     private boolean enableGlobalChat;
     private boolean globalNickRegisterd;
     private boolean allowPVP;
+    private boolean useRankManager;
     private String motd;
     private String world;
     private String serverName;
@@ -28,6 +29,7 @@ public class Config {
     private int renderDistance;
     private int slots;
     private int port;
+
 
     //Load Config
     public void loadConfig() {
@@ -73,6 +75,8 @@ public class Config {
                 getConf().setProperty("MAX-REBDER-DISTANCE", 9);
             if (!getConf().containsKey("USE-COMMAND-BLOCKS"))
                 getConf().setProperty("USE-COMMAND-BLOCKS", false);
+            if (!getConf().containsKey("useRankManager"))
+                getConf().setProperty("useRankManager", true);
             getConf().save();
             //Set all of the values from the config
             getConf().load();
@@ -92,6 +96,7 @@ public class Config {
             setAllowPVP(getConf().getBoolean("ALLOW-PVP"));
             setMaxRenderDistance(getConf().getInt("MAX-REBDER-DISTANCE"));
             setCommandBlocks(getConf().getBoolean("USE-COMMAND-BLOCKS"));
+            setUseRankManager(getConf().getBoolean("useRankManager"));
 
         } catch (ConfigurationException e) {
             Utils.tellConsole(LoggingLevel.ERROR, "Check Config File!");
@@ -240,5 +245,13 @@ public class Config {
 
     public void setCommandBlocks(boolean commandBlocks) {
         this.commandBlocks = commandBlocks;
+    }
+
+    public boolean getUseRankManager() {
+        return this.useRankManager;
+    }
+
+    public void setUseRankManager(boolean useRankManager) {
+        this.useRankManager = useRankManager;
     }
 }

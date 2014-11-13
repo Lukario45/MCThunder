@@ -27,7 +27,7 @@ public class ServerPlayerEntryListHandler {
                 new PlayerListEntry[]{new PlayerListEntry(player.getGameProfile(), player.getGameMode(), player.getPing(), Message.fromString(player.getName()))});
         for (Player p : MCThunder.getPlayers()) {
             p.sendPacket(serverPlayerListEntryPacket);
-            playerListEntries.add(new PlayerListEntry(p.getGameProfile(), p.getGameMode(), p.getPing(), Message.fromString(p.getName())));
+            playerListEntries.add(new PlayerListEntry(p.getGameProfile(), p.getGameMode(), player.getPing(), Message.fromString(p.getName())));
         }
         player.sendPacket(new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, playerListEntries.toArray(new PlayerListEntry[playerListEntries.size()])));
     }

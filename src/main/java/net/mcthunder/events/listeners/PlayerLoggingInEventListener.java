@@ -6,7 +6,6 @@ import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Player;
 import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
-import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
@@ -17,11 +16,7 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPo
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
-
-import java.util.HashMap;
-import java.util.UUID;
 
 import static net.mcthunder.api.Utils.tellConsole;
 
@@ -49,6 +44,7 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
         tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.getGameProfile().getName(), session.getHost(), session.getPort()));
         entryListHandler.addToPlayerEntryList(player);
         MCThunder.updateEntryList(entryListHandler);
+        playerProfileHandler.addAttribute(player, "test", "testity");
         //Send World Data
         player.loadChunks(null);
         player.sendPacket(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));

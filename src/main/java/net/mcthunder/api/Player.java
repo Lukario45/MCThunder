@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
-import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -83,11 +82,28 @@ public class Player {
         return this.tagMap;
     }
 
-    public void addTagToMap(String name, Tag t) {
-        this.tagMap.put(name, t);
+    public void writePlayerTag() {
+
         CompoundTag compundTag = new CompoundTag("Player", this.tagMap);
         try {
             NBTIO.writeFile(compundTag, getPlayerFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addTagToMap(String name, Tag t) {
+
+
+        CompoundTag c = null;
+        try {
+            c = NBTIO.readFile(getPlayerFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        c.put(t);
+        try {
+            NBTIO.writeFile(c, getPlayerFile());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -346,7 +362,7 @@ public class Player {
         getSession().disconnect(reason);
     }
 
-    public long getPing() {
+    public int getPing() {
         return getSession().getFlag(ProtocolConstants.PING_KEY);
     }
 

@@ -1,15 +1,14 @@
 package net.mcthunder.events.source;
 
-import net.mcthunder.api.Player;
 import net.mcthunder.events.PlayerLoggingInEvent;
-import net.mcthunder.events.listeners.PlayerLoggingInEventListener;
 import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
+import net.mcthunder.interfaces.PlayerLoggingInEventListener;
 import net.mcthunder.world.World;
-import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Kevin on 11/12/2014.

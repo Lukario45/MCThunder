@@ -72,8 +72,21 @@
             <artifactId>jansi</artifactId>
             <version>1.11</version>
         </dependency>
+        <dependency>
+            <groupId>com.Lukario45.NBTFile</groupId>
+            <artifactId>NBTFile</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
     <repositories>
+        <repository>
+            <id>NBTFile-mvn-repo</id>
+            <url>https://raw.github.com/Lukario45/NBTFile/mvn-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
         <repository>
             <id>spacehq-releases</id>
             <url>http://repo.spacehq.org/content/repositories/release/</url>
