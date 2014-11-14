@@ -8,31 +8,95 @@ import java.util.List;
 public enum Material {//http://minecraft.gamepedia.com/Id
     AIR("AIR", 0),
     STONE("STONE", 1),
+    GRANITE("GRANITE", STONE, (short) 1),
+    POLISHED_GRANITE("POLISHED_GRANITE", STONE, (short) 2),
+    DIORITE("DIORITE", STONE, (short) 3),
+    POLISHED_DIORITE("POLISHED_DIORITE", STONE, (short) 4),
+    ANDESITE("ANDESITE", STONE, (short) 5),
+    POLISHED_ANDESITE("POLISHED_ANDESITE", STONE, (short) 6),
     GRASS("GRASS", 2, Arrays.asList("GRASS_BLOCK")),
     DIRT("DIRT", 3),
     COARSE_DIRT("COURSE_DIRT", DIRT, (short) 1),
     PODZOL("PODZOL", DIRT, (short) 2),
     COBBLESTONE("COBBLESTONE", 4, Arrays.asList("COBBLE")),
     PLANKS("PLANKS", 5),
+    OAK_PLANKS("OAK_PLANKS", PLANKS, (short) 0),
+    SPRUCE_PLANKS("SPRUCE_PLANKS", PLANKS, (short) 1),
+    BIRCH_PLANKS("BIRCH_PLANKS", PLANKS, (short) 2),
+    JUNGLE_PLANKS("JUNGLE_PLANKS", PLANKS, (short) 3),
+    ACACIA_PLANKS("ACACIA_PLANKS", PLANKS, (short) 4),
+    DARK_OAK_PLANKS("DARK_OAK_PLANKS", PLANKS, (short) 5),
     SAPLING("SAPLING", 6),
+    OAK_SAPLING("OAK_SAPLING", SAPLING, (short) 0),
+    SPRUCE_SAPLING("SPRUCE_SAPLING", SAPLING, (short) 1),
+    BIRCH_SAPLING("BIRCH_SAPLING", SAPLING, (short) 2),
+    JUNGLE_SAPLING("JUNGLE_SAPLING", SAPLING, (short) 3),
+    ACACIA_SAPLING("ACACIA_SAPLING", SAPLING, (short) 4),
+    DARK_OAK_SAPLING("DARK_OAK_SAPLING", SAPLING, (short) 5),
     BEDROCK("BEDROCK", 7, Arrays.asList("ADMINIUM")),
     FLOWING_WATER("FLOWING_WATER", 8),
     WATER("WATER", 9, Arrays.asList("STILL_WATER")),
+    WATER_7_8_FULL("WATER_7_8_FULL", WATER, (short) 1),
+    WATER_3_4_FULL("WATER_3_4_FULL", WATER, (short) 2),
+    WATER_5_8_FULL("WATER_5_8_FULL", WATER, (short) 3),
+    WATER_1_2_FULL("WATER_1_2_FULL", WATER, (short) 4),
+    WATER_3_8_FULL("WATER_3_8_FULL", WATER, (short) 5),
+    WATER_1_4_FULL("WATER_1_4_FULL", WATER, (short) 6),
+    WATER_1_8_FULL("WATER_1_8_FULL", WATER, (short) 7),
     FLOWING_LAVA("FLOWING_LAVA", 10),
     LAVA("LAVA", 11, Arrays.asList("STILL_LAVA")),
+    LAVA_7_8_FULL("LAVA_7_8_FULL", LAVA, (short) 1),
+    LAVA_3_4_FULL("LAVA_3_4_FULL", LAVA, (short) 2),
+    LAVA_5_8_FULL("LAVA_5_8_FULL", LAVA, (short) 3),
+    LAVA_1_2_FULL("LAVA_1_2_FULL", LAVA, (short) 4),
+    LAVA_3_8_FULL("LAVA_3_8_FULL", LAVA, (short) 5),
+    LAVA_1_4_FULL("LAVA_1_4_FULL", LAVA, (short) 6),
+    LAVA_1_8_FULL("LAVA_1_8_FULL", LAVA, (short) 7),
     SAND("SAND", 12),
+    RED_SAND("RED_SAND", SAND, (short) 1),
     GRAVEL("GRAVEL", 13),
     GOLD_ORE("GOLD_ORE", 14),
     IRON_ORE("IRON_ORE", 15),
     COAL_ORE("COAL_ORE", 16),
     LOG("LOG", 17, Arrays.asList("BARK")),
+    OAK_LOG_UP("OAK_LOG_UP", LOG, (short) 0),
+    SPRUCE_LOG_UP("SPRUCE_LOG_UP", LOG, (short) 1),
+    BIRCH_LOG_UP("BIRCH_LOG_UP", LOG, (short) 2),
+    JUNGLE_LOG_UP("OAK_LOG_UP", LOG, (short) 3),
+    OAK_LOG_EAST("OAK_LOG_EAST", LOG, (short) 4),
+    SPRUCE_LOG_EAST("SPRUCE_LOG_EAST", LOG, (short) 5),
+    BIRCH_LOG_EAST("BIRCH_LOG_EAST", LOG, (short) 6),
+    JUNGLE_LOG_EAST("JUNGLE_LOG_EAST", LOG, (short) 7),
+    OAK_LOG_NORTH("OAK_LOG_NORTH", LOG, (short) 8),
+    SPRUCE_LOG_NORTH("SPRUCE_LOG_NORTH", LOG, (short) 9),
+    BIRCH_LOG_NORTH("BIRCH_LOG_NORTH", LOG, (short) 10),
+    JUNGLE_LOG_NORTH("JUNGLE_LOG_NORTH", LOG, (short) 11),
+    OAK_LOG_ALL_BARK("OAK_LOG_ALL_BARK", LOG, (short) 12),
+    SPRUCE_LOG_ALL_BARK("SPRUCE_LOG_ALL_BARK", LOG, (short) 13),
+    BIRCH_LOG_ALL_BARK("BIRCH_LOG_ALL_BARK", LOG, (short) 14),
+    JUNGLE_LOG_ALL_BARK("JUNGLE_LOG_ALL_BARK", LOG, (short) 15),
     LEAVES("LEAVES", 18),
+    OAK_LEAVES("OAK_LEAVES", LEAVES, (short) 0),
+    SPRUCE_LEAVES("SPRUCE_LEAVES", LEAVES, (short) 1),
+    BIRCH_LEAVES("BIRCH_LEAVES", LEAVES, (short) 2),
+    JUNGLE_LEAVES("JUNGLE_LEAVES", LEAVES, (short) 3),
+    OAK_LEAVES_NO_DECAY("OAK_LEAVES_NO_DECAY", LEAVES, (short) 4),
+    SPRUCE_LEAVES_NO_DECAY("SPRUCE_LEAVES_NO_DECAY", LEAVES, (short) 5),
+    BIRCH_LEAVES_NO_DECAY("BIRCH_LEAVES_NO_DECAY", LEAVES, (short) 6),
+    JUNGLE_LEAVES_NO_DECAY("JUNGLE_LEAVES_NO_DECAY", LEAVES, (short) 7),
+    OAK_LEAVES_DECAY("OAK_LEAVES_DECAY", LEAVES, (short) 8),
+    SPRUCE_LEAVES_DECAY("SPRUCE_LEAVES_DECAY", LEAVES, (short) 9),
+    BIRCH_LEAVES_DECAY("BIRCH_LEAVES_DECAY", LEAVES, (short) 10),
+    JUNGLE_LEAVES_DECAY("JUNGLE_LEAVES_DECAY", LEAVES, (short) 11),
     SPONGE("SPONGE", 19),
+    WET_SPONGE("WET_SPONGE", SPONGE, (short) 1),
     GLASS("GLASS", 20),
     LAPIS_ORE("LAPIS_ORE", 21, Arrays.asList("LAPIS_LAZULI_ORE")),
     LAPIS_BLOCK("LAPIS_BLOCK", 22, Arrays.asList("LAPIS_LAZULI_BLOCK")),
     DISPENSER("DISPENSER", 23),
     SANDSTONE("SANDSTONE", 24),
+    CHISELED_SANDSTONE("CHISELED_SANDSTONE", SANDSTONE, (short) 1),
+    SMOOTH_SANDSTONE("SMOOTH_SANDSTONE", SANDSTONE, (short) 2),
     NOTEBLOCK("NOTEBLOCK", 25),
     BED_BLOCK("BED_BLOCK", 26),//Unobtainable
     GOLDEN_RAIL("GOLDEN_RAIL", 27, Arrays.asList("POWERED_RAIL")),
@@ -40,17 +104,46 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     STICKY_PISTON("STICKY_PISTON", 29),
     WEB("WEB", 30, Arrays.asList("COBWEB", "SPIDER_WEB")),
     TALLGRASS("TALLGRASS", 31),
+    DEAD_BUSH("DEAD_BUSH", TALLGRASS, (short) 0),
+    TALL_GRASS("TALL_GRASS", TALLGRASS, (short) 1),
+    FERN("FERN", TALLGRASS, (short) 2),
     DEADBUSH("DEADBUSH", 32),
     PISTON("PISTON", 33),
     PISTON_HEAD("PISTON_HEAD", 34),//Unobtainable
     WOOL("WOOL", 35),
+    WHITE_WOOL("WHITE_WOOL", WOOL, (short) 0),
+    ORANGE_WOOL("ORANGE_WOOL", WOOL, (short) 1),
+    MAGENTA_WOOL("MAGENTA_WOOL", WOOL, (short) 2),
+    LIGHT_BLUE_WOOL("LIGHT_BLUE_WOOL", WOOL, (short) 3),
+    YELLOW_WOOL("YELLOW_WOOL", WOOL, (short) 4),
+    LIME_WOOL("LIME_WOOL", WOOL, (short) 5),
+    PINK_WOOL("PINK_WOOL", WOOL, (short) 6),
+    GRAY_WOOL("GRAY_WOOL", WOOL, (short) 7),
+    LIGHT_GRAY_WOOL("LIGHT_GRAY_WOOL", WOOL, (short) 8),
+    CYAN_WOOL("CYAN_WOOL", WOOL, (short) 9),
+    PURPLE_WOOL("PURPLE_WOOL", WOOL, (short) 10),
+    BLUE_WOOL("BLUE_WOOL", WOOL, (short) 11),
+    BROWN_WOOL("BROWN_WOOL", WOOL, (short) 12),
+    GREEN_WOOL("GREEN_WOOL", WOOL, (short) 13),
+    RED_WOOL("RED_WOOL", WOOL, (short) 14),
+    BLACK_WOOL("BLACK_WOOL", WOOL, (short) 15),
     PISTON_EXTENSION("PISTON_EXTENSION", 36),//Unobtainable
     YELLOW_FLOWER("YELLOW_FLOWER", 37, Arrays.asList("DANDELION")),
-    RED_FLOWER("RED_FLOWER", 38, Arrays.asList("POPPY")),
+    RED_FLOWER("RED_FLOWER", 38),
+    POPPY("POPPY", RED_FLOWER, (short) 0),
+    BLUE_ORCHID("BLUE_ORCHID", RED_FLOWER, (short) 1),
+    ALLIUM("ALLIUM", RED_FLOWER, (short) 2),
+    AZURE_BLUET("AZURE_BLUET", RED_FLOWER, (short) 3),
+    RED_TULIP("RED_TULIP", RED_FLOWER, (short) 4),
+    ORANGE_TULIP("ORANGE_TULIP", RED_FLOWER, (short) 5),
+    WHITE_TULIP("WHITE_TULIP", RED_FLOWER, (short) 6),
+    PINK_TULIP("PINK_TULIP", RED_FLOWER, (short) 7),
+    OXEYE_DAISY("OXEYE_DAISY", RED_FLOWER, (short) 8),
     BROWN_MUSHROOM("BROWN_MUSHROOM", 39),
     RED_MUSHROOM("RED_MUSHROOM", 40),
     GOLD_BLOCK("GOLD_BLOCK", 41, Arrays.asList("BLOCK_OF_GOLD")),
     IRON_BLOCK("IRON_BLOCK", 42, Arrays.asList("BLOCK_OF_IRON")),
+    //TODO: All data values past this point
     DOUBLE_STONE_SLAB("DOUBLE_STONE_SLAB", 43),//Unobtainable
     STONE_SLAB("STONE_SLAB", 44, Arrays.asList("SLAB")),
     BRICK_BLOCK("BRICK_BLOCK", 45),
@@ -409,6 +502,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     private static List<Material> shovelList;
     private static List<Material> swordsList;
     private static List<Material> hoeList;
+    private HashMap<Short,Material> children;
     private final Material parent;
     private final String name;
     private final Integer id;
@@ -425,6 +519,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
         this.data = 0;
         this.aliases = aliases;
         this.parent = null;
+        this.children = new HashMap<>();
     }
 
     private Material(String name, Material parent, short data) {
@@ -437,6 +532,12 @@ public enum Material {//http://minecraft.gamepedia.com/Id
         this.id = null;
         this.aliases = aliases;
         this.parent = parent;
+        this.children = new HashMap<>();
+        this.parent.addChild(this.data, this);
+    }
+
+    protected void addChild(short data, Material child) {
+        this.children.put(data, child);
     }
 
     public Material getParent() {
@@ -457,6 +558,14 @@ public enum Material {//http://minecraft.gamepedia.com/Id
 
     public List<String> getAliases() {
         return this.aliases;
+    }
+
+    public Material getChild(short data) {
+        return this.children.get(data) == null ? this : this.children.get(data);
+    }
+
+    public boolean hasChildren() {
+        return !this.children.isEmpty();
     }
 
     public boolean isBlock() {
@@ -504,6 +613,16 @@ public enum Material {//http://minecraft.gamepedia.com/Id
         name = name.toUpperCase().replaceAll(" ", "_");
         String n = aliasMap.get(name);
         return n == null ? nameMap.get(name) : nameMap.get(n);
+    }
+
+    public static Material fromData(Material m, short data) {
+        if (m == null)
+            return null;
+        return m.getChild(data);
+    }
+
+    public static Material fromData(int id, short data) {
+        return fromData(fromID(id), data);
     }
 
     public static void mapMaterials() {

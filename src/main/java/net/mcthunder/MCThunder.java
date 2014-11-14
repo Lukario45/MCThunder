@@ -323,6 +323,13 @@ public class MCThunder {
                                 }
                                 if (Material.fromString(setType.getName() + "_BLOCK") != null)
                                     setType = Material.fromString(setType.getName() + "_BLOCK");
+                                if ((packet.getFace().equals(Face.BOTTOM) || packet.getFace().equals(Face.TOP)) && Material.fromString(setType.getName() + "_UP") != null)
+                                    data = Material.fromString(setType.getName() + "_UP").getData();
+                                else if ((packet.getFace().equals(Face.EAST) || packet.getFace().equals(Face.WEST)) && Material.fromString(setType.getName() + "_EAST") != null)
+                                    data = Material.fromString(setType.getName() + "_EAST").getData();
+                                else if ((packet.getFace().equals(Face.NORTH) || packet.getFace().equals(Face.SOUTH)) && Material.fromString(setType.getName() + "_NORTH") != null)
+                                    data = Material.fromString(setType.getName() + "_NORTH").getData();
+                                //b.setType(Material.fromData(setType, data));
                                 b.setType(setType, data);
                             } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
                                 ClientPlayerActionPacket packet = event.getPacket();

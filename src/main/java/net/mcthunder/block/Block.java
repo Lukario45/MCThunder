@@ -108,7 +108,7 @@ public class Block {
         ShortArray3d blocks = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlocks() : new ShortArray3d(4096);
         NibbleArray3d blockLight = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlockLight() : new NibbleArray3d(4096);
         NibbleArray3d skyLight = chunks[this.chunkY] != null ? chunks[this.chunkY].getSkyLight() : new NibbleArray3d(4096);
-        blocks.setBlockAndData(this.blockX, this.blockY, this.blockZ, this.type.getID(), this.data);
+        blocks.setBlockAndData(this.blockX, this.blockY, this.blockZ, this.type.getID() == null ? this.type.getParent().getID() : this.type.getID(), this.data);
         Block above = getRelative(Direction.UP);
         blockLight.set(this.blockX, this.blockY, this.blockZ, this.type.getLightLevel());
         skyLight.set(this.blockX, this.blockY, this.blockZ, above.getSkyLight());
@@ -134,10 +134,6 @@ public class Block {
         if (isInvalid())
             return 0;
         return this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY].getBlockLight().get(this.blockX, this.blockY, this.blockZ);
-    }
-
-    public void setTypeID(int id) {
-        setType(Material.fromID(id), (short)0);
     }
 
     public void setType(Material type) {
