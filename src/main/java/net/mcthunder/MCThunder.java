@@ -1,7 +1,5 @@
 package net.mcthunder;
 
-import com.Lukario45.NBTFile.NBTFile;
-import com.Lukario45.NBTFile.Utilitys;
 import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
@@ -60,7 +58,6 @@ import org.spacehq.packetlib.tcp.TcpSessionFactory;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 import static net.mcthunder.api.Utils.*;
@@ -140,15 +137,6 @@ public class MCThunder {
             if (conf.getUseRankManager()) {
                 RankManager rankManager = new RankManager();
                 rankManager.load();
-                NBTFile nbtFile = new NBTFile("/test.nbt", "test");
-
-                try {
-                    nbtFile.createFile();
-                    nbtFile.write(Utilitys.makeStringTag("tests", "test"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
             }
 
             playerHashMap = new HashMap<>(conf.getSlots());
@@ -182,7 +170,7 @@ public class MCThunder {
                 @Override
                 public void loggedIn(Session session) {
                     try {
-                        loggingInEventSource.fireEvent(session, getEntryListHandler(), playerProfileHandler, world);
+                        loggingInEventSource.fireEvent(session, getEntryListHandler(), playerProfileHandler);
                     } catch (ClassNotFoundException e) {
                         e.printStackTrace();
                     }
