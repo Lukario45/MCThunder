@@ -8,7 +8,9 @@ import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.Position;
+import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
+import org.spacehq.mc.protocol.data.message.Message;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
@@ -57,7 +59,8 @@ public class Player {
     private boolean sprinting;
     private Player lastPmPerson;
     private String appended = "";
-    private Map<String, Tag> tagMap;
+    private Map<String, Tag> tagMap = new HashMap<>();
+    private PlayerListEntry listEntry;
 
     public Player(Session session, int entityID, EntityMetadata metadata) {
         this.session = session;
@@ -71,7 +74,7 @@ public class Player {
         this.moveable = false;
         this.inv = new PlayerInventory(44, this.name);
         this.playerFile = new File("PlayerFiles", this.uuid + ".dat");
-        this.tagMap = new HashMap<>();
+        this.listEntry = new PlayerListEntry(getGameProfile(), getGameMode(), getPing(), Message.fromString(getName()));
     }
 
     public File getPlayerFile() {
@@ -507,5 +510,9 @@ public class Player {
 
     public void sendPacket(Packet p) {
         getSession().send(p);
+    }
+
+    public PlayerListEntry getListEntry() {
+        return this.listEntry;
     }
 }

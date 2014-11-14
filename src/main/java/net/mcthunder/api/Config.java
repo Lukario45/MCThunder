@@ -20,6 +20,7 @@ public class Config {
     private boolean globalNickRegisterd;
     private boolean allowPVP;
     private boolean useRankManager;
+    private String chatFormat;
     private String motd;
     private String world;
     private String serverName;
@@ -77,6 +78,8 @@ public class Config {
                 getConf().setProperty("USE-COMMAND-BLOCKS", false);
             if (!getConf().containsKey("useRankManager"))
                 getConf().setProperty("useRankManager", true);
+            if (!getConf().containsKey("chatFormat"))
+                getConf().setProperty("chatFormat", "{WORLD} &e{NAME}:&r {MESSAGE}");
             getConf().save();
             //Set all of the values from the config
             getConf().load();
@@ -97,7 +100,7 @@ public class Config {
             setMaxRenderDistance(getConf().getInt("MAX-REBDER-DISTANCE"));
             setCommandBlocks(getConf().getBoolean("USE-COMMAND-BLOCKS"));
             setUseRankManager(getConf().getBoolean("useRankManager"));
-
+            setChatFormat(getConf().getString("chatFormat"));
         } catch (ConfigurationException e) {
             Utils.tellConsole(LoggingLevel.ERROR, "Check Config File!");
             e.printStackTrace();
@@ -177,6 +180,14 @@ public class Config {
 
     public boolean getGlobalNickRegistered() {
         return this.globalNickRegisterd;
+    }
+
+    public void setChatFormat(String format) {
+        this.chatFormat = format;
+    }
+
+    public String getChatFormat() {
+        return this.chatFormat;
     }
 
     public String getGlobalNickPassword() {

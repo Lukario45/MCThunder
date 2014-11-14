@@ -8,12 +8,10 @@ import java.util.HashMap;
  * Based of of Alphabot/Lukabot code that was created by zack6849
  */
 public class CommandRegistry {
-    public static HashMap<String, Command> commands = new HashMap<>();
+    private static HashMap<String, Command> commands = new HashMap<>();
 
     public static void register(Command command) {
-        if (command == null)
-            return;
-        if (!commands.containsKey(command.getName().toLowerCase()))
+        if (command != null && !commands.containsKey(command.getName().toLowerCase()))
             commands.put(command.getName().toLowerCase(), command);
     }
 
@@ -36,5 +34,16 @@ public class CommandRegistry {
             if (c.getAliases().contains(name))
                 return c;
         return null;
+    }
+
+    public static Command getCommand(String node) {
+        for (Command c : commands.values())
+            if (c.getPermissionNode().equalsIgnoreCase(node))
+                return c;
+        return null;
+    }
+
+    public static HashMap<String,Command> getCommands() {
+        return commands;
     }
 }
