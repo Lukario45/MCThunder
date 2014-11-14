@@ -27,7 +27,13 @@ public class ServerChatHandler {
             message = player.getAppended() + " " + message;
             player.setAppended("");
         }
-        sendMessage("&e" + player.getDisplayName() + ":&r " + message);
+        String format = MCThunder.getConfig().getChatFormat();
+        format = format.replaceAll("\\{WORLD\\}", player.getWorld().getName());
+        format = format.replaceAll("\\{NAME\\}", player.getDisplayName());
+        int i = format.indexOf("{MESSAGE}");
+        if(i == -1)
+            format = format.substring(0, i) + message + format.substring(i + 9);
+        sendMessage(format);
     }
 
     public void sendMessage(String message) {

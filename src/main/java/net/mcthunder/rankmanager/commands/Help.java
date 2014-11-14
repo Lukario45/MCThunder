@@ -42,8 +42,8 @@ public class Help extends Command {//Ported by pup from Necessities
         int time = 0;
         String searched = "";
         String usage = "";
-        for (String name : CommandRegistry.commands.keySet()) {
-            Command c = CommandRegistry.commands.get(name);
+        for (String name : CommandRegistry.getCommands().keySet()) {
+            Command c = CommandRegistry.getCommand(name);
             if (c == null)
                 continue;
             if (name.toLowerCase().contains(search) || c.getInformation().toLowerCase().contains(search) || c.getAliases().contains(search) || search.equals("")) {

@@ -4,7 +4,6 @@ import net.mcthunder.MCThunder;
 import net.mcthunder.api.Player;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntryAction;
-import org.spacehq.mc.protocol.data.message.Message;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerPlayerListEntryPacket;
 
 import java.util.ArrayList;
@@ -24,10 +23,10 @@ public class ServerPlayerEntryListHandler {
     public void addToPlayerEntryList(Player player) {
         List<PlayerListEntry> playerListEntries = new ArrayList<>();
         ServerPlayerListEntryPacket serverPlayerListEntryPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER,
-                new PlayerListEntry[]{new PlayerListEntry(player.getGameProfile(), player.getGameMode(), player.getPing(), Message.fromString(player.getName()))});
+                new PlayerListEntry[]{player.getListEntry()});
         for (Player p : MCThunder.getPlayers()) {
             p.sendPacket(serverPlayerListEntryPacket);
-            playerListEntries.add(new PlayerListEntry(p.getGameProfile(), p.getGameMode(), player.getPing(), Message.fromString(p.getName())));
+            playerListEntries.add(p.getListEntry());
         }
         player.sendPacket(new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, playerListEntries.toArray(new PlayerListEntry[playerListEntries.size()])));
     }

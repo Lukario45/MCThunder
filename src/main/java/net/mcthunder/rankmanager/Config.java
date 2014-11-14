@@ -71,5 +71,4 @@ public class Config {
     public void setDenyColor(String color) {
         this.denyColor = color;
     }
-
 }
