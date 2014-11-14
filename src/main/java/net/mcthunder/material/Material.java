@@ -10,25 +10,27 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     STONE("STONE", 1),
     GRASS("GRASS", 2, Arrays.asList("GRASS_BLOCK")),
     DIRT("DIRT", 3),
+    COARSE_DIRT("COURSE_DIRT", DIRT, (short) 1),
+    PODZOL("PODZOL", DIRT, (short) 2),
     COBBLESTONE("COBBLESTONE", 4, Arrays.asList("COBBLE")),
     PLANKS("PLANKS", 5),
     SAPLING("SAPLING", 6),
     BEDROCK("BEDROCK", 7, Arrays.asList("ADMINIUM")),
     FLOWING_WATER("FLOWING_WATER", 8),
-    WATER("WATER", 9),
+    WATER("WATER", 9, Arrays.asList("STILL_WATER")),
     FLOWING_LAVA("FLOWING_LAVA", 10),
-    LAVA("LAVA", 11),
+    LAVA("LAVA", 11, Arrays.asList("STILL_LAVA")),
     SAND("SAND", 12),
     GRAVEL("GRAVEL", 13),
     GOLD_ORE("GOLD_ORE", 14),
     IRON_ORE("IRON_ORE", 15),
     COAL_ORE("COAL_ORE", 16),
-    LOG("LOG", 17),
+    LOG("LOG", 17, Arrays.asList("BARK")),
     LEAVES("LEAVES", 18),
     SPONGE("SPONGE", 19),
     GLASS("GLASS", 20),
-    LAPIS_ORE("LAPIS_ORE", 21),
-    LAPIS_BLOCK("LAPIS_BLOCK", 22),
+    LAPIS_ORE("LAPIS_ORE", 21, Arrays.asList("LAPIS_LAZULI_ORE")),
+    LAPIS_BLOCK("LAPIS_BLOCK", 22, Arrays.asList("LAPIS_LAZULI_BLOCK")),
     DISPENSER("DISPENSER", 23),
     SANDSTONE("SANDSTONE", 24),
     NOTEBLOCK("NOTEBLOCK", 25),
@@ -36,7 +38,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     GOLDEN_RAIL("GOLDEN_RAIL", 27, Arrays.asList("POWERED_RAIL")),
     DETECTOR_RAIL("DETECTOR_RAIL", 28),
     STICKY_PISTON("STICKY_PISTON", 29),
-    WEB("WEB", 30, Arrays.asList("COBWEB")),
+    WEB("WEB", 30, Arrays.asList("COBWEB", "SPIDER_WEB")),
     TALLGRASS("TALLGRASS", 31),
     DEADBUSH("DEADBUSH", 32),
     PISTON("PISTON", 33),
@@ -50,25 +52,25 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     GOLD_BLOCK("GOLD_BLOCK", 41, Arrays.asList("BLOCK_OF_GOLD")),
     IRON_BLOCK("IRON_BLOCK", 42, Arrays.asList("BLOCK_OF_IRON")),
     DOUBLE_STONE_SLAB("DOUBLE_STONE_SLAB", 43),//Unobtainable
-    STONE_SLAB("STONE_SLAB", 44),
+    STONE_SLAB("STONE_SLAB", 44, Arrays.asList("SLAB")),
     BRICK_BLOCK("BRICK_BLOCK", 45),
     TNT("TNT", 46),
     BOOKSHELF("BOOKSHELF", 47),
-    MOSSY_COBBLESTONE("MOSSY_COBBLESTONE", 48),
+    MOSSY_COBBLESTONE("MOSSY_COBBLESTONE", 48, Arrays.asList("MOSSY_COBBLE")),
     OBSIDIAN("OBSIDIAN", 49),
     TORCH("TORCH", 50),
     FIRE("FIRE", 51),//Unobtainable
-    MOB_SPAWNER("MOB_SPAWNER", 52),
+    MOB_SPAWNER("MOB_SPAWNER", 52, Arrays.asList("SPAWNER", "MONSTERS_PAWNER")),
     OAK_STAIRS("OAK_STAIRS", 53),
     CHEST("CHEST", 54),
     REDSTONE_WIRE("REDSTONE_WIRE", 55),//Unobtainable
     DIAMOND_ORE("DIAMOND_ORE", 56),
-    DIAMOND_BLOCK("DIAMOND_BLOCK", 57),
-    CRAFTING_TABLE("CRAFTING_TABLE", 58),
+    DIAMOND_BLOCK("DIAMOND_BLOCK", 57, Arrays.asList("BLOCK_OF_DIAMOND")),
+    CRAFTING_TABLE("CRAFTING_TABLE", 58, Arrays.asList("WORKBENCH")),
     WHEAT_BLOCK("WHEAT_BLOCK", 59, Arrays.asList("CROPS")),//Unobtainable
-    FARMLAND("FARMLAND", 60),
+    FARMLAND("FARMLAND", 60, Arrays.asList("SOIL", "TILLED_SOIL", "TILLED_GROUND", "TILLED_LAND")),
     FURNACE("FURNACE", 61),
-    LIT_FURNACE("LIT_FURNACE", 62),
+    LIT_FURNACE("LIT_FURNACE", 62, Arrays.asList("BURNING_FURNACE")),
     STANDING_SIGN("STANDING_SIGN", 63),//Unobtainable
     WOODEN_DOOR_BLOCK("WOODEN_DOOR_BLOCK", 64),//Unobtainable
     LADDER("LADDER", 65),
@@ -82,7 +84,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     REDSTONE_ORE("REDSTONE_ORE", 73),
     LIT_REDSTONE_ORE("LIT_REDSTONE_ORE", 74),//Unobtainable
     UNLIT_REDSTONE_TORCH("UNLIT_REDSTONE_TORCH", 75),//Unobtainable
-    REDSTONE_TORCH("REDSTONE_TORCH", 76),
+    REDSTONE_TORCH("REDSTONE_TORCH", 76, Arrays.asList("LIT_REDSTONE_TORCH")),
     STONE_BUTTON("STONE_BUTTON", 77),
     SNOW_LAYER("SNOW_LAYER", 78),
     ICE("ICE", 79),
@@ -371,7 +373,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     DIAMOND_HORSE_ARMOR("DIAMOND_HORSE_ARMOR", 419),
     LEAD("LEAD", 420),
     NAME_TAG("NAME_TAG", 421),
-    COMMAND_BLOCK_MINECART("COMMAND_BLOCK_MINECART", 422),
+    COMMAND_BLOCK_MINECART("COMMAND_BLOCK_MINECART", 422, Arrays.asList("MINECART_WITH_COMMAND_BLOCK", "COMMAND_IN_MINECART", "MINECART_WITH_COMMAND")),
     MUTTON("MUTTON", 423),
     COOKED_MUTTON("COOKED_MUTTON", 424),
     BANNER("BANNER", 425),
@@ -407,35 +409,45 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     private static List<Material> shovelList;
     private static List<Material> swordsList;
     private static List<Material> hoeList;
+    private final Material parent;
     private final String name;
-    private final int id;
+    private final Integer id;
     private final short data;
     private List<String> aliases;
 
     private Material(String name, int id) {
-        this(name, id, (short) 0, new ArrayList<String>());
+        this(name, id, new ArrayList<String>());
     }
 
     private Material(String name, int id, List<String> aliases) {
-        this(name, id, (short) 0, aliases);
-    }
-
-    private Material(String name, int id, short data) {
-        this(name, id, data, new ArrayList<String>());
-    }
-
-    private Material(String name, int id, short data, List<String> aliases) {
         this.name = name;
         this.id = id;
-        this.data = data;
+        this.data = 0;
         this.aliases = aliases;
+        this.parent = null;
+    }
+
+    private Material(String name, Material parent, short data) {
+        this(name, parent, data, new ArrayList<String>());
+    }
+
+    private Material(String name, Material parent, short data, List<String> aliases) {
+        this.name = name;
+        this.data = data;
+        this.id = null;
+        this.aliases = aliases;
+        this.parent = parent;
+    }
+
+    public Material getParent() {
+        return this.parent;
     }
 
     public String getName() {
         return this.name;
     }
 
-    public int getID() {
+    public Integer getID() {
         return this.id;
     }
 
@@ -496,7 +508,8 @@ public enum Material {//http://minecraft.gamepedia.com/Id
 
     public static void mapMaterials() {
         for(Material m : values()) {
-            idMap.put(m.getID(), m);
+            if (m.getID() != null)
+                idMap.put(m.getID(), m);
             nameMap.put(m.getName(), m);
             for(String alias : m.getAliases())
                 aliasMap.put(alias, m.getName());

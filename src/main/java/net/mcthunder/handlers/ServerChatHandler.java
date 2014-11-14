@@ -31,7 +31,7 @@ public class ServerChatHandler {
         format = format.replaceAll("\\{WORLD\\}", player.getWorld().getName());
         format = format.replaceAll("\\{NAME\\}", player.getDisplayName());
         int i = format.indexOf("{MESSAGE}");
-        if(i == -1)
+        if(i != -1)
             format = format.substring(0, i) + message + format.substring(i + 9);
         sendMessage(format);
     }
