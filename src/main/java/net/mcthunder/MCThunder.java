@@ -330,8 +330,7 @@ public class MCThunder {
                                     data = Material.fromString(setType.getName() + "_EAST").getData();
                                 else if ((packet.getFace().equals(Face.NORTH) || packet.getFace().equals(Face.SOUTH)) && Material.fromString(setType.getName() + "_NORTH") != null)
                                     data = Material.fromString(setType.getName() + "_NORTH").getData();
-                                //b.setType(Material.fromData(setType, data));
-                                b.setType(setType, data);
+                                b.setType(Material.fromData(setType, data));
                             } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
                                 ClientPlayerActionPacket packet = event.getPacket();
                                 Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());

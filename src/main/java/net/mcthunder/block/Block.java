@@ -15,7 +15,6 @@ import static net.mcthunder.api.Utils.getLong;
 public class Block {
     private Location loc;
     private Material type;
-    private short data;
     private int columnX, columnZ, chunkY, blockX, blockY, blockZ;
 
     public Block(Location loc) {
@@ -48,7 +47,6 @@ public class Block {
         }
         if (isInvalid()) {
             this.type = null;
-            this.data = 0;
             return;
         }
         this.columnX = columnX;
@@ -59,8 +57,7 @@ public class Block {
         this.blockZ = blockZ;
         Chunk[] chunks = loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks();
         ShortArray3d blocks = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlocks() : new ShortArray3d(4096);
-        this.type = Material.fromID(blocks.getBlock(this.blockX, this.blockY, this.blockZ));
-        this.data = (short) blocks.getData(this.blockX, this.blockY, this.blockZ);
+        this.type = Material.fromData(Material.fromID(blocks.getBlock(this.blockX, this.blockY, this.blockZ)), (short) blocks.getData(this.blockX, this.blockY, this.blockZ));
     }
 
     public Block getRelative(Direction d, int distance) {
@@ -96,10 +93,9 @@ public class Block {
         return this.loc == null ? null : this.loc.clone();
     }
 
-    public void setType(Material type, short data) {
+    public void setType(Material type) {
         if (type == null)
             type = Material.AIR;
-        this.data = data;
         this.type = type;
         if (isInvalid())
             return;
@@ -108,7 +104,7 @@ public class Block {
         ShortArray3d blocks = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlocks() : new ShortArray3d(4096);
         NibbleArray3d blockLight = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlockLight() : new NibbleArray3d(4096);
         NibbleArray3d skyLight = chunks[this.chunkY] != null ? chunks[this.chunkY].getSkyLight() : new NibbleArray3d(4096);
-        blocks.setBlockAndData(this.blockX, this.blockY, this.blockZ, this.type.getID() == null ? this.type.getParent().getID() : this.type.getID(), this.data);
+        blocks.setBlockAndData(this.blockX, this.blockY, this.blockZ, this.type.getID() == null ? this.type.getParent().getID() : this.type.getID(), this.type.getData());
         Block above = getRelative(Direction.UP);
         blockLight.set(this.blockX, this.blockY, this.blockZ, this.type.getLightLevel());
         skyLight.set(this.blockX, this.blockY, this.blockZ, above.getSkyLight());
@@ -134,14 +130,6 @@ public class Block {
         if (isInvalid())
             return 0;
         return this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY].getBlockLight().get(this.blockX, this.blockY, this.blockZ);
-    }
-
-    public void setType(Material type) {
-        setType(type, (short)0);
-    }
-
-    public short getData() {
-        return this.data;
     }
 
     private boolean isInvalid() {
