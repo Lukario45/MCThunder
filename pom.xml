@@ -68,7 +68,7 @@
             <version>2.4</version>
         </dependency>
         <dependency>
-            <groupId>com.Lukario45</groupId>
+            <groupId>com.lukario45</groupId>
             <artifactId>NBTFile</artifactId>
             <version>1.0</version>
         </dependency>
