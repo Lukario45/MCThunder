@@ -25,6 +25,6 @@ public class RankManagerLoggingInEventListener implements net.mcthunder.interfac
         StringTag stringTag = new StringTag("RankName", "Test");
         map.put(stringTag.getName(), stringTag);
         CompoundTag c = new CompoundTag("RankManager", map);
-        playerProfileHandler.addCompundAttribute(player, c);
+        playerProfileHandler.addAttribute(player, c);
     }
 }

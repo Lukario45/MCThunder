@@ -364,7 +364,7 @@ public class MCThunder {
                         map.put("Z", new DoubleTag("Z", player.getLocation().getZ()));
                         map.put("Yaw", new FloatTag("Yaw", player.getLocation().getYaw()));
                         map.put("Pitch", new FloatTag("Pitch", player.getLocation().getPitch()));
-                        playerProfileHandler.changeCompundAttribute(player, new CompoundTag("SpawnPosition", map));
+                        playerProfileHandler.changeAttribute(player, new CompoundTag("SpawnPosition", map));
                         playerHashMap.remove(player.getUniqueID());
                     }
                 }

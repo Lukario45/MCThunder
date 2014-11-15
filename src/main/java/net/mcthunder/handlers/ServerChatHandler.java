@@ -23,6 +23,7 @@ public class ServerChatHandler {
             player.setAppended(appended.trim());
             player.sendMessage("&aMessage appended.");
             return;
+
         } else if (!player.getAppended().equals("")) {
             message = player.getAppended() + " " + message;
             player.setAppended("");

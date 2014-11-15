@@ -1,5 +1,6 @@
 package net.mcthunder.api;
 
+import com.Lukario45.NBTFile.NBTFile;
 import net.mcthunder.MCThunder;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
@@ -16,14 +17,11 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntities
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
-import org.spacehq.opennbt.NBTIO;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.Tag;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.packet.Packet;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +35,7 @@ import static net.mcthunder.api.Utils.getLong;
 public class Player {
     private final UUID uuid;
     private final String name;
-    private File playerFile;
+    private NBTFile playerFile;
     private HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
     private ArrayList<Long> loadedColumns = new ArrayList<>();
     private ArrayList<Long> northColumns = new ArrayList<>();
@@ -73,44 +71,16 @@ public class Player {
         this.gamemode = GameMode.CREATIVE;
         this.moveable = false;
         this.inv = new PlayerInventory(44, this.name);
-        this.playerFile = new File("PlayerFiles", this.uuid + ".dat");
+        this.playerFile = new NBTFile(new File("PlayerFiles", this.uuid + ".dat"), "Player");
         this.listEntry = new PlayerListEntry(getGameProfile(), getGameMode(), getPing(), Message.fromString(getName()));
     }
 
-    public File getPlayerFile() {
+    public NBTFile getPlayerFile() {
         return this.playerFile;
     }
 
-    public Map getTagMap() {
-        return this.tagMap;
-    }
-
-    public void writePlayerTag() {
-
-        CompoundTag compundTag = new CompoundTag("Player", this.tagMap);
-        try {
-            NBTIO.writeFile(compundTag, getPlayerFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void addTagToMap(String name, Tag t) {
 
 
-        CompoundTag c = null;
-        try {
-            c = NBTIO.readFile(getPlayerFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        c.put(t);
-        try {
-            NBTIO.writeFile(c, getPlayerFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void loadChunks(Direction d) {
         if(d == null) {

@@ -44,7 +44,6 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
         tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.getGameProfile().getName(), session.getHost(), session.getPort()));
         entryListHandler.addToPlayerEntryList(player);
         MCThunder.updateEntryList(entryListHandler);
-        playerProfileHandler.addAttribute(player, "test", "testity");
         //Send World Data
         player.loadChunks(null);
         player.sendPacket(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
