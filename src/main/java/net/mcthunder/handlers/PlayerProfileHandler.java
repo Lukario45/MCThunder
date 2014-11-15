@@ -64,9 +64,9 @@ public class PlayerProfileHandler {
 
     }
 
-    public void deleteAttribute(Player player, String attribute) {
+    public void deleteAttribute(Player player, Tag t) {
         try {
-            player.getPlayerFile().write(new CompoundTag(null, null));
+            player.getPlayerFile().write(new CompoundTag(t.getName(), null));
         } catch (IOException e) {
             e.printStackTrace();
         }
