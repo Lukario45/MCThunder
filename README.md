@@ -5,15 +5,15 @@ MCThunder is an open source minecraft server software that will allow people to 
 What MCThunder will have
 -
 MCThunder is planned for the newest version of minecraft, but it is ment to run sort of like a classic server, E.G MCLawl, MCBlend, MCForge, etc. Hence the reason its name starts with MC unlike Craftbukkit. When I say it will run like a classic server I mean it will have several built in things that make running it easiar in general, after all, why download a plugin for every aspect of your server, thats just more configuring and waiting for updates!
-Here is a list of what we plan to add to MCThunder
-~ Built in Rank plugin (Can be Disabled if someone wants their own rank plugin)
-~ Port Commands that would be related to world edit and world guard
-~ Economy (Disable able)
-~ Global Chat (This was a major feature of classic, can be disabled ofcourse) 
-~ Essentials Related Commands
-~ Plugin API
-~ Optional GUI
-~ Much more
+Here is a list of what we plan to add to MCThunder<br>
+~ Built in Rank plugin (Can be Disabled if someone wants their own rank plugin)<br>
+~ Port Commands that would be related to world edit and world guard<br>
+~ Economy (Disable able)<br>
+~ Global Chat (This was a major feature of classic, can be disabled ofcourse) <br>
+~ Essentials Related Commands<br>
+~ Plugin API<br>
+~ Optional GUI<br>
+~ Much more<br>
 
 Background of MCThunder
 - 
