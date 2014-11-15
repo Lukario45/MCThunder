@@ -21,35 +21,35 @@ I originally found MCThunder not to long after I started playing minecraft aroun
 
 What we have done already
 -
-~ World Parseing
-~ Some world saving
-~ Most blocks can be placed
-~ Blocks can be broken 
-~ Chat related things
-~ Command System 
+~ World Parseing<br>
+~ Some world saving<br>
+~ Most blocks can be placed<br>
+~ Blocks can be broken <br>
+~ Chat related things<br>
+~ Command System <br>
 
 Main Developers
 -
-~ Lukario45 (Me :D)
-~ pupnewfster
+~ Lukario45 (Me :D)<br>
+~ pupnewfster<br>
 
 People who have Contributed in some way, shape or form (Could be Debugging, testing, or developing)
 -
-~ zack6849
-~ Steveice10
-~ Evadable
-~ Merlin33069
-~ MinedroidFTW
+~ zack6849<br>
+~ Steveice10<br>
+~ Evadable<br>
+~ Merlin33069<br>
+~ MinedroidFTW<br>
 If anyone on this list has developed and wishes to be a main developer please tell me
 
 Vital for first release
 -
 These are just some things that are needed for the first release
-~ World generation
-~ better placing
-~ better saving
-~ materials
-I plan to release some sort of version, probably not completed at the end of winter towards early spring
+~ World generation<br>
+~ better placing<br>
+~ better saving<br>
+~ materials<br>
+I plan to release some sort of version, probably not completed at the end of winter towards early spring<br>
 
 Plugin Development
 =
