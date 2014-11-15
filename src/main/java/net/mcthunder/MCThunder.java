@@ -321,7 +321,8 @@ public class MCThunder {
                                     else
                                         data = 5;
                                 }
-                                if (Material.fromString(setType.getName() + "_BLOCK") != null)
+                                if (Material.fromString(setType.getName() + "_BLOCK") != null && !setType.equals(Material.BROWN_MUSHROOM) && !setType.equals(Material.RED_MUSHROOM) &&
+                                        !setType.equals(Material.MELON))
                                     setType = Material.fromString(setType.getName() + "_BLOCK");
                                 if ((packet.getFace().equals(Face.BOTTOM) || packet.getFace().equals(Face.TOP)) && Material.fromString(setType.getName() + "_UP") != null)
                                     data = Material.fromString(setType.getName() + "_UP").getData();
