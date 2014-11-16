@@ -62,7 +62,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     OAK_LOG_UP("OAK_LOG_UP", LOG, (short) 0),
     SPRUCE_LOG_UP("SPRUCE_LOG_UP", LOG, (short) 1),
     BIRCH_LOG_UP("BIRCH_LOG_UP", LOG, (short) 2),
-    JUNGLE_LOG_UP("OAK_LOG_UP", LOG, (short) 3),
+    JUNGLE_LOG_UP("JUNGLE_LOG_UP", LOG, (short) 3),
     OAK_LOG_EAST("OAK_LOG_EAST", LOG, (short) 4),
     SPRUCE_LOG_EAST("SPRUCE_LOG_EAST", LOG, (short) 5),
     BIRCH_LOG_EAST("BIRCH_LOG_EAST", LOG, (short) 6),
@@ -923,7 +923,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
         this.id = id;
         this.data = 0;
         this.aliases = aliases;
-        this.parent = null;
+        this.parent = this;
         this.children = new HashMap<>();
     }
 

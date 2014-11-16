@@ -79,9 +79,6 @@ public class Player {
         return this.playerFile;
     }
 
-
-
-
     public void loadChunks(Direction d) {
         if(d == null) {
             loadDir(Direction.NORTH);

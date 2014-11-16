@@ -301,36 +301,41 @@ public class MCThunder {
                                 if (heldItem == null || (position.getY() >> 4) < 0)
                                     return;
                                 //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
-                                int type = heldItem.getId();
-                                short data = (short) heldItem.getData();
                                 Block b = new Block(new Location(player.getWorld(), position.getX(), position.getY(), position.getZ()));
                                 if (!b.getType().isLiquid() && !b.getType().equals(Material.SNOW_LAYER) && !b.getType().isLongGrass())
                                     b = b.getRelative(Direction.fromFace(packet.getFace()));
                                 if (!b.getType().equals(Material.AIR))
                                     return;
-                                Material setType = Material.fromID(type);
-                                if (setType.equals(Material.TORCH)) {//Still need to check if is a valid torch position
+                                Material setType = Material.fromData(Material.fromID(heldItem.getId()), (short) heldItem.getData());
+                                if (setType == null)
+                                    return;
+                                if (setType.getParent().equals(Material.TORCH) || setType.getParent().equals(Material.REDSTONE_TORCH)) {//Still need to check if is a valid torch position
                                     if (packet.getFace().equals(Face.SOUTH))
-                                        data = 1;
+                                        setType = Material.fromString("EAST_" + setType.getParent());
                                     else if (packet.getFace().equals(Face.NORTH))
-                                        data = 2;
+                                        setType = Material.fromString("WEST_" + setType.getParent());
                                     else if (packet.getFace().equals(Face.WEST))
-                                        data = 3;
+                                        setType = Material.fromString("SOUTH_" + setType.getParent());
                                     else if (packet.getFace().equals(Face.EAST))
-                                        data = 4;
+                                        setType = Material.fromString("NORTH_" + setType.getParent());
                                     else
-                                        data = 5;
+                                        setType = Material.fromString("UP_" + setType.getParent());
                                 }
+                                if (setType.equals(Material.REDSTONE))
+                                    setType = Material.REDSTONE_WIRE;
+                                if (setType.equals(Material.STRING))
+                                    setType = Material.TRIPWIRE;
                                 if (Material.fromString(setType.getName() + "_BLOCK") != null && !setType.equals(Material.BROWN_MUSHROOM) && !setType.equals(Material.RED_MUSHROOM) &&
                                         !setType.equals(Material.MELON))
                                     setType = Material.fromString(setType.getName() + "_BLOCK");
-                                if ((packet.getFace().equals(Face.BOTTOM) || packet.getFace().equals(Face.TOP)) && Material.fromString(setType.getName() + "_UP") != null)
-                                    data = Material.fromString(setType.getName() + "_UP").getData();
-                                else if ((packet.getFace().equals(Face.EAST) || packet.getFace().equals(Face.WEST)) && Material.fromString(setType.getName() + "_EAST") != null)
-                                    data = Material.fromString(setType.getName() + "_EAST").getData();
-                                else if ((packet.getFace().equals(Face.NORTH) || packet.getFace().equals(Face.SOUTH)) && Material.fromString(setType.getName() + "_NORTH") != null)
-                                    data = Material.fromString(setType.getName() + "_NORTH").getData();
-                                b.setType(Material.fromData(setType, data));
+                                String name = setType.getName().replace("_UP", "");
+                                if ((packet.getFace().equals(Face.BOTTOM) || packet.getFace().equals(Face.TOP)) && Material.fromString(name + "_UP") != null)
+                                    setType = Material.fromString(name + "_UP");
+                                else if ((packet.getFace().equals(Face.NORTH) || packet.getFace().equals(Face.SOUTH)) && Material.fromString(name + "_EAST") != null)
+                                    setType = Material.fromString(name + "_EAST");
+                                else if ((packet.getFace().equals(Face.EAST) || packet.getFace().equals(Face.WEST)) && Material.fromString(name + "_NORTH") != null)
+                                    setType = Material.fromString(name + "_NORTH");
+                                b.setType(setType);
                             } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
                                 ClientPlayerActionPacket packet = event.getPacket();
                                 Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
