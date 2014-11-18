@@ -77,6 +77,7 @@ public enum EntityType {
 
     private static HashMap<Integer,EntityType> idMap = new HashMap<>();
     private static HashMap<String,EntityType> nameMap = new HashMap<>();
+    private static HashMap<String,EntityType> savegameIdMap = new HashMap<>();
     private String name;
     private String savegameID;
     private int id;
@@ -99,6 +100,26 @@ public enum EntityType {
         return this.savegameID;
     }
 
+    public boolean isCreature() {
+        return this.id >= 48;
+    }
+
+    public boolean isItem() {
+        return this.id == 1 || this.id == 2;
+    }
+
+    public boolean isVehicle() {
+        return this.id >= 40 && this.id <= 47;
+    }
+
+    public boolean isProjectile() {
+        return (this.id >= 10 && this.id <= 19) || this.id != 22;
+    }
+
+    public boolean isDynamic() {
+        return this.id == 20 || this.id == 21;
+    }
+
     public static EntityType fromID(int id) {
         return idMap.get(id);
     }
@@ -107,10 +128,15 @@ public enum EntityType {
         return nameMap.get(name.toUpperCase().replaceAll(" ", "_"));
     }
 
+    public static EntityType fromSavegameId(String name) {
+        return savegameIdMap.get(name);
+    }
+
     public static void mapEntityTypes() {
         for(EntityType e : values()) {
             idMap.put(e.getID(), e);
             nameMap.put(e.getName(), e);
+            savegameIdMap.put(e.getSavegameID(), e);
         }
     }
 }
