@@ -33,8 +33,8 @@ import static net.mcthunder.api.Utils.getLong;
  * Created by Kevin on 10/14/2014.
  */
 public class Player {
-    private final UUID uuid;
-    private final String name;
+    private UUID uuid;
+    private String name;
     private NBTFile playerFile;
     private HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
     private ArrayList<Long> loadedColumns = new ArrayList<>();
@@ -59,6 +59,10 @@ public class Player {
     private String appended = "";
     private Map<String, Tag> tagMap = new HashMap<>();
     private PlayerListEntry listEntry;
+
+    public Player(){
+
+    }
 
     public Player(Session session, int entityID, EntityMetadata metadata) {
         this.session = session;
