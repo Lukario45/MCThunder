@@ -46,7 +46,7 @@ public class Block {
             columnZ++;
         }
         if (isInvalid()) {
-            this.type = null;
+            this.type = Material.AIR;
             return;
         }
         this.columnX = columnX;
@@ -134,6 +134,6 @@ public class Block {
 
     private boolean isInvalid() {
         return this.loc == null || this.chunkY < 0 || this.chunkY > 15 || this.blockX < 0 || this.blockX > 15 || this.blockY < 0 ||
-                this.blockY > 15 || this.blockZ < 0 || this.blockZ > 15;
+                this.blockY > 15 || this.blockZ < 0 || this.blockZ > 15 || !this.loc.getWorld().isColumnLoaded(getLong(this.columnX, this.columnZ));
     }
 }

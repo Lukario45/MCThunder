@@ -2,6 +2,8 @@ package net.mcthunder;
 
 import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
+import net.mcthunder.entity.Entity;
+import net.mcthunder.entity.EntityType;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
 import net.mcthunder.events.listeners.PlayerCommandEventListener;
 import net.mcthunder.events.listeners.PlayerLoggingInEventListener;
@@ -160,8 +162,7 @@ public class MCThunder {
                     BufferedImage icon = null;
                     try {
                         icon = ImageIO.read(new File("server-icon.png"));
-                    } catch (Exception ignored) {
-                    }//When there is no icon set
+                    } catch (Exception ignored) { }//When there is no icon set
                     return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), playerHashMap.size(), gameProfiles), new TextMessage(conf.getServerMOTD()), icon);
                 }
             });
@@ -335,7 +336,12 @@ public class MCThunder {
                                     setType = Material.fromString(name + "_EAST");
                                 else if ((packet.getFace().equals(Face.EAST) || packet.getFace().equals(Face.WEST)) && Material.fromString(name + "_NORTH") != null)
                                     setType = Material.fromString(name + "_NORTH");
-                                b.setType(setType);
+                                if (setType.getParent().equals(Material.SPAWN_EGG)) {
+                                    Location l = new Location(player.getWorld(), b.getLocation().getX() + 1 - packet.getCursorX(), b.getLocation().getY() +
+                                            1 - (packet.getCursorY() == 0 ? 1 : packet.getCursorY()), b.getLocation().getZ() + 1 - packet.getCursorZ());
+                                    Entity.spawn(l, EntityType.fromString(setType.getName().replaceFirst("SPAWN_", "")));
+                                } else
+                                    b.setType(setType);
                             } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
                                 ClientPlayerActionPacket packet = event.getPacket();
                                 Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());

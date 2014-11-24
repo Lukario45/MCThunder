@@ -22,9 +22,7 @@ public class RankManagerLoggingInEventListener implements net.mcthunder.interfac
     public void onLogin(Session session, ServerPlayerEntryListHandler entryListHandler, PlayerProfileHandler playerProfileHandler) throws ClassNotFoundException {
         Player player = MCThunder.getPlayer(session.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
         Map<String, Tag> map = new HashMap<>();
-        StringTag stringTag = new StringTag("RankName", "Test");
-        map.put(stringTag.getName(), stringTag);
-        CompoundTag c = new CompoundTag("RankManager", map);
-        playerProfileHandler.addAttribute(player, c);
+        map.put("RankName", new StringTag("RankName", "Test"));
+        playerProfileHandler.addAttribute(player, new CompoundTag("RankManager", map));
     }
 }

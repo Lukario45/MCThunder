@@ -109,6 +109,10 @@ public class Location {
         this.world = w;
     }
 
+    public String toString() {
+        return this.world.getName() + " " + this.x + " " + this.y + " " + this.z + " " + this.yaw + " " + this.pitch;
+    }
+
     @Override
     public Location clone() {
         return new Location(this.world, this.x, this.y, this.z, this.yaw, this.pitch);

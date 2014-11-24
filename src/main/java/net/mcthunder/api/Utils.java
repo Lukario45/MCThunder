@@ -61,6 +61,14 @@ public class Utils {
         System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), format.toConsole(message));
     }
 
+    public static void tellConsole(LoggingLevel level, Object m) {
+        try {
+            tellConsole(level, m.toString());
+        } catch (Exception e) {//Could not cast to string
+            e.printStackTrace();
+        }
+    }
+
     public static long getLong(int x, int z) {
         return (long) x << 32 | z & 0xFFFFFFFFL;
     }

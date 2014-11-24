@@ -2,6 +2,7 @@ package net.mcthunder.api;
 
 import com.Lukario45.NBTFile.NBTFile;
 import net.mcthunder.MCThunder;
+import net.mcthunder.entity.Entity;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
@@ -32,9 +33,9 @@ import static net.mcthunder.api.Utils.getLong;
 /**
  * Created by Kevin on 10/14/2014.
  */
-public class Player {
-    private UUID uuid;
-    private String name;
+public class Player extends Entity {
+    private final UUID uuid;
+    private final String name;
     private NBTFile playerFile;
     private HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
     private ArrayList<Long> loadedColumns = new ArrayList<>();
@@ -60,8 +61,9 @@ public class Player {
     private Map<String, Tag> tagMap = new HashMap<>();
     private PlayerListEntry listEntry;
 
-    public Player(){
-
+    public Player() {//Why just why is this needed I made them final again because they should be...
+        this.uuid = null;
+        this.name = null;
     }
 
     public Player(Session session, int entityID, EntityMetadata metadata) {

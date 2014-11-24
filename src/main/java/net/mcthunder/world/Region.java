@@ -1,8 +1,8 @@
 package net.mcthunder.world;
 
-import net.mcthunder.api.Direction;
-import net.mcthunder.api.EntityType;
-import net.mcthunder.api.Player;
+import net.mcthunder.api.*;
+import net.mcthunder.entity.Entity;
+import net.mcthunder.entity.EntityType;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
+
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/21/2014.
@@ -153,7 +155,7 @@ public class Region {
             ListTag sections = level.get("Sections");
             ByteArrayTag biomes = level.get("Biomes");
             ListTag entities = level.get("Entities");
-            for (int i = 0; i < entities.size(); i++) {//http://minecraft.gamepedia.com/Chunk_format#Entity_format
+            for (int i = 0; i < entities.size(); i++) {//TODO: cleanup reading and spawning
                 CompoundTag entity = entities.get(i);
                 StringTag id = entity.get("id");
                 EntityType type = id == null ? null : EntityType.fromSavegameId(id.getValue());
@@ -162,6 +164,8 @@ public class Region {
                     DoubleTag posX = pos.get(0);
                     DoubleTag posY = pos.get(1);
                     DoubleTag posZ = pos.get(2);
+                    Location p = new Location(this.world, posX.getValue(), posY.getValue(), posZ.getValue());
+                    Entity.spawn(p, type);
                 }
                 ListTag motion = entity.get("Motion");
                 if (motion != null) {
@@ -178,26 +182,27 @@ public class Region {
                 ShortTag air = entity.get("Air");
                 ByteTag onGround = entity.get("OnGround");//1 true, 0 false
                 IntTag dimension = entity.get("Dimension");//-1 nether, 0 overworld, 1 end
+                this.world.setDimension(dimension.getValue());
                 ByteTag invulnerable = entity.get("Invulnerable");//1 true, 0 false
                 IntTag portalCooldown = entity.get("PortalCooldown");
                 LongTag uuidMost = entity.get("UUIDMost");
                 LongTag uuidLeast = entity.get("UUIDLeast");
-                UUID uuid = UUID.fromString(((StringTag) entity.get("UUID")).getValue());
+                UUID uuid = entity.get("UUID") != null ? UUID.fromString(((StringTag) entity.get("UUID")).getValue()) : null;
                 StringTag customName = entity.get("CustomName");
                 ByteTag customNameVisible = entity.get("CustomNameVisible");//1 true, 0 false
                 ByteTag silent = entity.get("Silent");//1 true, 0 false
                 CompoundTag riding = entity.get("Riding");
                 CompoundTag commandStats = entity.get("CommandStats");
-                StringTag successCountName = commandStats.get("SuccessCountName");
-                StringTag successCountObjective = commandStats.get("SuccessCountObjective");
-                StringTag affectedBlocksName = commandStats.get("AffectedBlocksName");
-                StringTag affectedBlocksObjective = commandStats.get("AffectedBlocksObjective");
-                StringTag affectedEntitiesName = commandStats.get("AffectedEntitiesName");
-                StringTag affectedEntitiesObjective = commandStats.get("AffectedEntitiesObjective");
-                StringTag affectedItemsName = commandStats.get("AffectedItemsName");
-                StringTag affectedItemsObjective = commandStats.get("AffectedItemsObjective");
-                StringTag queryResultName = commandStats.get("QueryResultName");
-                StringTag queryResultObjective = commandStats.get("QueryResultObjective");
+                StringTag successCountName = commandStats != null ? (StringTag) commandStats.get("SuccessCountName") : null;
+                StringTag successCountObjective = commandStats != null ? (StringTag) commandStats.get("SuccessCountObjective") : null;
+                StringTag affectedBlocksName = commandStats != null ? (StringTag) commandStats.get("AffectedBlocksName") : null;
+                StringTag affectedBlocksObjective = commandStats != null ? (StringTag) commandStats.get("AffectedBlocksObjective") : null;
+                StringTag affectedEntitiesName = commandStats != null ? (StringTag) commandStats.get("AffectedEntitiesName") : null;
+                StringTag affectedEntitiesObjective = commandStats != null ? (StringTag) commandStats.get("AffectedEntitiesObjective") : null;
+                StringTag affectedItemsName = commandStats != null ? (StringTag) commandStats.get("AffectedItemsName") : null;
+                StringTag affectedItemsObjective = commandStats != null ? (StringTag) commandStats.get("AffectedItemsObjective") : null;
+                StringTag queryResultName = commandStats != null ? (StringTag) commandStats.get("QueryResultName") : null;
+                StringTag queryResultObjective = commandStats != null ? (StringTag) commandStats.get("QueryResultObjective") : null;
                 if (type == null || type.isCreature()) {
                     FloatTag healF = entity.get("HealF");
                     ShortTag health = entity.get("Health");
@@ -266,7 +271,7 @@ public class Region {
                     IntTag age = entity.get("Age");
                     IntTag forcedAge = entity.get("ForcedAge");
                     StringTag owner = entity.get("Owner");//Legacy support for pre 1.8
-                    UUID ownerUUID = UUID.fromString(((StringTag) entity.get("OwnerUUID")).getValue());
+                    UUID ownerUUID = entity.get("OwnerUUID") != null ? UUID.fromString(((StringTag) entity.get("OwnerUUID")).getValue()) : null;
                     ByteTag sitting = entity.get("Sitting");//1 true, 0 false
                     if (type == null) {
                         //Then do nothing because it is a player
@@ -370,7 +375,7 @@ public class Region {
                     ShortTag xTile = entity.get("xTile");
                     ShortTag yTile = entity.get("yTile");
                     ShortTag zTile = entity.get("zTile");
-                    StringTag inTile = entity.get("inTile");
+                    ByteTag inTile = entity.get("inTile");//1 true, 0 false
                     if (!type.equals(EntityType.BLAZE_FIREBALL) && !type.equals(EntityType.GHAST_FIREBALL) && !type.equals(EntityType.WITHER_SKULL)) {
                         ByteTag shake = entity.get("shake");
                     }

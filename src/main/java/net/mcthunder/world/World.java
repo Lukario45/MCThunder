@@ -26,6 +26,7 @@ public class World {
     private int dimension;
     private boolean hardcore;
     private boolean generateStructures;
+    private boolean dimensionRead = false;
     private Location spawn;
     private Difficulty difficulty;
     private HashMap<Long, Region> regionHashMap;
@@ -111,6 +112,13 @@ public class World {
         } else {
             return false;
         }
+    }
+
+    public void setDimension(int dimension) {
+        if (dimensionRead)
+            return;
+        this.dimension = dimension;
+        dimensionRead = true;
     }
 
     public void loadAround(Location loc, int distance) {
