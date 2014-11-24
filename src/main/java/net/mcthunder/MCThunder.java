@@ -4,6 +4,7 @@ import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.EntityType;
+import net.mcthunder.entity.Player;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
 import net.mcthunder.events.listeners.PlayerCommandEventListener;
 import net.mcthunder.events.listeners.PlayerLoggingInEventListener;
@@ -339,7 +340,7 @@ public class MCThunder {
                                 if (setType.getParent().equals(Material.SPAWN_EGG)) {
                                     Location l = new Location(player.getWorld(), b.getLocation().getX() + 1 - packet.getCursorX(), b.getLocation().getY() +
                                             1 - (packet.getCursorY() == 0 ? 1 : packet.getCursorY()), b.getLocation().getZ() + 1 - packet.getCursorZ());
-                                    Entity.spawn(l, EntityType.fromString(setType.getName().replaceFirst("SPAWN_", "")));
+                                    l.getWorld().loadEntity(new Entity(l, EntityType.fromString(setType.getName().replaceFirst("SPAWN_", ""))));
                                 } else
                                     b.setType(setType);
                             } else if (event.getPacket() instanceof ClientPlayerActionPacket) {

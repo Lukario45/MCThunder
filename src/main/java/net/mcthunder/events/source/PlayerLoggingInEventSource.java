@@ -4,7 +4,6 @@ import net.mcthunder.events.PlayerLoggingInEvent;
 import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.interfaces.PlayerLoggingInEventListener;
-import net.mcthunder.world.World;
 import org.spacehq.packetlib.Session;
 
 import java.util.ArrayList;

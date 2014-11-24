@@ -73,7 +73,9 @@ public enum EntityType {
     HORSE("HORSE", 100, "EntityHorse"),
     RABBIT("RABBIT", 101, "Rabbit"),
     //NPCs
-    VILLAGER("VILLAGER", 120, "Villager");
+    VILLAGER("VILLAGER", 120, "Villager"),
+
+    PLAYER("PLAYER", "Player");
 
     private static HashMap<Integer,EntityType> idMap = new HashMap<>();
     private static HashMap<String,EntityType> nameMap = new HashMap<>();
@@ -85,6 +87,12 @@ public enum EntityType {
     private EntityType(String name, int id, String savegameID) {
         this.name = name;
         this.id = id;
+        this.savegameID = savegameID;
+    }
+
+    private EntityType(String name, String savegameID) {
+        this.name = name;
+        this.id = -7;
         this.savegameID = savegameID;
     }
 
@@ -134,7 +142,8 @@ public enum EntityType {
 
     public static void mapEntityTypes() {
         for(EntityType e : values()) {
-            idMap.put(e.getID(), e);
+            if (e.getID() != -7)
+                idMap.put(e.getID(), e);
             nameMap.put(e.getName(), e);
             savegameIdMap.put(e.getSavegameID(), e);
         }

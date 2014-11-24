@@ -3,7 +3,7 @@ package net.mcthunder.handlers;
 import com.Lukario45.NBTFile.NBTFile;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.LoggingLevel;
-import net.mcthunder.api.Player;
+import net.mcthunder.entity.Player;
 import org.spacehq.opennbt.tag.builtin.*;
 
 import java.io.File;

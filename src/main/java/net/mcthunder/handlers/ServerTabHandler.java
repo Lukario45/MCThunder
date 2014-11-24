@@ -1,7 +1,7 @@
 package net.mcthunder.handlers;
 
 import net.mcthunder.MCThunder;
-import net.mcthunder.api.Player;
+import net.mcthunder.entity.Player;
 import org.apache.commons.lang.StringUtils;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientTabCompletePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerTabCompletePacket;

@@ -3,7 +3,7 @@ package net.mcthunder.block;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
-import net.mcthunder.api.Player;
+import net.mcthunder.entity.Player;
 import net.mcthunder.material.Material;
 import net.mcthunder.world.Column;
 import org.spacehq.mc.protocol.data.game.Chunk;

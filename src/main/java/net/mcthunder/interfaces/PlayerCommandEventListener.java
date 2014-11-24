@@ -1,6 +1,6 @@
 package net.mcthunder.interfaces;
 
-import net.mcthunder.api.Player;
+import net.mcthunder.entity.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 /**

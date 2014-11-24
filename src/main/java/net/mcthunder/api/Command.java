@@ -1,5 +1,6 @@
 package net.mcthunder.api;
 
+import net.mcthunder.entity.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.ArrayList;

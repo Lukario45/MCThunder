@@ -3,7 +3,7 @@ package net.mcthunder.rankmanager;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.LoggingLevel;
-import net.mcthunder.api.Player;
+import net.mcthunder.entity.Player;
 import net.mcthunder.events.source.PlayerLoggingInEventSource;
 import net.mcthunder.rankmanager.listeners.RankManagerLoggingInEventListener;
 

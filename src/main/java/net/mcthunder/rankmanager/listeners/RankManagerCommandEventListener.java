@@ -1,6 +1,6 @@
 package net.mcthunder.rankmanager.listeners;
 
-import net.mcthunder.api.Player;
+import net.mcthunder.entity.Player;
 import net.mcthunder.handlers.CommandHandler;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 

@@ -1,6 +1,7 @@
 package net.mcthunder.api;
 
 import net.mcthunder.world.World;
+import org.spacehq.mc.protocol.data.game.Position;
 
 /**
  * Created by zack6849 on 10/17/14.
@@ -111,6 +112,10 @@ public class Location {
 
     public String toString() {
         return this.world.getName() + " " + this.x + " " + this.y + " " + this.z + " " + this.yaw + " " + this.pitch;
+    }
+
+    public Position getPosition() {
+        return new Position((int) getX(), (int) getY(), (int) getZ());
     }
 
     @Override

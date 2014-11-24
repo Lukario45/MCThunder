@@ -1,9 +1,8 @@
 package net.mcthunder.rankmanager;
 
 import com.Lukario45.NBTFile.NBTFile;
-import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
-import net.mcthunder.api.Player;
+import net.mcthunder.entity.Player;
 import net.mcthunder.handlers.PlayerProfileHandler;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;

@@ -1,4 +1,4 @@
-package net.mcthunder.api;
+package net.mcthunder.inventory;
 
 import org.spacehq.mc.protocol.data.game.ItemStack;
 

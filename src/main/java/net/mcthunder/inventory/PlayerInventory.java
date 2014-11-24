@@ -1,4 +1,4 @@
-package net.mcthunder.api;
+package net.mcthunder.inventory;
 
 public class PlayerInventory extends Inventory {
     public PlayerInventory(int size, String name) {

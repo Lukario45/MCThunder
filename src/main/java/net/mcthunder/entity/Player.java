@@ -1,15 +1,15 @@
-package net.mcthunder.api;
+package net.mcthunder.entity;
 
 import com.Lukario45.NBTFile.NBTFile;
 import net.mcthunder.MCThunder;
-import net.mcthunder.entity.Entity;
+import net.mcthunder.api.*;
+import net.mcthunder.inventory.Inventory;
+import net.mcthunder.inventory.PlayerInventory;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.ProtocolConstants;
-import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.ItemStack;
-import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.message.Message;
@@ -45,15 +45,11 @@ public class Player extends Entity {
     private ArrayList<Long> westColumns = new ArrayList<>();
     private Inventory inv;
     private int viewDistance = 9;
-    private int entityID;
     private int slot;
     private String displayName;
     private GameMode gamemode;
     private Session session;
-    private MetadataMap metadata;
-    private Location location;
     private boolean moveable;
-    private boolean onGround;
     private boolean sneaking;
     private boolean sprinting;
     private Player lastPmPerson;
@@ -61,19 +57,13 @@ public class Player extends Entity {
     private Map<String, Tag> tagMap = new HashMap<>();
     private PlayerListEntry listEntry;
 
-    public Player() {//Why just why is this needed I made them final again because they should be...
-        this.uuid = null;
-        this.name = null;
-    }
-
-    public Player(Session session, int entityID, EntityMetadata metadata) {
+    public Player(Session session) {
+        super(EntityType.PLAYER);
         this.session = session;
         this.uuid = getGameProfile().getId();
         this.name = getGameProfile().getName();
         this.slot = 36;
         this.displayName = this.name;
-        this.entityID = entityID;
-        this.metadata = new MetadataMap();
         this.gamemode = GameMode.CREATIVE;
         this.moveable = false;
         this.inv = new PlayerInventory(44, this.name);
@@ -306,7 +296,7 @@ public class Player extends Entity {
                 if (p.getWorld().equals(l.getWorld()))//If they are in the new world
                     p.sendPacket(spawnPlayerPacket);
             }
-        sendPacket(new ServerSpawnPositionPacket(new Position((int) l.getX(), (int) l.getY(), (int) l.getZ())));
+        sendPacket(new ServerSpawnPositionPacket(l.getPosition()));
         setLocation(l);
     }
 
@@ -322,10 +312,6 @@ public class Player extends Entity {
         return this.inv.getItemAt(this.slot);
     }
 
-    public int getEntityID() {
-        return this.entityID;
-    }
-
     public Session getSession() {
         return this.session;
     }
@@ -339,11 +325,7 @@ public class Player extends Entity {
     }
 
     public int getPing() {
-        return getSession().getFlag(ProtocolConstants.PING_KEY);
-    }
-
-    public MetadataMap getMetadata() {
-        return this.metadata;
+        return getSession().getFlag(ProtocolConstants.PING_KEY);//This will get ping since logging in aka will be incorrect
     }
 
     public UUID getUniqueID() {
@@ -358,44 +340,8 @@ public class Player extends Entity {
         return this.displayName;
     }
 
-    public Location getLocation() {
-        return this.location.clone();
-    }
-
-    public void setLocation(Location location) {
-        this.location = location.clone();
-    }
-
-    public void setX(double x) {
-        this.location.setX(x);
-    }
-
-    public void setY(double y) {
-        this.location.setY(y);
-    }
-
-    public void setZ(double z) {
-        this.location.setZ(z);
-    }
-
-    public void setYaw(float yaw) {
-        this.location.setYaw(yaw);
-    }
-
-    public void setPitch(float pitch) {
-        this.location.setPitch(pitch);
-    }
-
     public Inventory getInventory() {
         return this.inv;
-    }
-
-    public boolean isOnGround() {
-        return this.onGround;
-    }
-
-    public void setOnGround(boolean onGround) {
-        this.onGround = onGround;
     }
 
     public void toggleMoveable() {
@@ -413,6 +359,10 @@ public class Player extends Entity {
     public void setSneaking(boolean sneaking) {
         this.sneaking = sneaking;
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, sneaking);
+    }
+
+    public Packet getPacket() {
+        return new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch(), getHeldItem().getId(), getMetadata().getMetadataArray());
     }
 
     public int getSlot() {
@@ -448,12 +398,9 @@ public class Player extends Entity {
         this.lastPmPerson = lastPmPerson;
     }
 
-    public World getWorld() {
-        return this.location.getWorld();
-    }
-
     public void setWorld(World w) {
-        this.location.setWorld(w);//Also will need to remove loaded chunks and load new ones
+        super.setWorld(w);
+        //Also will need to remove loaded chunks and load new ones
     }
 
     public String getAppended() {

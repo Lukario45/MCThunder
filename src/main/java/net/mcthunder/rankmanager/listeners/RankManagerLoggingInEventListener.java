@@ -1,7 +1,7 @@
 package net.mcthunder.rankmanager.listeners;
 
 import net.mcthunder.MCThunder;
-import net.mcthunder.api.Player;
+import net.mcthunder.entity.Player;
 import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import org.spacehq.mc.auth.GameProfile;

@@ -1,8 +1,11 @@
 package net.mcthunder.world;
 
-import net.mcthunder.api.*;
+import net.mcthunder.api.Direction;
+import net.mcthunder.api.Location;
+import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.EntityType;
+import net.mcthunder.entity.Player;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
@@ -16,8 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
-
-import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/21/2014.
@@ -165,7 +166,7 @@ public class Region {
                     DoubleTag posY = pos.get(1);
                     DoubleTag posZ = pos.get(2);
                     Location p = new Location(this.world, posX.getValue(), posY.getValue(), posZ.getValue());
-                    Entity.spawn(p, type);
+                    this.world.loadEntity(new Entity(p, type));
                 }
                 ListTag motion = entity.get("Motion");
                 if (motion != null) {
@@ -552,9 +553,10 @@ public class Region {
             for (int i = 0; i < tileEntities.size(); i++) {
                 CompoundTag tile = tileEntities.get(i);
                 StringTag id = tile.get("id");
-                IntTag tileX = tile.get("X");
-                IntTag tileY = tile.get("Y");
-                IntTag tileZ = tile.get("Z");
+                IntTag tileX = tile.get("x");
+                IntTag tileY = tile.get("y");
+                IntTag tileZ = tile.get("z");
+                Location loc = (tileX == null || tileY == null || tileZ == null) ? null : new Location(this.world, tileX.getValue(), tileY.getValue(), tileZ.getValue());
                 if (id.getValue().equals("Airportal")) {//End Portal
 
                 } else if (id.getValue().equals("Banner")) {
@@ -658,6 +660,12 @@ public class Region {
                     StringTag line2 = tile.get("Text2");
                     StringTag line3 = tile.get("Text3");
                     StringTag line4 = tile.get("Text4");
+                    String[] lines = new String[4];
+                    lines[0] = line1.getValue();
+                    lines[1] = line2.getValue();
+                    lines[2] = line3.getValue();
+                    lines[3] = line4.getValue();
+                    this.world.addSign(new Sign(loc, lines));
                 } else if (id.getValue().equals("Skull")) {//Head
                     ByteTag skullType = tile.get("SkullType");
                     StringTag extraType = tile.get("ExtraType");//Legacy support for pre 1.8

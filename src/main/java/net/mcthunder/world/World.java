@@ -3,7 +3,9 @@ package net.mcthunder.world;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
-import net.mcthunder.api.Player;
+import net.mcthunder.block.Sign;
+import net.mcthunder.entity.Entity;
+import net.mcthunder.entity.Player;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.opennbt.NBTIO;
@@ -12,6 +14,8 @@ import org.spacehq.opennbt.tag.builtin.IntTag;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import static net.mcthunder.api.Utils.getLong;
@@ -31,6 +35,8 @@ public class World {
     private Difficulty difficulty;
     private HashMap<Long, Region> regionHashMap;
     private HashMap<Long, Column> columnHashMap;
+    private HashMap<Integer,Entity> loadedEntities;
+    private ArrayList<Sign> signs;//TEMP arraylist
     private WorldType worldType;
 
     public World(String name) {
@@ -38,6 +44,8 @@ public class World {
         this.dimension = 0;
         this.columnHashMap = new HashMap<>();
         this.regionHashMap = new HashMap<>();
+        this.loadedEntities = new HashMap<>();
+        this.signs = new ArrayList<>();
         try {
             CompoundTag tag = NBTIO.readFile(new File("worlds/" + this.name + "/level.dat"));
             CompoundTag data = tag.get("Data");
@@ -222,6 +230,24 @@ public class World {
 
     public boolean canGenerateStructures() {
         return this.generateStructures;
+    }
+
+    public Collection<Entity> getEntities() {
+        return this.loadedEntities.values();
+    }
+
+    public void loadEntity(Entity e) {
+        e.spawn();
+        this.loadedEntities.put(e.getEntityID(), e);
+    }
+
+    public void addSign(Sign s) {
+        s.sendPacket();
+        this.signs.add(s);
+    }
+
+    public Collection<Sign> getSigns() {
+        return this.signs;
     }
 
     private enum GameRule {
