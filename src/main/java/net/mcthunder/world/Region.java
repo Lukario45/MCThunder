@@ -2,6 +2,7 @@ package net.mcthunder.world;
 
 import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
+import net.mcthunder.api.Vector;
 import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.EntityType;
@@ -160,24 +161,31 @@ public class Region {
                 CompoundTag entity = entities.get(i);
                 StringTag id = entity.get("id");
                 EntityType type = id == null ? null : EntityType.fromSavegameId(id.getValue());
+                if (type == null)
+                    continue;
+                Entity e;
+                Location loc = null;
+                Vector vec = null;
                 ListTag pos = entity.get("Pos");
                 if (pos != null) {
                     DoubleTag posX = pos.get(0);
                     DoubleTag posY = pos.get(1);
                     DoubleTag posZ = pos.get(2);
-                    Location p = new Location(this.world, posX.getValue(), posY.getValue(), posZ.getValue());
-                    this.world.loadEntity(new Entity(p, type));
+                    loc = new Location(this.world, posX.getValue(), posY.getValue(), posZ.getValue());
+                }
+                ListTag rotation = entity.get("Rotation");
+                if (rotation != null && loc != null) {
+                    FloatTag yaw = rotation.get(0);
+                    FloatTag pitch = rotation.get(1);
+                    loc.setYaw(yaw.getValue());
+                    loc.setPitch(pitch.getValue());
                 }
                 ListTag motion = entity.get("Motion");
-                if (motion != null) {
+                if (motion != null && loc != null) {
                     DoubleTag dX = motion.get(0);
                     DoubleTag dY = motion.get(1);
                     DoubleTag dZ = motion.get(2);
-                }
-                ListTag rotation = entity.get("Rotation");
-                if (rotation != null) {
-                    FloatTag yaw = rotation.get(0);
-                    FloatTag pitch = rotation.get(1);
+                    loc.setVector(new Vector(dX.getValue(), dY.getValue(), dZ.getValue()));
                 }
                 ShortTag fire = entity.get("Fire");
                 ShortTag air = entity.get("Air");
@@ -548,6 +556,8 @@ public class Region {
                         ByteTag itemRotation = entity.get("ItemRotation");
                     }
                 }
+                e = new Entity(loc, type);
+                this.world.loadEntity(e);
             }
             ListTag tileEntities = level.get("TileEntities");
             for (int i = 0; i < tileEntities.size(); i++) {

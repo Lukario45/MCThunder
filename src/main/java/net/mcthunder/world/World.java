@@ -33,19 +33,15 @@ public class World {
     private boolean dimensionRead = false;
     private Location spawn;
     private Difficulty difficulty;
-    private HashMap<Long, Region> regionHashMap;
-    private HashMap<Long, Column> columnHashMap;
-    private HashMap<Integer,Entity> loadedEntities;
-    private ArrayList<Sign> signs;//TEMP arraylist
+    private HashMap<Long, Region> regionHashMap = new HashMap<>();
+    private HashMap<Long, Column> columnHashMap = new HashMap<>();
+    private HashMap<Integer,Entity> loadedEntities = new HashMap<>();
+    private ArrayList<Sign> signs = new ArrayList<>();//TEMP arraylist
     private WorldType worldType;
 
     public World(String name) {
         this.name = name;
         this.dimension = 0;
-        this.columnHashMap = new HashMap<>();
-        this.regionHashMap = new HashMap<>();
-        this.loadedEntities = new HashMap<>();
-        this.signs = new ArrayList<>();
         try {
             CompoundTag tag = NBTIO.readFile(new File("worlds/" + this.name + "/level.dat"));
             CompoundTag data = tag.get("Data");
@@ -99,15 +95,18 @@ public class World {
     }
 
     private Difficulty difFromName(int dif) {
-        if (dif == 0)
-            return Difficulty.PEACEFUL;
-        if (dif == 1)
-            return Difficulty.EASY;
-        if (dif == 2)
-            return Difficulty.NORMAL;
-        if (dif == 3)
-            return Difficulty.HARD;
-        return Difficulty.NORMAL;
+        switch(dif) {
+            case 0:
+                return Difficulty.PEACEFUL;
+            case 1:
+                return Difficulty.EASY;
+            case 2:
+                return Difficulty.NORMAL;
+            case 3:
+                return Difficulty.HARD;
+            default:
+                return Difficulty.NORMAL;
+        }
     }
 
     public String getName() {

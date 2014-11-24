@@ -13,18 +13,44 @@ public class Location {
     private float yaw;
     private float pitch;
     private World world;
+    private Vector v;
+
+    public Location(World world, Position p) {
+        this(world, p, 0, 0);
+    }
+
+    public Location(World world, Position p, float yaw, float pitch) {
+        this(world, p.getX(), p.getY(), p.getZ(), yaw, pitch, new Vector(0, 0, 0));
+    }
 
     public Location(World world, double x, double y, double z) {
-        this(world, x, y, z, 0, 0);
+        this(world, x, y, z, 0, 0, new Vector(0, 0, 0));
     }
 
     public Location(World world, double x, double y, double z, float yaw, float pitch) {
+        this(world, x, y, z, yaw, pitch, new Vector(0, 0, 0));
+    }
+
+    public Location(World world, Position p, Vector v) {
+        this(world, p, 0, 0, v);
+    }
+
+    public Location(World world, Position p, float yaw, float pitch, Vector v) {
+        this(world, p.getX(), p.getY(), p.getZ(), yaw, pitch, v);
+    }
+
+    public Location(World world, double x, double y, double z, Vector v) {
+        this(world, x, y, z, 0, 0, v);
+    }
+
+    public Location(World world, double x, double y, double z, float yaw, float pitch, Vector v) {
         this.world = world;
         this.x = x;
         this.y = y;
         this.z = z;
         this.yaw = yaw;
         this.pitch = pitch;
+        this.v = v;
     }
 
     /*public Location getRelative(double xz, double xy, double distance) {//Will finish this at some point but not now
@@ -108,6 +134,14 @@ public class Location {
 
     public void setWorld(World w) {
         this.world = w;
+    }
+
+    public void setVector(Vector v) {
+        this.v = v;
+    }
+
+    public Vector getVector() {
+        return this.v;
     }
 
     public String toString() {

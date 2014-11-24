@@ -20,6 +20,8 @@ public class Entity {
     private String customName;
     private Location location;
     private boolean onGround;
+    private short fireTicks;
+    private short airLeft;
     protected MetadataMap metadata;
 
     public Entity(EntityType type) {

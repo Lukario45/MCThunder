@@ -13,7 +13,7 @@ public class Sign {
     public Sign(Location location, String[] lines) {
         this.location = location;
         this.lines = lines;
-        this.packet = new ServerUpdateSignPacket(location.getPosition(), this.lines);
+        this.packet = new ServerUpdateSignPacket(location.getPosition(), getLines());
     }
 
     public void sendPacket() {
@@ -23,11 +23,16 @@ public class Sign {
     }
 
     public void updateSign(String[] lines) {
-        this.packet = new ServerUpdateSignPacket(this.location.getPosition(), lines);
+        this.lines = lines;
+        this.packet = new ServerUpdateSignPacket(this.location.getPosition(), getLines());
         sendPacket();
     }
 
     public ServerUpdateSignPacket getPacket() {
         return this.packet;
+    }
+
+    public String[] getLines() {
+        return this.lines;
     }
 }

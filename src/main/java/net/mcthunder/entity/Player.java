@@ -18,14 +18,12 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntities
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
-import org.spacehq.opennbt.tag.builtin.Tag;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.packet.Packet;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
@@ -54,7 +52,6 @@ public class Player extends Entity {
     private boolean sprinting;
     private Player lastPmPerson;
     private String appended = "";
-    private Map<String, Tag> tagMap = new HashMap<>();
     private PlayerListEntry listEntry;
 
     public Player(Session session) {

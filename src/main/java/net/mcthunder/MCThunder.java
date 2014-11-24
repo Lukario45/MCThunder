@@ -73,7 +73,6 @@ public class MCThunder {
     private static HashMap<String, World> worldHashMap;
     private static Config conf;
     private static String serverName;
-    private static boolean SPAWN_SERVER = true;//What is this variable for anyways
     private static String HOST;
     private static int PORT;
     private static int RENDER_DISTANCE;
@@ -120,285 +119,282 @@ public class MCThunder {
                 commands++;
         tellConsole(LoggingLevel.INFO, commands + " command" + (commands != 1 ? "s " : "") + "were loaded.");
         //Done
-        if (SPAWN_SERVER) {
-            server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
-            //Handlers
-            chatHandler = new ServerChatHandler();
-            entryListHandler = new ServerPlayerEntryListHandler();
-            tabHandler = new ServerTabHandler();
-            playerProfileHandler = new PlayerProfileHandler();
-            //Listeners
-            defaultPlayerChatEventListener = new PlayerChatEventListener();
-            defaultPlayerCommandEventListener = new PlayerCommandEventListener();
-            loggingInEventListener = new PlayerLoggingInEventListener();
-            playerChatEventSource = new PlayerChatEventSource();
-            playerCommandEventSource = new PlayerCommandEventSource();
-            loggingInEventSource = new PlayerLoggingInEventSource();
-            playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
-            playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
-            loggingInEventSource.addEventListener(loggingInEventListener);
-            if (conf.getUseRankManager()) {
-                RankManager rankManager = new RankManager();
-                rankManager.load();
-            }
+        server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
+        //Handlers
+        chatHandler = new ServerChatHandler();
+        entryListHandler = new ServerPlayerEntryListHandler();
+        tabHandler = new ServerTabHandler();
+        playerProfileHandler = new PlayerProfileHandler();
+        //Listeners
+        defaultPlayerChatEventListener = new PlayerChatEventListener();
+        defaultPlayerCommandEventListener = new PlayerCommandEventListener();
+        loggingInEventListener = new PlayerLoggingInEventListener();
+        playerChatEventSource = new PlayerChatEventSource();
+        playerCommandEventSource = new PlayerCommandEventSource();
+        loggingInEventSource = new PlayerLoggingInEventSource();
+        playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
+        playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
+        loggingInEventSource.addEventListener(loggingInEventListener);
+        if (conf.getUseRankManager()) {
+            RankManager rankManager = new RankManager();
+            rankManager.load();
+        }
 
-            playerHashMap = new HashMap<>(conf.getSlots());
-            worldHashMap = new HashMap<>();
+        playerHashMap = new HashMap<>(conf.getSlots());
+        worldHashMap = new HashMap<>();
 
-            final World world = new World(conf.getWorldName());
-            worldHashMap.put(conf.getWorldName(), world);
-            world.loadWorld();
+        final World world = new World(conf.getWorldName());
+        worldHashMap.put(conf.getWorldName(), world);
+        world.loadWorld();
 
-            server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
-            server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
-            server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
-                @Override
-                public ServerStatusInfo buildInfo(Session session) {
-                    GameProfile[] gameProfiles = new GameProfile[playerHashMap.size()];
-                    int i = 0;
-                    for (Player p : getPlayers()) {
-                        gameProfiles[i] = p.getGameProfile();
-                        i++;
-                    }
-                    BufferedImage icon = null;
-                    try {
-                        icon = ImageIO.read(new File("server-icon.png"));
-                    } catch (Exception ignored) { }//When there is no icon set
-                    return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), playerHashMap.size(), gameProfiles), new TextMessage(conf.getServerMOTD()), icon);
+        server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
+        server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
+        server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
+            @Override
+            public ServerStatusInfo buildInfo(Session session) {
+                GameProfile[] gameProfiles = new GameProfile[playerHashMap.size()];
+                int i = 0;
+                for (Player p : getPlayers()) {
+                    gameProfiles[i] = p.getGameProfile();
+                    i++;
                 }
-            });
-
-            server.setGlobalFlag(ProtocolConstants.SERVER_LOGIN_HANDLER_KEY, new ServerLoginHandler() {
-                @Override
-                public void loggedIn(Session session) {
-                    try {
-                        loggingInEventSource.fireEvent(session, getEntryListHandler(), playerProfileHandler);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-
-            server.addListener(new ServerAdapter() {
-                @Override
-                public void sessionAdded(SessionAddedEvent event) {
-                    event.getSession().addListener(new SessionAdapter() {
-                        @Override
-                        public void packetReceived(PacketReceivedEvent event) {
-                            if (event.getPacket() instanceof ClientPlayerMovementPacket) {
-                                ClientPlayerMovementPacket pack = event.getPacket();
-                                Player mover = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                                if (mover == null || !mover.isMoveable())
-                                    return;//Also will need to cancel on their end somehow
-                                for (Packet packet : createUpdatePackets(event.getSession(), pack))
-                                    for (Player p : getPlayers()) {
-                                        if (!p.getWorld().equals(mover.getWorld()))
-                                            continue;//Also will need to check if out of range ,_,
-                                        if (!p.getUniqueID().equals(mover.getUniqueID()))
-                                            p.sendPacket(packet);
-                                    }
-
-                                updatePlayerPosition(event.getSession(), pack);
-                            } else if (event.getPacket() instanceof ClientPlayerStatePacket) {
-                                ClientPlayerStatePacket packet = event.getPacket();
-                                GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                                Player player = getPlayer(profile.getId());
-                                switch (packet.getState()) {
-                                    case START_SNEAKING:
-                                        player.setSneaking(true);
-                                        break;
-                                    case STOP_SNEAKING:
-                                        player.setSneaking(false);
-                                        break;
-                                    case LEAVE_BED:
-                                        break;
-                                    case START_SPRINTING:
-                                        player.setSprinting(true);
-                                        break;
-                                    case STOP_SPRINTING:
-                                        player.setSprinting(false);
-                                        break;
-                                    case RIDING_JUMP:
-                                        break;
-                                    case OPEN_INVENTORY:
-                                        break;
-                                }
-                            } else if (event.getPacket() instanceof ClientSwingArmPacket) {
-                                GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                                Player player = getPlayer(profile.getId());
-                                for (Player p : getPlayers()) {
-                                    if (!p.getWorld().equals(player.getWorld()))
-                                        continue;//Do not send a animation packet if they are not in same world
-                                    if (!p.getUniqueID().equals(player.getUniqueID()))
-                                        p.sendPacket(new ServerAnimationPacket(player.getEntityID(), Animation.SWING_ARM));
-                                }
-                            } else if (event.getPacket() instanceof ClientChatPacket) {
-                                ClientChatPacket packet = event.getPacket();
-                                GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                                Player player = getPlayer(profile.getId());
-                                if (packet.getMessage().startsWith("/")) {
-                                    if (packet.getMessage().equals("/"))
-                                        chatHandler.sendMessage(event.getSession(), "&cCommand does not exist!");
-                                    else
-                                        try {
-                                            playerCommandEventSource.fireEvent(player, packet);
-                                        } catch (ClassNotFoundException e) {
-                                            player.sendMessage("&cUnknown Command");
-                                        }
-                                } else
-                                    playerChatEventSource.fireEvent(player, packet);
-
-                            } else if (event.getPacket() instanceof ClientKeepAlivePacket)
-                                event.getSession().send(new ServerKeepAlivePacket(event.<ClientKeepAlivePacket>getPacket().getPingId()));
-                            else if (event.getPacket() instanceof ClientSettingsPacket) {
-                                ClientSettingsPacket packet = event.getPacket();
-                                Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                                if (player.getView() != packet.getRenderDistance()) {
-                                    player.setView(packet.getRenderDistance());
-                                    //TODO: unload chunks if goes smaller load if goes higher also have it check during login what their distance is
-                                }
-                            } else if (event.getPacket() instanceof ClientTabCompletePacket) {
-                                ClientTabCompletePacket packet = event.getPacket();
-                                tabHandler.handleTabComplete(event.getSession(), packet);
-                            } else if (event.getPacket() instanceof ClientCreativeInventoryActionPacket) {
-                                ClientCreativeInventoryActionPacket packet = event.getPacket();
-                                Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                                ItemStack old = player.getHeldItem();
-                                ItemStack i = packet.getClickedItem();
-                                player.getInventory().setSlot(packet.getSlot(), i);
-                                if (packet.getSlot() == player.getSlot() && !old.equals(player.getHeldItem())) {
-                                    Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem());
-                                    for (Player p : getPlayers())
-                                        if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
-                                            p.sendPacket(pack);
-                                }
-                            } else if (event.getPacket() instanceof ClientWindowActionPacket) {
-                                ClientWindowActionPacket packet = event.getPacket();
-                                Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                                //tellConsole(LoggingLevel.DEBUG, packet.getSlot() + " " + packet.getAction().name() + " " + packet.getWindowId());
-                                //0 = click craft output
-                                //1-4 = craft input
-                                //5-8 = helm to boots
-                                //9-35 = inventory
-                                //36-44 = hotbar
-                                //-999 = outside of inventory for dropping items
-                                //TODO: logic for this as well as for when they hit like a number over the item to move the item
-                            } else if (event.getPacket() instanceof ClientChangeHeldItemPacket) {
-                                ClientChangeHeldItemPacket packet = event.getPacket();
-                                Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                                ItemStack old = player.getHeldItem();
-                                player.setSlot(packet.getSlot() + 36);
-                                if (!old.equals(player.getHeldItem())) {
-                                    Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem());
-                                    for (Player p : getPlayers())
-                                        if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
-                                            p.sendPacket(pack);
-                                }
-                            } else if (event.getPacket() instanceof ClientPlayerPlaceBlockPacket) {
-                                ClientPlayerPlaceBlockPacket packet = event.getPacket();
-                                Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                                Position position = packet.getPosition();
-                                ItemStack heldItem = packet.getHeldItem();
-                                if (heldItem == null || (position.getY() >> 4) < 0)
-                                    return;
-                                //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
-                                Block b = new Block(new Location(player.getWorld(), position.getX(), position.getY(), position.getZ()));
-                                if (!b.getType().isLiquid() && !b.getType().equals(Material.SNOW_LAYER) && !b.getType().isLongGrass())
-                                    b = b.getRelative(Direction.fromFace(packet.getFace()));
-                                if (!b.getType().equals(Material.AIR))
-                                    return;
-                                Material setType = Material.fromData(Material.fromID(heldItem.getId()), (short) heldItem.getData());
-                                if (setType == null)
-                                    return;
-                                if (setType.getParent().equals(Material.TORCH) || setType.getParent().equals(Material.REDSTONE_TORCH)) {//Still need to check if is a valid torch position
-                                    if (packet.getFace().equals(Face.SOUTH))
-                                        setType = Material.fromString("EAST_" + setType.getParent());
-                                    else if (packet.getFace().equals(Face.NORTH))
-                                        setType = Material.fromString("WEST_" + setType.getParent());
-                                    else if (packet.getFace().equals(Face.WEST))
-                                        setType = Material.fromString("SOUTH_" + setType.getParent());
-                                    else if (packet.getFace().equals(Face.EAST))
-                                        setType = Material.fromString("NORTH_" + setType.getParent());
-                                    else
-                                        setType = Material.fromString("UP_" + setType.getParent());
-                                }
-                                if (setType.equals(Material.REDSTONE))
-                                    setType = Material.REDSTONE_WIRE;
-                                if (setType.equals(Material.STRING))
-                                    setType = Material.TRIPWIRE;
-                                if (Material.fromString(setType.getName() + "_BLOCK") != null && !setType.equals(Material.BROWN_MUSHROOM) && !setType.equals(Material.RED_MUSHROOM) &&
-                                        !setType.equals(Material.MELON))
-                                    setType = Material.fromString(setType.getName() + "_BLOCK");
-                                String name = setType.getName().replace("_UP", "");
-                                if ((packet.getFace().equals(Face.BOTTOM) || packet.getFace().equals(Face.TOP)) && Material.fromString(name + "_UP") != null)
-                                    setType = Material.fromString(name + "_UP");
-                                else if ((packet.getFace().equals(Face.NORTH) || packet.getFace().equals(Face.SOUTH)) && Material.fromString(name + "_EAST") != null)
-                                    setType = Material.fromString(name + "_EAST");
-                                else if ((packet.getFace().equals(Face.EAST) || packet.getFace().equals(Face.WEST)) && Material.fromString(name + "_NORTH") != null)
-                                    setType = Material.fromString(name + "_NORTH");
-                                if (setType.getParent().equals(Material.SPAWN_EGG)) {
-                                    Location l = new Location(player.getWorld(), b.getLocation().getX() + 1 - packet.getCursorX(), b.getLocation().getY() +
-                                            1 - (packet.getCursorY() == 0 ? 1 : packet.getCursorY()), b.getLocation().getZ() + 1 - packet.getCursorZ());
-                                    l.getWorld().loadEntity(new Entity(l, EntityType.fromString(setType.getName().replaceFirst("SPAWN_", ""))));
-                                } else
-                                    b.setType(setType);
-                            } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
-                                ClientPlayerActionPacket packet = event.getPacket();
-                                Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                                if ((packet.getAction().equals(PlayerAction.START_DIGGING) && player.getGameMode().equals(GameMode.CREATIVE)) ||
-                                        (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
-                                    Block b = new Block(new Location(player.getWorld(), packet.getPosition().getX(), packet.getPosition().getY(), packet.getPosition().getZ()));
-                                    b.setType(Material.AIR);
-                                }
-                            } else if (event.getPacket() != null)
-                                tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
-                        }
-                    });
-                }
-
-                @Override
-                public void sessionRemoved(SessionRemovedEvent event) {
-                    if (((MinecraftProtocol) event.getSession().getPacketProtocol()).getMode() == ProtocolMode.GAME) {
-                        GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                        Player player = getPlayer(profile.getId());
-                        broadcast("&7&o" + player.getName() + " disconnected");
-                        entryListHandler.deleteFromPlayerEntryList(player);
-                        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(player.getEntityID());
-                        for (Player p : getPlayers())
-                            p.sendPacket(destroyEntitiesPacket);
-                        player.setAppended("");
-                        Map<String, Tag> map = new HashMap<>();
-                        map.put("World", new StringTag("World", player.getWorld().getName()));
-                        map.put("Dimension", new IntTag("Dimension", player.getWorld().getDimension()));
-                        map.put("X", new DoubleTag("X", player.getLocation().getX()));
-                        map.put("Y", new DoubleTag("Y", player.getLocation().getY()));
-                        map.put("Z", new DoubleTag("Z", player.getLocation().getZ()));
-                        map.put("Yaw", new FloatTag("Yaw", player.getLocation().getYaw()));
-                        map.put("Pitch", new FloatTag("Pitch", player.getLocation().getPitch()));
-                        playerProfileHandler.changeAttribute(player, new CompoundTag("SpawnPosition", map));
-                        playerHashMap.remove(player.getUniqueID());
-                    }
-                }
-            });
-
-            server.bind();
-            while (server.isListening()) {
-                for (Player player : getPlayers()) {
-                    EntityMetadata changes[] = player.getMetadata().getChanges();
-                    if (changes != null) {
-                        ServerEntityMetadataPacket pack = new ServerEntityMetadataPacket(player.getEntityID(), changes);
-                        for (Player p : getPlayers())
-                            if (!p.getUniqueID().equals(player.getUniqueID()))
-                                p.sendPacket(pack);
-
-                    }
-                }
+                BufferedImage icon = null;
                 try {
-                    Thread.sleep(20);
-                } catch (InterruptedException ignored) {
+                    icon = ImageIO.read(new File("server-icon.png"));
+                } catch (Exception ignored) { }//When there is no icon set
+                return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), playerHashMap.size(), gameProfiles), new TextMessage(conf.getServerMOTD()), icon);
+            }
+        });
+
+        server.setGlobalFlag(ProtocolConstants.SERVER_LOGIN_HANDLER_KEY, new ServerLoginHandler() {
+            @Override
+            public void loggedIn(Session session) {
+                try {
+                    loggingInEventSource.fireEvent(session);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        server.addListener(new ServerAdapter() {
+            @Override
+            public void sessionAdded(SessionAddedEvent event) {
+                event.getSession().addListener(new SessionAdapter() {
+                    @Override
+                    public void packetReceived(PacketReceivedEvent event) {
+                        if (event.getPacket() instanceof ClientPlayerMovementPacket) {
+                            ClientPlayerMovementPacket pack = event.getPacket();
+                            Player mover = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            if (mover == null || !mover.isMoveable())
+                                return;//Also will need to cancel on their end somehow
+                            for (Packet packet : createUpdatePackets(event.getSession(), pack))
+                                for (Player p : getPlayers()) {
+                                    if (!p.getWorld().equals(mover.getWorld()))
+                                        continue;//Also will need to check if out of range ,_,
+                                    if (!p.getUniqueID().equals(mover.getUniqueID()))
+                                        p.sendPacket(packet);
+                                }
+
+                            updatePlayerPosition(event.getSession(), pack);
+                        } else if (event.getPacket() instanceof ClientPlayerStatePacket) {
+                            ClientPlayerStatePacket packet = event.getPacket();
+                            GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+                            Player player = getPlayer(profile.getId());
+                            switch (packet.getState()) {
+                                case START_SNEAKING:
+                                    player.setSneaking(true);
+                                    break;
+                                case STOP_SNEAKING:
+                                    player.setSneaking(false);
+                                    break;
+                                case LEAVE_BED:
+                                    break;
+                                case START_SPRINTING:
+                                    player.setSprinting(true);
+                                    break;
+                                case STOP_SPRINTING:
+                                    player.setSprinting(false);
+                                    break;
+                                case RIDING_JUMP:
+                                    break;
+                                case OPEN_INVENTORY:
+                                    break;
+                            }
+                        } else if (event.getPacket() instanceof ClientSwingArmPacket) {
+                            GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+                            Player player = getPlayer(profile.getId());
+                            for (Player p : getPlayers()) {
+                                if (!p.getWorld().equals(player.getWorld()))
+                                    continue;//Do not send a animation packet if they are not in same world
+                                if (!p.getUniqueID().equals(player.getUniqueID()))
+                                    p.sendPacket(new ServerAnimationPacket(player.getEntityID(), Animation.SWING_ARM));
+                            }
+                        } else if (event.getPacket() instanceof ClientChatPacket) {
+                            ClientChatPacket packet = event.getPacket();
+                            GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+                            Player player = getPlayer(profile.getId());
+                            if (packet.getMessage().startsWith("/")) {
+                                if (packet.getMessage().equals("/"))
+                                    chatHandler.sendMessage(event.getSession(), "&cCommand does not exist!");
+                                else
+                                    try {
+                                        playerCommandEventSource.fireEvent(player, packet);
+                                    } catch (ClassNotFoundException e) {
+                                        player.sendMessage("&cUnknown Command");
+                                    }
+                            } else
+                                playerChatEventSource.fireEvent(player, packet);
+
+                        } else if (event.getPacket() instanceof ClientKeepAlivePacket)
+                            event.getSession().send(new ServerKeepAlivePacket(event.<ClientKeepAlivePacket>getPacket().getPingId()));
+                        else if (event.getPacket() instanceof ClientSettingsPacket) {
+                            ClientSettingsPacket packet = event.getPacket();
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            if (player.getView() != packet.getRenderDistance()) {
+                                player.setView(packet.getRenderDistance());
+                                //TODO: unload chunks if goes smaller load if goes higher also have it check during login what their distance is
+                            }
+                        } else if (event.getPacket() instanceof ClientTabCompletePacket) {
+                            ClientTabCompletePacket packet = event.getPacket();
+                            tabHandler.handleTabComplete(event.getSession(), packet);
+                        } else if (event.getPacket() instanceof ClientCreativeInventoryActionPacket) {
+                            ClientCreativeInventoryActionPacket packet = event.getPacket();
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            ItemStack old = player.getHeldItem();
+                            ItemStack i = packet.getClickedItem();
+                            player.getInventory().setSlot(packet.getSlot(), i);
+                            if (packet.getSlot() == player.getSlot() && !old.equals(player.getHeldItem())) {
+                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem());
+                                for (Player p : getPlayers())
+                                    if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
+                                        p.sendPacket(pack);
+                            }
+                        } else if (event.getPacket() instanceof ClientWindowActionPacket) {
+                            ClientWindowActionPacket packet = event.getPacket();
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            //tellConsole(LoggingLevel.DEBUG, packet.getSlot() + " " + packet.getAction().name() + " " + packet.getWindowId());
+                            //0 = click craft output
+                            //1-4 = craft input
+                            //5-8 = helm to boots
+                            //9-35 = inventory
+                            //36-44 = hotbar
+                            //-999 = outside of inventory for dropping items
+                            //TODO: logic for this as well as for when they hit like a number over the item to move the item
+                        } else if (event.getPacket() instanceof ClientChangeHeldItemPacket) {
+                            ClientChangeHeldItemPacket packet = event.getPacket();
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            ItemStack old = player.getHeldItem();
+                            player.setSlot(packet.getSlot() + 36);
+                            if (!old.equals(player.getHeldItem())) {
+                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem());
+                                for (Player p : getPlayers())
+                                    if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
+                                        p.sendPacket(pack);
+                            }
+                        } else if (event.getPacket() instanceof ClientPlayerPlaceBlockPacket) {
+                            ClientPlayerPlaceBlockPacket packet = event.getPacket();
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            Position position = packet.getPosition();
+                            ItemStack heldItem = packet.getHeldItem();
+                            if (heldItem == null || (position.getY() >> 4) < 0)
+                                return;
+                            //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
+                            Block b = new Block(new Location(player.getWorld(), position));
+                            if (!b.getType().isLiquid() && !b.getType().equals(Material.SNOW_LAYER) && !b.getType().isLongGrass())
+                                b = b.getRelative(Direction.fromFace(packet.getFace()));
+                            if (!b.getType().equals(Material.AIR))
+                                return;
+                            Material setType = Material.fromData(Material.fromID(heldItem.getId()), (short) heldItem.getData());
+                            if (setType == null)
+                                return;
+                            if (setType.getParent().equals(Material.TORCH) || setType.getParent().equals(Material.REDSTONE_TORCH)) {//Still need to check if is a valid torch position
+                                if (packet.getFace().equals(Face.SOUTH))
+                                    setType = Material.fromString("EAST_" + setType.getParent());
+                                else if (packet.getFace().equals(Face.NORTH))
+                                    setType = Material.fromString("WEST_" + setType.getParent());
+                                else if (packet.getFace().equals(Face.WEST))
+                                    setType = Material.fromString("SOUTH_" + setType.getParent());
+                                else if (packet.getFace().equals(Face.EAST))
+                                    setType = Material.fromString("NORTH_" + setType.getParent());
+                                else
+                                    setType = Material.fromString("UP_" + setType.getParent());
+                            }
+                            if (setType.equals(Material.REDSTONE))
+                                setType = Material.REDSTONE_WIRE;
+                            if (setType.equals(Material.STRING))
+                                setType = Material.TRIPWIRE;
+                            if (Material.fromString(setType.getName() + "_BLOCK") != null && !setType.equals(Material.BROWN_MUSHROOM) && !setType.equals(Material.RED_MUSHROOM) &&
+                                    !setType.equals(Material.MELON))
+                                setType = Material.fromString(setType.getName() + "_BLOCK");
+                            String name = setType.getName().replace("_UP", "");
+                            if ((packet.getFace().equals(Face.BOTTOM) || packet.getFace().equals(Face.TOP)) && Material.fromString(name + "_UP") != null)
+                                setType = Material.fromString(name + "_UP");
+                            else if ((packet.getFace().equals(Face.NORTH) || packet.getFace().equals(Face.SOUTH)) && Material.fromString(name + "_EAST") != null)
+                                setType = Material.fromString(name + "_EAST");
+                            else if ((packet.getFace().equals(Face.EAST) || packet.getFace().equals(Face.WEST)) && Material.fromString(name + "_NORTH") != null)
+                                setType = Material.fromString(name + "_NORTH");
+                            if (setType.getParent().equals(Material.SPAWN_EGG)) {
+                                Location l = new Location(player.getWorld(), b.getLocation().getX() + 1 - packet.getCursorX(), b.getLocation().getY() +
+                                        1 - (packet.getCursorY() == 0 ? 1 : packet.getCursorY()), b.getLocation().getZ() + 1 - packet.getCursorZ());
+                                l.getWorld().loadEntity(new Entity(l, EntityType.fromString(setType.getName().replaceFirst("SPAWN_", ""))));
+                            } else
+                                b.setType(setType);
+                        } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
+                            ClientPlayerActionPacket packet = event.getPacket();
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            if ((packet.getAction().equals(PlayerAction.START_DIGGING) && player.getGameMode().equals(GameMode.CREATIVE)) ||
+                                    (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
+                                Block b = new Block(new Location(player.getWorld(), packet.getPosition()));
+                                b.setType(Material.AIR);
+                            }
+                        } else if (event.getPacket() != null)
+                            tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
+                    }
+                });
+            }
+
+            @Override
+            public void sessionRemoved(SessionRemovedEvent event) {
+                if (((MinecraftProtocol) event.getSession().getPacketProtocol()).getMode() == ProtocolMode.GAME) {
+                    GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+                    Player player = getPlayer(profile.getId());
+                    broadcast("&7&o" + player.getName() + " disconnected");
+                    entryListHandler.deleteFromPlayerEntryList(player);
+                    ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(player.getEntityID());
+                    for (Player p : getPlayers())
+                        p.sendPacket(destroyEntitiesPacket);
+                    player.setAppended("");
+                    Map<String, Tag> map = new HashMap<>();
+                    map.put("World", new StringTag("World", player.getWorld().getName()));
+                    map.put("Dimension", new IntTag("Dimension", player.getWorld().getDimension()));
+                    map.put("X", new DoubleTag("X", player.getLocation().getX()));
+                    map.put("Y", new DoubleTag("Y", player.getLocation().getY()));
+                    map.put("Z", new DoubleTag("Z", player.getLocation().getZ()));
+                    map.put("Yaw", new FloatTag("Yaw", player.getLocation().getYaw()));
+                    map.put("Pitch", new FloatTag("Pitch", player.getLocation().getPitch()));
+                    playerProfileHandler.changeAttribute(player, new CompoundTag("SpawnPosition", map));
+                    playerHashMap.remove(player.getUniqueID());
                 }
             }
+        });
+
+        server.bind();
+        while (server.isListening()) {
+            for (Player player : getPlayers()) {
+                EntityMetadata changes[] = player.getMetadata().getChanges();
+                if (changes != null) {
+                    ServerEntityMetadataPacket pack = new ServerEntityMetadataPacket(player.getEntityID(), changes);
+                    for (Player p : getPlayers())
+                        if (!p.getUniqueID().equals(player.getUniqueID()))
+                            p.sendPacket(pack);
+
+                }
+            }
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException ignored) { }
         }
     }
 
@@ -552,8 +548,8 @@ public class MCThunder {
         return entryListHandler;
     }
 
-    public static void updateEntryList(ServerPlayerEntryListHandler serverPlayerEntryListHandler) {
-        entryListHandler = serverPlayerEntryListHandler;
+    public static void addToPlayerEntryList(Player player) {
+        entryListHandler.addToPlayerEntryList(player);
     }
 
 
@@ -571,6 +567,9 @@ public class MCThunder {
 
     public static void addLoginEventListener(net.mcthunder.interfaces.PlayerLoggingInEventListener listener) {
         loggingInEventSource.addEventListener(listener);
+    }
 
+    public static PlayerProfileHandler getProfileHandler() {
+        return playerProfileHandler;
     }
 }

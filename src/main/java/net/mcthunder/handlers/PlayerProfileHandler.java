@@ -11,9 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.Lukario45.NBTFile.Utilities.makeStringTag;
 import static net.mcthunder.api.Utils.tellConsole;
-
 
 /**
  * Created by Kevin on 10/13/2014.
@@ -44,29 +42,27 @@ public class PlayerProfileHandler {
         }
     }
 
-    public boolean tagExists(Player p, Tag t) {
+    public boolean tagExists(Player p, String tagName) {
         try {
-            return p.getPlayerFile().read(t.getName()) != null;
+            return p.getPlayerFile().read(tagName) != null;
         } catch (IOException ignored) { }
         return false;
     }
 
     public void addAttribute(Player player, Tag t) {
-        if (tagExists(player, t)) {
+        if (tagExists(player, t.getName()))
             tellConsole(LoggingLevel.WARNING, "Something tried to unintentionally overwriting an existing tag");
-        } else {
+        else
             try {
                 player.getPlayerFile().write(t);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-
     }
 
-    public void deleteAttribute(Player player, Tag t) {
+    public void deleteAttribute(Player player, String tagName) {
         try {
-            player.getPlayerFile().write(new CompoundTag(t.getName(), null));
+            player.getPlayerFile().write(new CompoundTag(tagName, null));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,7 +78,7 @@ public class PlayerProfileHandler {
     }
 
     public Tag getAttribute(Player p, String t) {
-        if (!tagExists(p, makeStringTag(t, null)))
+        if (!tagExists(p, t))
             tellConsole(LoggingLevel.ERROR, "Something tried to get a nonexistant attribute from player file: " + t);
         else
             try {
