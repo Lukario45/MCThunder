@@ -81,12 +81,9 @@ public class MCThunder {
     private static ServerPlayerEntryListHandler entryListHandler;
     private static PlayerProfileHandler playerProfileHandler;
     private static Server server;
-    private static PlayerChatEventListener defaultPlayerChatEventListener;
     private static PlayerChatEventSource playerChatEventSource;
     private static PlayerCommandEventSource playerCommandEventSource;
-    private static PlayerCommandEventListener defaultPlayerCommandEventListener;
     private static PlayerLoggingInEventSource loggingInEventSource;
-    private static PlayerLoggingInEventListener loggingInEventListener;
 
     public static void main(String args[]) {
         AnsiConsole.systemInstall();
@@ -126,9 +123,9 @@ public class MCThunder {
         tabHandler = new ServerTabHandler();
         playerProfileHandler = new PlayerProfileHandler();
         //Listeners
-        defaultPlayerChatEventListener = new PlayerChatEventListener();
-        defaultPlayerCommandEventListener = new PlayerCommandEventListener();
-        loggingInEventListener = new PlayerLoggingInEventListener();
+        PlayerChatEventListener defaultPlayerChatEventListener = new PlayerChatEventListener();
+        PlayerCommandEventListener defaultPlayerCommandEventListener = new PlayerCommandEventListener();
+        PlayerLoggingInEventListener loggingInEventListener = new PlayerLoggingInEventListener();
         playerChatEventSource = new PlayerChatEventSource();
         playerCommandEventSource = new PlayerCommandEventSource();
         loggingInEventSource = new PlayerLoggingInEventSource();
