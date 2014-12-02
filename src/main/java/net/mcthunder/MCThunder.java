@@ -332,6 +332,8 @@ public class MCThunder {
                                 setType = Material.fromString(name + "_EAST");
                             else if ((packet.getFace().equals(Face.EAST) || packet.getFace().equals(Face.WEST)) && Material.fromString(name + "_NORTH") != null)
                                 setType = Material.fromString(name + "_NORTH");
+                            if (setType.getName().contains("BUCKET"))
+                                setType = Material.fromString(setType.getName().replace("_BUCKET", ""));
                             if (setType.getParent().equals(Material.SPAWN_EGG)) {
                                 Location l = new Location(player.getWorld(), b.getLocation().getX() + 1 - packet.getCursorX(), b.getLocation().getY() +
                                         1 - (packet.getCursorY() == 0 ? 1 : packet.getCursorY()), b.getLocation().getZ() + 1 - packet.getCursorZ());

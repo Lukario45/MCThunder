@@ -3,6 +3,7 @@ package net.mcthunder.block;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
+import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.entity.Player;
 import net.mcthunder.material.Material;
 import net.mcthunder.world.Column;
@@ -11,6 +12,7 @@ import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
 
 import static net.mcthunder.api.Utils.getLong;
+import static net.mcthunder.api.Utils.tellConsole;
 
 public class Block {
     private Location loc;
@@ -24,9 +26,9 @@ public class Block {
         int columnX = (int)this.loc.getX() >> 4;
         int columnZ = (int)this.loc.getZ() >> 4;
         int chunkY = (int)this.loc.getY() >> 4;
-        int blockX = (int)this.loc.getX()%16;
-        int blockY = (int)this.loc.getY()%16;
-        int blockZ = (int)this.loc.getZ()%16;
+        int blockX = (int)this.loc.getX() % 16;
+        int blockY = (int)this.loc.getY() % 16;
+        int blockZ = (int)this.loc.getZ() % 16;
         if (blockX < 0)
             blockX += 16;
         if (blockX > 15) {
@@ -45,16 +47,16 @@ public class Block {
             blockZ = blockZ % 16;
             columnZ++;
         }
-        if (isInvalid()) {
-            this.type = Material.AIR;
-            return;
-        }
         this.columnX = columnX;
         this.columnZ = columnZ;
         this.chunkY = chunkY;
         this.blockX = blockX;
         this.blockY = blockY;
         this.blockZ = blockZ;
+        if (isInvalid()) {
+            this.type = Material.AIR;
+            return;
+        }
         Chunk[] chunks = loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks();
         ShortArray3d blocks = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlocks() : new ShortArray3d(4096);
         this.type = Material.fromData(Material.fromID(blocks.getBlock(this.blockX, this.blockY, this.blockZ)), (short) blocks.getData(this.blockX, this.blockY, this.blockZ));
@@ -114,6 +116,7 @@ public class Block {
         for (Player p : MCThunder.getPlayers())
             if (p.getWorld().equals(this.loc.getWorld()) && p.isColumnLoaded(getLong(this.columnX, this.columnZ)))
                 p.refreshColumn(c);
+        updatePhys();
     }
 
     public int getSkyLight() {
@@ -135,5 +138,30 @@ public class Block {
     private boolean isInvalid() {
         return this.loc == null || this.chunkY < 0 || this.chunkY > 15 || this.blockX < 0 || this.blockX > 15 || this.blockY < 0 ||
                 this.blockY > 15 || this.blockZ < 0 || this.blockZ > 15 || !this.loc.getWorld().isColumnLoaded(getLong(this.columnX, this.columnZ));
+    }
+
+    private void updatePhys() {//TODO: Replace with a physics engine instead of this temporary thing used for testing
+        if (this.type.getParent().equals(Material.WATER)) {//Todo: add a tick delay instead of it being instant
+            int height = this.type.equals(Material.WATER) ? 8 : Integer.parseInt(this.type.getName().split("_")[1]);
+            Block north = getRelative(Direction.NORTH);
+            Block east = getRelative(Direction.EAST);
+            Block south = getRelative(Direction.SOUTH);
+            Block west = getRelative(Direction.WEST);
+            Block down = getRelative(Direction.DOWN);
+            //TODO: Check these for other things water can go through
+            if (down.getType().equals(Material.AIR))
+                down.setType(Material.WATER_8_8);
+            if (height != 1 && !down.getType().equals(Material.WATER)) {
+                Material newMat = Material.fromString("WATER_" + (height - 1) + "_8");
+                if (north.getType().equals(Material.AIR))
+                    north.setType(newMat);
+                if (east.getType().equals(Material.AIR))
+                    east.setType(newMat);
+                if (south.getType().equals(Material.AIR))
+                    south.setType(newMat);
+                if (west.getType().equals(Material.AIR))
+                    west.setType(newMat);
+            }
+        }
     }
 }
