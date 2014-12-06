@@ -33,7 +33,7 @@ public abstract class Bot {
             this.skinUUID = this.uuid;
         this.botProfile = new GameProfile(this.uuid, this.name);
         this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
-        setSkin(this.uuid);
+        setSkin(this.skinUUID);
         load();
     }
 
