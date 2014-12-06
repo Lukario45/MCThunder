@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -44,6 +45,7 @@ public class Player extends Entity {
     private Inventory inv;
     private int viewDistance = 9;
     private int slot;
+    private int ping;
     private String displayName;
     private GameMode gamemode;
     private Session session;
@@ -52,7 +54,6 @@ public class Player extends Entity {
     private boolean sprinting;
     private Player lastPmPerson;
     private String appended = "";
-    private PlayerListEntry listEntry;
 
     public Player(Session session) {
         super(EntityType.PLAYER);
@@ -64,8 +65,8 @@ public class Player extends Entity {
         this.gamemode = GameMode.CREATIVE;
         this.moveable = false;
         this.inv = new PlayerInventory(44, this.name);
+        this.ping = getSession().getFlag(ProtocolConstants.PING_KEY);
         this.playerFile = new NBTFile(new File("PlayerFiles", this.uuid + ".dat"), "Player");
-        this.listEntry = new PlayerListEntry(getGameProfile(), getGameMode(), getPing(), Message.fromString(getName()));
     }
 
     public NBTFile getPlayerFile() {
@@ -322,7 +323,7 @@ public class Player extends Entity {
     }
 
     public int getPing() {
-        return getSession().getFlag(ProtocolConstants.PING_KEY);//This will get ping since logging in aka will be incorrect
+        return this.ping;
     }
 
     public UUID getUniqueID() {
@@ -430,6 +431,6 @@ public class Player extends Entity {
     }
 
     public PlayerListEntry getListEntry() {
-        return this.listEntry;
+        return new PlayerListEntry(getGameProfile(), getGameMode(), getPing(), Message.fromString(getName()));
     }
 }

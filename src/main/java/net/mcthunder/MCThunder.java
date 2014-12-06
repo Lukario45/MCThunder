@@ -69,8 +69,9 @@ import static net.mcthunder.api.Utils.*;
  * Created by Kevin on 8/9/2014.
  */
 public class MCThunder {
-    private static HashMap<UUID, Player> playerHashMap;
-    private static HashMap<String, World> worldHashMap;
+    private static ArrayList<Bot> bots;
+    private static HashMap<UUID, Player> players;
+    private static HashMap<String, World> worlds;
     private static Config conf;
     private static String serverName;
     private static String HOST;
@@ -137,11 +138,12 @@ public class MCThunder {
             rankManager.load();
         }
 
-        playerHashMap = new HashMap<>(conf.getSlots());
-        worldHashMap = new HashMap<>();
+        players = new HashMap<>(conf.getSlots());
+        worlds = new HashMap<>();
+        bots = new ArrayList<>();
 
         final World world = new World(conf.getWorldName());
-        worldHashMap.put(conf.getWorldName(), world);
+        worlds.put(conf.getWorldName(), world);
         world.loadWorld();
 
         server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
@@ -149,17 +151,21 @@ public class MCThunder {
         server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
             @Override
             public ServerStatusInfo buildInfo(Session session) {
-                GameProfile[] gameProfiles = new GameProfile[playerHashMap.size()];
+                GameProfile[] gameProfiles = new GameProfile[players.size() + bots.size()];
                 int i = 0;
                 for (Player p : getPlayers()) {
                     gameProfiles[i] = p.getGameProfile();
+                    i++;
+                }
+                for (Bot b : getBots()) {
+                    gameProfiles[i] = b.getGameProfile();
                     i++;
                 }
                 BufferedImage icon = null;
                 try {
                     icon = ImageIO.read(new File("server-icon.png"));
                 } catch (Exception ignored) { }//When there is no icon set
-                return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots(), playerHashMap.size(), gameProfiles), new TextMessage(conf.getServerMOTD()), icon);
+                return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots() + bots.size(), players.size() + bots.size(), gameProfiles), new TextMessage(conf.getServerMOTD()), icon);
             }
         });
 
@@ -171,7 +177,6 @@ public class MCThunder {
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-
             }
         });
 
@@ -360,7 +365,7 @@ public class MCThunder {
                     GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
                     Player player = getPlayer(profile.getId());
                     broadcast("&7&o" + player.getName() + " disconnected");
-                    entryListHandler.deleteFromPlayerEntryList(player);
+                    entryListHandler.removeFromList(player);
                     ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(player.getEntityID());
                     for (Player p : getPlayers())
                         p.sendPacket(destroyEntitiesPacket);
@@ -374,7 +379,7 @@ public class MCThunder {
                     map.put("Yaw", new FloatTag("Yaw", player.getLocation().getYaw()));
                     map.put("Pitch", new FloatTag("Pitch", player.getLocation().getPitch()));
                     playerProfileHandler.changeAttribute(player, new CompoundTag("SpawnPosition", map));
-                    playerHashMap.remove(player.getUniqueID());
+                    players.remove(player.getUniqueID());
                 }
             }
         });
@@ -491,7 +496,7 @@ public class MCThunder {
     }
 
     public static Player getPlayer(UUID uuid) {
-        return playerHashMap.get(uuid);
+        return players.get(uuid);
     }
 
     public static int maxRenderDistance() {
@@ -515,6 +520,8 @@ public class MCThunder {
             p.disconnect(args);
         for (World w : getWorlds())
             w.unloadWorld();
+        for (Bot b : getBots())
+            b.unload();
         AnsiConsole.systemUninstall();
         server.close();
     }
@@ -532,15 +539,15 @@ public class MCThunder {
     }
 
     public static Collection<Player> getPlayers() {
-        return playerHashMap.values();
+        return players.values();
     }
 
     public static void addPlayer(Player player) {
-        playerHashMap.put(player.getUniqueID(), player);
+        players.put(player.getUniqueID(), player);
     }
 
-    public static HashMap getRawPlayerHashmap() {
-        return playerHashMap;
+    public static HashMap getPlayerHashmap() {
+        return players;
     }
 
     public static ServerPlayerEntryListHandler getEntryListHandler() {
@@ -548,16 +555,19 @@ public class MCThunder {
     }
 
     public static void addToPlayerEntryList(Player player) {
-        entryListHandler.addToPlayerEntryList(player);
+        entryListHandler.addToList(player);
     }
 
+    public static Collection<Bot> getBots() {
+        return bots;
+    }
 
     public static World getWorld(String name) {
-        return worldHashMap.get(name);
+        return worlds.get(name);
     }
 
     public static Collection<World> getWorlds() {
-        return worldHashMap.values();
+        return worlds.values();
     }
 
     public static Config getConfig() {
@@ -570,5 +580,21 @@ public class MCThunder {
 
     public static PlayerProfileHandler getProfileHandler() {
         return playerProfileHandler;
+    }
+
+    public static void loadBot(Bot b) {
+        if (bots.contains(b))
+            return;
+        bots.add(b);
+        b.load();
+        entryListHandler.addToList(b);
+    }
+
+    public static void unloadBot(Bot b) {
+        if (!bots.contains(b))
+            return;
+        entryListHandler.removeFromList(b);
+        b.unload();
+        bots.remove(b);
     }
 }

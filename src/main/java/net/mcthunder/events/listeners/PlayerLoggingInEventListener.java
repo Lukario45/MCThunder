@@ -1,6 +1,7 @@
 package net.mcthunder.events.listeners;
 
 import net.mcthunder.MCThunder;
+import net.mcthunder.api.Bot;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.block.Sign;
@@ -23,7 +24,7 @@ import static net.mcthunder.api.Utils.tellConsole;
 public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.PlayerLoggingInEventListener {
     @Override
     public void onLogin(Session session) throws ClassNotFoundException {
-        //TODO fire event with session entryListGabdker playerProfileHandler
+        //TODO fire event with session
         GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
         if (MCThunder.getPlayer(profile.getId()) != null)
             MCThunder.getPlayer(profile.getId()).disconnect("You logged in from another location!");
@@ -35,7 +36,7 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
             l = new Location(MCThunder.getWorld((String) c.get("World").getValue()), (double) c.get("X").getValue(), (double) c.get("Y").getValue(), (double) c.get("Z").getValue(), (float) c.get("Yaw").getValue(), (float) c.get("Pitch").getValue());
         player.setLocation((l == null || l.getWorld() == null) ? MCThunder.getWorld(MCThunder.getConfig().getWorldName()).getSpawnLocation() : l);
         player.sendPacket(new ServerJoinGamePacket(player.getEntityID(), player.getWorld().isHardcore(), player.getGameMode(), player.getWorld().getDimension(), player.getWorld().getDifficulty(), MCThunder.getConfig().getSlots(), player.getWorld().getWorldType(), false));
-        tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.getGameProfile().getName(), session.getHost(), session.getPort()));
+        tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.getName(), session.getHost(), session.getPort()));
         MCThunder.addToPlayerEntryList(player);
         //Send World Data
         player.loadChunks(null);
@@ -54,6 +55,11 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
                 player1.sendPacket(toAllPlayers);
                 player.sendPacket(player1.getPacket());
             }
+        }
+        for (Bot b : MCThunder.getBots()) {
+            if (!b.getWorld().equals(player.getWorld()))
+                continue;//Also will need to check if out of range ,_,
+            player.sendPacket(b.getPacket());
         }
         for (Entity e : player.getWorld().getEntities())
             if(e.getPacket() != null)
