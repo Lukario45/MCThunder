@@ -2,6 +2,7 @@ package net.mcthunder;
 
 import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
+import net.mcthunder.block.Chest;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.EntityType;
 import net.mcthunder.entity.Player;
@@ -33,6 +34,9 @@ import org.spacehq.mc.protocol.data.game.values.Face;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.entity.player.PlayerAction;
+import org.spacehq.mc.protocol.data.game.values.window.WindowType;
+import org.spacehq.mc.protocol.data.game.values.world.block.value.BlockValue;
+import org.spacehq.mc.protocol.data.game.values.world.block.value.BlockValueType;
 import org.spacehq.mc.protocol.data.message.TextMessage;
 import org.spacehq.mc.protocol.data.status.PlayerInfo;
 import org.spacehq.mc.protocol.data.status.ServerStatusInfo;
@@ -43,10 +47,15 @@ import org.spacehq.mc.protocol.packet.ingame.client.ClientKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientSettingsPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientTabCompletePacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.*;
+import org.spacehq.mc.protocol.packet.ingame.client.window.ClientConfirmTransactionPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.window.ClientCreativeInventoryActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.window.ClientWindowActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
+import org.spacehq.mc.protocol.packet.ingame.server.window.ServerConfirmTransactionPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.window.ServerOpenWindowPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.window.ServerWindowItemsPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.world.ServerBlockValuePacket;
 import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
@@ -103,6 +112,7 @@ public class MCThunder {
         Enchantment.mapEnchantments();
         PotionEffectType.mapPotionEffects();
         EntityType.mapEntityTypes();
+        Achievement.mapAchievements();
         tellPublicIpAddress();
         //Register Default Commands
         /**
@@ -295,15 +305,33 @@ public class MCThunder {
                                     if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
                                         p.sendPacket(pack);
                             }
+                        } else if (event.getPacket() instanceof ClientConfirmTransactionPacket) {
+                            ClientConfirmTransactionPacket p = event.getPacket();
+                            tellConsole(LoggingLevel.DEBUG, p.getAccepted());
+                            tellConsole(LoggingLevel.DEBUG, p.getWindowId());
+                            tellConsole(LoggingLevel.DEBUG, p.getActionId());
                         } else if (event.getPacket() instanceof ClientPlayerPlaceBlockPacket) {
                             ClientPlayerPlaceBlockPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             Position position = packet.getPosition();
                             ItemStack heldItem = packet.getHeldItem();
-                            if (heldItem == null || (position.getY() >> 4) < 0)
+                            if ((position.getY() >> 4) < 0)
                                 return;
                             //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
                             Block b = new Block(new Location(player.getWorld(), position));
+                            Chest c = player.getWorld().getChest(b.getLocation());
+                            if (c != null && !player.isSneaking()) {
+                                int id = 54;
+                                player.sendPacket(new ServerOpenWindowPacket(id, WindowType.CHEST, c.getName(), 27, c.hasCustomName()));
+                                player.sendPacket(new ServerWindowItemsPacket(id, c.getInventory().getItems()));
+                                return;
+                            }
+                            if (b.getType().equals(Material.CRAFTING_TABLE)) {
+                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.CRAFTING_TABLE, "Workbench", 10, false));
+                                return;
+                            }
+                            if (heldItem == null)
+                                return;
                             if (!b.getType().isLiquid() && !b.getType().equals(Material.SNOW_LAYER) && !b.getType().isLongGrass())
                                 b = b.getRelative(Direction.fromFace(packet.getFace()));
                             if (!b.getType().equals(Material.AIR))
@@ -393,7 +421,6 @@ public class MCThunder {
                     for (Player p : getPlayers())
                         if (!p.getUniqueID().equals(player.getUniqueID()))
                             p.sendPacket(pack);
-
                 }
             }
             try {
@@ -468,7 +495,7 @@ public class MCThunder {
                 packets.add(new ServerEntityTeleportPacket(player.getEntityID(), packet.getX(), packet.getY(), packet.getZ(), yaw, pitch, packet.isOnGround()));
             else if (packet instanceof ClientPlayerPositionPacket)
                 packets.add(new ServerEntityPositionPacket(player.getEntityID(), movedX, movedY, movedZ, packet.isOnGround()));
-            else {//if (packet instanceof ClientPlayerPositionRotationPacket)
+            else {//ClientPlayerPositionRotationPacket
                 packets.add(new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, yaw, pitch, packet.isOnGround()));
                 packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
             }

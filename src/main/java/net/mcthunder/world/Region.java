@@ -3,6 +3,7 @@ package net.mcthunder.world;
 import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.Vector;
+import net.mcthunder.block.Chest;
 import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.EntityType;
@@ -592,6 +593,7 @@ public class Region {
                     StringTag customName = tile.get("CustomName");
                     StringTag lock = tile.get("Lock");
                     ListTag items = tile.get("Items");//27 slots
+                    this.world.registerChest(new Chest(loc, items, customName == null ? null : customName.getValue()));
                 } else if (id.getValue().equals("Comparator")) {
                     IntTag outputSignal = tile.get("OutputSignal");
                 } else if (id.getValue().equals("Control")) {//Command Block

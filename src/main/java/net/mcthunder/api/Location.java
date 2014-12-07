@@ -152,6 +152,10 @@ public class Location {
         return new Position((int) getX(), (int) getY(), (int) getZ());
     }
 
+    public boolean equals(Location l) {
+        return this.x == l.getX() && this.y == l.getY() && this.z == l.getZ() && this.yaw == l.getYaw() && this.pitch == l.getPitch() && this.world == l.getWorld();
+    }
+
     @Override
     public Location clone() {
         return new Location(this.world, this.x, this.y, this.z, this.yaw, this.pitch);

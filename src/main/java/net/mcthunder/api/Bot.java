@@ -34,7 +34,6 @@ public abstract class Bot {
         this.botProfile = new GameProfile(this.uuid, this.name);
         this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
         setSkin(this.skinUUID);
-        load();
     }
 
     public PlayerListEntry getListEntry() {
@@ -59,7 +58,7 @@ public abstract class Bot {
         return this.entitySpawned;
     }
 
-    public void setSkin(Property p) {
+    protected void setSkin(Property p) {
         if (p == null || !p.getName().equalsIgnoreCase("textures"))
             return;
         this.skin = p;
@@ -71,10 +70,11 @@ public abstract class Bot {
     }
 
     public void setSkin(UUID uuid) {
-        setSkin(Utils.getSkin(uuid));
+        this.skinUUID = uuid;
+        setSkin(Utils.getSkin(this.skinUUID));
     }
 
-    public void spawn(Location l) {//TODO: Will also need to send to people when they login also
+    public void spawn(Location l) {
         if (isEntitySpawned())
             return;
         this.entitySpawned = true;

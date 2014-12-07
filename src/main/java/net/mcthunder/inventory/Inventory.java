@@ -6,24 +6,38 @@ import java.util.HashMap;
 
 public class Inventory {
     private HashMap<Integer,ItemStack> contents;
-    private int size;
     private String name;
 
     public Inventory(int size, String name){
-        this.size = size;
         this.name = name;
-        contents = new HashMap<>(this.size);
+        this.contents = new HashMap<>(size);
+        for (int i = 0; i < this.contents.size(); i++)
+            this.contents.put(i, new ItemStack(0));
     }
 
     public void setSlot(int slot, ItemStack i) {
-        contents.put(slot, i == null ? new ItemStack(0) : i);
+        this.contents.put(slot, i == null ? new ItemStack(0) : i);
     }
 
     public ItemStack getItemAt(int slot) {
-        return contents.containsKey(slot) ? contents.get(slot) : new ItemStack(0);
+        return this.contents.get(slot) == null ? new ItemStack(0) : this.contents.get(slot);
     }
 
-    public void add(ItemStack i) {//TODO
+    public void add(ItemStack is) {//TODO: Make them stack
+        for (int i = 0; i < this.contents.size(); i++)
+            if (this.contents.get(i) == null || this.contents.get(i).getId() == 0) {
+                this.contents.put(i, is);
+                break;
+            }
+    }
 
+    public ItemStack[] getItems() {
+        ItemStack[] i = new ItemStack[contents.size()];
+        this.contents.values().toArray(i);
+        return i;
+    }
+
+    public String getName() {
+        return this.name;
     }
 }

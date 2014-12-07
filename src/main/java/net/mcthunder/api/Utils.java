@@ -2,6 +2,7 @@ package net.mcthunder.api;
 
 import net.mcthunder.MCThunder;
 import org.spacehq.mc.auth.properties.Property;
+import org.spacehq.opennbt.tag.builtin.Tag;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -71,16 +72,19 @@ public class Utils {
         }
     }
 
+    public static void tellConsole(LoggingLevel level, Tag t) {
+        tellConsole(level, t.getValue());
+    }
+
     public static UUID getUUIDfromString(String name) {
         if (name == null)
             return null;
         UUID uuid = null;
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + name).openConnection().getInputStream()));
-            String temp = in.readLine();
             String id = "";
             int count = 0;
-            for (char c : temp.toCharArray()) {
+            for (char c : in.readLine().toCharArray()) {
                 if (c == '"')
                     count++;
                 else if (count == 3)
@@ -94,18 +98,16 @@ public class Utils {
         return uuid;
     }
 
-    public static Property getSkin(UUID uuid) {//Can only request same skin once per minute so will need to keep track of them
+    public static Property getSkin(UUID uuid) {//Can only request same skin once per minute so will need to cache them for a minute
         if (uuid == null)
             return null;
-        Property p = null;
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" +
                     uuid.toString().replaceAll("-", "") + "?unsigned=false").openConnection().getInputStream()));
-            String temp = in.readLine();
             String value = "";
             String signature = "";
             int count = 0;
-            for (char c : temp.toCharArray()) {
+            for (char c : in.readLine().toCharArray()) {
                 if (c == '"')
                     count++;
                 else if (count == 17)
@@ -115,10 +117,10 @@ public class Utils {
                 if (count > 21)
                     break;
             }
-            p = new Property("textures", value, signature);
             in.close();
+            return new Property("textures", value, signature);
         } catch (Exception ignored) { }
-        return p;
+        return null;
     }
 
     public static long getLong(int x, int z) {

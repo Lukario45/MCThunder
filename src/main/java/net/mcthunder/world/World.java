@@ -3,6 +3,7 @@ package net.mcthunder.world;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
+import net.mcthunder.block.Chest;
 import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
@@ -36,6 +37,7 @@ public class World {
     private HashMap<Long, Region> regionHashMap = new HashMap<>();
     private HashMap<Long, Column> columnHashMap = new HashMap<>();
     private HashMap<Integer,Entity> loadedEntities = new HashMap<>();
+    private HashMap<Location, Chest> chestData = new HashMap<>();
     private ArrayList<Sign> signs = new ArrayList<>();//TEMP arraylist
     private WorldType worldType;
 
@@ -243,6 +245,17 @@ public class World {
     public void addSign(Sign s) {
         s.sendPacket();
         this.signs.add(s);
+    }
+
+    public void registerChest(Chest c) {
+        this.chestData.put(c.getLocation(), c);
+    }
+
+    public Chest getChest(Location l) {
+        for (Location i : this.chestData.keySet())
+            if (i.equals(l))
+                return this.chestData.get(i);
+        return this.chestData.get(l);
     }
 
     public Collection<Sign> getSigns() {
