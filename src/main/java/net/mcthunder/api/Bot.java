@@ -7,16 +7,15 @@ import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
-import org.spacehq.mc.protocol.data.message.Message;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.packetlib.packet.Packet;
 
 import java.util.UUID;
 
-import static net.mcthunder.api.Utils.tellConsole;
-
 public abstract class Bot {
-    private final int entityID;
+    protected MessageFormat format = new MessageFormat();
+    private int entityID;
     private GameProfile botProfile;
     private boolean entitySpawned = false;
     private Property skin = null;
@@ -28,16 +27,18 @@ public abstract class Bot {
     public Bot(String name) {
         this.name = name;
         this.uuid = UUID.randomUUID();
-        this.skinUUID = Utils.getUUIDfromString(this.name);
+        String temp = format.formatMessage(this.name).getFullText().trim();
+        this.skinUUID = Utils.getUUIDfromString(temp);
         if (this.skinUUID == null)
             this.skinUUID = this.uuid;
-        this.botProfile = new GameProfile(this.uuid, this.name);
+        this.botProfile = new GameProfile(this.uuid, temp);
         this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
         setSkin(this.skinUUID);
+        load();
     }
 
     public PlayerListEntry getListEntry() {
-        return new PlayerListEntry(getGameProfile(), GameMode.CREATIVE, 0, Message.fromString(this.name));
+        return new PlayerListEntry(getGameProfile(), GameMode.CREATIVE, 0, format.formatMessage(this.name));
     }
 
     public String getName() {
@@ -46,7 +47,7 @@ public abstract class Bot {
 
     public void setName(String newName) {
         this.name = newName;
-        this.botProfile = new GameProfile(this.uuid, this.name);
+        this.botProfile = new GameProfile(this.uuid, format.formatMessage(this.name).getFullText().trim());
         this.botProfile.getProperties().put("textures", this.skin);
     }
 
@@ -63,6 +64,17 @@ public abstract class Bot {
             return;
         this.skin = p;
         this.botProfile.getProperties().put("textures", this.skin);
+        MCThunder.getEntryListHandler().refresh(this);
+        if (isEntitySpawned()) {
+            ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(this.entityID);
+            this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+            ServerSpawnPlayerPacket spawnPlayerPacket = (ServerSpawnPlayerPacket) getPacket();
+            for (Player pl : MCThunder.getPlayers()) {
+                pl.sendPacket(destroyEntitiesPacket);
+                if (pl.getWorld().equals(getWorld()))
+                    pl.sendPacket(spawnPlayerPacket);
+            }
+        }
     }
 
     public void setSkin(String name) {
@@ -79,9 +91,9 @@ public abstract class Bot {
             return;
         this.entitySpawned = true;
         this.location = l;
-        Packet packet = getPacket();
+        ServerSpawnPlayerPacket packet = (ServerSpawnPlayerPacket) getPacket();
         for (Player p : MCThunder.getPlayers())
-            if (p.getWorld().equals(this.location.getWorld()))
+            if (p.getWorld().equals(getWorld()))
                 p.sendPacket(packet);
     }
 

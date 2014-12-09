@@ -27,7 +27,7 @@ public class Teleport extends Command {
         else {
             if (sendTo == null) {
                 sendTo = toSend;
-                 toSend = player;
+                toSend = player;
             }
             toSend.teleport(sendTo.getLocation());
         }

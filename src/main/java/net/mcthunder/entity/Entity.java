@@ -16,7 +16,7 @@ import org.spacehq.packetlib.packet.Packet;
 public class Entity {
     //TODO make one for each type of entity with also their ai and spawning things
     private final EntityType type;
-    private final int entityID;
+    private int entityID;
     private String customName;
     private Location location;
     private boolean onGround;
@@ -31,7 +31,7 @@ public class Entity {
     public Entity(Location location, EntityType type) {
         this.location = location;
         this.type = type;
-        this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+        refreshEntityID();
         this.metadata = new MetadataMap();
     }
 
@@ -109,6 +109,7 @@ public class Entity {
 
     public void teleport(Location l) {
         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+        refreshEntityID();
         Packet respawn = getPacket();
         if (respawn != null)
             for (Player p : MCThunder.getPlayers()) {
@@ -117,5 +118,9 @@ public class Entity {
                     p.sendPacket(respawn);
             }
         setLocation(l);
+    }
+
+    protected void refreshEntityID() {
+        this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
     }
 }

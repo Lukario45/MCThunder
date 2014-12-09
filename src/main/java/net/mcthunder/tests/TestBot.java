@@ -15,11 +15,11 @@ public class TestBot extends Bot {
 
     @Override
     public void unload() {
-        tellConsole(LoggingLevel.DEBUG, "TestBot(" + getName() + ") unloaded.");
+        tellConsole(LoggingLevel.DEBUG, "TestBot(" + getName() + "&r) unloaded.");
     }
 
     @Override
     public void load() {
-        tellConsole(LoggingLevel.DEBUG, "TestBot(" + getName() + ") loaded.");
+        tellConsole(LoggingLevel.DEBUG, "TestBot(" + getName() + "&r) loaded.");
     }
 }

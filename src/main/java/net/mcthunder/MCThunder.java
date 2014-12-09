@@ -613,7 +613,6 @@ public class MCThunder {
         if (bots.contains(b))
             return;
         bots.add(b);
-        b.load();
         entryListHandler.addToList(b);
     }
 

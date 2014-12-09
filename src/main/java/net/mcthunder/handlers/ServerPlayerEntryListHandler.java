@@ -15,9 +15,9 @@ import java.util.List;
  */
 public class ServerPlayerEntryListHandler {
     public void removeFromList(Player player) {
-        ServerPlayerListEntryPacket serverPlayerListEntryPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.REMOVE_PLAYER, new PlayerListEntry[]{new PlayerListEntry(player.getGameProfile())});
+        ServerPlayerListEntryPacket serverPlayerListExitPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.REMOVE_PLAYER, new PlayerListEntry[]{new PlayerListEntry(player.getGameProfile())});
         for (Player p : MCThunder.getPlayers())
-            p.sendPacket(serverPlayerListEntryPacket);
+            p.sendPacket(serverPlayerListExitPacket);
     }
 
     public void addToList(Player player) {
@@ -32,6 +32,15 @@ public class ServerPlayerEntryListHandler {
         player.sendPacket(new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, playerListEntries.toArray(new PlayerListEntry[playerListEntries.size()])));
     }
 
+    public void refresh(Player player) {
+        ServerPlayerListEntryPacket serverPlayerListExitPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.REMOVE_PLAYER, new PlayerListEntry[]{new PlayerListEntry(player.getGameProfile())});
+        ServerPlayerListEntryPacket serverPlayerListEntryPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, new PlayerListEntry[]{player.getListEntry()});
+        for (Player p : MCThunder.getPlayers()) {
+            p.sendPacket(serverPlayerListExitPacket);
+            p.sendPacket(serverPlayerListEntryPacket);
+        }
+    }
+
     public void removeFromList(Bot bot) {
         ServerPlayerListEntryPacket serverPlayerListEntryPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.REMOVE_PLAYER, new PlayerListEntry[]{new PlayerListEntry(bot.getGameProfile())});
         for (Player p : MCThunder.getPlayers())
@@ -42,5 +51,14 @@ public class ServerPlayerEntryListHandler {
         ServerPlayerListEntryPacket serverPlayerListEntryPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, new PlayerListEntry[]{bot.getListEntry()});
         for (Player p : MCThunder.getPlayers())
             p.sendPacket(serverPlayerListEntryPacket);
+    }
+
+    public void refresh(Bot bot) {
+        ServerPlayerListEntryPacket serverPlayerListExitPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.REMOVE_PLAYER, new PlayerListEntry[]{new PlayerListEntry(bot.getGameProfile())});
+        ServerPlayerListEntryPacket serverPlayerListEntryPacket = new ServerPlayerListEntryPacket(PlayerListEntryAction.ADD_PLAYER, new PlayerListEntry[]{bot.getListEntry()});
+        for (Player p : MCThunder.getPlayers()) {
+            p.sendPacket(serverPlayerListExitPacket);
+            p.sendPacket(serverPlayerListEntryPacket);
+        }
     }
 }

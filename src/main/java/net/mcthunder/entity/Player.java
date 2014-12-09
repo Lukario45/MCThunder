@@ -8,13 +8,17 @@ import net.mcthunder.inventory.PlayerInventory;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
+import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.message.Message;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
+import org.spacehq.mc.protocol.packet.ingame.server.ServerRespawnPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
@@ -27,7 +31,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
-import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -35,6 +38,10 @@ import static net.mcthunder.api.Utils.tellConsole;
 public class Player extends Entity {
     private final UUID uuid;
     private final String name;
+    private final Property origSkin;
+    private GameProfile profile;
+    private UUID skinUUID;
+    private Property skin;
     private NBTFile playerFile;
     private HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
     private ArrayList<Long> loadedColumns = new ArrayList<>();
@@ -58,6 +65,7 @@ public class Player extends Entity {
     public Player(Session session) {
         super(EntityType.PLAYER);
         this.session = session;
+        this.profile = getSession().getFlag(ProtocolConstants.PROFILE_KEY);
         this.uuid = getGameProfile().getId();
         this.name = getGameProfile().getName();
         this.slot = 36;
@@ -67,6 +75,9 @@ public class Player extends Entity {
         this.inv = new PlayerInventory(44, this.name);
         this.ping = getSession().getFlag(ProtocolConstants.PING_KEY);
         this.playerFile = new NBTFile(new File("PlayerFiles", this.uuid + ".dat"), "Player");
+        this.skinUUID = this.uuid;
+        this.origSkin = getGameProfile().getProperties().get("textures");
+        this.skin = origSkin;
     }
 
     public NBTFile getPlayerFile() {
@@ -286,16 +297,18 @@ public class Player extends Entity {
     }
 
     public void teleport(Location l) {
-        ServerSpawnPlayerPacket spawnPlayerPacket = new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), getHeldItem().getId(), getMetadata().getMetadataArray());
         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+        refreshEntityID();
+        ServerSpawnPlayerPacket spawnPlayerPacket = new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), getHeldItem().getId(), getMetadata().getMetadataArray());
         for (Player p : MCThunder.getPlayers())
             if (!p.getUniqueID().equals(getUniqueID())) {
                 p.sendPacket(destroyEntitiesPacket);
                 if (p.getWorld().equals(l.getWorld()))//If they are in the new world
                     p.sendPacket(spawnPlayerPacket);
             }
-        sendPacket(new ServerSpawnPositionPacket(l.getPosition()));
         setLocation(l);
+        sendPacket(new ServerPlayerPositionRotationPacket(getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch()));
+        sendPacket(new ServerSpawnPositionPacket(getLocation().getPosition()));
     }
 
     public int getView() {
@@ -315,7 +328,7 @@ public class Player extends Entity {
     }
 
     public GameProfile getGameProfile() {
-        return getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+        return profile;
     }
 
     public void disconnect(String reason) {
@@ -432,5 +445,38 @@ public class Player extends Entity {
 
     public PlayerListEntry getListEntry() {
         return new PlayerListEntry(getGameProfile(), getGameMode(), getPing(), Message.fromString(getName()));
+    }
+
+    protected void setSkin(Property p) {
+        if (p == null || !p.getName().equalsIgnoreCase("textures"))
+            return;
+        this.skin = p;
+        this.profile.getProperties().put("textures", this.skin);
+        MCThunder.getEntryListHandler().refresh(this);
+        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+        refreshEntityID();
+        ServerSpawnPlayerPacket spawnPlayerPacket = (ServerSpawnPlayerPacket) getPacket();
+        for (Player pl : MCThunder.getPlayers())
+            if (!pl.getUniqueID().equals(getUniqueID())) {
+                pl.sendPacket(destroyEntitiesPacket);
+                if (pl.getWorld().equals(getWorld()))
+                    pl.sendPacket(spawnPlayerPacket);
+            }
+        sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
+        sendPacket(new ServerPlayerPositionRotationPacket(getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch()));
+        sendPacket(new ServerSpawnPositionPacket(getLocation().getPosition()));
+    }
+
+    public void setSkin(String name) {
+        setSkin(Utils.getUUIDfromString(name));
+    }
+
+    public void setSkin(UUID uuid) {
+        this.skinUUID = uuid;
+        setSkin(Utils.getSkin(this.skinUUID));
+    }
+
+    public void removeSkin() {
+        setSkin(this.origSkin);
     }
 }
