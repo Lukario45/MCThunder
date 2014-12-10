@@ -31,6 +31,7 @@ public class ServerChatHandler {
         String format = MCThunder.getConfig().getChatFormat();
         format = format.replaceAll("\\{WORLD\\}", player.getWorld().getName());
         format = format.replaceAll("\\{NAME\\}", player.getDisplayName());
+        //todo format = format.replaceAll("\\{RANK\\}",)
         int i = format.indexOf("{MESSAGE}");
         if(i != -1)
             format = format.substring(0, i) + message + format.substring(i + 9);

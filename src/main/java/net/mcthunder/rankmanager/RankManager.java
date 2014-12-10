@@ -1,5 +1,6 @@
 package net.mcthunder.rankmanager;
 
+import com.Lukario45.NBTFile.NBTFile;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.LoggingLevel;
@@ -18,7 +19,7 @@ import static net.mcthunder.api.Utils.tellConsole;
  */
 public class RankManager {
     private Config config;
-    private File ranks;
+    private NBTFile ranks;
     private RankManagerLoggingInEventListener loginEventListener;
     private PlayerLoggingInEventSource loggingInEventSource;
 
@@ -29,19 +30,19 @@ public class RankManager {
         Rank rank = new Rank();
         tellConsole(LoggingLevel.INFO, "Loading Rank Manager");
         makeDir("RankManager");
-        ranks = new File("RankManager", "ranks.dat");
-        if (!ranks.exists()) {
+        ranks = new NBTFile(new File("RankManager/ranks.dat"), "Ranks");
+
             try {
-                ranks.createNewFile();
+                ranks.createFile();
                 rank.newRank("Default", 1);
                 rank.newRank("Moderator", 5000);
-                rank.newRank("Owner,", 9999);
+                rank.newRank("Owner", 9999);
 
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+
 
         config = new Config();
         config.loadConfig();
@@ -52,12 +53,12 @@ public class RankManager {
         return this.config;
     }
 
-    public File getRanks() {
+    public NBTFile getRanks() {
         return this.ranks;
     }
 
     public void deny(Player player, Command command) {
         player.sendMessage(config.getDenyColor() + config.getDenyMessage());
-        tellConsole(LoggingLevel.WARNING, player.getName() + " was denied access to " + command.getName());
+        tellConsole(LoggingLevel.DENY, player.getName() + " was denied access to " + command.getName());
     }
 }

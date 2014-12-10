@@ -10,16 +10,13 @@ public enum LoggingLevel {
     ERROR("ERROR"),
     SEVERE("SEVERE"),
     CHAT("CHAT"),
-    COMMAND("COMMAND");
+    COMMAND("COMMAND"),
+    DENY("DENY");
 
     private String name;
 
     private LoggingLevel(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return this.name;
     }
 
     public static LoggingLevel fromString(String name) {
@@ -35,6 +32,12 @@ public enum LoggingLevel {
             return CHAT;
         if (name.equalsIgnoreCase("command"))
             return COMMAND;
+        if (name.equalsIgnoreCase("deny"))
+            return DENY;
         return DEBUG;
+    }
+
+    public String getName() {
+        return this.name;
     }
 }

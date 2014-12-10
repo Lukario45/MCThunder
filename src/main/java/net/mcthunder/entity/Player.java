@@ -15,7 +15,6 @@ import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.message.Message;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerRespawnPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
@@ -306,6 +305,7 @@ public class Player extends Entity {
                 if (p.getWorld().equals(l.getWorld()))//If they are in the new world
                     p.sendPacket(spawnPlayerPacket);
             }
+
         setLocation(l);
         sendPacket(new ServerPlayerPositionRotationPacket(getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch()));
         sendPacket(new ServerSpawnPositionPacket(getLocation().getPosition()));
