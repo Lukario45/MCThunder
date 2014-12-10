@@ -3,8 +3,10 @@ package net.mcthunder.entity;
 import com.Lukario45.NBTFile.NBTFile;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.*;
+import net.mcthunder.block.Chest;
 import net.mcthunder.inventory.Inventory;
 import net.mcthunder.inventory.PlayerInventory;
+import net.mcthunder.material.Material;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
@@ -13,12 +15,16 @@ import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
+import org.spacehq.mc.protocol.data.game.values.window.WindowType;
 import org.spacehq.mc.protocol.data.message.Message;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerRespawnPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.window.ServerOpenWindowPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.packetlib.Session;
@@ -296,16 +302,23 @@ public class Player extends Entity {
     }
 
     public void teleport(Location l) {
-        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
-        refreshEntityID();
-        ServerSpawnPlayerPacket spawnPlayerPacket = new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), getHeldItem().getId(), getMetadata().getMetadataArray());
-        for (Player p : MCThunder.getPlayers())
-            if (!p.getUniqueID().equals(getUniqueID())) {
-                p.sendPacket(destroyEntitiesPacket);
-                if (p.getWorld().equals(l.getWorld()))//If they are in the new world
-                    p.sendPacket(spawnPlayerPacket);
-            }
-
+        if (!l.getWorld().equals(getWorld())) {
+            ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+            //refreshEntityID();//Should not be needed when they change world to one people have not been in
+            Packet respawn = getPacket();
+            if (respawn != null)
+                for (Player p : MCThunder.getPlayers()) {
+                    p.sendPacket(destroyEntitiesPacket);
+                    if (p.getWorld().equals(l.getWorld()))//If they are in the new world
+                        p.sendPacket(respawn);
+                }
+            sendPacket(new ServerRespawnPacket(l.getWorld().getDimension(), l.getWorld().getDifficulty(), getGameMode(), l.getWorld().getWorldType()));
+        } else {
+            ServerEntityTeleportPacket packet = new ServerEntityTeleportPacket(getEntityID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), isOnGround());
+            for (Player p : MCThunder.getPlayers())
+                if (p.getWorld().equals(l.getWorld()))
+                    p.sendPacket(packet);
+        }
         setLocation(l);
         sendPacket(new ServerPlayerPositionRotationPacket(getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch()));
         sendPacket(new ServerSpawnPositionPacket(getLocation().getPosition()));
@@ -453,8 +466,8 @@ public class Player extends Entity {
         this.skin = p;
         this.profile.getProperties().put("textures", this.skin);
         MCThunder.getEntryListHandler().refresh(this);
-        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
-        refreshEntityID();
+        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());//TODO: Test if this still works
+        //refreshEntityID();
         ServerSpawnPlayerPacket spawnPlayerPacket = (ServerSpawnPlayerPacket) getPacket();
         for (Player pl : MCThunder.getPlayers())
             if (!pl.getUniqueID().equals(getUniqueID())) {
@@ -478,5 +491,9 @@ public class Player extends Entity {
 
     public void removeSkin() {
         setSkin(this.origSkin);
+    }
+
+    public void openInventory(Inventory inv) {
+        //TODO
     }
 }

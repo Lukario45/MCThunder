@@ -24,28 +24,23 @@ public class RankManager {
     private PlayerLoggingInEventSource loggingInEventSource;
 
     public void load() {
-        loggingInEventSource = new PlayerLoggingInEventSource();
-        loginEventListener = new RankManagerLoggingInEventListener();
-        MCThunder.addLoginEventListener(loginEventListener);
+        this.loggingInEventSource = new PlayerLoggingInEventSource();
+        this.loginEventListener = new RankManagerLoggingInEventListener();
+        MCThunder.addLoginEventListener(this.loginEventListener);
         Rank rank = new Rank();
         tellConsole(LoggingLevel.INFO, "Loading Rank Manager");
         makeDir("RankManager");
-        ranks = new NBTFile(new File("RankManager/ranks.dat"), "Ranks");
-
-            try {
-                ranks.createFile();
-                rank.newRank("Default", 1);
-                rank.newRank("Moderator", 5000);
-                rank.newRank("Owner", 9999);
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-        config = new Config();
-        config.loadConfig();
+        this.ranks = new NBTFile(new File("RankManager/ranks.dat"), "Ranks");
+        try {
+            this.ranks.createFile();
+            rank.newRank("Default", 1);
+            rank.newRank("Moderator", 5000);
+            rank.newRank("Owner", 9999);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.config = new Config();
+        this.config.loadConfig();
 
     }
 
@@ -58,7 +53,7 @@ public class RankManager {
     }
 
     public void deny(Player player, Command command) {
-        player.sendMessage(config.getDenyColor() + config.getDenyMessage());
+        player.sendMessage(this.config.getDenyColor() + this.config.getDenyMessage());
         tellConsole(LoggingLevel.DENY, player.getName() + " was denied access to " + command.getName());
     }
 }

@@ -1,9 +1,12 @@
 package net.mcthunder.block;
 
 import net.mcthunder.api.Location;
+import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.inventory.Inventory;
 import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.opennbt.tag.builtin.*;
+
+import static net.mcthunder.api.Utils.tellConsole;
 
 public class Chest {
     private String customName;
@@ -31,7 +34,7 @@ public class Chest {
                     id = Integer.parseInt(itemID.getValue());
                 } catch (Exception e) {//pre 1.8 loading should be ShortTag instead
                     ShortTag itemID = item.get("id");
-                    id = itemID.getValue();
+                    id = Integer.parseInt(itemID.getValue().toString());
                 }
                 CompoundTag info = item.get("tag");
                 this.inv.setSlot(i, new ItemStack(id, amount.getValue(), data.getValue()));
@@ -44,14 +47,10 @@ public class Chest {
     }
 
     public Location getLocation() {
-        return this.l;
+        return this.l.clone();
     }
 
     public String getName() {
         return this.customName;
-    }
-
-    public boolean hasCustomName() {
-        return !this.customName.equals("Chest");
     }
 }

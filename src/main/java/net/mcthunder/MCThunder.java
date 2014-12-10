@@ -16,6 +16,7 @@ import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
+import net.mcthunder.inventory.Inventory;
 import net.mcthunder.material.Material;
 import net.mcthunder.rankmanager.RankManager;
 import net.mcthunder.world.Biome;
@@ -51,6 +52,7 @@ import org.spacehq.mc.protocol.packet.ingame.client.window.ClientWindowActionPac
 import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerOpenWindowPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerWindowItemsPacket;
 import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.Server;
@@ -320,32 +322,43 @@ public class MCThunder {
                                 return;
                             //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
                             Block b = new Block(new Location(player.getWorld(), position));
-                            Chest c = player.getWorld().getChest(b.getLocation());
-                            if (c != null && !player.isSneaking()) {
-                                int id = 54;
-                                player.sendPacket(new ServerOpenWindowPacket(id, WindowType.CHEST, c.getName(), 27));
-                                player.sendPacket(new ServerWindowItemsPacket(id, c.getInventory().getItems()));
+                            if (player.isSneaking()) {//Do nothing this is just here to shorten other things
+
+                            } else if (b.getType().equals(Material.CHEST) || b.getType().equals(Material.TRAPPED_CHEST)) {
+                                Chest c = player.getWorld().getChest(b.getLocation());
+                                if (c != null) {
+                                    Inventory inv = c.getInventory();
+                                    player.sendPacket(new ServerOpenWindowPacket(inv.getID(), WindowType.CHEST, c.getName(), 27));
+                                    for (int i = 0; i < inv.getItems().length; i++)
+                                        player.sendPacket(new ServerSetSlotPacket(inv.getID(), i, inv.getItemAt(i)));
+                                    return;
+                                }
+                            } else if (b.getType().equals(Material.CRAFTING_TABLE)) {//fix
+                                player.sendPacket(new ServerOpenWindowPacket(99, WindowType.CRAFTING_TABLE, "Crafting", 10));
                                 return;
-                            }
-                            if (b.getType().equals(Material.CRAFTING_TABLE)) {
-                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.CRAFTING_TABLE, "Crafting_Table", 10));
+                            } else if (b.getType().getParent().equals(Material.HOPPER)) {
+                                player.sendPacket(new ServerOpenWindowPacket(100, WindowType.HOPPER, "Hopper", 5));
                                 return;
-                            }
-                            if (b.getType().equals(Material.HOPPER_DOWN) || b.getType().equals(Material.HOPPER_NORTH) || b.getType().equals(Material.HOPPER_EAST) || b.getType().equals(Material.HOPPER_SOUTH) || b.getType().equals(Material.HOPPER_WEST) || b.getType().equals(Material.HOPPER_MINECART)) {
-                                tellConsole(LoggingLevel.DEBUG, "Hopper");
-                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.HOPPER, "Item_Hopper", 5));
+                            } else if (b.getType().equals(Material.BEACON)) {
+                                player.sendPacket(new ServerOpenWindowPacket(101, WindowType.BEACON, "Beacon", 1));
                                 return;
-                            }
-                            if (b.getType().equals(Material.BEACON)) {
-                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.BEACON, "Beacon", 2));
+                            } else if (b.getType().getParent().equals(Material.ANVIL)) {//fix
+                                player.sendPacket(new ServerOpenWindowPacket(102, WindowType.ANVIL, "Anvil", 3));
                                 return;
-                            }
-                            if (b.getType().equals(Material.ANVIL)) {
-                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.ANVIL, "Anvil", 4));
+                            } else if (b.getType().equals(Material.BREWING_STAND_BLOCK)) {
+                                player.sendPacket(new ServerOpenWindowPacket(103, WindowType.BREWING_STAND, "BrewingStand", 4));
                                 return;
-                            }
-                            if (b.getType().equals(Material.ENCHANTING_TABLE)) {
-                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.ENCHANTING_TABLE, "Enchanting", 3));
+                            } else if (b.getType().equals(Material.DISPENSER)) {
+                                player.sendPacket(new ServerOpenWindowPacket(104, WindowType.DISPENSER, "Dispenser", 9));
+                                return;
+                            } else if (b.getType().equals(Material.DROPPER)) {
+                                player.sendPacket(new ServerOpenWindowPacket(105, WindowType.DROPPER, "Dropper", 9));
+                                return;
+                            } else if (b.getType().equals(Material.FURNACE)) {//fix
+                                player.sendPacket(new ServerOpenWindowPacket(106, WindowType.FURNACE, "Furnace", 3));
+                                return;
+                            } else if (b.getType().equals(Material.ENCHANTING_TABLE)) {//fix
+                                player.sendPacket(new ServerOpenWindowPacket(107, WindowType.ENCHANTING_TABLE, "Enchanting", 2));
                                 return;
                             }
                             if (heldItem == null)

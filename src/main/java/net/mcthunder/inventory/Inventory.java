@@ -5,7 +5,9 @@ import org.spacehq.mc.protocol.data.game.ItemStack;
 import java.util.HashMap;
 
 public class Inventory {
+    private static int nextID = 1;
     private HashMap<Integer,ItemStack> contents;
+    private final int id;
     private String name;
 
     public Inventory(int size, String name){
@@ -13,6 +15,8 @@ public class Inventory {
         this.contents = new HashMap<>(size);
         for (int i = 0; i < this.contents.size(); i++)
             this.contents.put(i, new ItemStack(0));
+        this.id = nextID;
+        nextID++;
     }
 
     public void setSlot(int slot, ItemStack i) {
@@ -39,5 +43,9 @@ public class Inventory {
 
     public String getName() {
         return this.name;
+    }
+
+    public int getID() {
+        return this.id;
     }
 }

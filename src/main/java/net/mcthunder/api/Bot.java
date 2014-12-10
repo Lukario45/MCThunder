@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public abstract class Bot {
     protected MessageFormat format = new MessageFormat();
-    private int entityID;
+    private final int entityID;
     private GameProfile botProfile;
     private boolean entitySpawned = false;
     private Property skin = null;
@@ -65,9 +65,9 @@ public abstract class Bot {
         this.skin = p;
         this.botProfile.getProperties().put("textures", this.skin);
         MCThunder.getEntryListHandler().refresh(this);
-        if (isEntitySpawned()) {
+        if (isEntitySpawned()) {//TODO: Test if this still works
             ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(this.entityID);
-            this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+            //this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
             ServerSpawnPlayerPacket spawnPlayerPacket = (ServerSpawnPlayerPacket) getPacket();
             for (Player pl : MCThunder.getPlayers()) {
                 pl.sendPacket(destroyEntitiesPacket);

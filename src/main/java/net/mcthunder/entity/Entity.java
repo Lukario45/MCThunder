@@ -8,6 +8,7 @@ import org.spacehq.mc.protocol.data.game.values.entity.Art;
 import org.spacehq.mc.protocol.data.game.values.entity.HangingDirection;
 import org.spacehq.mc.protocol.data.game.values.entity.MobType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnExpOrbPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPaintingPacket;
@@ -16,7 +17,7 @@ import org.spacehq.packetlib.packet.Packet;
 public class Entity {
     //TODO make one for each type of entity with also their ai and spawning things
     private final EntityType type;
-    private int entityID;
+    private final int entityID;
     private String customName;
     private Location location;
     private boolean onGround;
@@ -31,7 +32,7 @@ public class Entity {
     public Entity(Location location, EntityType type) {
         this.location = location;
         this.type = type;
-        refreshEntityID();
+        this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
         this.metadata = new MetadataMap();
     }
 
@@ -108,19 +109,22 @@ public class Entity {
     }
 
     public void teleport(Location l) {
-        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
-        refreshEntityID();
-        Packet respawn = getPacket();
-        if (respawn != null)
-            for (Player p : MCThunder.getPlayers()) {
-                p.sendPacket(destroyEntitiesPacket);
-                if (p.getWorld().equals(l.getWorld()))//If they are in the new world
-                    p.sendPacket(respawn);
-            }
+        if (!l.getWorld().equals(getWorld())) {
+            ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+            //refreshEntityID();//Should not be needed when they change world to one people have not been in
+            Packet respawn = getPacket();
+            if (respawn != null)
+                for (Player p : MCThunder.getPlayers()) {
+                    p.sendPacket(destroyEntitiesPacket);
+                    if (p.getWorld().equals(l.getWorld()))//If they are in the new world
+                        p.sendPacket(respawn);
+                }
+        } else {
+            ServerEntityTeleportPacket packet = new ServerEntityTeleportPacket(getEntityID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), this.onGround);
+            for (Player p : MCThunder.getPlayers())
+                if (p.getWorld().equals(l.getWorld()))
+                    p.sendPacket(packet);
+        }
         setLocation(l);
-    }
-
-    protected void refreshEntityID() {
-        this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
     }
 }
