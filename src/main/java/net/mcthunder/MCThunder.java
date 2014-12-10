@@ -35,8 +35,6 @@ import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.entity.player.PlayerAction;
 import org.spacehq.mc.protocol.data.game.values.window.WindowType;
-import org.spacehq.mc.protocol.data.game.values.world.block.value.BlockValue;
-import org.spacehq.mc.protocol.data.game.values.world.block.value.BlockValueType;
 import org.spacehq.mc.protocol.data.message.TextMessage;
 import org.spacehq.mc.protocol.data.status.PlayerInfo;
 import org.spacehq.mc.protocol.data.status.ServerStatusInfo;
@@ -52,10 +50,8 @@ import org.spacehq.mc.protocol.packet.ingame.client.window.ClientCreativeInvento
 import org.spacehq.mc.protocol.packet.ingame.client.window.ClientWindowActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
-import org.spacehq.mc.protocol.packet.ingame.server.window.ServerConfirmTransactionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerOpenWindowPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerWindowItemsPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.world.ServerBlockValuePacket;
 import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
@@ -97,6 +93,7 @@ public class MCThunder {
 
     public static void main(String args[]) {
         AnsiConsole.systemInstall();
+
         conf = new Config();
         conf.loadConfig();
         //Set Server data
@@ -127,13 +124,16 @@ public class MCThunder {
                 commands++;
         tellConsole(LoggingLevel.INFO, commands + " command" + (commands != 1 ? "s " : "") + "were loaded.");
         //Done
+
         server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
+
         //Handlers
         chatHandler = new ServerChatHandler();
         entryListHandler = new ServerPlayerEntryListHandler();
         tabHandler = new ServerTabHandler();
         playerProfileHandler = new PlayerProfileHandler();
         //Listeners
+
         PlayerChatEventListener defaultPlayerChatEventListener = new PlayerChatEventListener();
         PlayerCommandEventListener defaultPlayerCommandEventListener = new PlayerCommandEventListener();
         PlayerLoggingInEventListener loggingInEventListener = new PlayerLoggingInEventListener();
@@ -155,6 +155,7 @@ public class MCThunder {
         final World world = new World(conf.getWorldName());
         worlds.put(conf.getWorldName(), world);
         world.loadWorld();
+
 
         server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
         server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
@@ -322,12 +323,29 @@ public class MCThunder {
                             Chest c = player.getWorld().getChest(b.getLocation());
                             if (c != null && !player.isSneaking()) {
                                 int id = 54;
-                                player.sendPacket(new ServerOpenWindowPacket(id, WindowType.CHEST, c.getName(), 27, c.hasCustomName()));
+                                player.sendPacket(new ServerOpenWindowPacket(id, WindowType.CHEST, c.getName(), 27));
                                 player.sendPacket(new ServerWindowItemsPacket(id, c.getInventory().getItems()));
                                 return;
                             }
                             if (b.getType().equals(Material.CRAFTING_TABLE)) {
-                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.CRAFTING_TABLE, "Workbench", 10, false));
+                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.CRAFTING_TABLE, "Crafting_Table", 10));
+                                return;
+                            }
+                            if (b.getType().equals(Material.HOPPER_DOWN) || b.getType().equals(Material.HOPPER_NORTH) || b.getType().equals(Material.HOPPER_EAST) || b.getType().equals(Material.HOPPER_SOUTH) || b.getType().equals(Material.HOPPER_WEST) || b.getType().equals(Material.HOPPER_MINECART)) {
+                                tellConsole(LoggingLevel.DEBUG, "Hopper");
+                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.HOPPER, "Item_Hopper", 5));
+                                return;
+                            }
+                            if (b.getType().equals(Material.BEACON)) {
+                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.BEACON, "Beacon", 2));
+                                return;
+                            }
+                            if (b.getType().equals(Material.ANVIL)) {
+                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.ANVIL, "Anvil", 4));
+                                return;
+                            }
+                            if (b.getType().equals(Material.ENCHANTING_TABLE)) {
+                                player.sendPacket(new ServerOpenWindowPacket(1, WindowType.ENCHANTING_TABLE, "Enchanting", 3));
                                 return;
                             }
                             if (heldItem == null)
@@ -389,7 +407,7 @@ public class MCThunder {
 
             @Override
             public void sessionRemoved(SessionRemovedEvent event) {
-                if (((MinecraftProtocol) event.getSession().getPacketProtocol()).getMode() == ProtocolMode.GAME) {
+                if (((org.spacehq.mc.protocol.MinecraftProtocol) event.getSession().getPacketProtocol()).getMode() == ProtocolMode.GAME) {
                     GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
                     Player player = getPlayer(profile.getId());
                     broadcast("&7&o" + player.getName() + " disconnected");
