@@ -2,7 +2,6 @@ package net.mcthunder;
 
 import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
-import net.mcthunder.block.Chest;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.EntityType;
 import net.mcthunder.entity.Player;
@@ -16,7 +15,7 @@ import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
-import net.mcthunder.inventory.Inventory;
+import net.mcthunder.inventory.*;
 import net.mcthunder.material.Material;
 import net.mcthunder.rankmanager.RankManager;
 import net.mcthunder.world.Biome;
@@ -35,7 +34,6 @@ import org.spacehq.mc.protocol.data.game.values.Face;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.values.entity.player.PlayerAction;
-import org.spacehq.mc.protocol.data.game.values.window.WindowType;
 import org.spacehq.mc.protocol.data.message.TextMessage;
 import org.spacehq.mc.protocol.data.status.PlayerInfo;
 import org.spacehq.mc.protocol.data.status.ServerStatusInfo;
@@ -51,9 +49,6 @@ import org.spacehq.mc.protocol.packet.ingame.client.window.ClientCreativeInvento
 import org.spacehq.mc.protocol.packet.ingame.client.window.ClientWindowActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
-import org.spacehq.mc.protocol.packet.ingame.server.window.ServerOpenWindowPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.window.ServerWindowItemsPacket;
 import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
@@ -322,43 +317,31 @@ public class MCThunder {
                                 return;
                             //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
                             Block b = new Block(new Location(player.getWorld(), position));
-                            if (player.isSneaking()) {//Do nothing this is just here to shorten other things
-
-                            } else if (b.getType().equals(Material.CHEST) || b.getType().equals(Material.TRAPPED_CHEST)) {
-                                Chest c = player.getWorld().getChest(b.getLocation());
-                                if (c != null) {
-                                    Inventory inv = c.getInventory();
-                                    player.sendPacket(new ServerOpenWindowPacket(inv.getID(), WindowType.CHEST, c.getName(), 27));
-                                    for (int i = 0; i < inv.getItems().length; i++)
-                                        player.sendPacket(new ServerSetSlotPacket(inv.getID(), i, inv.getItemAt(i)));
-                                    return;
-                                }
-                            } else if (b.getType().equals(Material.CRAFTING_TABLE)) {//fix
-                                player.sendPacket(new ServerOpenWindowPacket(99, WindowType.CRAFTING_TABLE, "Crafting", 10));
-                                return;
-                            } else if (b.getType().getParent().equals(Material.HOPPER)) {
-                                player.sendPacket(new ServerOpenWindowPacket(100, WindowType.HOPPER, "Hopper", 5));
-                                return;
-                            } else if (b.getType().equals(Material.BEACON)) {
-                                player.sendPacket(new ServerOpenWindowPacket(101, WindowType.BEACON, "Beacon", 1));
-                                return;
-                            } else if (b.getType().getParent().equals(Material.ANVIL)) {//fix
-                                player.sendPacket(new ServerOpenWindowPacket(102, WindowType.ANVIL, "Anvil", 3));
-                                return;
-                            } else if (b.getType().equals(Material.BREWING_STAND_BLOCK)) {
-                                player.sendPacket(new ServerOpenWindowPacket(103, WindowType.BREWING_STAND, "BrewingStand", 4));
-                                return;
-                            } else if (b.getType().equals(Material.DISPENSER)) {
-                                player.sendPacket(new ServerOpenWindowPacket(104, WindowType.DISPENSER, "Dispenser", 9));
-                                return;
-                            } else if (b.getType().equals(Material.DROPPER)) {
-                                player.sendPacket(new ServerOpenWindowPacket(105, WindowType.DROPPER, "Dropper", 9));
-                                return;
-                            } else if (b.getType().equals(Material.FURNACE)) {//fix
-                                player.sendPacket(new ServerOpenWindowPacket(106, WindowType.FURNACE, "Furnace", 3));
-                                return;
-                            } else if (b.getType().equals(Material.ENCHANTING_TABLE)) {//fix
-                                player.sendPacket(new ServerOpenWindowPacket(107, WindowType.ENCHANTING_TABLE, "Enchanting", 2));
+                            Inventory inv = null;
+                            if (b.getType().equals(Material.CHEST) || b.getType().equals(Material.TRAPPED_CHEST))
+                                inv = player.getWorld().getChest(b.getLocation()).getInventory();
+                            else if (b.getType().equals(Material.ENDER_CHEST))
+                                inv = player.getEnderChest();
+                            else if (b.getType().equals(Material.CRAFTING_TABLE))
+                                inv = new CraftingInventory("Crafting");
+                            else if (b.getType().getParent().equals(Material.HOPPER))
+                                inv = new HopperInventory("Hopper");
+                            else if (b.getType().equals(Material.BEACON))
+                                inv = new BeaconInventory("Beacon");
+                            else if (b.getType().getParent().equals(Material.ANVIL))
+                                inv = new AnvilInventory("Anvil");
+                            else if (b.getType().equals(Material.BREWING_STAND_BLOCK))
+                                inv = new BrewingStandInventory("BrewingStand");
+                            else if (b.getType().equals(Material.DISPENSER))
+                                inv = new DispenserInventory("Dispenser");
+                            else if (b.getType().equals(Material.DROPPER))
+                                inv = new DropperInventory("Dropper");
+                            else if (b.getType().equals(Material.FURNACE))
+                                inv = new FurnaceInventory("Furnace");
+                            else if (b.getType().equals(Material.ENCHANTING_TABLE))
+                                inv = new EnchantingInventory("Enchanting");
+                            if (inv != null && !player.isSneaking()) {
+                                player.openInventory(inv);
                                 return;
                             }
                             if (heldItem == null)

@@ -3,8 +3,6 @@ package net.mcthunder.tests;
 import net.mcthunder.api.Bot;
 import net.mcthunder.api.LoggingLevel;
 
-import java.util.UUID;
-
 import static net.mcthunder.api.Utils.tellConsole;
 
 public class TestBot extends Bot {

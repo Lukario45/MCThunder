@@ -3,10 +3,9 @@ package net.mcthunder.entity;
 import com.Lukario45.NBTFile.NBTFile;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.*;
-import net.mcthunder.block.Chest;
+import net.mcthunder.inventory.ChestInventory;
 import net.mcthunder.inventory.Inventory;
 import net.mcthunder.inventory.PlayerInventory;
-import net.mcthunder.material.Material;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
@@ -15,7 +14,6 @@ import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
-import org.spacehq.mc.protocol.data.game.values.window.WindowType;
 import org.spacehq.mc.protocol.data.message.Message;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerRespawnPacket;
@@ -23,7 +21,6 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntities
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.window.ServerOpenWindowPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
@@ -48,6 +45,7 @@ public class Player extends Entity {
     private UUID skinUUID;
     private Property skin;
     private NBTFile playerFile;
+    private Inventory openInventory;
     private HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
     private ArrayList<Long> loadedColumns = new ArrayList<>();
     private ArrayList<Long> northColumns = new ArrayList<>();
@@ -83,6 +81,7 @@ public class Player extends Entity {
         this.skinUUID = this.uuid;
         this.origSkin = getGameProfile().getProperties().get("textures");
         this.skin = origSkin;
+        this.openInventory = null;
     }
 
     public NBTFile getPlayerFile() {
@@ -494,6 +493,15 @@ public class Player extends Entity {
     }
 
     public void openInventory(Inventory inv) {
-        //TODO
+        this.openInventory = inv;
+        sendPacket(this.openInventory.getView());
+        for (int i = 0; i < this.openInventory.getItems().length; i++)
+            sendPacket(new ServerSetSlotPacket(this.openInventory.getID(), i, this.openInventory.getItemAt(i)));
+    }
+
+    public Inventory getEnderChest() {
+        Inventory e = new ChestInventory("EnderChest");
+        //TODO: Retrieve enderchest data
+        return e;
     }
 }

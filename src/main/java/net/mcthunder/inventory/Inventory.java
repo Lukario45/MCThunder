@@ -1,6 +1,8 @@
 package net.mcthunder.inventory;
 
 import org.spacehq.mc.protocol.data.game.ItemStack;
+import org.spacehq.mc.protocol.data.game.values.window.WindowType;
+import org.spacehq.mc.protocol.packet.ingame.server.window.ServerOpenWindowPacket;
 
 import java.util.HashMap;
 
@@ -9,11 +11,15 @@ public class Inventory {
     private HashMap<Integer,ItemStack> contents;
     private final int id;
     private String name;
+    private int size;
+    private WindowType type;
 
-    public Inventory(int size, String name){
+    public Inventory(int size, String name, WindowType type) {
         this.name = name;
-        this.contents = new HashMap<>(size);
-        for (int i = 0; i < this.contents.size(); i++)
+        this.type = type;
+        this.size = size;
+        this.contents = new HashMap<>(this.size);
+        for (int i = 0; i < this.size; i++)
             this.contents.put(i, new ItemStack(0));
         this.id = nextID;
         nextID++;
@@ -36,7 +42,7 @@ public class Inventory {
     }
 
     public ItemStack[] getItems() {
-        ItemStack[] i = new ItemStack[contents.size()];
+        ItemStack[] i = new ItemStack[this.size];
         this.contents.values().toArray(i);
         return i;
     }
@@ -47,5 +53,9 @@ public class Inventory {
 
     public int getID() {
         return this.id;
+    }
+
+    public ServerOpenWindowPacket getView() {
+        return new ServerOpenWindowPacket(this.id, this.type, this.name, this.size);
     }
 }

@@ -1,12 +1,10 @@
 package net.mcthunder.block;
 
 import net.mcthunder.api.Location;
-import net.mcthunder.api.LoggingLevel;
+import net.mcthunder.inventory.ChestInventory;
 import net.mcthunder.inventory.Inventory;
 import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.opennbt.tag.builtin.*;
-
-import static net.mcthunder.api.Utils.tellConsole;
 
 public class Chest {
     private String customName;
@@ -16,7 +14,7 @@ public class Chest {
     public Chest(Location l, ListTag items, String customName) {
         this.customName = customName == null ? "Chest" : customName;
         this.l = l;
-        this.inv = new Inventory(27, this.customName);
+        this.inv = new ChestInventory(this.customName);
         if (items != null)
             setItems(items);
     }

@@ -3,7 +3,6 @@ package net.mcthunder.block;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
-import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.entity.Player;
 import net.mcthunder.material.Material;
 import net.mcthunder.world.Column;
@@ -12,7 +11,6 @@ import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
 
 import static net.mcthunder.api.Utils.getLong;
-import static net.mcthunder.api.Utils.tellConsole;
 
 public class Block {
     private Location loc;
