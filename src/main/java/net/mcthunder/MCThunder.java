@@ -28,7 +28,6 @@ import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
-import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.Face;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
@@ -272,11 +271,12 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientCreativeInventoryActionPacket) {
                             ClientCreativeInventoryActionPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                            ItemStack old = player.getHeldItem().getIS();
-                            ItemStack i = packet.getClickedItem();
-                            player.getInventory().setSlot(packet.getSlot(), new net.mcthunder.inventory.ItemStack(Material.fromData(i.getId(), (short) i.getData()), i.getAmount()));
+                            ItemStack old = player.getHeldItem();
+                            player.getInventory().setSlot(packet.getSlot(), new ItemStack(packet.getClickedItem() == null ? Material.AIR :
+                                    Material.fromData(packet.getClickedItem().getId(), (short) packet.getClickedItem().getData()),
+                                    packet.getClickedItem() == null ? 0 : packet.getClickedItem().getAmount()));
                             if (packet.getSlot() == player.getSlot() && !old.equals(player.getHeldItem())) {
-                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem().getIS());
+                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), 0, player.getHeldItem().getIS());
                                 for (Player p : getPlayers())
                                     if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
                                         p.sendPacket(pack);
@@ -295,10 +295,10 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientChangeHeldItemPacket) {
                             ClientChangeHeldItemPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                            ItemStack old = player.getHeldItem().getIS();
+                            ItemStack old = player.getHeldItem();
                             player.setSlot(packet.getSlot() + 36);
                             if (!old.equals(player.getHeldItem())) {
-                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem().getIS());
+                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), 0, player.getHeldItem().getIS());
                                 for (Player p : getPlayers())
                                     if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
                                         p.sendPacket(pack);
@@ -312,7 +312,8 @@ public class MCThunder {
                             ClientPlayerPlaceBlockPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             Position position = packet.getPosition();
-                            ItemStack heldItem = packet.getHeldItem();
+                            ItemStack heldItem = packet.getHeldItem() == null ? null : new ItemStack(Material.fromData(packet.getHeldItem().getId(),
+                                    (short) packet.getHeldItem().getData()), packet.getHeldItem().getAmount());
                             if ((position.getY() >> 4) < 0)
                                 return;
                             //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
@@ -350,7 +351,7 @@ public class MCThunder {
                                 b = b.getRelative(Direction.fromFace(packet.getFace()));
                             if (!b.getType().equals(Material.AIR))
                                 return;
-                            Material setType = Material.fromData(Material.fromID(heldItem.getId()), (short) heldItem.getData());
+                            Material setType = heldItem.getType();
                             if (setType == null)
                                 return;
                             if (setType.getParent().equals(Material.TORCH) || setType.getParent().equals(Material.REDSTONE_TORCH)) {//Still need to check if is a valid torch position
