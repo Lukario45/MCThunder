@@ -46,8 +46,9 @@ Vital for the first release
 -
 These are just some things that are needed for the first release
 ~ World generation<br>
-~ Finish block placing<br>
-~ Improve saving<br>
+~ Mob AI<br>
+~ Invetory<br>
+~ Crafting Recipies<br>
 ~ Finish Material enum (Mostly done)<br>
 I plan to release some sort of version, probably not completed at the end of winter towards early spring<br>
 
