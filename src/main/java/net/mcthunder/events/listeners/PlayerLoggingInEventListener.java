@@ -62,10 +62,10 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
             player.sendPacket(b.getPacket());
         }
         for (Entity e : player.getWorld().getEntities())
-            if(e.getPacket() != null)
+            if (e.getPacket() != null)
                 player.sendPacket(e.getPacket());
         for (Sign s : player.getWorld().getSigns())
-            if(s.getPacket() != null)
+            if (s.getPacket() != null)
                 player.sendPacket(s.getPacket());
         player.toggleMoveable();
     }
