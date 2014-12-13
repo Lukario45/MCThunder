@@ -991,6 +991,11 @@ public enum Material {//http://minecraft.gamepedia.com/Id
         return this.equals(TALLGRASS) || this.equals(DOUBLE_PLANT);
     }
 
+    public String plural(int amount) {
+        //TODO: make return friendly then plural name this enum has to be finished first though
+        return this.name;
+    }
+
     public int getLightLevel() {
         switch(this) {
             case FIRE: case GLOWSTONE: case LIT_PUMPKIN: case LAVA: case FLOWING_LAVA: case BEACON: case END_PORTAL: case LIT_REDSTONE_LAMP: case SEA_LANTERN:
@@ -1030,6 +1035,10 @@ public enum Material {//http://minecraft.gamepedia.com/Id
 
     public static Material fromData(int id, short data) {
         return fromData(fromID(id), data);
+    }
+
+    public static Material fromData(String name, short data) {
+        return fromData(fromString(name), data);
     }
 
     public static void mapMaterials() {

@@ -43,4 +43,8 @@ public class ItemStack {
     public boolean hasEnchantment(Enchantment e) {
         return this.enchantments.containsKey(e);
     }
+
+    public org.spacehq.mc.protocol.data.game.ItemStack getIS() {//TODO also pass enchants with compoundtag
+        return new org.spacehq.mc.protocol.data.game.ItemStack(this.type.getID(), this.amount, this.type.getData());
+    }
 }

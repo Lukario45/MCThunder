@@ -5,13 +5,13 @@ import net.mcthunder.MCThunder;
 import net.mcthunder.api.*;
 import net.mcthunder.inventory.ChestInventory;
 import net.mcthunder.inventory.Inventory;
+import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.inventory.PlayerInventory;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.mc.protocol.ProtocolConstants;
-import org.spacehq.mc.protocol.data.game.ItemStack;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.message.Message;
@@ -75,7 +75,7 @@ public class Player extends Entity {
         this.displayName = this.name;
         this.gamemode = GameMode.CREATIVE;
         this.moveable = false;
-        this.inv = new PlayerInventory(44, this.name);
+        this.inv = new PlayerInventory(44, this.name, this);
         this.ping = getSession().getFlag(ProtocolConstants.PING_KEY);
         this.playerFile = new NBTFile(new File("PlayerFiles", this.uuid + ".dat"), "Player");
         this.skinUUID = this.uuid;
@@ -385,7 +385,7 @@ public class Player extends Entity {
     }
 
     public Packet getPacket() {
-        return new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch(), getHeldItem().getId(), getMetadata().getMetadataArray());
+        return new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch(), getHeldItem().getType().getID(), getMetadata().getMetadataArray());
     }
 
     public int getSlot() {
@@ -496,7 +496,7 @@ public class Player extends Entity {
         this.openInventory = inv;
         sendPacket(this.openInventory.getView());
         for (int i = 0; i < this.openInventory.getItems().length; i++)
-            sendPacket(new ServerSetSlotPacket(this.openInventory.getID(), i, this.openInventory.getItemAt(i)));
+            sendPacket(new ServerSetSlotPacket(this.openInventory.getID(), i, this.openInventory.getItemAt(i).getIS()));
     }
 
     public Inventory getEnderChest() {

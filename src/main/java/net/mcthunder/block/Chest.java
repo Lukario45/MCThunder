@@ -3,13 +3,14 @@ package net.mcthunder.block;
 import net.mcthunder.api.Location;
 import net.mcthunder.inventory.ChestInventory;
 import net.mcthunder.inventory.Inventory;
-import org.spacehq.mc.protocol.data.game.ItemStack;
+import net.mcthunder.inventory.ItemStack;
+import net.mcthunder.material.Material;
 import org.spacehq.opennbt.tag.builtin.*;
 
 public class Chest {
+    private final Location l;
     private String customName;
     private Inventory inv;
-    private Location l;
 
     public Chest(Location l, ListTag items, String customName) {
         this.customName = customName == null ? "Chest" : customName;
@@ -35,7 +36,7 @@ public class Chest {
                     id = Integer.parseInt(itemID.getValue().toString());
                 }
                 CompoundTag info = item.get("tag");
-                this.inv.setSlot(i, new ItemStack(id, amount.getValue(), data.getValue()));
+                this.inv.setSlot(i, new ItemStack(Material.fromData(id, data.getValue()), amount.getValue()));
             }
         }
     }

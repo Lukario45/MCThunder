@@ -272,11 +272,11 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientCreativeInventoryActionPacket) {
                             ClientCreativeInventoryActionPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                            ItemStack old = player.getHeldItem();
+                            ItemStack old = player.getHeldItem().getIS();
                             ItemStack i = packet.getClickedItem();
-                            player.getInventory().setSlot(packet.getSlot(), i);
+                            player.getInventory().setSlot(packet.getSlot(), new net.mcthunder.inventory.ItemStack(Material.fromData(i.getId(), (short) i.getData()), i.getAmount()));
                             if (packet.getSlot() == player.getSlot() && !old.equals(player.getHeldItem())) {
-                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem());
+                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem().getIS());
                                 for (Player p : getPlayers())
                                     if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
                                         p.sendPacket(pack);
@@ -295,10 +295,10 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientChangeHeldItemPacket) {
                             ClientChangeHeldItemPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                            ItemStack old = player.getHeldItem();
+                            ItemStack old = player.getHeldItem().getIS();
                             player.setSlot(packet.getSlot() + 36);
                             if (!old.equals(player.getHeldItem())) {
-                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem());
+                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), packet.getSlot(), player.getHeldItem().getIS());
                                 for (Player p : getPlayers())
                                     if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
                                         p.sendPacket(pack);
