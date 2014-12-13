@@ -15,6 +15,7 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlay
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.Session;
+import org.spacehq.packetlib.packet.Packet;
 
 import static net.mcthunder.api.Utils.tellConsole;
 
@@ -62,8 +63,9 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
             player.sendPacket(b.getPacket());
         }
         for (Entity e : player.getWorld().getEntities())
-            if (e.getPacket() != null)
-                player.sendPacket(e.getPacket());
+            for (Packet packet : e.getPackets())
+                if (packet != null)
+                    player.sendPacket(packet);
         for (Sign s : player.getWorld().getSigns())
             if (s.getPacket() != null)
                 player.sendPacket(s.getPacket());

@@ -6,7 +6,7 @@ import org.spacehq.mc.protocol.data.game.values.window.WindowType;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
 
 public class PlayerInventory extends Inventory {
-    Player p;
+    private Player p;
 
     public PlayerInventory(int size, String name, Player p) {
         super(size, name, WindowType.GENERIC_INVENTORY);
@@ -14,12 +14,25 @@ public class PlayerInventory extends Inventory {
     }
 
     public void add(ItemStack is) {
-        for (int i = 9; i < this.contents.size(); i++)
+        for (int i = 36; i < 44; i++)
             if (this.contents.get(i) == null || this.contents.get(i).getType().equals(Material.AIR)) {
-                this.contents.put(i, is);
-                this.p.sendPacket(new ServerSetSlotPacket(0, i, is.getIS()));
-                break;
+                setSlot(i, is);
+                return;
+            } else {//if (this.contents.get(i).canStack(is))
+                //combine them
             }
+        for (int i = 9; i < 35; i++)
+            if (this.contents.get(i) == null || this.contents.get(i).getType().equals(Material.AIR)) {
+                setSlot(i, is);
+                break;
+            } else {//if (this.contents.get(i).canStack(is))
+                //combine them
+            }
+    }
+
+    public void setSlot(int slot, ItemStack i) {
+        this.contents.put(slot, i == null ? new ItemStack(Material.AIR) : i);
+        this.p.sendPacket(new ServerSetSlotPacket(0, slot, i.getIS()));
     }
     //0 = craft output
     //1-4 = craft input

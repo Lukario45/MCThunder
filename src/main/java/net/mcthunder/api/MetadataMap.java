@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MetadataMap {
-    private Map<Integer, EntityMetadata> metadata = new HashMap<Integer, EntityMetadata>();
-    private List<EntityMetadata> changes = new ArrayList<EntityMetadata>();
+    private Map<Integer, EntityMetadata> metadata = new HashMap<>();
+    private List<EntityMetadata> changes = new ArrayList<>();
 
     public Object getMetadata(int id) {
         EntityMetadata metadata = this.metadata.get(id);

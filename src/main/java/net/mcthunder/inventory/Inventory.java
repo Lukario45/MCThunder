@@ -36,8 +36,10 @@ public class Inventory {
     public void add(ItemStack is) {//TODO: Make them stack
         for (int i = 0; i < this.contents.size(); i++)
             if (this.contents.get(i) == null || this.contents.get(i).getType().equals(Material.AIR)) {
-                this.contents.put(i, is);
+                setSlot(i, is);
                 break;
+            } else {//if (this.contents.get(i).canStack(is))
+                //combine them
             }
     }
 

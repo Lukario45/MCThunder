@@ -14,12 +14,15 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobP
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPaintingPacket;
 import org.spacehq.packetlib.packet.Packet;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 public class Entity {
     //TODO make one for each type of entity with also their ai and spawning things
-    private final EntityType type;
-    private final int entityID;
+    protected final EntityType type;
+    protected final int entityID;
     private String customName;
-    private Location location;
+    protected Location location;
     private boolean onGround;
     private short fireTicks;
     private short airLeft;
@@ -37,11 +40,12 @@ public class Entity {
     }
 
     public void spawn() {
-        Packet packet = getPacket();
-        if (packet != null)//TODO: replace this to send from world
-            for (Player p : MCThunder.getPlayers())
-                if (p.getWorld().equals(this.location.getWorld()))
-                    p.sendPacket(packet);
+        //TODO: replace this to send from world
+        for (Player p : MCThunder.getPlayers())
+            if (p.getWorld().equals(this.location.getWorld()))
+                for (Packet packet : getPackets())
+                    if (packet != null)
+                        p.sendPacket(packet);
     }
 
     public MetadataMap getMetadata() {
@@ -62,6 +66,10 @@ public class Entity {
         else if (this.type.isCreature())
             return new ServerSpawnMobPacket(this.entityID, MobType.valueOf(this.type.getName()), this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), 0, 0, 0, 0, getMetadata().getMetadataArray());
         return null;
+    }
+
+    public Collection<Packet> getPackets() {
+        return Arrays.asList(getPacket());
     }
 
     public Location getLocation() {

@@ -2,6 +2,7 @@ package net.mcthunder;
 
 import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
+import net.mcthunder.entity.DroppedItem;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.EntityType;
 import net.mcthunder.entity.Player;
@@ -292,6 +293,7 @@ public class MCThunder {
                             //36-44 = hotbar
                             //-999 = outside of inventory for dropping items
                             //TODO: logic for this as well as for when they hit like a number over the item to move the item
+                            //TODO: Make it actually count for updating held item
                         } else if (event.getPacket() instanceof ClientChangeHeldItemPacket) {
                             ClientChangeHeldItemPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
@@ -394,7 +396,12 @@ public class MCThunder {
                             if ((packet.getAction().equals(PlayerAction.START_DIGGING) && player.getGameMode().equals(GameMode.CREATIVE)) ||
                                     (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
                                 Block b = new Block(new Location(player.getWorld(), packet.getPosition()));
+                                if (player.getGameMode().equals(GameMode.SURVIVAL))
+                                    player.getWorld().loadEntity(new DroppedItem(player.getLocation(), new ItemStack(b.getType(), 1)));
                                 b.setType(Material.AIR);
+                            } else if (packet.getAction().equals(PlayerAction.DROP_ITEM) || packet.getAction().equals(PlayerAction.DROP_ITEM_STACK)) {
+                                player.getWorld().loadEntity(new DroppedItem(new Location(player.getWorld(), packet.getPosition()), player.getHeldItem()));
+                                //TODO: Remove from inventory as well as only drop 1 when its not a full stack
                             }
                         } else if (event.getPacket() != null)
                             tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
