@@ -73,7 +73,7 @@ public class Player extends Entity {
         this.name = getGameProfile().getName();
         this.slot = 36;
         this.displayName = this.name;
-        this.gamemode = GameMode.CREATIVE;
+        this.gamemode = GameMode.SURVIVAL;
         this.moveable = false;
         this.inv = new PlayerInventory(44, this.name, this);
         this.ping = getSession().getFlag(ProtocolConstants.PING_KEY);

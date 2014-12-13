@@ -9,13 +9,11 @@ public class CraftingRecipe {
     private RecipeType recipeType;
     private Material output;
     private int quantityOutput;
-    private boolean workbenchOnly;
 
-    public CraftingRecipe(RecipeType recipeType, Material output, int quantityOutput, boolean workbenchOnly) {
+    public CraftingRecipe(RecipeType recipeType, Material output, int quantityOutput) {
         this.recipeType = recipeType;
         this.output = output;
         this.quantityOutput = quantityOutput;
-        this.workbenchOnly = workbenchOnly;
     }
 
     public RecipeType getRecipeType() {
@@ -40,14 +38,6 @@ public class CraftingRecipe {
 
     public void setQuantityOutput(int quantityOutput) {
         this.quantityOutput = quantityOutput;
-    }
-
-    public boolean getWorkbenchOnly() {
-        return this.workbenchOnly;
-    }
-
-    public void setWorkbenchOnly(boolean workbenchOnly) {
-        this.workbenchOnly = workbenchOnly;
     }
 
     public int getOutputID() {
