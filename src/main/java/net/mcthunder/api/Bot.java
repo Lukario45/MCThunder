@@ -146,4 +146,8 @@ public abstract class Bot {
     public MetadataMap getMetadata() {
         return this.metadata;
     }
+
+    public int getEntityID() {
+        return this.entityID;
+    }
 }

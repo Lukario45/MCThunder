@@ -175,8 +175,18 @@ public class Player extends LivingEntity {
             ArrayList<Long> temp = (ArrayList<Long>) this.southColumns.clone();
             this.northColumns.clear();
             this.southColumns.clear();
-            for (long l : temp)
+            for (long l : temp) {
                 getWorld().unloadColumn(l);
+                for (Player player1 : MCThunder.getPlayers())
+                    if (player1.getWorld().equals(getWorld()) && l == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                        sendPacket(new ServerDestroyEntitiesPacket(player1.getEntityID()));
+                for (Bot b : MCThunder.getBots())
+                    if (b.getWorld().equals(getWorld()) && l == b.getChunk())
+                        sendPacket(new ServerDestroyEntitiesPacket(b.getEntityID()));
+                for (Entity e : getWorld().getEntities())
+                    if (l == e.getChunk())
+                        sendPacket(new ServerDestroyEntitiesPacket(e.getEntityID()));
+            }
             for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
                 getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView() - 1) >> 5)).readChunk(getLong(x + xAdd, z - getView() - 1), this, d, false);
                 getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView()) >> 5)).readChunk(getLong(x + xAdd, z + getView()), this, Direction.SOUTH, true);
@@ -185,8 +195,18 @@ public class Player extends LivingEntity {
             ArrayList<Long> temp = (ArrayList<Long>) this.westColumns.clone();
             this.eastColumns.clear();
             this.westColumns.clear();
-            for (long l : temp)
+            for (long l : temp) {
                 getWorld().unloadColumn(l);
+                for (Player player1 : MCThunder.getPlayers())
+                    if (player1.getWorld().equals(getWorld()) && l == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                        sendPacket(new ServerDestroyEntitiesPacket(player1.getEntityID()));
+                for (Bot b : MCThunder.getBots())
+                    if (b.getWorld().equals(getWorld()) && l == b.getChunk())
+                        sendPacket(new ServerDestroyEntitiesPacket(b.getEntityID()));
+                for (Entity e : getWorld().getEntities())
+                    if (l == e.getChunk())
+                        sendPacket(new ServerDestroyEntitiesPacket(e.getEntityID()));
+            }
             for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
                 getWorld().getRegion(getLong((x + getView() + 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView() + 1, z + zAdd), this, d, false);
                 getWorld().getRegion(getLong((x - getView()) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView(), z + zAdd), this, Direction.WEST, true);
@@ -195,8 +215,18 @@ public class Player extends LivingEntity {
             ArrayList<Long> temp = (ArrayList<Long>) this.northColumns.clone();
             this.southColumns.clear();
             this.northColumns.clear();
-            for (long l : temp)
+            for (long l : temp) {
                 getWorld().unloadColumn(l);
+                for (Player player1 : MCThunder.getPlayers())
+                    if (player1.getWorld().equals(getWorld()) && l == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                        sendPacket(new ServerDestroyEntitiesPacket(player1.getEntityID()));
+                for (Bot b : MCThunder.getBots())
+                    if (b.getWorld().equals(getWorld()) && l == b.getChunk())
+                        sendPacket(new ServerDestroyEntitiesPacket(b.getEntityID()));
+                for (Entity e : getWorld().getEntities())
+                    if (l == e.getChunk())
+                        sendPacket(new ServerDestroyEntitiesPacket(e.getEntityID()));
+            }
             for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
                 getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView() + 1) >> 5)).readChunk(getLong(x + xAdd, z + getView() + 1), this, d, false);
                 getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView()) >> 5)).readChunk(getLong(x + xAdd, z - getView()), this, Direction.NORTH, true);
@@ -205,8 +235,18 @@ public class Player extends LivingEntity {
             ArrayList<Long> temp = (ArrayList<Long>) this.eastColumns.clone();
             this.westColumns.clear();
             this.eastColumns.clear();
-            for (long l : temp)
-                getWorld().unloadColumn(l);
+            for (long l : temp) {
+                getWorld().unloadColumn(l);;
+                for (Player player1 : MCThunder.getPlayers())
+                    if (player1.getWorld().equals(getWorld()) && l == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                        sendPacket(new ServerDestroyEntitiesPacket(player1.getEntityID()));
+                for (Bot b : MCThunder.getBots())
+                    if (b.getWorld().equals(getWorld()) && l == b.getChunk())
+                        sendPacket(new ServerDestroyEntitiesPacket(b.getEntityID()));
+                for (Entity e : getWorld().getEntities())
+                    if (l == e.getChunk())
+                        sendPacket(new ServerDestroyEntitiesPacket(e.getEntityID()));
+            }
             for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
                 getWorld().getRegion(getLong((x - getView() - 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView() - 1, z + zAdd), this, d, false);
                 getWorld().getRegion(getLong((x + getView()) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView(), z + zAdd), this, Direction.EAST, true);
