@@ -6,19 +6,22 @@ import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
 import org.spacehq.packetlib.packet.Packet;
 
-public class DroppedItem extends Entity {
+public class ItemFrame extends Entity {
     private ItemStack i;
+    private byte rotation;
 
-    public DroppedItem(Location location, ItemStack i) {
+    public ItemFrame(Location location, ItemStack i) {
         super(location);
-        this.type = EntityType.ITEM;
+        this.type = EntityType.ITEM_FRAME;
         this.i = i;
-        this.metadata.setMetadata(10, this.i.getIS());
+        this.rotation = (byte) 0;
+        this.metadata.setMetadata(8, this.i.getIS());
+        this.metadata.setMetadata(9, this.rotation);
     }
 
     @Override
     public Packet getPacket() {
-        return new ServerSpawnObjectPacket(this.entityID, ObjectType.ITEM, this.location.getX(), this.location.getY(), this.location.getZ(),
+        return new ServerSpawnObjectPacket(this.entityID, ObjectType.ITEM_FRAME, this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
     }
 }

@@ -6,19 +6,19 @@ import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
 import org.spacehq.packetlib.packet.Packet;
 
-public class DroppedItem extends Entity {
+public class Firework extends Entity {
     private ItemStack i;
 
-    public DroppedItem(Location location, ItemStack i) {
+    public Firework(Location location, ItemStack i) {
         super(location);
-        this.type = EntityType.ITEM;
+        this.type = EntityType.FIREWORKS_ROCKET;
         this.i = i;
-        this.metadata.setMetadata(10, this.i.getIS());
+        this.metadata.setMetadata(8, this.i.getIS());
     }
 
     @Override
-    public Packet getPacket() {
-        return new ServerSpawnObjectPacket(this.entityID, ObjectType.ITEM, this.location.getX(), this.location.getY(), this.location.getZ(),
+    public Packet getPacket() {//TODO: Also create particles
+        return new ServerSpawnObjectPacket(this.entityID, ObjectType.FIREWORK_ROCKET, this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
     }
 }

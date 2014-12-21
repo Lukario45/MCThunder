@@ -153,7 +153,6 @@ public class MCThunder {
         worlds.put(conf.getWorldName(), world);
         world.loadWorld();
 
-
         server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
         server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
         server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
@@ -199,11 +198,10 @@ public class MCThunder {
                             Player mover = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             if (mover == null || !mover.isMoveable())
                                 return;//Also will need to cancel on their end somehow
+                            long chunk = mover.getChunk();
                             for (Packet packet : createUpdatePackets(event.getSession(), pack))
                                 for (Player p : getPlayers()) {
-                                    if (!p.getWorld().equals(mover.getWorld()))
-                                        continue;//Also will need to check if out of range ,_,
-                                    if (!p.getUniqueID().equals(mover.getUniqueID()))
+                                    if (p.getWorld().equals(mover.getWorld()) && p.isColumnLoaded(chunk) && !p.getUniqueID().equals(mover.getUniqueID()))
                                         p.sendPacket(packet);
                                 }
 
@@ -235,10 +233,9 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientSwingArmPacket) {
                             GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
                             Player player = getPlayer(profile.getId());
+                            long chunk = player.getChunk();
                             for (Player p : getPlayers()) {
-                                if (!p.getWorld().equals(player.getWorld()))
-                                    continue;//Do not send a animation packet if they are not in same world
-                                if (!p.getUniqueID().equals(player.getUniqueID()))
+                                if (p.getWorld().equals(player.getWorld()) && p.isColumnLoaded(chunk) && !p.getUniqueID().equals(player.getUniqueID()))
                                     p.sendPacket(new ServerAnimationPacket(player.getEntityID(), Animation.SWING_ARM));
                             }
                         } else if (event.getPacket() instanceof ClientChatPacket) {
@@ -278,8 +275,9 @@ public class MCThunder {
                                     packet.getClickedItem() == null ? 0 : packet.getClickedItem().getAmount()));
                             if (packet.getSlot() == player.getSlot() && !old.equals(player.getHeldItem())) {
                                 Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), 0, player.getHeldItem().getIS());
+                                long chunk = player.getChunk();
                                 for (Player p : getPlayers())
-                                    if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
+                                    if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()) && p.isColumnLoaded(chunk))
                                         p.sendPacket(pack);
                             }
                         } else if (event.getPacket() instanceof ClientWindowActionPacket) {
@@ -301,8 +299,9 @@ public class MCThunder {
                             player.setSlot(packet.getSlot() + 36);
                             if (!old.equals(player.getHeldItem())) {
                                 Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), 0, player.getHeldItem().getIS());
+                                long chunk = player.getChunk();
                                 for (Player p : getPlayers())
-                                    if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()))
+                                    if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()) && p.isColumnLoaded(chunk))
                                         p.sendPacket(pack);
                             }
                         } else if (event.getPacket() instanceof ClientConfirmTransactionPacket) {
@@ -387,7 +386,7 @@ public class MCThunder {
                             if (setType.getParent().equals(Material.SPAWN_EGG)) {
                                 Location l = new Location(player.getWorld(), b.getLocation().getX() + 1 - packet.getCursorX(), b.getLocation().getY() +
                                         1 - (packet.getCursorY() == 0 ? 1 : packet.getCursorY()), b.getLocation().getZ() + 1 - packet.getCursorZ());
-                                l.getWorld().loadEntity(new Entity(l, EntityType.fromString(setType.getName().replaceFirst("SPAWN_", ""))));
+                                l.getWorld().loadEntity(Entity.fromType(EntityType.fromString(setType.getName().replaceFirst("SPAWN_", "")), l));
                             } else
                                 b.setType(setType);
                         } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
@@ -440,8 +439,9 @@ public class MCThunder {
                 EntityMetadata changes[] = player.getMetadata().getChanges();
                 if (changes != null) {
                     ServerEntityMetadataPacket pack = new ServerEntityMetadataPacket(player.getEntityID(), changes);
+                    long chunk = player.getChunk();
                     for (Player p : getPlayers())
-                        if (!p.getUniqueID().equals(player.getUniqueID()))
+                        if (!p.getUniqueID().equals(player.getUniqueID()) && p.isColumnLoaded(chunk))
                             p.sendPacket(pack);
                 }
             }

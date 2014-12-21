@@ -49,23 +49,19 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
         // tellConsole(LoggingLevel.DEBUG,test.getValue());
 
         ServerSpawnPlayerPacket toAllPlayers = (ServerSpawnPlayerPacket) player.getPacket();
-        for (Player player1 : MCThunder.getPlayers()) {
-            if (!player1.getWorld().equals(player.getWorld()))
-                continue;//Also will need to check if out of range ,_,
-            if (!player1.getUniqueID().equals(player.getUniqueID())) {
+        for (Player player1 : MCThunder.getPlayers())
+            if (player1.getWorld().equals(player.getWorld()) && player.isColumnLoaded(player1.getChunk()) && !player1.getUniqueID().equals(player.getUniqueID())) {
                 player1.sendPacket(toAllPlayers);
                 player.sendPacket(player1.getPacket());
             }
-        }
-        for (Bot b : MCThunder.getBots()) {
-            if (!b.getWorld().equals(player.getWorld()))
-                continue;//Also will need to check if out of range ,_,
-            player.sendPacket(b.getPacket());
-        }
+        for (Bot b : MCThunder.getBots())
+            if (b.getWorld().equals(player.getWorld()) && player.isColumnLoaded(b.getChunk()))
+                player.sendPacket(b.getPacket());
         for (Entity e : player.getWorld().getEntities())
-            for (Packet packet : e.getPackets())
-                if (packet != null)
-                    player.sendPacket(packet);
+            if(player.isColumnLoaded(e.getChunk()))
+                for (Packet packet : e.getPackets())
+                    if (packet != null)
+                        player.sendPacket(packet);
         for (Sign s : player.getWorld().getSigns())
             if (s.getPacket() != null)
                 player.sendPacket(s.getPacket());

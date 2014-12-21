@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 public class Utils {
     private static MessageFormat format = new MessageFormat();
+    private static HashMap<UUID,Property> skins = new HashMap<>();
 
     public static String getIP() {
         InetAddress ip = null;
@@ -98,9 +100,11 @@ public class Utils {
         return uuid;
     }
 
-    public static Property getSkin(UUID uuid) {//Can only request same skin once per minute so will need to cache them for a minute
+    public static Property getSkin(UUID uuid) {//TODO: Remove skins from cache after a minute
         if (uuid == null)
             return null;
+        if (skins.containsKey(uuid))
+            return skins.get(uuid);
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" +
                     uuid.toString().replaceAll("-", "") + "?unsigned=false").openConnection().getInputStream()));
@@ -118,7 +122,8 @@ public class Utils {
                     break;
             }
             in.close();
-            return new Property("textures", value, signature);
+            skins.put(uuid, new Property("textures", value, signature));
+            return skins.get(uuid);
         } catch (Exception ignored) { }
         return null;
     }

@@ -557,7 +557,7 @@ public class Region {
                         ByteTag itemRotation = entity.get("ItemRotation");
                     }
                 }
-                e = new Entity(loc, type);
+                e = Entity.fromType(type, loc);
                 this.world.loadEntity(e);
             }
             ListTag tileEntities = level.get("TileEntities");

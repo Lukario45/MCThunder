@@ -1,24 +1,19 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
-import net.mcthunder.inventory.ItemStack;
 import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
 import org.spacehq.packetlib.packet.Packet;
 
-public class DroppedItem extends Entity {
-    private ItemStack i;
-
-    public DroppedItem(Location location, ItemStack i) {
+public class FallingSand extends Entity {
+    public FallingSand(Location location) {
         super(location);
-        this.type = EntityType.ITEM;
-        this.i = i;
-        this.metadata.setMetadata(10, this.i.getIS());
+        this.type = EntityType.FALLING_SAND;
     }
 
     @Override
     public Packet getPacket() {
-        return new ServerSpawnObjectPacket(this.entityID, ObjectType.ITEM, this.location.getX(), this.location.getY(), this.location.getZ(),
+        return new ServerSpawnObjectPacket(this.entityID, ObjectType.FALLING_BLOCK, this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
     }
 }

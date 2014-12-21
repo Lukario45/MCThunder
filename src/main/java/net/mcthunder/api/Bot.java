@@ -16,7 +16,9 @@ import java.util.UUID;
 public abstract class Bot {
     protected MessageFormat format = new MessageFormat();
     private final int entityID;
+    private MetadataMap metadata;
     private GameProfile botProfile;
+    private boolean hasAI = false;
     private boolean entitySpawned = false;
     private Property skin = null;
     private Location location;
@@ -34,6 +36,24 @@ public abstract class Bot {
         this.botProfile = new GameProfile(this.uuid, temp);
         this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
         setSkin(this.skinUUID);
+        this.metadata = new MetadataMap();
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, false);//on fire
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, false);//sneaking
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, false);//sprinting
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ARM_UP, false);//Eating, drinking, blocking
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, false);//invisible
+        this.metadata.setMetadata(1, (short) 0);//airLeft
+        this.metadata.setMetadata(2, this.name);
+        this.metadata.setMetadata(3, (byte) 1);//Always show name
+        this.metadata.setMetadata(6, (float) 20);//health
+        this.metadata.setMetadata(7, 0);//potionColor
+        this.metadata.setMetadata(8, (byte) 0);//potion ambient = false
+        this.metadata.setMetadata(9, (byte) 0);//arrows in bot
+        this.metadata.setMetadata(15, (byte) (this.hasAI ? 1 : 0));
+        //this.metadata.setMetadata(10, (byte) 0);//Unsigned byte for skin flags TODO: Figure out what to put here
+        this.metadata.setBit(16, 0x02, false);//TODO: Read cape of the one whose name bot has
+        this.metadata.setMetadata(17, (float) 0);//absorption
+        this.metadata.setMetadata(18, 0);//score
         load();
     }
 
@@ -65,13 +85,13 @@ public abstract class Bot {
         this.skin = p;
         this.botProfile.getProperties().put("textures", this.skin);
         MCThunder.getEntryListHandler().refresh(this);
-        if (isEntitySpawned()) {//TODO: Test if this still works
+        if (isEntitySpawned()) {
             ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(this.entityID);
-            //this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
             ServerSpawnPlayerPacket spawnPlayerPacket = (ServerSpawnPlayerPacket) getPacket();
+            long chunk = getChunk();
             for (Player pl : MCThunder.getPlayers()) {
                 pl.sendPacket(destroyEntitiesPacket);
-                if (pl.getWorld().equals(getWorld()))
+                if (pl.getWorld().equals(getWorld()) && pl.isColumnLoaded(chunk))
                     pl.sendPacket(spawnPlayerPacket);
             }
         }
@@ -106,7 +126,7 @@ public abstract class Bot {
     }
 
     public Packet getPacket() {
-        return new ServerSpawnPlayerPacket(this.entityID, this.uuid, getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch(), 0, new MetadataMap().getMetadataArray());
+        return new ServerSpawnPlayerPacket(this.entityID, this.uuid, getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch(), 0, getMetadata().getMetadataArray());
     }
 
     public World getWorld() {
@@ -116,4 +136,14 @@ public abstract class Bot {
     public abstract void unload();
 
     public abstract void load();
+
+    public long getChunk() {
+        if (this.location == null)
+            return 0;
+        return Utils.getLong((int) this.location.getX() >> 4, (int) this.location.getZ() >> 4);
+    }
+
+    public MetadataMap getMetadata() {
+        return this.metadata;
+    }
 }

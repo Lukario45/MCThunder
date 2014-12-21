@@ -37,7 +37,7 @@ import static net.mcthunder.api.Utils.getLong;
 /**
  * Created by Kevin on 10/14/2014.
  */
-public class Player extends Entity {
+public class Player extends LivingEntity {
     private final UUID uuid;
     private final String name;
     private final Property origSkin;
@@ -60,13 +60,14 @@ public class Player extends Entity {
     private GameMode gamemode;
     private Session session;
     private boolean moveable;
-    private boolean sneaking;
-    private boolean sprinting;
+    private boolean hideCape;
+    private float absorption;
+    private int score;
     private Player lastPmPerson;
     private String appended = "";
 
     public Player(Session session) {
-        super(EntityType.PLAYER);
+        super(null);
         this.session = session;
         this.profile = getSession().getFlag(ProtocolConstants.PROFILE_KEY);
         this.uuid = getGameProfile().getId();
@@ -75,6 +76,9 @@ public class Player extends Entity {
         this.displayName = this.name;
         this.gamemode = GameMode.SURVIVAL;
         this.moveable = false;
+        this.hideCape = false;
+        this.absorption = 0;
+        this.score = 0;
         this.inv = new PlayerInventory(44, this.name, this);
         this.ping = getSession().getFlag(ProtocolConstants.PING_KEY);
         this.playerFile = new NBTFile(new File("PlayerFiles", this.uuid + ".dat"), "Player");
@@ -82,6 +86,13 @@ public class Player extends Entity {
         this.origSkin = getGameProfile().getProperties().get("textures");
         this.skin = origSkin;
         this.openInventory = null;
+        this.metadata.setMetadata(2, this.name);
+        this.metadata.setMetadata(3, (byte) 1);//Always show name
+        //this.metadata.setMetadata(10, (byte) 0);//Unsigned byte for skin flags TODO: Figure out what to put here
+        this.metadata.setMetadata(15, (byte) 1);//Assuming player has a brain
+        this.metadata.setBit(16, 0x02, this.hideCape);
+        this.metadata.setMetadata(17, this.absorption);
+        this.metadata.setMetadata(18, this.score);
     }
 
     public NBTFile getPlayerFile() {
@@ -228,6 +239,17 @@ public class Player extends Entity {
 
     public void refreshColumn(Column c) {
         sendPacket(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
+        for (Player player1 : MCThunder.getPlayers())
+            if (player1.getWorld().equals(getWorld()) && isColumnLoaded(player1.getChunk()) && !player1.getUniqueID().equals(getUniqueID()))
+                sendPacket(player1.getPacket());
+        for (Bot b : MCThunder.getBots())
+            if (b.getWorld().equals(getWorld()) && isColumnLoaded(b.getChunk()))
+                sendPacket(b.getPacket());
+        for (Entity e : getWorld().getEntities())
+            if (isColumnLoaded(e.getChunk()))
+                for (Packet packet : e.getPackets())
+                    if (packet != null)
+                        sendPacket(packet);
     }
 
     private void sendColumns(Direction d) {
@@ -257,6 +279,17 @@ public class Player extends Entity {
                     chunks[i] = getWorld().getColumn(pos).getChunks();
                     biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
                     sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    for (Player player1 : MCThunder.getPlayers())
+                        if (player1.getWorld().equals(getWorld()) && pos == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                            sendPacket(player1.getPacket());
+                    for (Bot b : MCThunder.getBots())
+                        if (b.getWorld().equals(getWorld()) && pos == b.getChunk())
+                            sendPacket(b.getPacket());
+                    for (Entity e : getWorld().getEntities())
+                        if (pos == e.getChunk())
+                            for (Packet packet : e.getPackets())
+                                if (packet != null)
+                                    sendPacket(packet);
                     this.loadedColumns.add(pos);
                 }
             }
@@ -269,6 +302,17 @@ public class Player extends Entity {
                     chunks[i] = getWorld().getColumn(pos).getChunks();
                     biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
                     sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    for (Player player1 : MCThunder.getPlayers())
+                        if (player1.getWorld().equals(getWorld()) && pos == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                            sendPacket(player1.getPacket());
+                    for (Bot b : MCThunder.getBots())
+                        if (b.getWorld().equals(getWorld()) && pos == b.getChunk())
+                            sendPacket(b.getPacket());
+                    for (Entity e : getWorld().getEntities())
+                        if (pos == e.getChunk())
+                            for (Packet packet : e.getPackets())
+                                if (packet != null)
+                                    sendPacket(packet);
                     this.loadedColumns.add(pos);
                 }
             }
@@ -281,6 +325,17 @@ public class Player extends Entity {
                     chunks[i] = getWorld().getColumn(pos).getChunks();
                     biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
                     sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    for (Player player1 : MCThunder.getPlayers())
+                        if (player1.getWorld().equals(getWorld()) && pos == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                            sendPacket(player1.getPacket());
+                    for (Bot b : MCThunder.getBots())
+                        if (b.getWorld().equals(getWorld()) && pos == b.getChunk())
+                            sendPacket(b.getPacket());
+                    for (Entity e : getWorld().getEntities())
+                        if (pos == e.getChunk())
+                            for (Packet packet : e.getPackets())
+                                if (packet != null)
+                                    sendPacket(packet);
                     this.loadedColumns.add(pos);
                 }
             }
@@ -293,6 +348,17 @@ public class Player extends Entity {
                     chunks[i] = getWorld().getColumn(pos).getChunks();
                     biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
                     sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
+                    for (Player player1 : MCThunder.getPlayers())
+                        if (player1.getWorld().equals(getWorld()) && pos == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                            sendPacket(player1.getPacket());
+                    for (Bot b : MCThunder.getBots())
+                        if (b.getWorld().equals(getWorld()) && pos == b.getChunk())
+                            sendPacket(b.getPacket());
+                    for (Entity e : getWorld().getEntities())
+                        if (pos == e.getChunk())
+                            for (Packet packet : e.getPackets())
+                                if (packet != null)
+                                    sendPacket(packet);
                     this.loadedColumns.add(pos);
                 }
             }
@@ -375,15 +441,6 @@ public class Player extends Entity {
         return this.moveable;
     }
 
-    public boolean isSneaking() {
-        return this.sneaking;
-    }
-
-    public void setSneaking(boolean sneaking) {
-        this.sneaking = sneaking;
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, sneaking);
-    }
-
     public Packet getPacket() {
         return new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch(), getHeldItem().getType().getID(), getMetadata().getMetadataArray());
     }
@@ -394,15 +451,6 @@ public class Player extends Entity {
 
     public void setSlot(int slot) {
         this.slot = slot;
-    }
-
-    public boolean isSprinting() {
-        return this.sprinting;
-    }
-
-    public void setSprinting(boolean sprinting) {
-        this.sprinting = sprinting;
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, sneaking);
     }
 
     public GameMode getGameMode() {
@@ -423,6 +471,9 @@ public class Player extends Entity {
 
     public void setWorld(World w) {
         super.setWorld(w);
+        sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
+        sendPacket(new ServerPlayerPositionRotationPacket(getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch()));
+        sendPacket(new ServerSpawnPositionPacket(getLocation().getPosition()));
         //Also will need to remove loaded chunks and load new ones
     }
 
@@ -503,5 +554,10 @@ public class Player extends Entity {
         Inventory e = new ChestInventory("EnderChest");
         //TODO: Retrieve enderchest data
         return e;
+    }
+
+    @Override
+    public void ai() {
+        //Do nothing as the player themselves is the intelligence
     }
 }

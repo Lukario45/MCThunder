@@ -20,6 +20,15 @@ public class MetadataMap {
         return metadata != null ? metadata.getValue() : null;
     }
 
+    public void setMetadata(int id, EntityMetadata meta) {
+        if (meta == null)
+            throw new IllegalArgumentException("Cannot set a metadata value to null.");
+        EntityMetadata old = this.metadata.get(id);
+        this.metadata.put(id, meta);
+        if (!meta.equals(old))
+            this.changes.add(meta);
+    }
+
     public void setMetadata(int id, Object value) {
         if (value == null)
             throw new IllegalArgumentException("Cannot set a metadata value to null.");
