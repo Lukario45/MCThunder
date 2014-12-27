@@ -73,6 +73,10 @@ public class MetadataMap {
         this.setMetadata(id, (byte) (value ? (this.getNumber(id).byteValue() | bit) : (this.getNumber(id).byteValue() & ~bit)));
     }
 
+    public void setBitOfInt(int id, int bit, boolean value) {
+        this.setMetadata(id, value ? (this.getNumber(id).byteValue() | bit) : (this.getNumber(id).byteValue() & ~bit));
+    }
+
     public EntityMetadata[] getMetadataArray() {
         return this.metadata.values().toArray(new EntityMetadata[this.metadata.size()]);
     }

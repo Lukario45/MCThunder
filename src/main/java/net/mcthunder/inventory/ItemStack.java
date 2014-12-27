@@ -45,6 +45,6 @@ public class ItemStack {
     }
 
     public org.spacehq.mc.protocol.data.game.ItemStack getIS() {//TODO also pass enchants with compoundtag
-        return new org.spacehq.mc.protocol.data.game.ItemStack(this.type.getID(), this.amount, this.type.getData());
+        return new org.spacehq.mc.protocol.data.game.ItemStack(this.type.getParent().getID(), this.amount, this.type.getData());
     }
 }

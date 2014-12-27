@@ -2,19 +2,27 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 
-public class Villager extends Ageable {
+public class Villager extends Ageable {//TODO: Add a villager inventory with it calculating things
     private int villagerType;
 
     public Villager(Location location) {
         super(location);
         this.type = EntityType.VILLAGER;
-        this.villagerType = VillagerType.FARMER;
-        this.metadata.setMetadata(16, this.villagerType);
+        this.metadata.setMetadata(16, this.villagerType = VillagerType.FARMER);
     }
 
     @Override
     public void ai() {
 
+    }
+
+    public void setVillagerType(int villagerType) {
+        this.metadata.setMetadata(16, this.villagerType = villagerType);
+        updateMetadata();
+    }
+
+    public int getVillagerType() {
+        return this.villagerType;
     }
 
     public class VillagerType {

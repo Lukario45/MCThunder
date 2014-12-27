@@ -2,13 +2,12 @@ package net.mcthunder;
 
 import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
-import net.mcthunder.entity.DroppedItem;
-import net.mcthunder.entity.Entity;
-import net.mcthunder.entity.EntityType;
-import net.mcthunder.entity.Player;
+import net.mcthunder.entity.*;
+import net.mcthunder.events.listeners.MetadataChangeEventListener;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
 import net.mcthunder.events.listeners.PlayerCommandEventListener;
 import net.mcthunder.events.listeners.PlayerLoggingInEventListener;
+import net.mcthunder.events.source.MetadataChangeEventSource;
 import net.mcthunder.events.source.PlayerChatEventSource;
 import net.mcthunder.events.source.PlayerCommandEventSource;
 import net.mcthunder.events.source.PlayerLoggingInEventSource;
@@ -28,7 +27,6 @@ import org.spacehq.mc.protocol.MinecraftProtocol;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.ProtocolMode;
 import org.spacehq.mc.protocol.ServerLoginHandler;
-import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.Face;
 import org.spacehq.mc.protocol.data.game.values.entity.player.Animation;
@@ -87,6 +85,7 @@ public class MCThunder {
     private static PlayerChatEventSource playerChatEventSource;
     private static PlayerCommandEventSource playerCommandEventSource;
     private static PlayerLoggingInEventSource loggingInEventSource;
+    private static MetadataChangeEventSource metadataChangeEventSource;
 
     public static void main(String args[]) {
         AnsiConsole.systemInstall();
@@ -134,12 +133,15 @@ public class MCThunder {
         PlayerChatEventListener defaultPlayerChatEventListener = new PlayerChatEventListener();
         PlayerCommandEventListener defaultPlayerCommandEventListener = new PlayerCommandEventListener();
         PlayerLoggingInEventListener loggingInEventListener = new PlayerLoggingInEventListener();
+        MetadataChangeEventListener metadataChangeEventListener = new MetadataChangeEventListener();
         playerChatEventSource = new PlayerChatEventSource();
         playerCommandEventSource = new PlayerCommandEventSource();
         loggingInEventSource = new PlayerLoggingInEventSource();
+        metadataChangeEventSource = new MetadataChangeEventSource();
         playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
         playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
         loggingInEventSource.addEventListener(loggingInEventListener);
+        metadataChangeEventSource.addEventListener(metadataChangeEventListener);
         if (conf.getUseRankManager()) {
             RankManager rankManager = new RankManager();
             rankManager.load();
@@ -435,18 +437,26 @@ public class MCThunder {
 
         server.bind();
         while (server.isListening()) {
-            for (Player player : getPlayers()) {
-                EntityMetadata changes[] = player.getMetadata().getChanges();
-                if (changes != null) {
-                    ServerEntityMetadataPacket pack = new ServerEntityMetadataPacket(player.getEntityID(), changes);
-                    long chunk = player.getChunk();
-                    for (Player p : getPlayers())
-                        if (!p.getUniqueID().equals(player.getUniqueID()) && p.isColumnLoaded(chunk))
-                            p.sendPacket(pack);
-                }
-            }
             try {
-                Thread.sleep(20);
+                long startTime = System.currentTimeMillis();
+                //TODO: put things to happen each tick such as either physics checks or entity ai ect.
+                for (World w : getWorlds())
+                    for (Entity e : w.getEntities())
+                        if (e instanceof Ageable) {
+                            Ageable a = (Ageable) e;
+                            a.setAge((byte) (a.getAge() + 1));
+                        }
+                for (Player p : getPlayers()) {//TODO Make it so entities can have potion effects and then have them also tick down
+                    ArrayList<PotionEffectType> toRem = new ArrayList<>();
+                    for (PotionEffect e : p.getActiveEffects())
+                        if (e.getDuration() > 1)
+                            e.setDuration(e.getDuration() - 1);
+                        else
+                            toRem.add(e.getType());
+                    for (PotionEffectType t : toRem)
+                        p.removePotionEffect(t);
+                }
+                Thread.sleep(50 + startTime - System.currentTimeMillis());//Wait for next tick after everything finishes
             } catch (InterruptedException ignored) { }
         }
     }
@@ -644,5 +654,9 @@ public class MCThunder {
         entryListHandler.removeFromList(b);
         b.unload();
         bots.remove(b);
+    }
+
+    public static MetadataChangeEventSource getMetadataChangeEventSource() {
+        return metadataChangeEventSource;
     }
 }

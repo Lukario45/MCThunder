@@ -158,13 +158,12 @@ public class Region {
             ListTag sections = level.get("Sections");
             ByteArrayTag biomes = level.get("Biomes");
             ListTag entities = level.get("Entities");
-            for (int i = 0; i < entities.size(); i++) {//TODO: cleanup reading and spawning
+            for (int i = 0; i < entities.size(); i++) {//TODO: cleanup move majority of this into entity objects
                 CompoundTag entity = entities.get(i);
                 StringTag id = entity.get("id");
                 EntityType type = id == null ? null : EntityType.fromSavegameId(id.getValue());
                 if (type == null)
                     continue;
-                Entity e;
                 Location loc = null;
                 Vector vec = null;
                 ListTag pos = entity.get("Pos");
@@ -557,8 +556,8 @@ public class Region {
                         ByteTag itemRotation = entity.get("ItemRotation");
                     }
                 }
-                e = Entity.fromType(type, loc);
-                this.world.loadEntity(e);
+                this.world.loadEntity(Entity.fromType(type, loc));
+                //this.world.loadEntity(Entity.fromType(type, entity));
             }
             ListTag tileEntities = level.get("TileEntities");
             for (int i = 0; i < tileEntities.size(); i++) {

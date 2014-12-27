@@ -22,4 +22,8 @@ public class PotionEffect {
     public int getAmplifier() {
         return this.amplifier;
     }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
 }

@@ -12,13 +12,21 @@ public class DroppedItem extends Entity {
     public DroppedItem(Location location, ItemStack i) {
         super(location);
         this.type = EntityType.ITEM;
-        this.i = i;
-        this.metadata.setMetadata(10, this.i.getIS());
+        this.metadata.setMetadata(10, (this.i = i).getIS());
     }
 
     @Override
     public Packet getPacket() {
         return new ServerSpawnObjectPacket(this.entityID, ObjectType.ITEM, this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
+    }
+
+    public void setItemStack(ItemStack i) {
+        this.metadata.setMetadata(10, (this.i = i).getIS());
+        updateMetadata();
+    }
+
+    public ItemStack getItemStack() {
+        return this.i;
     }
 }

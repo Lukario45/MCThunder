@@ -1,10 +1,17 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
+import org.spacehq.mc.protocol.data.game.values.entity.MobType;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.packetlib.packet.Packet;
 
 public class Giant extends Zombie {
     public Giant(Location location) {
         super(location);
         this.type = EntityType.GIANT;
+    }
+
+    public Packet getPacket() {
+        return new ServerSpawnMobPacket(this.entityID, MobType.GIANT_ZOMBIE, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), 0, 0, 0, 0, getMetadata().getMetadataArray());
     }
 }

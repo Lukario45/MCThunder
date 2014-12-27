@@ -238,6 +238,8 @@ public class World {
     }
 
     public void loadEntity(Entity e) {
+        if (e == null)
+            return;
         e.spawn();
         this.loadedEntities.put(e.getEntityID(), e);
     }

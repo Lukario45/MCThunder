@@ -21,9 +21,8 @@ public abstract class Entity {
     protected final int entityID;
     protected String customName;
     protected Location location;
-    protected boolean onGround;
     protected short fireTicks, airLeft;
-    protected boolean sneaking, sprinting, invisible;
+    protected boolean sneaking, sprinting, invisible, onGround;
     protected MetadataMap metadata;
 
     public static Entity fromType(EntityType t, Location l) {
@@ -152,38 +151,158 @@ public abstract class Entity {
         return null;
     }
 
+    /*public static Entity fromType(EntityType t, CompoundTag tag) {//TODO: Implement the creation of entities by tag and setting metadata from tag
+        switch (t) {
+            case ITEM:
+                return new DroppedItem(tag);
+            case XP_ORB:
+                return new ExperienceOrb(tag);
+            case LEAD_KNOT:
+                return new LeadKnot(tag);
+            case PAINTING:
+                return new Painting(tag);
+            case ITEM_FRAME:
+                return new ItemFrame(tag);
+            case ARMOR_STAND:
+                return new ArmorStand(tag);
+            case ENDER_CRYSTAL:
+                return new EnderCrystal(tag);
+            case ARROW:
+                return new Arrow(tag);
+            case SNOWBALL:
+                return new Snowball(tag);
+            case GHAST_FIREBALL:
+                return new GhastFireball(tag);
+            case BLAZE_FIREBALL:
+                return new BlazeFireball(tag);
+            case THROWN_ENDER_PEARL:
+                return new ThrownEnderPearl(tag);
+            case THROWN_EYE_OF_ENDER:
+                return new ThrownEyeOfEnder(tag);
+            case THROWN_SPLASH_POTION:
+                return new ThrownSplashPotion(tag);
+            case THROWN_EXP_BOTTLE:
+                return new ThrownExpBottle(tag);
+            case WITHER_SKULL:
+                return new WitherSkull(tag);
+            case FIREWORKS_ROCKET:
+                return new Firework(tag);
+            case PRIMED_TNT:
+                return new PrimedTNT(tag);
+            case FALLING_SAND:
+                return new FallingSand(tag);
+            case MINECART_COMMAND_BLOCK:
+                return new CommandBlockMinecart(tag);
+            case BOAT:
+                return new Boat(tag);
+            case MINECART:
+                return new Minecart(tag);
+            case MINECART_CHEST:
+                return new ChestMinecart(tag);
+            case MINECART_FURNACE:
+                return new FurnaceMinecart(tag);
+            case MINECART_TNT:
+                return new TNTMinecart(tag);
+            case MINECART_HOPPER:
+                return new HopperMinecart(tag);
+            case MINECART_SPAWNER:
+                return new SpawnerMinecart(tag);
+            case CREEPER:
+                return new Creeper(tag);
+            case SKELETON:
+                return new Skeleton(tag);
+            case SPIDER:
+                return new Spider(tag);
+            case GIANT:
+                return new Giant(tag);
+            case ZOMBIE:
+                return new Zombie(tag);
+            case SLIME:
+                return new Slime(tag);
+            case GHAST:
+                return new Ghast(tag);
+            case ZOMBIE_PIGMAN:
+                return new ZombiePigman(tag);
+            case ENDERMAN:
+                return new Enderman(tag);
+            case CAVESPIDER:
+                return new CaveSpider(tag);
+            case SILVERFISH:
+                return new Silverfish(tag);
+            case BLAZE:
+                return new Blaze(tag);
+            case MAGMA_CUBE:
+                return new MagmaCube(tag);
+            case ENDER_DRAGON:
+                return new EnderDragon(tag);
+            case WITHER:
+                return new Wither(tag);
+            case WITCH:
+                return new Witch(tag);
+            case ENDERMITE:
+                return new Endermite(tag);
+            case GUARDIAN:
+                return new Guardian(tag);
+            case BAT:
+                return new Bat(tag);
+            case PIG:
+                return new Pig(tag);
+            case SHEEP:
+                return new Sheep(tag);
+            case COW:
+                return new Cow(tag);
+            case CHICKEN:
+                return new Chicken(tag);
+            case SQUID:
+                return new Squid(tag);
+            case WOLF:
+                return new Wolf(tag);
+            case MOOSHROOM:
+                return new Mooshroom(tag);
+            case SNOW_GOLEM:
+                return new SnowGolem(tag);
+            case OCELOT:
+                return new Ocelot(tag);
+            case IRON_GOLEM:
+                return new IronGolem(tag);
+            case HORSE:
+                return new Horse(tag);
+            case RABBIT:
+                return new Rabbit(tag);
+            case VILLAGER:
+                return new Villager(tag);
+            case MOB: case MONSTER: case PLAYER://Cannot be created
+                break;
+        }
+        return null;
+    }*/
+
     protected Entity(Location location) {
         this.location = location;
-        this.sneaking = false;
-        this.sprinting = false;
-        this.invisible = false;
         this.customName = "";
         this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
         this.metadata = new MetadataMap();
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, this.fireTicks > 0);
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, this.sneaking);
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, this.sprinting);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, this.sneaking = false);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, this.sprinting = false);
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ARM_UP, false);//Eating, drinking, blocking
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, this.invisible);
-        this.metadata.setMetadata(1, this.airLeft);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, this.invisible = false);
+        this.metadata.setMetadata(1, this.airLeft = 0);
     }
 
     public void spawn() {//TODO: replace this to send from world
         long chunk = getChunk();
         for (Player p : MCThunder.getPlayers())
-            if (p.getWorld().equals(this.location.getWorld()) && p.isColumnLoaded(chunk))
+            if (p.getWorld().equals(getWorld()) && p.isColumnLoaded(chunk))
                 for (Packet packet : getPackets())
-                    if (packet != null)
-                        p.sendPacket(packet);
+                    p.sendPacket(packet);
     }
 
     public long getChunk() {
-        if (this.location == null)
-            return 0;
-        return Utils.getLong((int) this.location.getX() >> 4, (int) this.location.getZ() >> 4);
+        return this.location == null ? 0 : Utils.getLong((int) this.location.getX() >> 4, (int) this.location.getZ() >> 4);
     }
 
-    public MetadataMap getMetadata() {
+    public MetadataMap getMetadata() {//Should we clone the return
         return this.metadata;
     }
 
@@ -245,12 +364,11 @@ public abstract class Entity {
         long chunk = getChunk();
         if (!l.getWorld().equals(getWorld())) {
             ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
-            //refreshEntityID();//Should not be needed when they change world to one people have not been in
             Packet respawn = getPacket();
             if (respawn != null)
                 for (Player p : MCThunder.getPlayers()) {
                     p.sendPacket(destroyEntitiesPacket);
-                    if (p.getWorld().equals(l.getWorld()) && p.isColumnLoaded(chunk))//If they are in the new world
+                    if (p.getWorld().equals(l.getWorld()) && p.isColumnLoaded(chunk))
                         p.sendPacket(respawn);
                 }
         } else {
@@ -267,8 +385,8 @@ public abstract class Entity {
     }
 
     public void setSprinting(boolean sprinting) {
-        this.sprinting = sprinting;
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, this.sprinting);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, this.sprinting = sprinting);
+        updateMetadata();
     }
 
     public boolean isSneaking() {
@@ -276,7 +394,16 @@ public abstract class Entity {
     }
 
     public void setSneaking(boolean sneaking) {
-        this.sneaking = sneaking;
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, this.sneaking);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, this.sneaking = sneaking);
+        updateMetadata();
+    }
+
+    public void setAirLeft(short air) {
+        this.metadata.setMetadata(1, this.airLeft = air);
+        updateMetadata();
+    }
+
+    protected void updateMetadata() {
+        MCThunder.getMetadataChangeEventSource().fireEvent(this);
     }
 }

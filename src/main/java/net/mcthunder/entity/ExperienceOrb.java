@@ -17,4 +17,12 @@ public class ExperienceOrb extends Entity {
     public Packet getPacket() {
         return new ServerSpawnExpOrbPacket(this.entityID, this.location.getX(), this.location.getY(), this.location.getZ(), this.value);
     }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return this.value;
+    }
 }

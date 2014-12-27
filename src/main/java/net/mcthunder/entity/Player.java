@@ -29,6 +29,7 @@ import org.spacehq.packetlib.packet.Packet;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -74,25 +75,22 @@ public class Player extends LivingEntity {
         this.name = getGameProfile().getName();
         this.slot = 36;
         this.displayName = this.name;
-        this.gamemode = GameMode.SURVIVAL;
+        this.gamemode = GameMode.CREATIVE;
         this.moveable = false;
-        this.hideCape = false;
-        this.absorption = 0;
-        this.score = 0;
         this.inv = new PlayerInventory(44, this.name, this);
         this.ping = getSession().getFlag(ProtocolConstants.PING_KEY);
         this.playerFile = new NBTFile(new File("PlayerFiles", this.uuid + ".dat"), "Player");
         this.skinUUID = this.uuid;
         this.origSkin = getGameProfile().getProperties().get("textures");
-        this.skin = origSkin;
+        this.skin = this.origSkin;
         this.openInventory = null;
         this.metadata.setMetadata(2, this.name);
         this.metadata.setMetadata(3, (byte) 1);//Always show name
-        //this.metadata.setMetadata(10, (byte) 0);//Unsigned byte for skin flags TODO: Figure out what to put here
+        this.metadata.setMetadata(10, (byte) 0);//Unsigned byte for skin flags TODO: Figure out what to put here
         this.metadata.setMetadata(15, (byte) 1);//Assuming player has a brain
-        this.metadata.setBit(16, 0x02, this.hideCape);
-        this.metadata.setMetadata(17, this.absorption);
-        this.metadata.setMetadata(18, this.score);
+        this.metadata.setBit(16, 0x02, this.hideCape = false);
+        this.metadata.setMetadata(17, this.absorption = 0);
+        this.metadata.setMetadata(18, this.score = 0);
     }
 
     public NBTFile getPlayerFile() {
@@ -171,86 +169,56 @@ public class Player extends LivingEntity {
     private void updateDir(Direction d) {
         int x = (int)getLocation().getX() >> 4;
         int z = (int)getLocation().getZ() >> 4;
+        ArrayList<Long> temp = null;
         if (d.equals(Direction.NORTH)) {
-            ArrayList<Long> temp = (ArrayList<Long>) this.southColumns.clone();
+            temp = (ArrayList<Long>) this.southColumns.clone();
             this.northColumns.clear();
             this.southColumns.clear();
-            for (long l : temp) {
-                getWorld().unloadColumn(l);
-                for (Player player1 : MCThunder.getPlayers())
-                    if (player1.getWorld().equals(getWorld()) && l == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
-                        sendPacket(new ServerDestroyEntitiesPacket(player1.getEntityID()));
-                for (Bot b : MCThunder.getBots())
-                    if (b.getWorld().equals(getWorld()) && l == b.getChunk())
-                        sendPacket(new ServerDestroyEntitiesPacket(b.getEntityID()));
-                for (Entity e : getWorld().getEntities())
-                    if (l == e.getChunk())
-                        sendPacket(new ServerDestroyEntitiesPacket(e.getEntityID()));
-            }
             for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
                 getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView() - 1) >> 5)).readChunk(getLong(x + xAdd, z - getView() - 1), this, d, false);
                 getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView()) >> 5)).readChunk(getLong(x + xAdd, z + getView()), this, Direction.SOUTH, true);
             }
         } else if (d.equals(Direction.EAST)) {
-            ArrayList<Long> temp = (ArrayList<Long>) this.westColumns.clone();
+            temp = (ArrayList<Long>) this.westColumns.clone();
             this.eastColumns.clear();
             this.westColumns.clear();
-            for (long l : temp) {
-                getWorld().unloadColumn(l);
-                for (Player player1 : MCThunder.getPlayers())
-                    if (player1.getWorld().equals(getWorld()) && l == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
-                        sendPacket(new ServerDestroyEntitiesPacket(player1.getEntityID()));
-                for (Bot b : MCThunder.getBots())
-                    if (b.getWorld().equals(getWorld()) && l == b.getChunk())
-                        sendPacket(new ServerDestroyEntitiesPacket(b.getEntityID()));
-                for (Entity e : getWorld().getEntities())
-                    if (l == e.getChunk())
-                        sendPacket(new ServerDestroyEntitiesPacket(e.getEntityID()));
-            }
             for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
                 getWorld().getRegion(getLong((x + getView() + 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView() + 1, z + zAdd), this, d, false);
                 getWorld().getRegion(getLong((x - getView()) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView(), z + zAdd), this, Direction.WEST, true);
             }
         } else if (d.equals(Direction.SOUTH)) {
-            ArrayList<Long> temp = (ArrayList<Long>) this.northColumns.clone();
+            temp = (ArrayList<Long>) this.northColumns.clone();
             this.southColumns.clear();
             this.northColumns.clear();
-            for (long l : temp) {
-                getWorld().unloadColumn(l);
-                for (Player player1 : MCThunder.getPlayers())
-                    if (player1.getWorld().equals(getWorld()) && l == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
-                        sendPacket(new ServerDestroyEntitiesPacket(player1.getEntityID()));
-                for (Bot b : MCThunder.getBots())
-                    if (b.getWorld().equals(getWorld()) && l == b.getChunk())
-                        sendPacket(new ServerDestroyEntitiesPacket(b.getEntityID()));
-                for (Entity e : getWorld().getEntities())
-                    if (l == e.getChunk())
-                        sendPacket(new ServerDestroyEntitiesPacket(e.getEntityID()));
-            }
             for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
                 getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView() + 1) >> 5)).readChunk(getLong(x + xAdd, z + getView() + 1), this, d, false);
                 getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView()) >> 5)).readChunk(getLong(x + xAdd, z - getView()), this, Direction.NORTH, true);
             }
         } else if (d.equals(Direction.WEST)) {
-            ArrayList<Long> temp = (ArrayList<Long>) this.eastColumns.clone();
+            temp = (ArrayList<Long>) this.eastColumns.clone();
             this.westColumns.clear();
             this.eastColumns.clear();
-            for (long l : temp) {
-                getWorld().unloadColumn(l);;
-                for (Player player1 : MCThunder.getPlayers())
-                    if (player1.getWorld().equals(getWorld()) && l == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
-                        sendPacket(new ServerDestroyEntitiesPacket(player1.getEntityID()));
-                for (Bot b : MCThunder.getBots())
-                    if (b.getWorld().equals(getWorld()) && l == b.getChunk())
-                        sendPacket(new ServerDestroyEntitiesPacket(b.getEntityID()));
-                for (Entity e : getWorld().getEntities())
-                    if (l == e.getChunk())
-                        sendPacket(new ServerDestroyEntitiesPacket(e.getEntityID()));
-            }
             for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
                 getWorld().getRegion(getLong((x - getView() - 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView() - 1, z + zAdd), this, d, false);
                 getWorld().getRegion(getLong((x + getView()) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView(), z + zAdd), this, Direction.EAST, true);
             }
+        }
+        if (temp != null)
+            unloadColumn(temp);
+    }
+
+    private void unloadColumn(ArrayList<Long> temp) {
+        for (long l : temp) {
+            getWorld().unloadColumn(l);
+            for (Player player1 : MCThunder.getPlayers())
+                if (player1.getWorld().equals(getWorld()) && l == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                    sendPacket(new ServerDestroyEntitiesPacket(player1.getEntityID()));
+            for (Bot b : MCThunder.getBots())
+                if (b.getWorld().equals(getWorld()) && l == b.getChunk())
+                    sendPacket(new ServerDestroyEntitiesPacket(b.getEntityID()));
+            for (Entity e : getWorld().getEntities())
+                if (l == e.getChunk())
+                    sendPacket(new ServerDestroyEntitiesPacket(e.getEntityID()));
         }
     }
 
@@ -288,145 +256,60 @@ public class Player extends LivingEntity {
         for (Entity e : getWorld().getEntities())
             if (isColumnLoaded(e.getChunk()))
                 for (Packet packet : e.getPackets())
-                    if (packet != null)
-                        sendPacket(packet);
+                    sendPacket(packet);
     }
 
     private void sendColumns(Direction d) {
-        /*int[] x = null;
-        int[] z = null;
-        Chunk[][] chunks = null;
-        byte[][] biomeData = null;
-        int size = 0;
         if (d.equals(Direction.NORTH))
-            size = this.northColumns.size();
+            sendColumns(this.northColumns);
         else if (d.equals(Direction.EAST))
-            size = this.eastColumns.size();
+            sendColumns(this.eastColumns);
         else if (d.equals(Direction.SOUTH))
-            size = this.southColumns.size();
+            sendColumns(this.southColumns);
         else if (d.equals(Direction.WEST))
-            size = this.westColumns.size();
-        x = new int[size];
-        z = new int[size];
-        chunks = new Chunk[size][];
-        biomeData = new byte[size][];*/
-        if (d.equals(Direction.NORTH)) {
-            for (int i = 0; i < this.northColumns.size(); i++) {
-                long pos = this.northColumns.get(i);
-                if (!isColumnLoaded(pos)) {
-                    /*x[i] = getWorld().getColumn(pos).getX();
-                    z[i] = getWorld().getColumn(pos).getZ();
-                    chunks[i] = getWorld().getColumn(pos).getChunks();
-                    biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
-                    sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
-                    for (Player player1 : MCThunder.getPlayers())
-                        if (player1.getWorld().equals(getWorld()) && pos == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
-                            sendPacket(player1.getPacket());
-                    for (Bot b : MCThunder.getBots())
-                        if (b.getWorld().equals(getWorld()) && pos == b.getChunk())
-                            sendPacket(b.getPacket());
-                    for (Entity e : getWorld().getEntities())
-                        if (pos == e.getChunk())
-                            for (Packet packet : e.getPackets())
-                                if (packet != null)
-                                    sendPacket(packet);
-                    this.loadedColumns.add(pos);
-                }
+            sendColumns(this.westColumns);
+    }
+
+    private void sendColumns(ArrayList<Long> columns) {
+        for (long column : columns)
+            if (!isColumnLoaded(column)) {
+                Column c = getWorld().getColumn(column);
+                sendPacket(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
+                for (Player player1 : MCThunder.getPlayers())
+                    if (player1.getWorld().equals(getWorld()) && column == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                        sendPacket(player1.getPacket());
+                for (Bot b : MCThunder.getBots())
+                    if (b.getWorld().equals(getWorld()) && column == b.getChunk())
+                        sendPacket(b.getPacket());
+                for (Entity e : getWorld().getEntities())
+                    if (column == e.getChunk())
+                        for (Packet packet : e.getPackets())
+                            sendPacket(packet);
+                this.loadedColumns.add(column);
             }
-        } else if (d.equals(Direction.EAST)) {
-            for (int i = 0; i < this.eastColumns.size(); i++) {
-                long pos = this.eastColumns.get(i);
-                if (!isColumnLoaded(pos)) {
-                    /*x[i] = getWorld().getColumn(pos).getX();
-                    z[i] = getWorld().getColumn(pos).getZ();
-                    chunks[i] = getWorld().getColumn(pos).getChunks();
-                    biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
-                    sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
-                    for (Player player1 : MCThunder.getPlayers())
-                        if (player1.getWorld().equals(getWorld()) && pos == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
-                            sendPacket(player1.getPacket());
-                    for (Bot b : MCThunder.getBots())
-                        if (b.getWorld().equals(getWorld()) && pos == b.getChunk())
-                            sendPacket(b.getPacket());
-                    for (Entity e : getWorld().getEntities())
-                        if (pos == e.getChunk())
-                            for (Packet packet : e.getPackets())
-                                if (packet != null)
-                                    sendPacket(packet);
-                    this.loadedColumns.add(pos);
-                }
-            }
-        } else if (d.equals(Direction.SOUTH)) {
-            for (int i = 0; i < this.southColumns.size(); i++) {
-                long pos = this.southColumns.get(i);
-                if (!isColumnLoaded(pos)) {
-                    /*x[i] = getWorld().getColumn(pos).getX();
-                    z[i] = getWorld().getColumn(pos).getZ();
-                    chunks[i] = getWorld().getColumn(pos).getChunks();
-                    biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
-                    sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
-                    for (Player player1 : MCThunder.getPlayers())
-                        if (player1.getWorld().equals(getWorld()) && pos == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
-                            sendPacket(player1.getPacket());
-                    for (Bot b : MCThunder.getBots())
-                        if (b.getWorld().equals(getWorld()) && pos == b.getChunk())
-                            sendPacket(b.getPacket());
-                    for (Entity e : getWorld().getEntities())
-                        if (pos == e.getChunk())
-                            for (Packet packet : e.getPackets())
-                                if (packet != null)
-                                    sendPacket(packet);
-                    this.loadedColumns.add(pos);
-                }
-            }
-        } else if (d.equals(Direction.WEST)) {
-            for (int i = 0; i < this.westColumns.size(); i++) {
-                long pos = this.westColumns.get(i);
-                if (!isColumnLoaded(pos)) {
-                    /*x[i] = getWorld().getColumn(pos).getX();
-                    z[i] = getWorld().getColumn(pos).getZ();
-                    chunks[i] = getWorld().getColumn(pos).getChunks();
-                    biomeData[i] = getWorld().getColumn(pos).getBiomes();*/
-                    sendPacket(new ServerChunkDataPacket(getWorld().getColumn(pos).getX(), getWorld().getColumn(pos).getZ(), getWorld().getColumn(pos).getChunks(), getWorld().getColumn(pos).getBiomes()));
-                    for (Player player1 : MCThunder.getPlayers())
-                        if (player1.getWorld().equals(getWorld()) && pos == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
-                            sendPacket(player1.getPacket());
-                    for (Bot b : MCThunder.getBots())
-                        if (b.getWorld().equals(getWorld()) && pos == b.getChunk())
-                            sendPacket(b.getPacket());
-                    for (Entity e : getWorld().getEntities())
-                        if (pos == e.getChunk())
-                            for (Packet packet : e.getPackets())
-                                if (packet != null)
-                                    sendPacket(packet);
-                    this.loadedColumns.add(pos);
-                }
-            }
-        }
-        //sendPacket(new ServerMultiChunkDataPacket(x, z, chunks, biomeData));
     }
 
     public void teleport(Location l) {
+        long chunk = getChunk();
         if (!l.getWorld().equals(getWorld())) {
             ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
-            //refreshEntityID();//Should not be needed when they change world to one people have not been in
             Packet respawn = getPacket();
             if (respawn != null)
                 for (Player p : MCThunder.getPlayers()) {
                     p.sendPacket(destroyEntitiesPacket);
-                    if (p.getWorld().equals(l.getWorld()))//If they are in the new world
+                    if (p.getWorld().equals(l.getWorld()) && p.isColumnLoaded(chunk))
                         p.sendPacket(respawn);
                 }
             sendPacket(new ServerRespawnPacket(l.getWorld().getDimension(), l.getWorld().getDifficulty(), getGameMode(), l.getWorld().getWorldType()));
         } else {
             ServerEntityTeleportPacket packet = new ServerEntityTeleportPacket(getEntityID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), isOnGround());
             for (Player p : MCThunder.getPlayers())
-                if (p.getWorld().equals(l.getWorld()))
+                if (p.getWorld().equals(l.getWorld()) && p.isColumnLoaded(chunk))
                     p.sendPacket(packet);
         }
         setLocation(l);
-        sendPacket(new ServerPlayerPositionRotationPacket(getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch()));
-        sendPacket(new ServerSpawnPositionPacket(getLocation().getPosition()));
+        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
+        sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
     }
 
     public int getView() {
@@ -482,7 +365,7 @@ public class Player extends LivingEntity {
     }
 
     public Packet getPacket() {
-        return new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch(), getHeldItem().getType().getID(), getMetadata().getMetadataArray());
+        return new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), getHeldItem().getType().getID(), getMetadata().getMetadataArray());
     }
 
     public int getSlot() {
@@ -512,8 +395,8 @@ public class Player extends LivingEntity {
     public void setWorld(World w) {
         super.setWorld(w);
         sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
-        sendPacket(new ServerPlayerPositionRotationPacket(getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch()));
-        sendPacket(new ServerSpawnPositionPacket(getLocation().getPosition()));
+        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
+        sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
         //Also will need to remove loaded chunks and load new ones
     }
 
@@ -538,11 +421,13 @@ public class Player extends LivingEntity {
         this.activeEffects.clear();
     }
 
-    public PotionEffect[] getActiveEffects() {
-        return (PotionEffect[]) this.activeEffects.values().toArray();
+    public Collection<PotionEffect> getActiveEffects() {
+        return this.activeEffects.values();
     }
 
     public void sendPacket(Packet p) {
+        if (p == null)
+            return;
         getSession().send(p);
     }
 
@@ -556,8 +441,7 @@ public class Player extends LivingEntity {
         this.skin = p;
         this.profile.getProperties().put("textures", this.skin);
         MCThunder.getEntryListHandler().refresh(this);
-        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());//TODO: Test if this still works
-        //refreshEntityID();
+        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
         ServerSpawnPlayerPacket spawnPlayerPacket = (ServerSpawnPlayerPacket) getPacket();
         for (Player pl : MCThunder.getPlayers())
             if (!pl.getUniqueID().equals(getUniqueID())) {
@@ -566,8 +450,8 @@ public class Player extends LivingEntity {
                     pl.sendPacket(spawnPlayerPacket);
             }
         sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
-        sendPacket(new ServerPlayerPositionRotationPacket(getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch()));
-        sendPacket(new ServerSpawnPositionPacket(getLocation().getPosition()));
+        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
+        sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
     }
 
     public void setSkin(String name) {

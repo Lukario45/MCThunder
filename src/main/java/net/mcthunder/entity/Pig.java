@@ -8,12 +8,20 @@ public class Pig extends Ageable {
     public Pig(Location location) {
         super(location);
         this.type = EntityType.PIG;
-        this.hasSaddle = false;
-        this.metadata.setMetadata(16, (byte) (this.hasSaddle ? 1 : 0));
+        this.metadata.setMetadata(16, (byte) ((this.hasSaddle = false) ? 1 : 0));
     }
 
     @Override
     public void ai() {
 
+    }
+
+    public void setHasSaddle(boolean hasSaddle) {
+        this.metadata.setMetadata(16, (byte) ((this.hasSaddle = hasSaddle) ? 1 : 0));
+        updateMetadata();
+    }
+
+    public boolean hasSaddle() {
+        return this.hasSaddle;
     }
 }

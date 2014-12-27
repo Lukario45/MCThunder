@@ -8,12 +8,20 @@ public class Rabbit extends Ageable {
     public Rabbit(Location location) {
         super(location);
         this.type = EntityType.RABBIT;
-        this.rabbitType = (byte) 0;
-        this.metadata.setMetadata(18, this.rabbitType);
+        this.metadata.setMetadata(18, this.rabbitType = (byte) 0);
     }
 
     @Override
     public void ai() {
 
+    }
+
+    public void setRabbitType(byte rabbitType) {
+        this.metadata.setMetadata(18, this.rabbitType = rabbitType);
+        updateMetadata();
+    }
+
+    public byte getRabbitType() {
+        return this.rabbitType;
     }
 }

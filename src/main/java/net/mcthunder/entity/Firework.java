@@ -12,13 +12,21 @@ public class Firework extends Entity {
     public Firework(Location location, ItemStack i) {
         super(location);
         this.type = EntityType.FIREWORKS_ROCKET;
-        this.i = i;
-        this.metadata.setMetadata(8, this.i.getIS());
+        this.metadata.setMetadata(8, (this.i = i).getIS());
     }
 
     @Override
     public Packet getPacket() {//TODO: Also create particles
         return new ServerSpawnObjectPacket(this.entityID, ObjectType.FIREWORK_ROCKET, this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
+    }
+
+    public void setItemStack(ItemStack i) {
+        this.metadata.setMetadata(8, (this.i = i).getIS());
+        updateMetadata();
+    }
+
+    public ItemStack getItemStack() {
+        return this.i;
     }
 }

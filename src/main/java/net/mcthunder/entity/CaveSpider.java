@@ -1,15 +1,18 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
+import org.spacehq.mc.protocol.data.game.values.entity.MobType;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.packetlib.packet.Packet;
 
-public class CaveSpider extends LivingEntity {
-    private boolean climbing;
-
-    public CaveSpider(Location location) {//Extends spider for practical purposes
+public class CaveSpider extends Spider {
+    public CaveSpider(Location location) {
         super(location);
         this.type = EntityType.CAVESPIDER;
-        this.climbing = false;
-        this.metadata.setMetadata(16, (byte) (this.climbing ? 1 : 0));
+    }
+
+    public Packet getPacket() {
+        return new ServerSpawnMobPacket(this.entityID, MobType.CAVE_SPIDER, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), 0, 0, 0, 0, getMetadata().getMetadataArray());
     }
 
     @Override

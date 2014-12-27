@@ -25,7 +25,6 @@ import static net.mcthunder.api.Utils.tellConsole;
 public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.PlayerLoggingInEventListener {
     @Override
     public void onLogin(Session session) throws ClassNotFoundException {
-        //TODO fire event with session
         GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
         if (MCThunder.getPlayer(profile.getId()) != null)
             MCThunder.getPlayer(profile.getId()).disconnect("You logged in from another location!");
@@ -60,11 +59,9 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
         for (Entity e : player.getWorld().getEntities())
             if(player.isColumnLoaded(e.getChunk()))
                 for (Packet packet : e.getPackets())
-                    if (packet != null)
-                        player.sendPacket(packet);
+                    player.sendPacket(packet);
         for (Sign s : player.getWorld().getSigns())
-            if (s.getPacket() != null)
-                player.sendPacket(s.getPacket());
+            player.sendPacket(s.getPacket());
         player.toggleMoveable();
     }
 }

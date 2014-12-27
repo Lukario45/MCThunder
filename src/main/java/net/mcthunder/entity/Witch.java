@@ -8,12 +8,20 @@ public class Witch extends LivingEntity {
     public Witch(Location location) {
         super(location);
         this.type = EntityType.WITCH;
-        this.aggressive = false;
-        this.metadata.setMetadata(21, (byte) (this.aggressive ? 1 : 0));
+        this.metadata.setMetadata(21, (byte) ((this.aggressive = false) ? 1 : 0));
     }
 
     @Override
     public void ai() {
 
+    }
+
+    public void setAggressive(boolean aggressive) {
+        this.metadata.setMetadata(21, (byte) ((this.aggressive = aggressive) ? 1 : 0));
+        updateMetadata();
+    }
+
+    public boolean isAggressive() {
+        return this.aggressive;
     }
 }

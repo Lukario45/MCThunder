@@ -112,8 +112,9 @@ public abstract class Bot {
         this.entitySpawned = true;
         this.location = l;
         ServerSpawnPlayerPacket packet = (ServerSpawnPlayerPacket) getPacket();
+        long chunk = getChunk();
         for (Player p : MCThunder.getPlayers())
-            if (p.getWorld().equals(getWorld()))
+            if (p.getWorld().equals(getWorld()) && p.isColumnLoaded(chunk))
                 p.sendPacket(packet);
     }
 
@@ -138,9 +139,7 @@ public abstract class Bot {
     public abstract void load();
 
     public long getChunk() {
-        if (this.location == null)
-            return 0;
-        return Utils.getLong((int) this.location.getX() >> 4, (int) this.location.getZ() >> 4);
+        return this.location == null ? 0 : Utils.getLong((int) this.location.getX() >> 4, (int) this.location.getZ() >> 4);
     }
 
     public MetadataMap getMetadata() {

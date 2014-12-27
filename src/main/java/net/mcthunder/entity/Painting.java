@@ -9,7 +9,7 @@ import org.spacehq.packetlib.packet.Packet;
 public class Painting extends Entity {
     private Art picture;
 
-    protected Painting(Location location) {
+    public Painting(Location location) {
         super(location);
         this.type = EntityType.PAINTING;
         this.picture = Art.ALBAN;
@@ -18,5 +18,13 @@ public class Painting extends Entity {
     @Override
     public Packet getPacket() {
         return new ServerSpawnPaintingPacket(this.entityID, this.picture, this.location.getPosition(), HangingDirection.EAST);
+    }
+
+    public void setPicture(Art picture) {
+        this.picture = picture;
+    }
+
+    public Art getPicture() {
+        return this.picture;
     }
 }

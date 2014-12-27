@@ -8,12 +8,20 @@ public class Spider extends LivingEntity {
     public Spider(Location location) {
         super(location);
         this.type = EntityType.SPIDER;
-        this.climbing = false;
-        this.metadata.setMetadata(16, (byte) (this.climbing ? 1 : 0));
+        this.metadata.setMetadata(16, (byte) ((this.climbing = false) ? 1 : 0));
     }
 
     @Override
     public void ai() {
 
+    }
+
+    public void setClimbing(boolean climbing) {
+        this.metadata.setMetadata(16, (byte) ((this.climbing = climbing) ? 1 : 0));
+        updateMetadata();
+    }
+
+    public boolean isClimbing() {
+        return this.climbing;
     }
 }

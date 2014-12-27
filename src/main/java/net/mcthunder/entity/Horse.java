@@ -12,29 +12,17 @@ public class Horse extends LivingEntity {
     public Horse(Location location) {
         super(location);
         this.type = EntityType.HORSE;
-        this.isTame = false;
-        this.hasSaddle = false;
-        this.hasChest = false;
-        this.isBred = false;
-        this.isEating = false;
-        this.isRearing = false;
-        this.mouthOpen = false;
-        this.horseType = HorseType.HORSE;
-        this.ownerName = "";
-        this.color = HorseColor.WHITE;
-        this.style = HorseStyle.NONE;
-        this.armorType = ArmorType.NONE;
-        this.metadata.setBit(MetadataConstants.HORSE, MetadataConstants.HorseFlags.TAME, this.isTame);
-        this.metadata.setBit(MetadataConstants.HORSE, MetadataConstants.HorseFlags.SADDLE, this.hasSaddle);
-        this.metadata.setBit(MetadataConstants.HORSE, MetadataConstants.HorseFlags.CHEST, this.hasChest);
-        this.metadata.setBit(MetadataConstants.HORSE, MetadataConstants.HorseFlags.BRED, this.isBred);
-        this.metadata.setBit(MetadataConstants.HORSE, MetadataConstants.HorseFlags.EATING, this.isEating);
-        this.metadata.setBit(MetadataConstants.HORSE, MetadataConstants.HorseFlags.REARING, this.isRearing);
-        this.metadata.setBit(MetadataConstants.HORSE, MetadataConstants.HorseFlags.MOUTH_OPEN, this.mouthOpen);
-        this.metadata.setMetadata(19, this.horseType.getID());
-        this.metadata.setMetadata(20, this.color | this.style << 8);
-        this.metadata.setMetadata(21, this.ownerName);
-        this.metadata.setMetadata(22, this.armorType);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.TAME, this.isTame = false);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.SADDLE, this.hasSaddle = false);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.CHEST, this.hasChest = false);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.BRED, this.isBred = false);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.EATING, this.isEating = false);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.REARING, this.isRearing = false);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.MOUTH_OPEN, this.mouthOpen = false);
+        this.metadata.setMetadata(19, (this.horseType = HorseType.HORSE).getID());
+        this.metadata.setMetadata(20, (this.color = HorseColor.WHITE) | (this.style = HorseStyle.NONE) << 8);
+        this.metadata.setMetadata(21, this.ownerName = "");
+        this.metadata.setMetadata(22, this.armorType = ArmorType.NONE);
     }
 
     @Override
@@ -42,20 +30,132 @@ public class Horse extends LivingEntity {
 
     }
 
+    public void setTame(boolean isTame) {
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.TAME, this.isTame = isTame);
+        updateMetadata();
+    }
+
+    public boolean isTame() {
+        return this.isTame;
+    }
+
+    public void setHasSaddle(boolean hasSaddle) {
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.SADDLE, this.hasSaddle = hasSaddle);
+        updateMetadata();
+    }
+
+    public boolean hasSaddle() {
+        return this.hasSaddle;
+    }
+
+    public void setHasChest(boolean hasChest) {
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.CHEST, this.hasChest = hasChest);
+        updateMetadata();
+    }
+
+    public boolean hasChest() {
+        return this.hasChest;
+    }
+
+    public void setBred(boolean isBred) {
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.BRED, this.isBred = isBred);
+        updateMetadata();
+    }
+
+    public boolean isBred() {
+        return this.isBred;
+    }
+
+    public void setEating(boolean isEating) {
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.EATING, this.isEating = isEating);
+        updateMetadata();
+    }
+
+    public boolean isEating() {
+        return this.isEating;
+    }
+
+    public void setRearing(boolean isRearing) {
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.REARING, this.isRearing = isRearing);
+        updateMetadata();
+    }
+
+    public boolean isRearing() {
+        return this.isRearing;
+    }
+
+    public void setMouthOpen(boolean mouthOpen) {
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.MOUTH_OPEN, this.mouthOpen = mouthOpen);
+        updateMetadata();
+    }
+
+    public boolean isMouthOpen() {
+        return this.mouthOpen;
+    }
+
+    public void setHorseType(HorseType horseType) {
+        this.metadata.setMetadata(19, (this.horseType = horseType).getID());
+        updateMetadata();
+    }
+
+    public HorseType getHorseType() {
+        return this.horseType;
+    }
+
+    public void setColor(int color) {
+        this.metadata.setMetadata(20, (this.color = color) | this.style << 8);
+        updateMetadata();
+    }
+
+    public int getColor() {
+        return this.color;
+    }
+
+    public void setStyle(int style) {
+        this.metadata.setMetadata(20, this.color | (this.style = style) << 8);
+        updateMetadata();
+    }
+
+    public int getStyle() {
+        return this.style;
+    }
+
+    public int getVariant() {
+        return this.color | this.style << 8;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.metadata.setMetadata(21, this.ownerName = ownerName);
+        updateMetadata();
+    }
+
+    public String getOwnerName() {
+        return this.ownerName;
+    }
+
+    public void setArmorType(int armorType) {
+        this.metadata.setMetadata(22, this.armorType = armorType);
+        updateMetadata();
+    }
+
+    public int getArmorType() {
+        return this.armorType;
+    }
+
     public enum HorseType {
-        HORSE(0),
-        DONKEY(1),
-        MULE(2),
-        ZOMBIE(3),
-        SKELETON(4);
+        HORSE((byte) 0),
+        DONKEY((byte) 1),
+        MULE((byte) 2),
+        ZOMBIE((byte) 3),
+        SKELETON((byte) 4);
 
-        private int horseID;
+        private byte horseID;
 
-        private HorseType(int horseID) {
+        private HorseType(byte horseID) {
             this.horseID = horseID;
         }
 
-        public int getID() {
+        public byte getID() {
             return this.horseID;
         }
     }
