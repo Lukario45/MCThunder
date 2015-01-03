@@ -17,7 +17,7 @@ public class PrivateMessage extends Command {
 
     @Override
     public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().split(" ");
+        String[] wholeMessage = packet.getMessage().trim().split(" ");
         if (wholeMessage.length < 3)
             return false;
         String toPlayer = wholeMessage[1];

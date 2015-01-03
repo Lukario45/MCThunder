@@ -17,8 +17,8 @@ public class Kick extends Command {
 
     @Override
     public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().split(" ");
-        if (wholeMessage.length <= 1)
+        String[] wholeMessage = packet.getMessage().trim().split(" ");
+        if (wholeMessage.length < 2)
             return false;
         String saidName = wholeMessage[1];
         Player p = MCThunder.getPlayer(saidName);

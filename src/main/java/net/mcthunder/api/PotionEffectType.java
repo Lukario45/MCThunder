@@ -53,6 +53,59 @@ public enum PotionEffectType {
         return this.particle;
     }
 
+    public int getColor() {
+        switch (this) {
+            case SPEED:
+                return 0x7cafc6;
+            case SLOWNESS:
+                return 0x5a6c81;
+            case HASTE:
+                return 0xd9c043;
+            case MINING_FATIGUE:
+                return 0x4a4217;
+            case STRENGTH:
+                return 0x932423;
+            case INSTANT_HEALTH:
+                return 0xf82423;
+            case INSTANT_DAMAGE:
+                return 0x430a09;
+            case JUMP_BOOST:
+                return 0x786297;
+            case NAUSEA:
+                return 0x551d4a;
+            case REGENERATION:
+                return 0xcd5cab;
+            case RESISTANCE:
+                return 0x99453a;
+            case FIRE_RESISTANCE:
+                return 0xe49a3a;
+            case WATER_BREATHING:
+                return 0x2e5299;
+            case INVISIBILITY:
+                return 0x7f8392;
+            case BLINDNESS:
+                return 0x1f1f23;
+            case NIGHT_VISION:
+                return 0x1f1fa1;
+            case HUNGER:
+                return 0x587653;
+            case WEAKNESS:
+                return 0x484d48;
+            case POISON:
+                return 0x4e9331;
+            case WITHER:
+                return 0x352a27;
+            case HEALTH_BOOST:
+                return 0xf87d23;
+            case ABSORPTION:
+                return 0x2552a5;
+            case SATURATION:
+                return 0xf82423;
+            default:
+                return 0;
+        }
+    }
+
     public static PotionEffectType fromID(int id) {
         return idMap.get(id);
     }

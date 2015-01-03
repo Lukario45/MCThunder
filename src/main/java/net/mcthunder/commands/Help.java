@@ -18,7 +18,7 @@ public class Help extends Command {//Ported by pup from Necessities
     public boolean execute(Player player, ClientChatPacket packet) {
         String[] args = new String[0];
         if (packet.getMessage().contains(" "))
-            args = packet.getMessage().substring(packet.getMessage().indexOf(" ")).trim().split(" ");
+            args = packet.getMessage().trim().substring(packet.getMessage().trim().indexOf(" ")).trim().split(" ");
         ArrayList<String> helpList = new ArrayList<>();
         int page = 0;
         String search = "";

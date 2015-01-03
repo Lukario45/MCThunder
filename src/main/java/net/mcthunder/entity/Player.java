@@ -26,11 +26,8 @@ import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.packet.Packet;
-
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
@@ -46,8 +43,7 @@ public class Player extends LivingEntity {
     private UUID skinUUID;
     private Property skin;
     private NBTFile playerFile;
-    private Inventory openInventory;
-    private HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
+    private Inventory openInventory = null;
     private ArrayList<Long> loadedColumns = new ArrayList<>();
     private ArrayList<Long> northColumns = new ArrayList<>();
     private ArrayList<Long> eastColumns = new ArrayList<>();
@@ -55,15 +51,11 @@ public class Player extends LivingEntity {
     private ArrayList<Long> westColumns = new ArrayList<>();
     private Inventory inv;
     private int viewDistance = 9;
-    private int slot;
-    private int ping;
+    private int slot, ping, score;
     private String displayName;
     private GameMode gamemode;
     private Session session;
-    private boolean moveable;
-    private boolean hideCape;
-    private float absorption;
-    private int score;
+    private boolean moveable, hideCape;
     private Player lastPmPerson;
     private String appended = "";
 
@@ -72,7 +64,8 @@ public class Player extends LivingEntity {
         this.session = session;
         this.profile = getSession().getFlag(ProtocolConstants.PROFILE_KEY);
         this.uuid = getGameProfile().getId();
-        this.name = getGameProfile().getName();
+        this.metadata.setMetadata(2, this.name = getGameProfile().getName());
+        this.metadata.setMetadata(3, (byte) 1);//Always show name
         this.slot = 36;
         this.displayName = this.name;
         this.gamemode = GameMode.CREATIVE;
@@ -83,13 +76,10 @@ public class Player extends LivingEntity {
         this.skinUUID = this.uuid;
         this.origSkin = getGameProfile().getProperties().get("textures");
         this.skin = this.origSkin;
-        this.openInventory = null;
-        this.metadata.setMetadata(2, this.name);
-        this.metadata.setMetadata(3, (byte) 1);//Always show name
         this.metadata.setMetadata(10, (byte) 0);//Unsigned byte for skin flags TODO: Figure out what to put here
         this.metadata.setMetadata(15, (byte) 1);//Assuming player has a brain
         this.metadata.setBit(16, 0x02, this.hideCape = false);
-        this.metadata.setMetadata(17, this.absorption = 0);
+        this.metadata.setMetadata(17, (float) (this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));
         this.metadata.setMetadata(18, this.score = 0);
     }
 
@@ -134,41 +124,32 @@ public class Player extends LivingEntity {
     }
 
     private void loadDir(Direction d) {
-        if (!preLoaded(d)) {
-            int xMod = 0;
-            int zMod = 0;
-            if (d.equals(Direction.NORTH))
-                zMod = -1;
-            else if (d.equals(Direction.EAST))
-                xMod = 1;
-            else if (d.equals(Direction.SOUTH))
-                zMod = 1;
-            else if (d.equals(Direction.WEST))
-                xMod = -1;
+        if (!preLoaded(d)) {//if not loaded then load it
             int x = (int) getLocation().getX() >> 4;
             int z = (int) getLocation().getZ() >> 4;
+            int xMod = d.equals(Direction.EAST) ? 1 : d.equals(Direction.WEST) ? -1 : 0;
+            int zMod = d.equals(Direction.SOUTH) ? 1 : d.equals(Direction.NORTH) ? -1 : 0;
             for (int xAdd = -getView() + xMod; xAdd < getView() + xMod; xAdd++)
                 for (int zAdd = -getView() + zMod; zAdd < getView() + zMod; zAdd++)
                     getWorld().getRegion(getLong((x + xAdd) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + xAdd, z + zAdd), this, d, false);
         }
-        sendColumns(d);
+        sendColumns(d.equals(Direction.NORTH) ? this.northColumns : d.equals(Direction.EAST) ? this.eastColumns : d.equals(Direction.SOUTH) ?
+                this.southColumns : d.equals(Direction.WEST) ? this.westColumns : null);
     }
 
     private boolean preLoaded(Direction d) {
         if (d.equals(Direction.NORTH))
             return !this.northColumns.isEmpty();
-        else if (d.equals(Direction.EAST))
+        if (d.equals(Direction.EAST))
             return !this.eastColumns.isEmpty();
-        else if (d.equals(Direction.SOUTH))
+        if (d.equals(Direction.SOUTH))
             return !this.southColumns.isEmpty();
-        else if (d.equals(Direction.WEST))
-            return !this.westColumns.isEmpty();
-        return false;
+        return d.equals(Direction.WEST) && !this.westColumns.isEmpty();
     }
 
     private void updateDir(Direction d) {
-        int x = (int)getLocation().getX() >> 4;
-        int z = (int)getLocation().getZ() >> 4;
+        int x = (int)this.location.getX() >> 4;
+        int z = (int)this.location.getZ() >> 4;
         ArrayList<Long> temp = null;
         if (d.equals(Direction.NORTH)) {
             temp = (ArrayList<Long>) this.southColumns.clone();
@@ -259,34 +240,24 @@ public class Player extends LivingEntity {
                     sendPacket(packet);
     }
 
-    private void sendColumns(Direction d) {
-        if (d.equals(Direction.NORTH))
-            sendColumns(this.northColumns);
-        else if (d.equals(Direction.EAST))
-            sendColumns(this.eastColumns);
-        else if (d.equals(Direction.SOUTH))
-            sendColumns(this.southColumns);
-        else if (d.equals(Direction.WEST))
-            sendColumns(this.westColumns);
-    }
-
     private void sendColumns(ArrayList<Long> columns) {
-        for (long column : columns)
-            if (!isColumnLoaded(column)) {
-                Column c = getWorld().getColumn(column);
-                sendPacket(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
-                for (Player player1 : MCThunder.getPlayers())
-                    if (player1.getWorld().equals(getWorld()) && column == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
-                        sendPacket(player1.getPacket());
-                for (Bot b : MCThunder.getBots())
-                    if (b.getWorld().equals(getWorld()) && column == b.getChunk())
-                        sendPacket(b.getPacket());
-                for (Entity e : getWorld().getEntities())
-                    if (column == e.getChunk())
-                        for (Packet packet : e.getPackets())
-                            sendPacket(packet);
-                this.loadedColumns.add(column);
-            }
+        if (columns != null)
+            for (long column : columns)
+                if (!isColumnLoaded(column)) {
+                    Column c = getWorld().getColumn(column);
+                    sendPacket(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
+                    for (Player player1 : MCThunder.getPlayers())
+                        if (player1.getWorld().equals(getWorld()) && column == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                            sendPacket(player1.getPacket());
+                    for (Bot b : MCThunder.getBots())
+                        if (b.getWorld().equals(getWorld()) && column == b.getChunk())
+                            sendPacket(b.getPacket());
+                    for (Entity e : getWorld().getEntities())
+                        if (column == e.getChunk())
+                            for (Packet packet : e.getPackets())
+                                sendPacket(packet);
+                    this.loadedColumns.add(column);
+                }
     }
 
     public void teleport(Location l) {
@@ -348,8 +319,13 @@ public class Player extends LivingEntity {
         return this.name;
     }
 
-    public String getDisplayName() {
-        return this.displayName;
+    public String getDisplayName() {//TODO: Config value for symbol in front of nickname
+        return "~" + this.displayName;
+    }
+
+    public void setDisplayName(String displayName) {//TODO: Save nick to file, as well as, show in client when pinging server and above head
+        this.displayName = displayName == null ? this.name : displayName;
+        MCThunder.getEntryListHandler().refresh(this);
     }
 
     public Inventory getInventory() {
@@ -393,11 +369,16 @@ public class Player extends LivingEntity {
     }
 
     public void setWorld(World w) {
+        unloadColumn(this.northColumns);
+        unloadColumn(this.eastColumns);
+        unloadColumn(this.westColumns);
+        unloadColumn(this.southColumns);
+        unloadColumn(this.loadedColumns);
         super.setWorld(w);
         sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
         sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
         sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
-        //Also will need to remove loaded chunks and load new ones
+        loadChunks(null);
     }
 
     public String getAppended() {
@@ -408,31 +389,13 @@ public class Player extends LivingEntity {
         this.appended = toAppend;
     }
 
-    public void addPotionEffect(PotionEffect p) {
-        this.activeEffects.put(p.getType(), p);
-        //TODO: Have the duration tick down and then run out also for all potion effect stuff have it actually send effects and things to player
-    }
-
-    public void removePotionEffect(PotionEffectType p) {
-        this.activeEffects.remove(p);
-    }
-
-    public void clearPotionEffects() {
-        this.activeEffects.clear();
-    }
-
-    public Collection<PotionEffect> getActiveEffects() {
-        return this.activeEffects.values();
-    }
-
     public void sendPacket(Packet p) {
-        if (p == null)
-            return;
-        getSession().send(p);
+        if (p != null)
+            getSession().send(p);
     }
 
     public PlayerListEntry getListEntry() {
-        return new PlayerListEntry(getGameProfile(), getGameMode(), getPing(), Message.fromString(getName()));
+        return new PlayerListEntry(getGameProfile(), getGameMode(), getPing(), Message.fromString(getDisplayName()));
     }
 
     protected void setSkin(Property p) {

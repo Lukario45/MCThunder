@@ -21,7 +21,7 @@ public class Respond extends Command {
             player.sendMessage("&cNo one to respond to!");
             return true;
         }
-        String[] wholeMessage = packet.getMessage().split(" ");
+        String[] wholeMessage = packet.getMessage().trim().split(" ");
         if (wholeMessage.length < 2)
             return false;
         StringBuilder sb = new StringBuilder();

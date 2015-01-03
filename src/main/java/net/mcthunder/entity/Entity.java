@@ -1,26 +1,27 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.MCThunder;
-import net.mcthunder.api.Location;
-import net.mcthunder.api.MetadataConstants;
-import net.mcthunder.api.MetadataMap;
-import net.mcthunder.api.Utils;
+import net.mcthunder.api.*;
 import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.material.Material;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityMetadataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
+import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.packet.Packet;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.UUID;
 
 public abstract class Entity {
     protected EntityType type;
     protected final int entityID;
     protected String customName;
     protected Location location;
+    protected Vector motion;
+    protected Entity riding;
     protected short fireTicks, airLeft;
     protected boolean sneaking, sprinting, invisible, onGround;
     protected MetadataMap metadata;
@@ -278,9 +279,12 @@ public abstract class Entity {
     }*/
 
     protected Entity(Location location) {
-        this.location = location;
-        this.customName = "";
         this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+        this.location = location;
+        this.riding = null;
+        if (this.location != null)
+            this.location.setVector(this.motion = new Vector(0, 0, 0));
+        this.customName = "";
         this.metadata = new MetadataMap();
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, this.fireTicks > 0);
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, this.sneaking = false);
@@ -290,12 +294,62 @@ public abstract class Entity {
         this.metadata.setMetadata(1, this.airLeft = 0);
     }
 
-    public void spawn() {//TODO: replace this to send from world
-        long chunk = getChunk();
-        for (Player p : MCThunder.getPlayers())
-            if (p.getWorld().equals(getWorld()) && p.isColumnLoaded(chunk))
-                for (Packet packet : getPackets())
-                    p.sendPacket(packet);
+    protected Entity(World w, CompoundTag tag) {
+        this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+        StringTag id = tag.get("id");
+        EntityType type = id == null ? null : EntityType.fromSavegameId(id.getValue());
+        if (type == null)
+            return;
+        ListTag pos = tag.get("Pos");
+        if (pos != null) {
+            DoubleTag posX = pos.get(0);
+            DoubleTag posY = pos.get(1);
+            DoubleTag posZ = pos.get(2);
+            this.location = new Location(w, posX.getValue(), posY.getValue(), posZ.getValue());
+        }
+        ListTag rotation = tag.get("Rotation");
+        if (rotation != null && this.location != null) {
+            FloatTag yaw = rotation.get(0);
+            FloatTag pitch = rotation.get(1);
+            this.location.setYaw(yaw.getValue());
+            this.location.setPitch(pitch.getValue());
+        }
+        ListTag motion = tag.get("Motion");
+        if (motion != null && this.location != null) {
+            DoubleTag dX = motion.get(0);
+            DoubleTag dY = motion.get(1);
+            DoubleTag dZ = motion.get(2);
+            this.location.setVector(this.motion = new Vector(dX.getValue(), dY.getValue(), dZ.getValue()));
+        }
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, (this.fireTicks = ((ShortTag) tag.get("Fire")).getValue()) > 0);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, this.sneaking = false);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, this.sprinting = false);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ARM_UP, false);//Eating, drinking, blocking
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, this.invisible = false);
+        this.metadata.setMetadata(1, this.airLeft = ((ShortTag) tag.get("Air")).getValue());
+        ByteTag onGround = tag.get("OnGround");//1 true, 0 false
+        getWorld().setDimension(((IntTag) tag.get("Dimension")).getValue());//-1 nether, 0 overworld, 1 end
+        ByteTag invulnerable = tag.get("Invulnerable");//1 true, 0 false
+        IntTag portalCooldown = tag.get("PortalCooldown");
+        LongTag uuidMost = tag.get("UUIDMost");
+        LongTag uuidLeast = tag.get("UUIDLeast");
+        UUID uuid = tag.get("UUID") != null ? UUID.fromString(((StringTag) tag.get("UUID")).getValue()) : null;
+        StringTag customName = tag.get("CustomName");
+        this.customName = customName != null ? customName.getValue() : "";
+        ByteTag customNameVisible = tag.get("CustomNameVisible");//1 true, 0 false
+        ByteTag silent = tag.get("Silent");//1 true, 0 false
+        CompoundTag riding = tag.get("Riding");
+        CompoundTag commandStats = tag.get("CommandStats");
+        StringTag successCountName = commandStats != null ? (StringTag) commandStats.get("SuccessCountName") : null;
+        StringTag successCountObjective = commandStats != null ? (StringTag) commandStats.get("SuccessCountObjective") : null;
+        StringTag affectedBlocksName = commandStats != null ? (StringTag) commandStats.get("AffectedBlocksName") : null;
+        StringTag affectedBlocksObjective = commandStats != null ? (StringTag) commandStats.get("AffectedBlocksObjective") : null;
+        StringTag affectedEntitiesName = commandStats != null ? (StringTag) commandStats.get("AffectedEntitiesName") : null;
+        StringTag affectedEntitiesObjective = commandStats != null ? (StringTag) commandStats.get("AffectedEntitiesObjective") : null;
+        StringTag affectedItemsName = commandStats != null ? (StringTag) commandStats.get("AffectedItemsName") : null;
+        StringTag affectedItemsObjective = commandStats != null ? (StringTag) commandStats.get("AffectedItemsObjective") : null;
+        StringTag queryResultName = commandStats != null ? (StringTag) commandStats.get("QueryResultName") : null;
+        StringTag queryResultObjective = commandStats != null ? (StringTag) commandStats.get("QueryResultObjective") : null;
     }
 
     public long getChunk() {
@@ -313,7 +367,7 @@ public abstract class Entity {
     public abstract Packet getPacket();
 
     public Collection<Packet> getPackets() {
-        return Arrays.asList(getPacket(), new ServerEntityMetadataPacket(this.entityID, this.getMetadata().getMetadataArray()));
+        return Arrays.asList(getPacket(), new ServerEntityMetadataPacket(this.entityID, getMetadata().getMetadataArray()));
     }
 
     public Location getLocation() {
@@ -372,7 +426,7 @@ public abstract class Entity {
                         p.sendPacket(respawn);
                 }
         } else {
-            ServerEntityTeleportPacket packet = new ServerEntityTeleportPacket(getEntityID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), this.onGround);
+            ServerEntityTeleportPacket packet = new ServerEntityTeleportPacket(getEntityID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), isOnGround());
             for (Player p : MCThunder.getPlayers())
                 if (p.getWorld().equals(l.getWorld()) && p.isColumnLoaded(chunk))
                     p.sendPacket(packet);

@@ -21,7 +21,7 @@ public class Teleport extends Command {
         if (wholeMessage.length < 2)
             return false;
         Player toSend = MCThunder.getPlayer(wholeMessage[1]);
-        Player sendTo = MCThunder.getPlayer(wholeMessage[2]);
+        Player sendTo = wholeMessage.length > 2 ? MCThunder.getPlayer(wholeMessage[2]) : null;
         if (toSend == null)
             player.sendMessage("&cThat player is not online!");
         else {

@@ -2,6 +2,9 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 import net.mcthunder.api.MetadataConstants;
+import org.spacehq.mc.protocol.data.game.values.entity.MobType;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.packetlib.packet.Packet;
 
 public class Wolf extends Tameable {
     private boolean angry, begging;
@@ -14,6 +17,11 @@ public class Wolf extends Tameable {
         this.metadata.setMetadata(18, this.health);
         this.metadata.setMetadata(19, (byte) ((this.begging = false) ? 1 : 0));
         this.metadata.setMetadata(20, this.collarColor = MetadataConstants.ColorFlags.RED);
+    }
+
+    public Packet getPacket() {
+        return new ServerSpawnMobPacket(this.entityID, MobType.WOLF, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
+                this.location.getPitch(), this.location.getYaw(), this.motion.getdX(), this.motion.getdY(), this.motion.getdZ(), getMetadata().getMetadataArray());
     }
 
     @Override

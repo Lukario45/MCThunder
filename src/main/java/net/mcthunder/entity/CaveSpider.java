@@ -12,7 +12,8 @@ public class CaveSpider extends Spider {
     }
 
     public Packet getPacket() {
-        return new ServerSpawnMobPacket(this.entityID, MobType.CAVE_SPIDER, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), 0, 0, 0, 0, getMetadata().getMetadataArray());
+        return new ServerSpawnMobPacket(this.entityID, MobType.CAVE_SPIDER, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
+                this.location.getPitch(), this.location.getYaw(), this.motion.getdX(), this.motion.getdY(), this.motion.getdZ(), getMetadata().getMetadataArray());
     }
 
     @Override

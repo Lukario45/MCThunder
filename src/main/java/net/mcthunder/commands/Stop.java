@@ -17,9 +17,9 @@ public class Stop extends Command {
 
     @Override
     public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().split(" ");
+        String[] wholeMessage = packet.getMessage().trim().split(" ");
         String args = "Server Closed!";
-        if (wholeMessage.length >= 2) {
+        if (wholeMessage.length > 1) {
             StringBuilder sb = new StringBuilder();
             for (int i = 1; i < wholeMessage.length; i++)
                 sb.append(wholeMessage[i]).append(" ");

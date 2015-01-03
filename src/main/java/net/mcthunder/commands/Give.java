@@ -18,7 +18,7 @@ public class Give extends Command {
     public boolean execute(Player player, ClientChatPacket packet) {
         String[] args = new String[0];
         if (packet.getMessage().contains(" "))
-            args = packet.getMessage().substring(packet.getMessage().indexOf(" ")).trim().split(" ");
+            args = packet.getMessage().trim().substring(packet.getMessage().trim().indexOf(" ")).trim().split(" ");
         if (args.length < 2) {
             player.sendMessage("&4Error: You need to enter an item and a player to give that item to.");
             return true;

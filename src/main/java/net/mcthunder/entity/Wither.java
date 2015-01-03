@@ -1,6 +1,9 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
+import org.spacehq.mc.protocol.data.game.values.entity.MobType;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.packetlib.packet.Packet;
 
 public class Wither extends LivingEntity {
     private int watched1, watched2, watched3, invulnerableTime;
@@ -12,6 +15,11 @@ public class Wither extends LivingEntity {
         this.metadata.setMetadata(18, this.watched2 = 0);
         this.metadata.setMetadata(19, this.watched3 = 0);
         this.metadata.setMetadata(20, this.invulnerableTime = 0);
+    }
+
+    public Packet getPacket() {
+        return new ServerSpawnMobPacket(this.entityID, MobType.WITHER, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
+                this.location.getPitch(), this.location.getYaw(), this.motion.getdX(), this.motion.getdY(), this.motion.getdZ(), getMetadata().getMetadataArray());
     }
 
     @Override

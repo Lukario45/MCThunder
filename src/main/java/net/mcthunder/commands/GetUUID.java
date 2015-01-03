@@ -17,8 +17,8 @@ public class GetUUID extends Command {
 
     @Override
     public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().split(" ");
-        if (wholeMessage.length != 2)
+        String[] wholeMessage = packet.getMessage().trim().split(" ");
+        if (wholeMessage.length < 2)
             return false;
         Player p = MCThunder.getPlayer(wholeMessage[1]);
         if (p == null)

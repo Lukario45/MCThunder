@@ -8,4 +8,16 @@ public class Vector {
         this.dY = dY;
         this.dZ = dZ;
     }
+
+    public double getdX() {
+        return this.dX;
+    }
+
+    public double getdY() {
+        return this.dY;
+    }
+
+    public double getdZ() {
+        return this.dZ;
+    }
 }

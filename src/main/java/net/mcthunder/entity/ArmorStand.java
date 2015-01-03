@@ -4,6 +4,7 @@ import net.mcthunder.api.Location;
 import net.mcthunder.api.MetadataConstants;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
+import org.spacehq.packetlib.packet.Packet;
 
 public class ArmorStand extends LivingEntity {
     private boolean small, gravity, arms, baseplate;
@@ -36,6 +37,11 @@ public class ArmorStand extends LivingEntity {
         this.metadata.setMetadata(16, this.rightLegPitch = 0);
         this.metadata.setMetadata(1010, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegYaw = 0));
         this.metadata.setMetadata(1011, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegRoll = 0));
+    }
+
+    @Override
+    public Packet getPacket() {
+        return null;
     }
 
     @Override

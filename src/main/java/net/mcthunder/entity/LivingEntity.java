@@ -1,30 +1,30 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
-import org.spacehq.mc.protocol.data.game.values.entity.MobType;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
-import org.spacehq.packetlib.packet.Packet;
+import net.mcthunder.api.PotionEffect;
+import net.mcthunder.api.PotionEffectType;
+
+import java.util.Collection;
+import java.util.HashMap;
 
 public abstract class LivingEntity extends Entity {//TODO: set default max healths for each living entity type
-    private boolean alwaysShowName, hasAI, potionAmbient;
+    protected HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
+    private PotionEffectType latest;
+    private boolean alwaysShowName, hasAI;
     protected float health, maxHealth;
-    private int potionColor;
     private byte arrows;
 
     public LivingEntity(Location location) {
         super(location);
         this.maxHealth = 20;
+        this.latest = null;
         this.metadata.setMetadata(2, this.customName);
         this.metadata.setMetadata(3, (byte) ((this.alwaysShowName = false) ? 1 : 0));
         this.metadata.setMetadata(6, this.health = this.maxHealth);
-        this.metadata.setMetadata(7, this.potionColor = 0);//TODO: Base off of active effects
-        this.metadata.setMetadata(8, (byte) ((this.potionAmbient = false) ? 1 : 0));
+        this.metadata.setMetadata(7, 0);//No color until a potion is set
+        this.metadata.setMetadata(8, (byte) 0);//False until potion effects are set
         this.metadata.setMetadata(9, this.arrows = (byte) 0);
         this.metadata.setMetadata(15, (byte) ((this.hasAI = false) ? 1 : 0));
-    }
-
-    public Packet getPacket() {//TODO: For efficiency move into each own class so will not have to rely on MobType.valueOf, Also add headYaw and mot instead of using 0's
-        return new ServerSpawnMobPacket(this.entityID, MobType.valueOf(this.type.getName()), this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), 0, 0, 0, 0, getMetadata().getMetadataArray());
     }
 
     public abstract void ai();
@@ -54,5 +54,43 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
 
     public float getHealth() {
         return this.health;
+    }
+
+    public void addPotionEffect(PotionEffect p) {
+        this.latest = p.getType();
+        this.activeEffects.put(p.getType(), p);
+        this.metadata.setMetadata(7, p.getType().getColor());
+        this.metadata.setMetadata(8, (byte) (p.isAmbient() ? 1 : 0));
+        updateMetadata();
+        //TODO: Have the duration tick down and then run out also for all potion effect stuff have it actually send effects and things to player
+    }
+
+    public void removePotionEffect(PotionEffectType p) {
+        this.activeEffects.remove(p);
+        if (this.latest != null && p.equals(this.latest)) {
+            if (this.activeEffects.isEmpty()) {
+                this.latest = null;
+                this.metadata.setMetadata(7, 0);
+                this.metadata.setMetadata(8, (byte) 0);
+                updateMetadata();
+                return;
+            }
+            this.latest = (PotionEffectType) this.activeEffects.keySet().toArray()[0];
+            this.metadata.setMetadata(7, this.latest.getColor());
+            this.metadata.setMetadata(8, (byte) (this.activeEffects.get(this.latest).isAmbient() ? 1 : 0));
+            updateMetadata();
+        }
+    }
+
+    public void clearPotionEffects() {
+        this.activeEffects.clear();
+        this.latest = null;
+        this.metadata.setMetadata(7, 0);
+        this.metadata.setMetadata(8, (byte) 0);
+        updateMetadata();
+    }
+
+    public Collection<PotionEffect> getActiveEffects() {
+        return this.activeEffects.values();
     }
 }

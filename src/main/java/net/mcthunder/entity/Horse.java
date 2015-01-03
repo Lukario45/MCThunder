@@ -2,6 +2,9 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 import net.mcthunder.api.MetadataConstants;
+import org.spacehq.mc.protocol.data.game.values.entity.MobType;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.packetlib.packet.Packet;
 
 public class Horse extends LivingEntity {
     private boolean isTame, hasSaddle, hasChest, isBred, isEating, isRearing, mouthOpen;
@@ -23,6 +26,11 @@ public class Horse extends LivingEntity {
         this.metadata.setMetadata(20, (this.color = HorseColor.WHITE) | (this.style = HorseStyle.NONE) << 8);
         this.metadata.setMetadata(21, this.ownerName = "");
         this.metadata.setMetadata(22, this.armorType = ArmorType.NONE);
+    }
+
+    public Packet getPacket() {
+        return new ServerSpawnMobPacket(this.entityID, MobType.HORSE, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
+                this.location.getPitch(), this.location.getYaw(), this.motion.getdX(), this.motion.getdY(), this.motion.getdZ(), getMetadata().getMetadataArray());
     }
 
     @Override

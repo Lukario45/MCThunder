@@ -12,6 +12,7 @@ import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;
+import org.spacehq.packetlib.packet.Packet;
 
 import java.io.File;
 import java.io.IOException;
@@ -240,7 +241,11 @@ public class World {
     public void loadEntity(Entity e) {
         if (e == null)
             return;
-        e.spawn();
+        long chunk = e.getChunk();
+        for (Player p : MCThunder.getPlayers())
+            if (p.getWorld().equals(this) && p.isColumnLoaded(chunk))
+                for (Packet packet : e.getPackets())
+                    p.sendPacket(packet);
         this.loadedEntities.put(e.getEntityID(), e);
     }
 

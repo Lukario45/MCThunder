@@ -156,20 +156,16 @@ public class MCThunder {
         world.loadWorld();
 
         server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
-        server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 100);
+        server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 256);//Default is 256 not 100
         server.setGlobalFlag(ProtocolConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
             @Override
             public ServerStatusInfo buildInfo(Session session) {
                 GameProfile[] gameProfiles = new GameProfile[players.size() + bots.size()];
                 int i = 0;
-                for (Player p : getPlayers()) {
-                    gameProfiles[i] = p.getGameProfile();
-                    i++;
-                }
-                for (Bot b : getBots()) {
-                    gameProfiles[i] = b.getGameProfile();
-                    i++;
-                }
+                for (Player p : getPlayers())
+                    gameProfiles[i++] = p.getGameProfile();
+                for (Bot b : getBots())
+                    gameProfiles[i++] = b.getGameProfile();
                 BufferedImage icon = null;
                 try {
                     icon = ImageIO.read(new File("server-icon.png"));
@@ -199,14 +195,12 @@ public class MCThunder {
                             ClientPlayerMovementPacket pack = event.getPacket();
                             Player mover = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             if (mover == null || !mover.isMoveable())
-                                return;//Also will need to cancel on their end somehow
+                                return;
                             long chunk = mover.getChunk();
                             for (Packet packet : createUpdatePackets(event.getSession(), pack))
-                                for (Player p : getPlayers()) {
+                                for (Player p : getPlayers())
                                     if (p.getWorld().equals(mover.getWorld()) && p.isColumnLoaded(chunk) && !p.getUniqueID().equals(mover.getUniqueID()))
                                         p.sendPacket(packet);
-                                }
-
                             updatePlayerPosition(event.getSession(), pack);
                         } else if (event.getPacket() instanceof ClientPlayerStatePacket) {
                             ClientPlayerStatePacket packet = event.getPacket();
@@ -219,27 +213,22 @@ public class MCThunder {
                                 case STOP_SNEAKING:
                                     player.setSneaking(false);
                                     break;
-                                case LEAVE_BED:
-                                    break;
                                 case START_SPRINTING:
                                     player.setSprinting(true);
                                     break;
                                 case STOP_SPRINTING:
                                     player.setSprinting(false);
                                     break;
-                                case RIDING_JUMP:
-                                    break;
-                                case OPEN_INVENTORY:
+                                case RIDING_JUMP: case OPEN_INVENTORY: case LEAVE_BED:
                                     break;
                             }
                         } else if (event.getPacket() instanceof ClientSwingArmPacket) {
                             GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
                             Player player = getPlayer(profile.getId());
                             long chunk = player.getChunk();
-                            for (Player p : getPlayers()) {
+                            for (Player p : getPlayers())
                                 if (p.getWorld().equals(player.getWorld()) && p.isColumnLoaded(chunk) && !p.getUniqueID().equals(player.getUniqueID()))
                                     p.sendPacket(new ServerAnimationPacket(player.getEntityID(), Animation.SWING_ARM));
-                            }
                         } else if (event.getPacket() instanceof ClientChatPacket) {
                             ClientChatPacket packet = event.getPacket();
                             GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
@@ -255,7 +244,6 @@ public class MCThunder {
                                     }
                             } else
                                 playerChatEventSource.fireEvent(player, packet);
-
                         } else if (event.getPacket() instanceof ClientKeepAlivePacket)
                             event.getSession().send(new ServerKeepAlivePacket(event.<ClientKeepAlivePacket>getPacket().getPingId()));
                         else if (event.getPacket() instanceof ClientSettingsPacket) {
@@ -265,10 +253,9 @@ public class MCThunder {
                                 player.setView(packet.getRenderDistance());
                                 //TODO: unload chunks if goes smaller load if goes higher also have it check during login what their distance is
                             }
-                        } else if (event.getPacket() instanceof ClientTabCompletePacket) {
-                            ClientTabCompletePacket packet = event.getPacket();
-                            tabHandler.handleTabComplete(event.getSession(), packet);
-                        } else if (event.getPacket() instanceof ClientCreativeInventoryActionPacket) {
+                        } else if (event.getPacket() instanceof ClientTabCompletePacket)
+                            tabHandler.handleTabComplete(event.getSession(), (ClientTabCompletePacket) event.getPacket());
+                        else if (event.getPacket() instanceof ClientCreativeInventoryActionPacket) {
                             ClientCreativeInventoryActionPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ItemStack old = player.getHeldItem();
@@ -357,18 +344,12 @@ public class MCThunder {
                             Material setType = heldItem.getType();
                             if (setType == null)
                                 return;
-                            if (setType.getParent().equals(Material.TORCH) || setType.getParent().equals(Material.REDSTONE_TORCH)) {//Still need to check if is a valid torch position
-                                if (packet.getFace().equals(Face.SOUTH))
-                                    setType = Material.fromString("EAST_" + setType.getParent());
-                                else if (packet.getFace().equals(Face.NORTH))
-                                    setType = Material.fromString("WEST_" + setType.getParent());
-                                else if (packet.getFace().equals(Face.WEST))
-                                    setType = Material.fromString("SOUTH_" + setType.getParent());
-                                else if (packet.getFace().equals(Face.EAST))
-                                    setType = Material.fromString("NORTH_" + setType.getParent());
-                                else
-                                    setType = Material.fromString("UP_" + setType.getParent());
-                            }
+                            if (setType.getParent().equals(Material.TORCH) || setType.getParent().equals(Material.REDSTONE_TORCH))//TODO: Check if is a valid torch position
+                                setType = packet.getFace().equals(Face.SOUTH) ? Material.fromString("EAST_" + setType.getParent()) :
+                                        packet.getFace().equals(Face.NORTH) ? Material.fromString("WEST_" + setType.getParent()) :
+                                        packet.getFace().equals(Face.WEST) ? Material.fromString("SOUTH_" + setType.getParent()) :
+                                        packet.getFace().equals(Face.EAST) ? Material.fromString("NORTH_" + setType.getParent()) :
+                                        Material.fromString("UP_" + setType.getParent());
                             if (setType.equals(Material.REDSTONE))
                                 setType = Material.REDSTONE_WIRE;
                             if (setType.equals(Material.STRING))
@@ -441,12 +422,24 @@ public class MCThunder {
                 long startTime = System.currentTimeMillis();
                 //TODO: put things to happen each tick such as either physics checks or entity ai ect.
                 for (World w : getWorlds())
-                    for (Entity e : w.getEntities())
+                    for (Entity e : w.getEntities()) {
                         if (e instanceof Ageable) {
                             Ageable a = (Ageable) e;
                             a.setAge((byte) (a.getAge() + 1));
                         }
-                for (Player p : getPlayers()) {//TODO Make it so entities can have potion effects and then have them also tick down
+                        if (e instanceof LivingEntity) {
+                            LivingEntity l = (LivingEntity) e;
+                            ArrayList<PotionEffectType> toRem = new ArrayList<>();
+                            for (PotionEffect p : l.getActiveEffects())
+                                if (p.getDuration() > 1)
+                                    p.setDuration(p.getDuration() - 1);
+                                else
+                                    toRem.add(p.getType());
+                            for (PotionEffectType t : toRem)
+                                l.removePotionEffect(t);
+                        }
+                    }
+                for (Player p : getPlayers()) {
                     ArrayList<PotionEffectType> toRem = new ArrayList<>();
                     for (PotionEffect e : p.getActiveEffects())
                         if (e.getDuration() > 1)
@@ -533,8 +526,7 @@ public class MCThunder {
             }
         } else if (packet instanceof ClientPlayerRotationPacket) {
             float yaw = (float) packet.getYaw();
-            float pitch = (float) packet.getPitch();
-            packets.add(new ServerEntityRotationPacket(player.getEntityID(), yaw, pitch, packet.isOnGround()));
+            packets.add(new ServerEntityRotationPacket(player.getEntityID(), yaw, (float) packet.getPitch(), packet.isOnGround()));
             packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
         }
         return packets;
@@ -545,6 +537,9 @@ public class MCThunder {
     }
 
     public static Player getPlayer(String name) {
+        if (name == null)
+            return null;
+        name = name.trim();
         Player partial = null;
         for (Player p : getPlayers())
             if (p.getName().equalsIgnoreCase(name))

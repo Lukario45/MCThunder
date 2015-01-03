@@ -21,6 +21,7 @@ public class RankManagerLoggingInEventListener implements net.mcthunder.interfac
         Player player = MCThunder.getPlayer(session.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
         Map<String, Tag> map = new HashMap<>();
         map.put("RankName", new StringTag("RankName", "Test"));
-        MCThunder.getProfileHandler().addAttribute(player, new CompoundTag("RankManager", map));
+        if (!MCThunder.getProfileHandler().tagExists(player, "RankManager"))
+            MCThunder.getProfileHandler().addAttribute(player, new CompoundTag("RankManager", map));
     }
 }
