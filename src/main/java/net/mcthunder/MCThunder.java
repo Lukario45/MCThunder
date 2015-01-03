@@ -192,20 +192,19 @@ public class MCThunder {
                     @Override
                     public void packetReceived(PacketReceivedEvent event) {
                         if (event.getPacket() instanceof ClientPlayerMovementPacket) {
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ClientPlayerMovementPacket pack = event.getPacket();
-                            Player mover = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
-                            if (mover == null || !mover.isMoveable())
+                            if (player == null || !player.isMoveable())
                                 return;
-                            long chunk = mover.getChunk();
+                            long chunk = player.getChunk();
                             for (Packet packet : createUpdatePackets(event.getSession(), pack))
                                 for (Player p : getPlayers())
-                                    if (p.getWorld().equals(mover.getWorld()) && p.isColumnLoaded(chunk) && !p.getUniqueID().equals(mover.getUniqueID()))
+                                    if (p.getWorld().equals(player.getWorld()) && p.isColumnLoaded(chunk) && !p.getUniqueID().equals(player.getUniqueID()))
                                         p.sendPacket(packet);
                             updatePlayerPosition(event.getSession(), pack);
                         } else if (event.getPacket() instanceof ClientPlayerStatePacket) {
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ClientPlayerStatePacket packet = event.getPacket();
-                            GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                            Player player = getPlayer(profile.getId());
                             switch (packet.getState()) {
                                 case START_SNEAKING:
                                     player.setSneaking(true);
@@ -223,16 +222,14 @@ public class MCThunder {
                                     break;
                             }
                         } else if (event.getPacket() instanceof ClientSwingArmPacket) {
-                            GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                            Player player = getPlayer(profile.getId());
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             long chunk = player.getChunk();
                             for (Player p : getPlayers())
                                 if (p.getWorld().equals(player.getWorld()) && p.isColumnLoaded(chunk) && !p.getUniqueID().equals(player.getUniqueID()))
                                     p.sendPacket(new ServerAnimationPacket(player.getEntityID(), Animation.SWING_ARM));
                         } else if (event.getPacket() instanceof ClientChatPacket) {
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ClientChatPacket packet = event.getPacket();
-                            GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                            Player player = getPlayer(profile.getId());
                             if (packet.getMessage().startsWith("/")) {
                                 if (packet.getMessage().equals("/"))
                                     chatHandler.sendMessage(event.getSession(), "&cCommand does not exist!");
@@ -247,8 +244,8 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientKeepAlivePacket)
                             event.getSession().send(new ServerKeepAlivePacket(event.<ClientKeepAlivePacket>getPacket().getPingId()));
                         else if (event.getPacket() instanceof ClientSettingsPacket) {
-                            ClientSettingsPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            ClientSettingsPacket packet = event.getPacket();
                             if (player.getView() != packet.getRenderDistance()) {
                                 player.setView(packet.getRenderDistance());
                                 //TODO: unload chunks if goes smaller load if goes higher also have it check during login what their distance is
@@ -256,8 +253,8 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientTabCompletePacket)
                             tabHandler.handleTabComplete(event.getSession(), (ClientTabCompletePacket) event.getPacket());
                         else if (event.getPacket() instanceof ClientCreativeInventoryActionPacket) {
-                            ClientCreativeInventoryActionPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            ClientCreativeInventoryActionPacket packet = event.getPacket();
                             ItemStack old = player.getHeldItem();
                             player.getInventory().setSlot(packet.getSlot(), new ItemStack(packet.getClickedItem() == null ? Material.AIR :
                                     Material.fromData(packet.getClickedItem().getId(), (short) packet.getClickedItem().getData()),
@@ -271,7 +268,6 @@ public class MCThunder {
                             }
                         } else if (event.getPacket() instanceof ClientWindowActionPacket) {
                             ClientWindowActionPacket packet = event.getPacket();
-                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             //tellConsole(LoggingLevel.DEBUG, packet.getSlot() + " " + packet.getAction().name() + " " + packet.getWindowId());
                             //0 = click craft output
                             //1-4 = craft input
@@ -282,8 +278,8 @@ public class MCThunder {
                             //TODO: logic for this as well as for when they hit like a number over the item to move the item
                             //TODO: Make it actually count for updating held item
                         } else if (event.getPacket() instanceof ClientChangeHeldItemPacket) {
-                            ClientChangeHeldItemPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            ClientChangeHeldItemPacket packet = event.getPacket();
                             ItemStack old = player.getHeldItem();
                             player.setSlot(packet.getSlot() + 36);
                             if (!old.equals(player.getHeldItem())) {
@@ -299,41 +295,30 @@ public class MCThunder {
                             tellConsole(LoggingLevel.DEBUG, p.getWindowId());
                             tellConsole(LoggingLevel.DEBUG, p.getActionId());
                         } else if (event.getPacket() instanceof ClientPlayerPlaceBlockPacket) {
-                            ClientPlayerPlaceBlockPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            ClientPlayerPlaceBlockPacket packet = event.getPacket();
                             Position position = packet.getPosition();
                             ItemStack heldItem = packet.getHeldItem() == null ? null : new ItemStack(Material.fromData(packet.getHeldItem().getId(),
                                     (short) packet.getHeldItem().getData()), packet.getHeldItem().getAmount());
                             if ((position.getY() >> 4) < 0)
                                 return;
-                            //tellConsole(LoggingLevel.DEBUG, "x " + packet.getCursorX() + " y " + packet.getCursorY() + " z " + packet.getCursorZ());
                             Block b = new Block(new Location(player.getWorld(), position));
-                            Inventory inv = null;
-                            if (b.getType().equals(Material.CHEST) || b.getType().equals(Material.TRAPPED_CHEST))
-                                inv = player.getWorld().getChest(b.getLocation()).getInventory();
-                            else if (b.getType().equals(Material.ENDER_CHEST))
-                                inv = player.getEnderChest();
-                            else if (b.getType().equals(Material.CRAFTING_TABLE))
-                                inv = new CraftingInventory("Crafting");
-                            else if (b.getType().getParent().equals(Material.HOPPER))
-                                inv = new HopperInventory("Hopper");
-                            else if (b.getType().equals(Material.BEACON))
-                                inv = new BeaconInventory("Beacon");
-                            else if (b.getType().getParent().equals(Material.ANVIL))
-                                inv = new AnvilInventory("Anvil");
-                            else if (b.getType().equals(Material.BREWING_STAND_BLOCK))
-                                inv = new BrewingStandInventory("BrewingStand");
-                            else if (b.getType().equals(Material.DISPENSER))
-                                inv = new DispenserInventory("Dispenser");
-                            else if (b.getType().equals(Material.DROPPER))
-                                inv = new DropperInventory("Dropper");
-                            else if (b.getType().equals(Material.FURNACE))
-                                inv = new FurnaceInventory("Furnace");
-                            else if (b.getType().equals(Material.ENCHANTING_TABLE))
-                                inv = new EnchantingInventory("Enchanting");
-                            if (inv != null && !player.isSneaking()) {
-                                player.openInventory(inv);
-                                return;
+                            if (!player.isSneaking()) {
+                                Inventory inv = b.getType().equals(Material.CHEST) || b.getType().equals(Material.TRAPPED_CHEST) ?
+                                        player.getWorld().getChest(b.getLocation()).getInventory() : b.getType().equals(Material.ENDER_CHEST) ?
+                                        player.getEnderChest() : b.getType().equals(Material.CRAFTING_TABLE) ? new CraftingInventory("Crafting") :
+                                        b.getType().getParent().equals(Material.HOPPER) ? new HopperInventory("Hopper") :
+                                        b.getType().equals(Material.BEACON) ? new BeaconInventory("Beacon") :
+                                        b.getType().getParent().equals(Material.ANVIL) ? new AnvilInventory("Anvil") :
+                                        b.getType().equals(Material.BREWING_STAND_BLOCK) ? new BrewingStandInventory("BrewingStand") :
+                                        b.getType().equals(Material.DISPENSER) ? new DispenserInventory("Dispenser") :
+                                        b.getType().equals(Material.DROPPER) ? new DropperInventory("Dropper") :
+                                        b.getType().equals(Material.FURNACE) ? new FurnaceInventory("Furnace") :
+                                        b.getType().equals(Material.ENCHANTING_TABLE) ? new EnchantingInventory("Enchanting") : null;
+                                if (inv != null) {
+                                    player.openInventory(inv);
+                                    return;
+                                }
                             }
                             if (heldItem == null)
                                 return;
@@ -341,6 +326,8 @@ public class MCThunder {
                                 b = b.getRelative(Direction.fromFace(packet.getFace()));
                             if (!b.getType().equals(Material.AIR))
                                 return;
+                            Location clicked = new Location(player.getWorld(), b.getLocation().getX() + packet.getCursorX(), b.getLocation().getY() +
+                                    1 - (packet.getCursorY() == 0 ? 1 : packet.getCursorY()), b.getLocation().getZ() + packet.getCursorZ());
                             Material setType = heldItem.getType();
                             if (setType == null)
                                 return;
@@ -366,15 +353,15 @@ public class MCThunder {
                                 setType = Material.fromString(name + "_NORTH");
                             if (setType.getName().contains("BUCKET"))
                                 setType = Material.fromString(setType.getName().replace("_BUCKET", ""));
-                            if (setType.getParent().equals(Material.SPAWN_EGG)) {
-                                Location l = new Location(player.getWorld(), b.getLocation().getX() + 1 - packet.getCursorX(), b.getLocation().getY() +
-                                        1 - (packet.getCursorY() == 0 ? 1 : packet.getCursorY()), b.getLocation().getZ() + 1 - packet.getCursorZ());
-                                l.getWorld().loadEntity(Entity.fromType(EntityType.fromString(setType.getName().replaceFirst("SPAWN_", "")), l));
-                            } else
+                            if (setType.getParent().equals(Material.SPAWN_EGG))
+                                clicked.getWorld().loadEntity(Entity.fromType(EntityType.fromString(setType.getName().replaceFirst("SPAWN_", "")), clicked));
+                            else if (setType.equals(Material.ARMOR_STAND))
+                                clicked.getWorld().loadEntity(Entity.fromType(EntityType.ARMOR_STAND, clicked));
+                            else
                                 b.setType(setType);
                         } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
-                            ClientPlayerActionPacket packet = event.getPacket();
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            ClientPlayerActionPacket packet = event.getPacket();
                             if ((packet.getAction().equals(PlayerAction.START_DIGGING) && player.getGameMode().equals(GameMode.CREATIVE)) ||
                                     (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
                                 Block b = new Block(new Location(player.getWorld(), packet.getPosition()));
@@ -386,7 +373,7 @@ public class MCThunder {
                                 //TODO: Remove from inventory as well as only drop 1 when its not a full stack
                             }
                         } else if (event.getPacket() != null)
-                            tellConsole(LoggingLevel.DEBUG, event.getPacket().toString());
+                            tellConsole(LoggingLevel.DEBUG, event.getPacket());
                     }
                 });
             }
@@ -394,17 +381,16 @@ public class MCThunder {
             @Override
             public void sessionRemoved(SessionRemovedEvent event) {
                 if (((org.spacehq.mc.protocol.MinecraftProtocol) event.getSession().getPacketProtocol()).getMode() == ProtocolMode.GAME) {
-                    GameProfile profile = event.getSession().getFlag(ProtocolConstants.PROFILE_KEY);
-                    Player player = getPlayer(profile.getId());
+                    Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                     broadcast("&7&o" + player.getName() + " disconnected");
                     entryListHandler.removeFromList(player);
                     ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(player.getEntityID());
                     for (Player p : getPlayers())
                         p.sendPacket(destroyEntitiesPacket);
                     player.setAppended("");
+                    player.unloadChunks();
                     Map<String, Tag> map = new HashMap<>();
                     map.put("World", new StringTag("World", player.getWorld().getName()));
-                    map.put("Dimension", new IntTag("Dimension", player.getWorld().getDimension()));
                     map.put("X", new DoubleTag("X", player.getLocation().getX()));
                     map.put("Y", new DoubleTag("Y", player.getLocation().getY()));
                     map.put("Z", new DoubleTag("Z", player.getLocation().getZ()));
@@ -421,6 +407,7 @@ public class MCThunder {
             try {
                 long startTime = System.currentTimeMillis();
                 //TODO: put things to happen each tick such as either physics checks or entity ai ect.
+                //TODO: Add a way to register events to happen after certain number of ticks
                 for (World w : getWorlds())
                     for (Entity e : w.getEntities()) {
                         if (e instanceof Ageable) {
@@ -468,27 +455,12 @@ public class MCThunder {
             player.setX(packet.getX());
             player.setY(packet.getY());
             player.setZ(packet.getZ());
-            if (fromChunkX != toChunkX || fromChunkZ != toChunkZ) {
-                //tellConsole(LoggingLevel.DEBUG, "Player has entered new Chunk");
-                Direction dir = null;
-                if (fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX < 0)
-                    dir = Direction.NORTH_EAST;
-                else if (fromChunkZ - toChunkZ < 0 && fromChunkX - toChunkX < 0)
-                    dir = Direction.SOUTH_EAST;
-                else if (fromChunkZ - toChunkZ < 0 && fromChunkX - toChunkX > 0)
-                    dir = Direction.SOUTH_WEST;
-                else if (fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX > 0)
-                    dir = Direction.NORTH_WEST;
-                else if (fromChunkZ - toChunkZ > 0)
-                    dir = Direction.NORTH;
-                else if (fromChunkX - toChunkX < 0)
-                    dir = Direction.EAST;
-                else if (fromChunkZ - toChunkZ < 0)
-                    dir = Direction.SOUTH;
-                else if (fromChunkX - toChunkX > 0)
-                    dir = Direction.WEST;
-                player.loadChunks(dir);
-            }
+            if (fromChunkX != toChunkX || fromChunkZ != toChunkZ)
+                player.loadChunks(fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX < 0 ? Direction.NORTH_EAST : fromChunkZ - toChunkZ < 0 &&
+                        fromChunkX - toChunkX < 0 ? Direction.SOUTH_EAST : fromChunkZ - toChunkZ < 0 && fromChunkX - toChunkX > 0 ?
+                        Direction.SOUTH_WEST : fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX > 0 ? Direction.NORTH_WEST :
+                        fromChunkZ - toChunkZ > 0 ? Direction.NORTH : fromChunkX - toChunkX < 0 ? Direction.EAST :
+                        fromChunkZ - toChunkZ < 0 ? Direction.SOUTH : fromChunkX - toChunkX > 0 ? Direction.WEST : null);
         }
 
         if (packet instanceof ClientPlayerRotationPacket || packet instanceof ClientPlayerPositionRotationPacket) {
@@ -502,6 +474,7 @@ public class MCThunder {
         List<Packet> packets = new ArrayList<>();
         GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);
         Player player = getPlayer(profile.getId());
+        player.setOnGround(packet.isOnGround());
         if (packet instanceof ClientPlayerPositionPacket || packet instanceof ClientPlayerPositionRotationPacket) {
             double movedX = packet.getX() - player.getLocation().getX();
             double movedY = packet.getY() - player.getLocation().getY();
@@ -517,16 +490,16 @@ public class MCThunder {
             int packedY = (int) (movedY * 32);
             int packedZ = (int) (movedZ * 32);
             if (packedX > Byte.MAX_VALUE || packedY > Byte.MAX_VALUE || packedZ > Byte.MAX_VALUE || packedX < Byte.MIN_VALUE || packedY < Byte.MIN_VALUE || packedZ < Byte.MIN_VALUE)
-                packets.add(new ServerEntityTeleportPacket(player.getEntityID(), packet.getX(), packet.getY(), packet.getZ(), yaw, pitch, packet.isOnGround()));
+                packets.add(new ServerEntityTeleportPacket(player.getEntityID(), packet.getX(), packet.getY(), packet.getZ(), yaw, pitch, player.isOnGround()));
             else if (packet instanceof ClientPlayerPositionPacket)
-                packets.add(new ServerEntityPositionPacket(player.getEntityID(), movedX, movedY, movedZ, packet.isOnGround()));
+                packets.add(new ServerEntityPositionPacket(player.getEntityID(), movedX, movedY, movedZ, player.isOnGround()));
             else {//ClientPlayerPositionRotationPacket
-                packets.add(new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, yaw, pitch, packet.isOnGround()));
+                packets.add(new ServerEntityPositionRotationPacket(player.getEntityID(), movedX, movedY, movedZ, yaw, pitch, player.isOnGround()));
                 packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
             }
         } else if (packet instanceof ClientPlayerRotationPacket) {
             float yaw = (float) packet.getYaw();
-            packets.add(new ServerEntityRotationPacket(player.getEntityID(), yaw, (float) packet.getPitch(), packet.isOnGround()));
+            packets.add(new ServerEntityRotationPacket(player.getEntityID(), yaw, (float) packet.getPitch(), player.isOnGround()));
             packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
         }
         return packets;
@@ -641,6 +614,7 @@ public class MCThunder {
             return;
         bots.add(b);
         entryListHandler.addToList(b);
+        b.load();
     }
 
     public static void unloadBot(Bot b) {

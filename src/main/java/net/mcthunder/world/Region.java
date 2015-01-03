@@ -2,12 +2,14 @@ package net.mcthunder.world;
 
 import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
+import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Vector;
 import net.mcthunder.block.Chest;
 import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.EntityType;
 import net.mcthunder.entity.Player;
+import net.mcthunder.material.Material;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
@@ -21,6 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
+
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/21/2014.
@@ -79,7 +83,7 @@ public class Region {
             Map<String,Tag> values = compoundTag.getValue();
             Map<String,Tag> levelInfo = level.getValue();
             ArrayList<Tag> newSections = new ArrayList<>();
-            for (int i = 0; i < sections.size(); i++) {//Loop through all 16 chunks in a verticle fashion
+            for (int i = 0; i < sections.size(); i++) {//Loop through all 16 chunks
                 CompoundTag chunkz = sections.get(i);
                 Map<String,Tag> cv = chunkz.getValue();
                 ByteArrayTag blocks = chunkz.get("Blocks");
@@ -93,15 +97,18 @@ public class Region {
                     if (chunks[i].getSkyLight() != null)
                         skyLight.setValue(chunks[i].getSkyLight().getData());
                     if(chunks[i].getBlocks() != null)
-                        for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
-                            for (int cZ = 0; cZ < 16; cZ++) //Loop through z
-                                for (int cX = 0; cX < 16; cX++) { //Loop through x
+                        for (int cX = 0; cX < 16; cX++) //Loop through x
+                            for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
+                                for (int cZ = 0; cZ < 16; cZ++) { //Loop through z
                                     int index = 256*cY + 16*cZ + cX;
-                                    blocks.setValue(index, Byte.parseByte(chunks[i].getBlocks().getBlock(cX, cY, cZ) + ""));
+                                    int id = chunks[i].getBlocks().getBlock(cX, cY, cZ);//TODO: Use add where needed
+                                    if (id > 128)
+                                        id -= 256;
+                                    blocks.setValue(index, Byte.parseByte(id + ""));
                                     if(index%2 == 0)
-                                        data.setValue(index/2, (byte) (chunks[i].getBlocks().getData(cX, cY, cZ) << 4 | getValue(data, index + 1)));
+                                        data.setValue(index/2, (byte) ((getValue(data, index + 1) << 4) | chunks[i].getBlocks().getData(cX, cY, cZ)));
                                     else
-                                        data.setValue(index/2, (byte) (getValue(data, index - 1) << 4 | chunks[i].getBlocks().getData(cX, cY, cZ)));
+                                        data.setValue(index/2, (byte) ((chunks[i].getBlocks().getData(cX, cY, cZ) << 4) | getValue(data, index - 1)));
                                 }
                 }
                 cv.put("Blocks", blocks);
@@ -111,7 +118,7 @@ public class Region {
                 //cv.put("Add", add);//How to calculate from value if even needed
                 chunkz.setValue(cv);
                 newSections.add(chunkz);
-            }
+                }
             sections.setValue(newSections);
             levelInfo.put("Sections", sections);
             level.setValue(levelInfo);
@@ -158,6 +165,25 @@ public class Region {
             ListTag sections = level.get("Sections");
             ByteArrayTag biomes = level.get("Biomes");
             ListTag entities = level.get("Entities");
+            Chunk[] chunks = new Chunk[16];
+            for (int i = 0; i < sections.size(); i++) {//Loop through all 16 chunks
+                CompoundTag chunkz = sections.get(i);
+                ByteArrayTag blocks = chunkz.get("Blocks");
+                ByteArrayTag blockLight = chunkz.get("BlockLight");
+                ByteArrayTag skyLight = chunkz.get("SkyLight");
+                ByteArrayTag data = chunkz.get("Data");
+                ByteArrayTag add = chunkz.get("Add");
+                ShortArray3d block = new ShortArray3d(4096);
+                for (int cX = 0; cX < 16; cX++) //Loop through x
+                    for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
+                        for (int cZ = 0; cZ < 16; cZ++) { //Loop through z
+                            int index = 256*cY + 16*cZ + cX;
+                            int id = blocks.getValue(index) + (add != null ? getValue(add, index) << 8 : 0);
+                            block.setBlockAndData(cX, cY, cZ, id + (id < 0 ? 256: 0), getValue(data, index));
+                        }
+                chunks[i] = new Chunk(block, new NibbleArray3d(blockLight.getValue()), new NibbleArray3d(skyLight.getValue()));
+            }
+            this.world.addColumn(new Column(l, chunks, biomes.getValue()));
             for (int i = 0; i < entities.size(); i++) {//TODO: cleanup move majority of this into entity objects
                 CompoundTag entity = entities.get(i);
                 StringTag id = entity.get("id");
@@ -694,26 +720,6 @@ public class Region {
                         }
                 }
             }
-            Chunk[] chunks = new Chunk[16];
-            for (int i = 0; i < sections.size(); i++) {//Loop through all 16 chunks in a verticle fashion
-                CompoundTag chunkz = sections.get(i);
-                ByteArrayTag blocks = chunkz.get("Blocks");
-                ByteArrayTag blockLight = chunkz.get("BlockLight");
-                ByteArrayTag skyLight = chunkz.get("SkyLight");
-                ByteArrayTag data = chunkz.get("Data");
-                ByteArrayTag add = chunkz.get("Add");
-                ShortArray3d block = new ShortArray3d(4096);
-                for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
-                    for (int cZ = 0; cZ < 16; cZ++) //Loop through z
-                        for (int cX = 0; cX < 16; cX++) { //Loop through x
-                            int index = 256*cY + 16*cZ + cX;
-                            byte blockValue = blocks.getValue(index);
-                            if (blockValue >= 0)//Figure out why sometimes it gives negative values...
-                                block.setBlockAndData(cX, cY, cZ, blockValue + (add != null ? getValue(add, index) << 8 : 0), getValue(data, index));
-                        }
-                chunks[i] = new Chunk(block, new NibbleArray3d(blockLight.getValue()), new NibbleArray3d(skyLight.getValue()));
-            }
-            this.world.addColumn(new Column(l, chunks, biomes.getValue()));
         }
     }
 

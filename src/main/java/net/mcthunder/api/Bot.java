@@ -50,11 +50,10 @@ public abstract class Bot {
         this.metadata.setMetadata(8, (byte) 0);//potion ambient = false
         this.metadata.setMetadata(9, (byte) 0);//arrows in bot
         this.metadata.setMetadata(15, (byte) (this.hasAI ? 1 : 0));
-        //this.metadata.setMetadata(10, (byte) 0);//Unsigned byte for skin flags TODO: Figure out what to put here
+        this.metadata.setMetadata(10, (byte) 0);//Unsigned byte for skin flags TODO: Figure out what to put here
         this.metadata.setBit(16, 0x02, false);//TODO: Read cape of the one whose name bot has
         this.metadata.setMetadata(17, (float) 0);//absorption
         this.metadata.setMetadata(18, 0);//score
-        load();
     }
 
     public PlayerListEntry getListEntry() {
@@ -127,11 +126,11 @@ public abstract class Bot {
     }
 
     public Packet getPacket() {
-        return new ServerSpawnPlayerPacket(this.entityID, this.uuid, getLocation().getX(), getLocation().getY(), getLocation().getZ(), getLocation().getYaw(), getLocation().getPitch(), 0, getMetadata().getMetadataArray());
+        return new ServerSpawnPlayerPacket(this.entityID, this.uuid, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), 0, getMetadata().getMetadataArray());
     }
 
     public World getWorld() {
-        return getLocation().getWorld();
+        return this.location.getWorld();
     }
 
     public abstract void unload();

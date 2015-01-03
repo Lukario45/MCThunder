@@ -18,7 +18,7 @@ import static net.mcthunder.api.Utils.tellConsole;
  */
 public class PlayerProfileHandler {
     public void checkPlayer(Player player) {
-        tellConsole(LoggingLevel.DEBUG, player.getName() + " has an ID of " + player.getUniqueID().toString());
+        tellConsole(LoggingLevel.DEBUG, player.getName() + " has an ID of " + player.getUniqueID());
         File playerFile = new File("PlayerFiles", player.getUniqueID().toString() + ".dat");
         NBTFile playerNBTFile = new NBTFile(playerFile, "Player");
         if (!playerFile.exists()) {
@@ -28,7 +28,6 @@ public class PlayerProfileHandler {
 
                 Map<String, Tag> map = new HashMap<>();
                 map.put("World", new StringTag("World", player.getWorld().getName()));
-                map.put("Dimension", new IntTag("Dimension", player.getWorld().getDimension()));
                 map.put("X", new DoubleTag("X", player.getLocation().getX()));
                 map.put("Y", new DoubleTag("Y", player.getLocation().getY()));
                 map.put("Z", new DoubleTag("Z", player.getLocation().getZ()));

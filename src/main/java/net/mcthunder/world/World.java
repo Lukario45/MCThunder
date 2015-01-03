@@ -10,6 +10,7 @@ import net.mcthunder.entity.Player;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.opennbt.NBTIO;
+import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
@@ -51,13 +52,22 @@ public class World {
             IntTag xTag = data.get("SpawnX");
             IntTag yTag = data.get("SpawnY");
             IntTag zTag = data.get("SpawnZ");
-            IntTag dif = data.get("Difficulty");
+            int di = 2;
+            try {
+                ByteTag dif = data.get("Difficulty");
+                if (dif != null)
+                    di = Byte.toUnsignedInt(dif.getValue());
+            } catch (Exception e) {//Older Map compatibility
+                IntTag dif = data.get("Difficulty");
+                if (dif != null)
+                    di = dif.getValue();
+            }
             CompoundTag gamerules = data.get("GameRules");
             //tellConsole(LoggingLevel.DEBUG, String.valueOf(xTag.getValue()) + String.valueOf(yTag.getValue()) + String.valueOf(zTag.getValue()));
             this.worldType = fromName(data.get("generatorName").getValue().toString());
             this.seed = (long) data.get("RandomSeed").getValue();
             this.hardcore = (byte) data.get("hardcore").getValue() == 1;
-            this.difficulty = difFromName(dif != null ? dif.getValue() : 2);
+            this.difficulty = difFromName(di);
             this.generateStructures = (byte) data.get("MapFeatures").getValue() == 1;
             if (gamerules.get("commandBlockOutput") != null)
                 GameRule.commandBlockOutput.setEnabled(Boolean.valueOf(gamerules.get("commandBlockOutput").getValue().toString()));
@@ -79,8 +89,13 @@ public class World {
                 GameRule.mobGriefing.setEnabled(Boolean.valueOf(gamerules.get("mobGriefing").getValue().toString()));
             if (gamerules.get("naturalRegeneration") != null)
                 GameRule.naturalRegeneration.setEnabled(Boolean.valueOf(gamerules.get("naturalRegeneration").getValue().toString()));
-            if (gamerules.get("randomTickSpeed") != null)
-                GameRule.randomTickSpeed.setTickSpeed((Integer) gamerules.get("randomTickSpeed").getValue());
+            if (gamerules.get("randomTickSpeed") != null) {
+                try {
+                    GameRule.randomTickSpeed.setTickSpeed(Integer.parseInt((String) gamerules.get("randomTickSpeed").getValue()));
+                } catch (Exception e) {//Older Map compatibility
+                    GameRule.randomTickSpeed.setTickSpeed((Integer) gamerules.get("randomTickSpeed").getValue());
+                }
+            }
             if (gamerules.get("sendCommandFeedback") != null)
                 GameRule.sendCommandFeedback.setEnabled(Boolean.valueOf(gamerules.get("sendCommandFeedback").getValue().toString()));
             if (gamerules.get("showDeathMessages") != null)
@@ -92,9 +107,7 @@ public class World {
     }
 
     private WorldType fromName(String name) {
-        if (name.equals("largeBiomes"))
-            return WorldType.LARGE_BIOMES;
-        return WorldType.valueOf(name.toUpperCase());
+        return name.equals("largeBiomes") ? WorldType.LARGE_BIOMES : WorldType.valueOf(name.toUpperCase());
     }
 
     private Difficulty difFromName(int dif) {
@@ -125,10 +138,10 @@ public class World {
     }
 
     public void setDimension(int dimension) {
-        if (dimensionRead)
+        if (this.dimensionRead)
             return;
         this.dimension = dimension;
-        dimensionRead = true;
+        this.dimensionRead = true;
     }
 
     public void loadAround(Location loc, int distance) {
@@ -176,8 +189,8 @@ public class World {
         return this.columnHashMap.containsKey(l);
     }
 
-    public Column[] getAllColumnsAsArray() {
-        return (Column[]) this.columnHashMap.values().toArray();
+    public Collection<Column> getAllColumns() {
+        return this.columnHashMap.values();
     }
 
     public Column getColumn(long l) {
@@ -196,8 +209,8 @@ public class World {
     }
 
     public void unloadWorld() {
-        HashMap<Long, Column> temp = (HashMap<Long, Column>) this.columnHashMap.clone();
-        for(long l : temp.keySet())
+        Collection<Long> temp = ((HashMap<Long,Column>)this.columnHashMap.clone()).keySet();
+        for(long l : temp)
             unloadColumn(l);
     }
 

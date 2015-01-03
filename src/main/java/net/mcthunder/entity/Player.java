@@ -320,7 +320,7 @@ public class Player extends LivingEntity {
     }
 
     public String getDisplayName() {//TODO: Config value for symbol in front of nickname
-        return "~" + this.displayName;
+        return (this.displayName.equals(this.name) ? "" : "~") + this.displayName;
     }
 
     public void setDisplayName(String displayName) {//TODO: Save nick to file, as well as, show in client when pinging server and above head
@@ -368,12 +368,20 @@ public class Player extends LivingEntity {
         this.lastPmPerson = lastPmPerson;
     }
 
-    public void setWorld(World w) {
+    public void unloadChunks() {
         unloadColumn(this.northColumns);
         unloadColumn(this.eastColumns);
         unloadColumn(this.westColumns);
         unloadColumn(this.southColumns);
         unloadColumn(this.loadedColumns);
+    }
+
+    public void setWorld(World w) {
+        this.northColumns.clear();
+        this.eastColumns.clear();
+        this.westColumns.clear();
+        this.southColumns.clear();
+        this.loadedColumns.clear();
         super.setWorld(w);
         sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
         sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
@@ -422,8 +430,7 @@ public class Player extends LivingEntity {
     }
 
     public void setSkin(UUID uuid) {
-        this.skinUUID = uuid;
-        setSkin(Utils.getSkin(this.skinUUID));
+        setSkin(Utils.getSkin(this.skinUUID = uuid));
     }
 
     public void removeSkin() {
@@ -431,6 +438,8 @@ public class Player extends LivingEntity {
     }
 
     public void openInventory(Inventory inv) {
+        if (inv == null)
+            return;
         this.openInventory = inv;
         sendPacket(this.openInventory.getView());
         for (int i = 0; i < this.openInventory.getItems().length; i++)
@@ -444,7 +453,5 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    public void ai() {
-        //Do nothing as the player themselves is the intelligence
-    }
+    public void ai() { }//Do nothing as the player themselves is the intelligence
 }

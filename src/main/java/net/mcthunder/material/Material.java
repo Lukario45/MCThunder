@@ -1022,7 +1022,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     }
 
     public static Material fromString(String name) {//Tries to get based on alias and then on exact name if no alias
-        name = name.toUpperCase().replaceAll(" ", "_");
+        name = name.toUpperCase().replaceAll(" ", "").replaceAll("_", "");
         String n = aliasMap.get(name);
         return n == null ? nameMap.get(name) : nameMap.get(n);
     }
@@ -1045,9 +1045,9 @@ public enum Material {//http://minecraft.gamepedia.com/Id
         for(Material m : values()) {
             if (m.getID() != null)
                 idMap.put(m.getID(), m);
-            nameMap.put(m.getName(), m);
+            nameMap.put(m.getName().replaceAll("_", ""), m);
             for(String alias : m.getAliases())
-                aliasMap.put(alias, m.getName());
+                aliasMap.put(alias.replaceAll("_", ""), m.getName().replace("_", ""));
         }
         armorList = Arrays.asList(LEATHER_BOOTS, LEATHER_CHESTPLATE, LEATHER_HELMET, LEATHER_LEGGINGS, IRON_BOOTS, IRON_CHESTPLATE, IRON_HELMET, IRON_LEGGINGS, GOLDEN_BOOTS, GOLDEN_CHESTPLATE, GOLDEN_HELMET,
                 GOLDEN_LEGGINGS, DIAMOND_BOOTS, DIAMOND_CHESTPLATE, DIAMOND_HELMET, DIAMOND_LEGGINGS, CHAINMAIL_BOOTS, CHAINMAIL_CHESTPLATE, CHAINMAIL_HELMET, CHAINMAIL_LEGGINGS);

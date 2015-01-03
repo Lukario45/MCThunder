@@ -1,11 +1,14 @@
 package net.mcthunder.block;
 
 import net.mcthunder.api.Location;
+import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.inventory.ChestInventory;
 import net.mcthunder.inventory.Inventory;
 import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.material.Material;
 import org.spacehq.opennbt.tag.builtin.*;
+
+import static net.mcthunder.api.Utils.tellConsole;
 
 public class Chest {
     private final Location l;
@@ -30,7 +33,7 @@ public class Chest {
                 int id;
                 try {
                     StringTag itemID = item.get("id");
-                    id = Integer.parseInt(itemID.getValue());
+                    id = Material.fromString(itemID.getValue().split("minecraft:")[1]).getParent().getID();
                 } catch (Exception e) {//pre 1.8 loading should be ShortTag instead
                     ShortTag itemID = item.get("id");
                     id = Integer.parseInt(itemID.getValue().toString());
