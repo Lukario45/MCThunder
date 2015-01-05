@@ -1,23 +1,33 @@
 package net.mcthunder.api;
 
 import net.mcthunder.MCThunder;
+import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
+import org.spacehq.mc.auth.ProfileTexture;
+import org.spacehq.mc.auth.SessionService;
 import org.spacehq.mc.auth.properties.Property;
+import org.spacehq.mc.auth.util.Base64;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.packetlib.packet.Packet;
 
+import java.io.IOException;
+import java.security.PublicKey;
 import java.util.UUID;
+
+import static net.mcthunder.api.Utils.tellConsole;
 
 public abstract class Bot {
     protected MessageFormat format = new MessageFormat();
-    private final int entityID;
+    private int entityID;
     private MetadataMap metadata;
     private GameProfile botProfile;
+    private byte skinFlags;
+    private String capeURL;
     private boolean hasAI = false;
     private boolean entitySpawned = false;
     private Property skin = null;
@@ -34,7 +44,7 @@ public abstract class Bot {
         if (this.skinUUID == null)
             this.skinUUID = this.uuid;
         this.botProfile = new GameProfile(this.uuid, temp);
-        this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+        this.entityID = Entity.getNextID();
         setSkin(this.skinUUID);
         this.metadata = new MetadataMap();
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, false);//on fire
@@ -49,8 +59,15 @@ public abstract class Bot {
         this.metadata.setMetadata(7, 0);//potionColor
         this.metadata.setMetadata(8, (byte) 0);//potion ambient = false
         this.metadata.setMetadata(9, (byte) 0);//arrows in bot
+        this.skinFlags = (byte) (1);
+        this.skinFlags |= 1 << 1;
+        this.skinFlags |= 1 << 2;
+        this.skinFlags |= 1 << 3;
+        this.skinFlags |= 1 << 4;
+        this.skinFlags |= 1 << 5;
+        this.skinFlags |= 1 << 6;
+        this.metadata.setMetadata(10, this.skinFlags);//Unsigned byte for skin flags
         this.metadata.setMetadata(15, (byte) (this.hasAI ? 1 : 0));
-        this.metadata.setMetadata(10, (byte) 0);//Unsigned byte for skin flags TODO: Figure out what to put here
         this.metadata.setBit(16, 0x02, false);//TODO: Read cape of the one whose name bot has
         this.metadata.setMetadata(17, (float) 0);//absorption
         this.metadata.setMetadata(18, 0);//score
@@ -86,6 +103,7 @@ public abstract class Bot {
         MCThunder.getEntryListHandler().refresh(this);
         if (isEntitySpawned()) {
             ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(this.entityID);
+            this.entityID = Entity.getNextID();
             ServerSpawnPlayerPacket spawnPlayerPacket = (ServerSpawnPlayerPacket) getPacket();
             long chunk = getChunk();
             for (Player pl : MCThunder.getPlayers()) {
@@ -94,6 +112,23 @@ public abstract class Bot {
                     pl.sendPacket(spawnPlayerPacket);
             }
         }
+    }
+
+    public void setCape(String url) {
+        try {//http://textures.minecraft.net/texture/3f688e0e699b3d9fe448b5bb50a3a288f9c589762b3dae8308842122dcb81
+            this.capeURL = url;
+            byte[] bytes = Base64.decode(this.skin.getValue().getBytes());
+            String value = new String(bytes);
+            int s = value.indexOf("CAPE");
+            if (s == -1)
+                value = value.substring(0, value.length() - 2) + ",\"CAPE\":{\"url\":\"" + this.capeURL + "\"}}}";
+            else
+                value = value.substring(0, s - 1) + ",\"CAPE\":{\"url\":\"" + this.capeURL + "\"}}}";
+            setSkin(new Property("textures", new String(Base64.encode(value.getBytes())), this.skin.getSignature()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void setSkin(String name) {

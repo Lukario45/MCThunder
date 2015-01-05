@@ -409,23 +409,24 @@ public class MCThunder {
                 //TODO: put things to happen each tick such as either physics checks or entity ai ect.
                 //TODO: Add a way to register events to happen after certain number of ticks
                 for (World w : getWorlds())
-                    for (Entity e : w.getEntities()) {
-                        if (e instanceof Ageable) {
-                            Ageable a = (Ageable) e;
-                            a.setAge((byte) (a.getAge() + 1));
+                    if (!w.getEntities().isEmpty())
+                        for (Entity e : w.getEntities()) {
+                            if (e instanceof Ageable) {
+                                Ageable a = (Ageable) e;
+                                a.setAge((byte) (a.getAge() + 1));
+                            }
+                            if (e instanceof LivingEntity) {
+                                LivingEntity l = (LivingEntity) e;
+                                ArrayList<PotionEffectType> toRem = new ArrayList<>();
+                                for (PotionEffect p : l.getActiveEffects())
+                                    if (p.getDuration() > 1)
+                                        p.setDuration(p.getDuration() - 1);
+                                    else
+                                        toRem.add(p.getType());
+                                for (PotionEffectType t : toRem)
+                                    l.removePotionEffect(t);
+                            }
                         }
-                        if (e instanceof LivingEntity) {
-                            LivingEntity l = (LivingEntity) e;
-                            ArrayList<PotionEffectType> toRem = new ArrayList<>();
-                            for (PotionEffect p : l.getActiveEffects())
-                                if (p.getDuration() > 1)
-                                    p.setDuration(p.getDuration() - 1);
-                                else
-                                    toRem.add(p.getType());
-                            for (PotionEffectType t : toRem)
-                                l.removePotionEffect(t);
-                        }
-                    }
                 for (Player p : getPlayers()) {
                     ArrayList<PotionEffectType> toRem = new ArrayList<>();
                     for (PotionEffect e : p.getActiveEffects())
@@ -436,7 +437,9 @@ public class MCThunder {
                     for (PotionEffectType t : toRem)
                         p.removePotionEffect(t);
                 }
-                Thread.sleep(50 + startTime - System.currentTimeMillis());//Wait for next tick after everything finishes
+                long time = 50 + startTime - System.currentTimeMillis();
+                if (time > 0)
+                    Thread.sleep(time);//Wait for next tick after everything finishes
             } catch (InterruptedException ignored) { }
         }
     }

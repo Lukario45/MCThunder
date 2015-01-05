@@ -2,14 +2,12 @@ package net.mcthunder.world;
 
 import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
-import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.api.Vector;
 import net.mcthunder.block.Chest;
 import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.EntityType;
 import net.mcthunder.entity.Player;
-import net.mcthunder.material.Material;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
@@ -23,8 +21,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
-
-import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/21/2014.
@@ -66,14 +62,13 @@ public class Region {
             return;
         DataOutputStream out = this.regionFile.getChunkDataOutputStream(x, z);
         DataInputStream in = this.regionFile.getChunkDataInputStream(x, z);
-        Tag tag = null;
         if (in != null && out != null) {
+            CompoundTag compoundTag = null;
             try {
-                tag = NBTIO.readTag(in);
+                compoundTag = (CompoundTag) NBTIO.readTag(in);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            CompoundTag compoundTag = (CompoundTag) tag;
             if (compoundTag == null)
                 return;
             CompoundTag level = compoundTag.get("Level");
@@ -152,13 +147,12 @@ public class Region {
         if (in == null) {//Chunk needs to be created or is corrupted and should be regenerated
 
         } else {
-            Tag tag = null;
+            CompoundTag compoundTag = null;
             try {
-                tag = NBTIO.readTag(in);
+                compoundTag = (CompoundTag) NBTIO.readTag(in);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            CompoundTag compoundTag = (CompoundTag) tag;
             if (compoundTag == null)
                 return;
             CompoundTag level = compoundTag.get("Level");
@@ -179,7 +173,7 @@ public class Region {
                         for (int cZ = 0; cZ < 16; cZ++) { //Loop through z
                             int index = 256*cY + 16*cZ + cX;
                             int id = blocks.getValue(index) + (add != null ? getValue(add, index) << 8 : 0);
-                            block.setBlockAndData(cX, cY, cZ, id + (id < 0 ? 256: 0), getValue(data, index));
+                            block.setBlockAndData(cX, cY, cZ, id + (id < 0 ? 256 : 0), getValue(data, index));
                         }
                 chunks[i] = new Chunk(block, new NibbleArray3d(blockLight.getValue()), new NibbleArray3d(skyLight.getValue()));
             }

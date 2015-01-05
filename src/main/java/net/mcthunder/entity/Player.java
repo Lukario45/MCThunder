@@ -42,6 +42,7 @@ public class Player extends LivingEntity {
     private GameProfile profile;
     private UUID skinUUID;
     private Property skin;
+    private byte skinFlags;
     private NBTFile playerFile;
     private Inventory openInventory = null;
     private ArrayList<Long> loadedColumns = new ArrayList<>();
@@ -76,7 +77,14 @@ public class Player extends LivingEntity {
         this.skinUUID = this.uuid;
         this.origSkin = getGameProfile().getProperties().get("textures");
         this.skin = this.origSkin;
-        this.metadata.setMetadata(10, (byte) 0);//Unsigned byte for skin flags TODO: Figure out what to put here
+        this.skinFlags = (byte) (1);
+        this.skinFlags |= 1 << 1;
+        this.skinFlags |= 1 << 2;
+        this.skinFlags |= 1 << 3;
+        this.skinFlags |= 1 << 4;
+        this.skinFlags |= 1 << 5;
+        this.skinFlags |= 1 << 6;
+        this.metadata.setMetadata(10, this.skinFlags);//Unsigned byte for skin flags TODO: Figure out what to put here
         this.metadata.setMetadata(15, (byte) 1);//Assuming player has a brain
         this.metadata.setBit(16, 0x02, this.hideCape = false);
         this.metadata.setMetadata(17, (float) (this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));
@@ -413,6 +421,7 @@ public class Player extends LivingEntity {
         this.profile.getProperties().put("textures", this.skin);
         MCThunder.getEntryListHandler().refresh(this);
         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+        this.entityID = getNextID();
         ServerSpawnPlayerPacket spawnPlayerPacket = (ServerSpawnPlayerPacket) getPacket();
         for (Player pl : MCThunder.getPlayers())
             if (!pl.getUniqueID().equals(getUniqueID())) {

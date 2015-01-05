@@ -16,8 +16,9 @@ import java.util.Collection;
 import java.util.UUID;
 
 public abstract class Entity {
+    private static int nextID = 0;
     protected EntityType type;
-    protected final int entityID;
+    protected int entityID;
     protected String customName;
     protected Location location;
     protected Vector motion;
@@ -279,7 +280,7 @@ public abstract class Entity {
     }*/
 
     protected Entity(Location location) {
-        this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+        this.entityID = nextID++;
         this.location = location;
         this.riding = null;
         if (this.location != null)
@@ -295,7 +296,7 @@ public abstract class Entity {
     }
 
     protected Entity(World w, CompoundTag tag) {
-        this.entityID = (int) Math.ceil(Math.random() * Integer.MAX_VALUE);
+        this.entityID = nextID++;
         StringTag id = tag.get("id");
         EntityType type = id == null ? null : EntityType.fromSavegameId(id.getValue());
         if (type == null)
@@ -350,6 +351,10 @@ public abstract class Entity {
         StringTag affectedItemsObjective = commandStats != null ? (StringTag) commandStats.get("AffectedItemsObjective") : null;
         StringTag queryResultName = commandStats != null ? (StringTag) commandStats.get("QueryResultName") : null;
         StringTag queryResultObjective = commandStats != null ? (StringTag) commandStats.get("QueryResultObjective") : null;
+    }
+
+    public static int getNextID() {
+        return nextID++;//Returns it and adds 1 incase they use it
     }
 
     public long getChunk() {
