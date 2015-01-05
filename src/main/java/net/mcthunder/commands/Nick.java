@@ -1,9 +1,7 @@
 package net.mcthunder.commands;
 
-import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.Arrays;
 
@@ -13,9 +11,8 @@ public class Nick extends Command {
     }
 
     @Override
-    public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().trim().split(" ");
-        player.setDisplayName(wholeMessage.length == 1 ? null : wholeMessage[1]);
+    public boolean execute(Player player, String[] args) {
+        player.setDisplayName(args.length == 0 ? null : args[0]);
         player.sendMessage("Nickname updated.");
         return true;
     }

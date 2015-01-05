@@ -5,7 +5,6 @@ import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
 import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.material.Material;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.Arrays;
 
@@ -15,10 +14,7 @@ public class Give extends Command {
     }
 
     @Override
-    public boolean execute(Player player, ClientChatPacket packet) {
-        String[] args = new String[0];
-        if (packet.getMessage().contains(" "))
-            args = packet.getMessage().trim().substring(packet.getMessage().trim().indexOf(" ")).trim().split(" ");
+    public boolean execute(Player player, String[] args) {
         if (args.length < 2) {
             player.sendMessage("&4Error: You need to enter an item and a player to give that item to.");
             return true;

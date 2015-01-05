@@ -3,7 +3,6 @@ package net.mcthunder.commands;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.Arrays;
 
@@ -16,19 +15,18 @@ public class PrivateMessage extends Command {
     }
 
     @Override
-    public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().trim().split(" ");
-        if (wholeMessage.length < 3)
+    public boolean execute(Player player, String[] args) {
+        if (args.length < 2)
             return false;
-        String toPlayer = wholeMessage[1];
+        String toPlayer = args[0];
         Player p = MCThunder.getPlayer(toPlayer);
         if(p == null) {
             player.sendMessage("&cThat player is not online!");
             return true;
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 2; i < wholeMessage.length; i++)
-            sb.append(wholeMessage[i]).append(" ");
+        for (int i = 1; i < args.length; i++)
+            sb.append(args[i]).append(" ");
         String message = sb.toString().trim();
         player.sendMessage("&3[You &e---> &3" + p.getName() + "]&e:&r " + message);
         p.sendMessage("&3[" + player.getName() + " &e---> &3You]&e:&r " + message);

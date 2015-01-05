@@ -5,29 +5,26 @@ import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
 import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
-import org.spacehq.mc.auth.ProfileTexture;
-import org.spacehq.mc.auth.SessionService;
 import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.mc.auth.util.Base64;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityMetadataPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.packetlib.packet.Packet;
 
-import java.io.IOException;
-import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.UUID;
 
-import static net.mcthunder.api.Utils.tellConsole;
-
 public abstract class Bot {
-    protected MessageFormat format = new MessageFormat();
     private int entityID;
     private MetadataMap metadata;
     private GameProfile botProfile;
     private byte skinFlags;
-    private String capeURL;
+    private String capeURL = null;
     private boolean hasAI = false;
     private boolean entitySpawned = false;
     private Property skin = null;
@@ -39,7 +36,7 @@ public abstract class Bot {
     public Bot(String name) {
         this.name = name;
         this.uuid = UUID.randomUUID();
-        String temp = format.formatMessage(this.name).getFullText().trim();
+        String temp = MessageFormat.formatMessage(this.name).getFullText().trim();
         this.skinUUID = Utils.getUUIDfromString(temp);
         if (this.skinUUID == null)
             this.skinUUID = this.uuid;
@@ -68,13 +65,13 @@ public abstract class Bot {
         this.skinFlags |= 1 << 6;
         this.metadata.setMetadata(10, this.skinFlags);//Unsigned byte for skin flags
         this.metadata.setMetadata(15, (byte) (this.hasAI ? 1 : 0));
-        this.metadata.setBit(16, 0x02, false);//TODO: Read cape of the one whose name bot has
+        this.metadata.setBit(16, 0x02, false);
         this.metadata.setMetadata(17, (float) 0);//absorption
         this.metadata.setMetadata(18, 0);//score
     }
 
     public PlayerListEntry getListEntry() {
-        return new PlayerListEntry(getGameProfile(), GameMode.CREATIVE, 0, format.formatMessage(this.name));
+        return new PlayerListEntry(getGameProfile(), GameMode.CREATIVE, 0, MessageFormat.formatMessage(this.name));
     }
 
     public String getName() {
@@ -83,7 +80,7 @@ public abstract class Bot {
 
     public void setName(String newName) {
         this.name = newName;
-        this.botProfile = new GameProfile(this.uuid, format.formatMessage(this.name).getFullText().trim());
+        this.botProfile = new GameProfile(this.uuid, MessageFormat.formatMessage(this.name).getFullText().trim());
         this.botProfile.getProperties().put("textures", this.skin);
     }
 
@@ -99,36 +96,38 @@ public abstract class Bot {
         if (p == null || !p.getName().equalsIgnoreCase("textures"))
             return;
         this.skin = p;
+        if (this.capeURL != null)//This does not work because signature is not valid after it is changed
+            try {//TODO: Try to come up with a way to get this to work, that does not require the private mc auth key
+                byte[] bytes = Base64.decode(this.skin.getValue().getBytes("UTF-8"));
+                String value = new String(bytes);
+                int s = value.indexOf("CAPE");
+                if (s == -1)
+                    value = value.substring(0, value.length() - 2) + ",\"CAPE\":{\"url\":\"" + this.capeURL + "\"}}}";
+                else
+                    value = value.substring(0, s - 2) + ",\"CAPE\":{\"url\":\"" + this.capeURL + "\"}}}";
+                this.skin = new Property("textures", new String(Base64.encode(value.getBytes("UTF-8"))), this.skin.getSignature());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         this.botProfile.getProperties().put("textures", this.skin);
         MCThunder.getEntryListHandler().refresh(this);
         if (isEntitySpawned()) {
             ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(this.entityID);
             this.entityID = Entity.getNextID();
-            ServerSpawnPlayerPacket spawnPlayerPacket = (ServerSpawnPlayerPacket) getPacket();
             long chunk = getChunk();
             for (Player pl : MCThunder.getPlayers()) {
                 pl.sendPacket(destroyEntitiesPacket);
                 if (pl.getWorld().equals(getWorld()) && pl.isColumnLoaded(chunk))
-                    pl.sendPacket(spawnPlayerPacket);
+                    for (Packet packet : getPackets())
+                        pl.sendPacket(packet);
             }
         }
     }
 
+    @Deprecated
     public void setCape(String url) {
-        try {//http://textures.minecraft.net/texture/3f688e0e699b3d9fe448b5bb50a3a288f9c589762b3dae8308842122dcb81
-            this.capeURL = url;
-            byte[] bytes = Base64.decode(this.skin.getValue().getBytes());
-            String value = new String(bytes);
-            int s = value.indexOf("CAPE");
-            if (s == -1)
-                value = value.substring(0, value.length() - 2) + ",\"CAPE\":{\"url\":\"" + this.capeURL + "\"}}}";
-            else
-                value = value.substring(0, s - 1) + ",\"CAPE\":{\"url\":\"" + this.capeURL + "\"}}}";
-            setSkin(new Property("textures", new String(Base64.encode(value.getBytes())), this.skin.getSignature()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        this.capeURL = url;
+        setSkin(this.skin);
     }
 
     public void setSkin(String name) {
@@ -145,11 +144,11 @@ public abstract class Bot {
             return;
         this.entitySpawned = true;
         this.location = l;
-        ServerSpawnPlayerPacket packet = (ServerSpawnPlayerPacket) getPacket();
         long chunk = getChunk();
         for (Player p : MCThunder.getPlayers())
             if (p.getWorld().equals(getWorld()) && p.isColumnLoaded(chunk))
-                p.sendPacket(packet);
+                for (Packet packet : getPackets())
+                    p.sendPacket(packet);
     }
 
     public Location getLocation() {
@@ -162,6 +161,12 @@ public abstract class Bot {
 
     public Packet getPacket() {
         return new ServerSpawnPlayerPacket(this.entityID, this.uuid, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), 0, getMetadata().getMetadataArray());
+    }
+
+    public Collection<Packet> getPackets() {
+        return Arrays.asList(getPacket(), new ServerEntityMetadataPacket(this.entityID, getMetadata().getMetadataArray()),
+                new ServerEntityTeleportPacket(this.entityID, this.location.getX(), this.location.getY(), this.location.getZ(),
+                this.location.getYaw(), this.location.getPitch(), true));
     }
 
     public World getWorld() {

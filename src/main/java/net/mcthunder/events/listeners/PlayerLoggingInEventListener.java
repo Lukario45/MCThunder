@@ -55,7 +55,8 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
             }
         for (Bot b : MCThunder.getBots())
             if (b.getWorld().equals(player.getWorld()) && player.isColumnLoaded(b.getChunk()))
-                player.sendPacket(b.getPacket());
+                for (Packet p : b.getPackets())
+                    player.sendPacket(p);
         for (Entity e : player.getWorld().getEntities())
             if(player.isColumnLoaded(e.getChunk()))
                 for (Packet packet : e.getPackets())

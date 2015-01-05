@@ -3,7 +3,6 @@ package net.mcthunder.rankmanager.commands;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.CommandRegistry;
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,10 +15,7 @@ public class Help extends Command {//Ported by pup from Necessities
     }
 
     @Override
-    public boolean execute(Player player, ClientChatPacket packet) {
-        String[] args = new String[0];
-        if (packet.getMessage().contains(" "))
-            args = packet.getMessage().trim().substring(packet.getMessage().trim().indexOf(" ")).trim().split(" ");
+    public boolean execute(Player player, String[] args) {
         ArrayList<String> helpList = new ArrayList<>();
         int page = 0;
         String search = "";

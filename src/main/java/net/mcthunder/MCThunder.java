@@ -232,7 +232,7 @@ public class MCThunder {
                             ClientChatPacket packet = event.getPacket();
                             if (packet.getMessage().startsWith("/")) {
                                 if (packet.getMessage().equals("/"))
-                                    chatHandler.sendMessage(event.getSession(), "&cCommand does not exist!");
+                                    player.sendMessage("&cCommand does not exist!");
                                 else
                                     try {
                                         playerCommandEventSource.fireEvent(player, packet);
@@ -512,7 +512,7 @@ public class MCThunder {
         return server;
     }
 
-    public static Player getPlayer(String name) {
+    public static Player getPlayer(String name) {//Add a search by display name
         if (name == null)
             return null;
         name = name.trim();
@@ -520,7 +520,7 @@ public class MCThunder {
         for (Player p : getPlayers())
             if (p.getName().equalsIgnoreCase(name))
                 return p;
-            else if (partial == null && p.getName().toLowerCase().contains(name.toLowerCase()))
+            else if (partial == null && (p.getName().toLowerCase().contains(name.toLowerCase()) || p.getDisplayName().toLowerCase().contains(name.toLowerCase())))
                 partial = p;
         return partial;
     }

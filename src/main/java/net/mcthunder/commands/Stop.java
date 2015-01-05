@@ -3,7 +3,6 @@ package net.mcthunder.commands;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.Arrays;
 
@@ -16,16 +15,15 @@ public class Stop extends Command {
     }
 
     @Override
-    public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().trim().split(" ");
-        String args = "Server Closed!";
-        if (wholeMessage.length > 1) {
+    public boolean execute(Player player, String[] args) {
+        String message = "Server Closed!";
+        if (args.length > 0) {
             StringBuilder sb = new StringBuilder();
-            for (int i = 1; i < wholeMessage.length; i++)
-                sb.append(wholeMessage[i]).append(" ");
-            args = sb.toString().trim();
+            for (String arg : args)
+                sb.append(arg).append(" ");
+            message = sb.toString().trim();
         }
-        MCThunder.shutdown(args);
+        MCThunder.shutdown(message);
         return true;
     }
 }

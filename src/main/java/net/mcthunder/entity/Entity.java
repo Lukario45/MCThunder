@@ -280,7 +280,7 @@ public abstract class Entity {
     }*/
 
     protected Entity(Location location) {
-        this.entityID = nextID++;
+        this.entityID = getNextID();
         this.location = location;
         this.riding = null;
         if (this.location != null)
@@ -296,7 +296,7 @@ public abstract class Entity {
     }
 
     protected Entity(World w, CompoundTag tag) {
-        this.entityID = nextID++;
+        this.entityID = getNextID();
         StringTag id = tag.get("id");
         EntityType type = id == null ? null : EntityType.fromSavegameId(id.getValue());
         if (type == null)

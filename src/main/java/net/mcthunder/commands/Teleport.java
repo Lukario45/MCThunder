@@ -3,7 +3,6 @@ package net.mcthunder.commands;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.Arrays;
 
@@ -16,12 +15,11 @@ public class Teleport extends Command {
     }
 
     @Override
-    public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().split(" ");
-        if (wholeMessage.length < 2)
+    public boolean execute(Player player, String[] args) {
+        if (args.length == 0)
             return false;
-        Player toSend = MCThunder.getPlayer(wholeMessage[1]);
-        Player sendTo = wholeMessage.length > 2 ? MCThunder.getPlayer(wholeMessage[2]) : null;
+        Player toSend = MCThunder.getPlayer(args[0]);
+        Player sendTo = args.length > 1 ? MCThunder.getPlayer(args[1]) : null;
         if (toSend == null)
             player.sendMessage("&cThat player is not online!");
         else {

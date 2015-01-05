@@ -9,7 +9,7 @@ import java.util.Arrays;
  * Created by Kevin on 10/18/2014.
  */
 public class MessageFormat {
-    public Message formatMessage(String message) {
+    public static Message formatMessage(String message) {
         if (!message.contains("&"))
             return new TextMessage(message);
         for (String col : Arrays.asList("&A", "&B", "&C", "&D", "&E", "&F", "&L", "&N", "&M", "&O", "&K", "&R"))
@@ -130,7 +130,7 @@ public class MessageFormat {
         return msg;
     }
 
-    public String toConsole(String message) {
+    public static String toConsole(String message) {
         for (String col : Arrays.asList("&A", "&B", "&C", "&D", "&E", "&F", "&L", "&N", "&M", "&O", "&K", "&R"))
             message = message.replaceAll(col, col.toLowerCase());
         message = message + "&r";

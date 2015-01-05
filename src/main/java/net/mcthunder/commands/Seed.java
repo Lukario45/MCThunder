@@ -2,7 +2,6 @@ package net.mcthunder.commands;
 
 import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.Arrays;
 
@@ -12,7 +11,7 @@ public class Seed extends Command {
     }
 
     @Override
-    public boolean execute(Player player, ClientChatPacket packet) {
+    public boolean execute(Player player, String[] args) {
         player.sendMessage("Seed: " + player.getWorld().getSeed());
         return true;
     }

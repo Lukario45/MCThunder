@@ -1,7 +1,6 @@
 package net.mcthunder.api;
 
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,5 +49,5 @@ public abstract class Command {
         return this.arguments;
     }
 
-    public abstract boolean execute(Player player, ClientChatPacket packet);
+    public abstract boolean execute(Player player, String[] args);
 }

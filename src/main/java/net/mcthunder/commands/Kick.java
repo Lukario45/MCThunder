@@ -3,7 +3,6 @@ package net.mcthunder.commands;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.Arrays;
 
@@ -16,18 +15,17 @@ public class Kick extends Command {
     }
 
     @Override
-    public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().trim().split(" ");
-        if (wholeMessage.length < 2)
+    public boolean execute(Player player, String[] args) {
+        if (args.length == 0)
             return false;
-        String saidName = wholeMessage[1];
+        String saidName = args[0];
         Player p = MCThunder.getPlayer(saidName);
         if (p == null)
             player.sendMessage("&6Could not find player &c" + saidName + "&6!");
         else {
             StringBuilder sb = new StringBuilder();
-            for (int i = 2; i < wholeMessage.length; i++)
-                sb.append(wholeMessage[i]).append(" ");
+            for (int i = 1; i < args.length; i++)
+                sb.append(args[i]).append(" ");
             MCThunder.broadcast("&1" + p.getDisplayName() + " &6was kicked by &1" + player.getDisplayName() + "&6!");
             p.disconnect("Kicked: " + sb.toString().trim());
         }

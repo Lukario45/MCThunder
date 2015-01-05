@@ -3,7 +3,6 @@ package net.mcthunder.commands;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.Arrays;
 
@@ -16,15 +15,11 @@ public class GetUUID extends Command {
     }
 
     @Override
-    public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().trim().split(" ");
-        if (wholeMessage.length < 2)
+    public boolean execute(Player player, String[] args) {
+        if (args.length == 0)
             return false;
-        Player p = MCThunder.getPlayer(wholeMessage[1]);
-        if (p == null)
-            player.sendMessage("&6Could not find player &c" + wholeMessage[1] + "&6!");
-        else
-            player.sendMessage("&3" + p.getName() + ":&e " + p.getUniqueID());
+        Player p = MCThunder.getPlayer(args[0]);
+        player.sendMessage(p == null ? "&6Could not find player &c" + args[0] + "&6!" :"&3" + p.getName() + ":&e " + p.getUniqueID());
         return true;
     }
 }

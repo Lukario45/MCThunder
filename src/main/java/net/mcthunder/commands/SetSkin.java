@@ -2,7 +2,6 @@ package net.mcthunder.commands;
 
 import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.Arrays;
 
@@ -12,12 +11,11 @@ public class SetSkin extends Command {
     }
 
     @Override
-    public boolean execute(Player player, ClientChatPacket packet) {
-        String[] wholeMessage = packet.getMessage().trim().split(" ");
-        if (wholeMessage.length < 2)
+    public boolean execute(Player player, String[] args) {
+        if (args.length == 0)
             player.removeSkin();
         else
-            player.setSkin(wholeMessage[1]);
+            player.setSkin(args[0]);
         player.sendMessage("Skin updated.");
         return true;
     }

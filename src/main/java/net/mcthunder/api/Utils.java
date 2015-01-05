@@ -20,7 +20,6 @@ import java.util.UUID;
  */
 
 public class Utils {
-    private static MessageFormat format = new MessageFormat();
     private static HashMap<UUID,Property> skins = new HashMap<>();
 
     public static String getIP() {
@@ -63,7 +62,7 @@ public class Utils {
     }
 
     public static void tellConsole(LoggingLevel level, String message) {
-        System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), format.toConsole(message));
+        System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), MessageFormat.toConsole(message));
     }
 
     public static void tellConsole(LoggingLevel level, Object m) {
