@@ -12,6 +12,7 @@ import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.mc.auth.properties.PropertyMap;
+import org.spacehq.mc.auth.util.Base64;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
@@ -41,6 +42,7 @@ public class Player extends LivingEntity {
     private final GameProfile origProfile;
     private final String name;
     private final Property origSkin;
+    private final String capeURL = null;
     private GameProfile profile;
     private UUID skinUUID;
     private Property skin;
@@ -80,14 +82,7 @@ public class Player extends LivingEntity {
         this.skinUUID = this.uuid;
         this.origSkin = getGameProfile().getProperties().get("textures");
         this.skin = this.origSkin;
-        this.skinFlags = (byte) (1);
-        this.skinFlags |= 1 << 1;
-        this.skinFlags |= 1 << 2;
-        this.skinFlags |= 1 << 3;
-        this.skinFlags |= 1 << 4;
-        this.skinFlags |= 1 << 5;
-        this.skinFlags |= 1 << 6;
-        this.metadata.setMetadata(10, this.skinFlags);//TODO: make these settings reflect those set by client
+        this.metadata.setMetadata(10, this.skinFlags = (byte) 127);
         this.metadata.setMetadata(15, (byte) 1);//Assumes the player has a brain
         this.metadata.setBit(16, 0x02, this.hideCape = false);
         this.metadata.setMetadata(17, (float) (this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));
@@ -348,10 +343,11 @@ public class Player extends LivingEntity {
         MCThunder.getEntryListHandler().refresh(this);
         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
         this.entityID = getNextID();
+        long chunk = getChunk();
         for (Player pl : MCThunder.getPlayers())
             if (!pl.getUniqueID().equals(getUniqueID())) {
                 pl.sendPacket(destroyEntitiesPacket);
-                if (pl.getWorld().equals(getWorld()))
+                if (pl.getWorld().equals(getWorld()) && pl.isColumnLoaded(chunk))
                     for (Packet packet : getPackets())
                         pl.sendPacket(packet);
             }
@@ -442,14 +438,25 @@ public class Player extends LivingEntity {
         if (p == null || !p.getName().equalsIgnoreCase("textures"))
             return;
         this.skin = p;
+        if (this.capeURL != null)//This does not work because signature is not valid after it is changed
+            try {//TODO: Try to come up with a way to get this to work, that does not require the private mc auth key
+                byte[] bytes = Base64.decode(this.skin.getValue().getBytes("UTF-8"));
+                String value = new String(bytes);
+                int s = value.indexOf("CAPE");
+                value = value.substring(0, (s == -1 ? value.length() : s) - 2) + ",\"CAPE\":{\"url\":\"" + this.capeURL + "\"}}}";
+                this.skin = new Property("textures", new String(Base64.encode(value.getBytes("UTF-8"))), this.skin.getSignature());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         this.profile.getProperties().put("textures", this.skin);
         MCThunder.getEntryListHandler().refresh(this);
         ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
         this.entityID = getNextID();
+        long chunk = getChunk();
         for (Player pl : MCThunder.getPlayers())
             if (!pl.getUniqueID().equals(getUniqueID())) {
                 pl.sendPacket(destroyEntitiesPacket);
-                if (pl.getWorld().equals(getWorld()))
+                if (pl.getWorld().equals(getWorld()) && pl.isColumnLoaded(chunk))
                     for (Packet packet : getPackets())
                         pl.sendPacket(packet);
             }
@@ -483,6 +490,42 @@ public class Player extends LivingEntity {
         Inventory e = new ChestInventory("EnderChest");
         //TODO: Retrieve enderchest data
         return e;
+    }
+
+    public void showCape(boolean show) {
+        this.metadata.setBit(16, 0x02, this.hideCape = !show);
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 1 : this.skinFlags & ~1));
+        updateMetadata();
+    }
+
+    public void showJacket(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? (this.skinFlags | 2) : this.skinFlags & ~2));
+        updateMetadata();
+    }
+
+    public void showLeftSleeve(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 4 : this.skinFlags & ~4));
+        updateMetadata();
+    }
+
+    public void showRightSleeve(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 8 : this.skinFlags & ~8));
+        updateMetadata();
+    }
+
+    public void showLeftPantLeg(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 16 : this.skinFlags & ~16));
+        updateMetadata();
+    }
+
+    public void showRightPantLeg(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 32 : this.skinFlags & ~32));
+        updateMetadata();
+    }
+
+    public void showHat(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 64 : this.skinFlags & ~64));
+        updateMetadata();
     }
 
     @Override

@@ -2,71 +2,44 @@ package net.mcthunder.api;
 
 import net.mcthunder.MCThunder;
 import net.mcthunder.entity.Entity;
+import net.mcthunder.entity.LivingEntity;
 import net.mcthunder.entity.Player;
-import net.mcthunder.world.World;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.mc.auth.util.Base64;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityMetadataPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.packetlib.packet.Packet;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.UUID;
 
-public abstract class Bot {
-    private int entityID;
-    private MetadataMap metadata;
+public abstract class Bot extends LivingEntity {
     private GameProfile botProfile;
     private byte skinFlags;
+    private boolean hideCape;
     private String capeURL = null;
-    private boolean hasAI = false;
     private boolean entitySpawned = false;
     private Property skin = null;
-    private Location location;
     private String name;
     private UUID skinUUID;
     private UUID uuid;
 
     public Bot(String name) {
-        this.name = name;
+        super(null);
+        this.metadata.setMetadata(2, this.name = name);
+        this.metadata.setMetadata(3, (byte) 1);//Always show name
         this.uuid = UUID.randomUUID();
-        String temp = MessageFormat.formatMessage(this.name).getFullText().trim();
-        this.skinUUID = Utils.getUUIDfromString(temp);
+        String uncoloredName = MessageFormat.formatMessage(this.name).getFullText().trim();
+        this.skinUUID = Utils.getUUIDfromString(uncoloredName);
         if (this.skinUUID == null)
             this.skinUUID = this.uuid;
-        this.botProfile = new GameProfile(this.uuid, temp);
-        this.entityID = Entity.getNextID();
+        this.botProfile = new GameProfile(this.uuid, uncoloredName);
         setSkin(this.skinUUID);
-        this.metadata = new MetadataMap();
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, false);//on fire
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, false);//sneaking
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, false);//sprinting
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ARM_UP, false);//Eating, drinking, blocking
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, false);//invisible
-        this.metadata.setMetadata(1, (short) 0);//airLeft
-        this.metadata.setMetadata(2, this.name);
-        this.metadata.setMetadata(3, (byte) 1);//Always show name
-        this.metadata.setMetadata(6, (float) 20);//health
-        this.metadata.setMetadata(7, 0);//potionColor
-        this.metadata.setMetadata(8, (byte) 0);//potion ambient = false
-        this.metadata.setMetadata(9, (byte) 0);//arrows in bot
-        this.skinFlags = (byte) (1);
-        this.skinFlags |= 1 << 1;
-        this.skinFlags |= 1 << 2;
-        this.skinFlags |= 1 << 3;
-        this.skinFlags |= 1 << 4;
-        this.skinFlags |= 1 << 5;
-        this.skinFlags |= 1 << 6;
-        this.metadata.setMetadata(10, this.skinFlags);//Unsigned byte for skin flags
-        this.metadata.setMetadata(15, (byte) (this.hasAI ? 1 : 0));
-        this.metadata.setBit(16, 0x02, false);
-        this.metadata.setMetadata(17, (float) 0);//absorption
+        this.metadata.setMetadata(10, this.skinFlags = (byte) 127);
+        this.metadata.setBit(16, 0x02, this.hideCape = false);
+        this.metadata.setMetadata(17, (float) (this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));
         this.metadata.setMetadata(18, 0);//score
     }
 
@@ -79,9 +52,11 @@ public abstract class Bot {
     }
 
     public void setName(String newName) {
-        this.name = newName;
+        super.setCustomName(newName);
+        this.metadata.setMetadata(2, this.name = newName);
         this.botProfile = new GameProfile(this.uuid, MessageFormat.formatMessage(this.name).getFullText().trim());
         this.botProfile.getProperties().put("textures", this.skin);
+        updateMetadata();
     }
 
     public GameProfile getGameProfile() {
@@ -101,10 +76,7 @@ public abstract class Bot {
                 byte[] bytes = Base64.decode(this.skin.getValue().getBytes("UTF-8"));
                 String value = new String(bytes);
                 int s = value.indexOf("CAPE");
-                if (s == -1)
-                    value = value.substring(0, value.length() - 2) + ",\"CAPE\":{\"url\":\"" + this.capeURL + "\"}}}";
-                else
-                    value = value.substring(0, s - 2) + ",\"CAPE\":{\"url\":\"" + this.capeURL + "\"}}}";
+                value = value.substring(0, (s == -1 ? value.length() : s) - 2) + ",\"CAPE\":{\"url\":\"" + this.capeURL + "\"}}}";
                 this.skin = new Property("textures", new String(Base64.encode(value.getBytes("UTF-8"))), this.skin.getSignature());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -151,41 +123,47 @@ public abstract class Bot {
                     p.sendPacket(packet);
     }
 
-    public Location getLocation() {
-        return this.location.clone();
-    }
-
-    public void setLocation(Location location) {
-        this.location = location.clone();
-    }
-
     public Packet getPacket() {
         return new ServerSpawnPlayerPacket(this.entityID, this.uuid, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), 0, getMetadata().getMetadataArray());
     }
 
-    public Collection<Packet> getPackets() {
-        return Arrays.asList(getPacket(), new ServerEntityMetadataPacket(this.entityID, getMetadata().getMetadataArray()),
-                new ServerEntityTeleportPacket(this.entityID, this.location.getX(), this.location.getY(), this.location.getZ(),
-                this.location.getYaw(), this.location.getPitch(), true));
+    public void showCape(boolean show) {
+        this.metadata.setBit(16, 0x02, this.hideCape = !show);
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 1 : this.skinFlags & ~1));
+        updateMetadata();
     }
 
-    public World getWorld() {
-        return this.location.getWorld();
+    public void showJacket(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? (this.skinFlags | 2) : this.skinFlags & ~2));
+        updateMetadata();
+    }
+
+    public void showLeftSleeve(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 4 : this.skinFlags & ~4));
+        updateMetadata();
+    }
+
+    public void showRightSleeve(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 8 : this.skinFlags & ~8));
+        updateMetadata();
+    }
+
+    public void showLeftPantLeg(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 16 : this.skinFlags & ~16));
+        updateMetadata();
+    }
+
+    public void showRightPantLeg(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 32 : this.skinFlags & ~32));
+        updateMetadata();
+    }
+
+    public void showHat(boolean show) {
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 64 : this.skinFlags & ~64));
+        updateMetadata();
     }
 
     public abstract void unload();
 
     public abstract void load();
-
-    public long getChunk() {
-        return this.location == null ? 0 : Utils.getLong((int) this.location.getX() >> 4, (int) this.location.getZ() >> 4);
-    }
-
-    public MetadataMap getMetadata() {
-        return this.metadata;
-    }
-
-    public int getEntityID() {
-        return this.entityID;
-    }
 }

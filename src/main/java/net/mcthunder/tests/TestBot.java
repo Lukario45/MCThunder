@@ -20,4 +20,11 @@ public class TestBot extends Bot {
     public void load() {
         tellConsole(LoggingLevel.DEBUG, "TestBot(" + getName() + "&r) loaded.");
     }
+
+    @Override
+    public void ai() {//Random test ai for testing entity movement for when I get around to making entity ais
+        moveUp(0.1);
+        moveForward(0.5);
+        turnRight(5);
+    }
 }

@@ -1,9 +1,13 @@
 package net.mcthunder.entity;
 
+import net.mcthunder.MCThunder;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.PotionEffect;
 import net.mcthunder.api.PotionEffectType;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
+import org.spacehq.packetlib.packet.Packet;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -92,5 +96,98 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
 
     public Collection<PotionEffect> getActiveEffects() {
         return this.activeEffects.values();
+    }
+
+    protected void moveForward(double distance) {
+        Location old = getLocation();
+        this.location.setX(this.location.getX() - distance * Math.sin(Math.toRadians(this.location.getYaw())));
+        this.location.setZ(this.location.getZ() + distance * Math.cos(Math.toRadians(this.location.getYaw())));
+        Packet update;
+        int packed = (int) (distance * 32);
+        if (packed > Byte.MAX_VALUE || packed < Byte.MIN_VALUE)
+            update = new ServerEntityTeleportPacket(this.entityID, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), isOnGround());
+        else
+            update = new ServerEntityPositionPacket(this.entityID, this.location.getX() - old.getX(), 0, this.location.getZ() - old.getZ(), isOnGround());
+        long chunk = getChunk();
+        for (Player p : MCThunder.getPlayers())
+            if (p.getWorld().equals(getWorld()) && p.isColumnLoaded(chunk))
+                p.sendPacket(update);
+    }
+
+    protected void moveBackward(double distance) {
+        moveForward(-distance);
+    }
+
+    protected void moveRight(double distance) {
+        Location old = getLocation();
+        this.location.setX(this.location.getX() - distance * Math.cos(Math.toRadians(this.location.getYaw())));
+        this.location.setZ(this.location.getZ() + distance * Math.sin(Math.toRadians(this.location.getYaw())));
+        Packet update;
+        int packed = (int) (distance * 32);
+        if (packed > Byte.MAX_VALUE || packed < Byte.MIN_VALUE)
+            update = new ServerEntityTeleportPacket(this.entityID, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), isOnGround());
+        else
+            update = new ServerEntityPositionPacket(this.entityID, this.location.getX() - old.getX(), 0, this.location.getZ() - old.getZ(), isOnGround());
+        long chunk = getChunk();
+        for (Player p : MCThunder.getPlayers())
+            if (p.getWorld().equals(getWorld()) && p.isColumnLoaded(chunk))
+                p.sendPacket(update);
+    }
+
+    protected void moveLeft(double distance) {
+        moveRight(-distance);
+    }
+
+    protected void moveUp(double distance) {
+        Location old = getLocation();
+        this.location.setY(this.location.getY() + distance);
+        Packet update;
+        int packed = (int) (distance * 32);
+        if (packed > Byte.MAX_VALUE || packed < Byte.MIN_VALUE)
+            update = new ServerEntityTeleportPacket(this.entityID, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), isOnGround());
+        else
+            update = new ServerEntityPositionPacket(this.entityID, 0, this.location.getY() - old.getY(), 0, isOnGround());
+        long chunk = getChunk();
+        for (Player p : MCThunder.getPlayers())
+            if (p.getWorld().equals(getWorld()) && p.isColumnLoaded(chunk))
+                p.sendPacket(update);
+    }
+
+    protected void moveDown(double distance) {
+        moveUp(-distance);
+    }
+
+    protected void turnRight(double angle) {
+        this.location.setYaw((float) ((this.location.getYaw() + angle) % 360));
+        Collection<Packet> packets = Arrays.asList(new ServerEntityRotationPacket(this.entityID, this.location.getYaw(), this.location.getPitch(), isOnGround()),
+                new ServerEntityHeadLookPacket(this.entityID, this.location.getYaw()));
+        long chunk = getChunk();
+        for (Player p : MCThunder.getPlayers())
+            if (p.getWorld().equals(getWorld()) && p.isColumnLoaded(chunk))
+                for (Packet update : packets)
+                    p.sendPacket(update);
+    }
+
+    protected void turnLeft(double angle) {
+        turnRight(-angle);
+    }
+
+    protected void lookUp(double angle) {
+        this.location.setPitch((float) ((this.location.getPitch() + 90 + angle) % 180) - 90);
+        Packet update = new ServerEntityRotationPacket(this.entityID, this.location.getYaw(), this.location.getPitch(), isOnGround());
+        long chunk = getChunk();
+        for (Player p : MCThunder.getPlayers())
+            if (p.getWorld().equals(getWorld()) && p.isColumnLoaded(chunk))
+                p.sendPacket(update);
+    }
+
+    protected void lookDown(double angle) {
+        lookUp(-angle);
+    }
+
+    public Collection<Packet> getPackets() {
+        return Arrays.asList(getPacket(), new ServerEntityMetadataPacket(this.entityID, getMetadata().getMetadataArray()),
+                new ServerEntityPositionRotationPacket(this.entityID, 0, 0, 0, this.location.getYaw(), this.location.getPitch(), isOnGround()),
+                new ServerEntityHeadLookPacket(this.entityID, this.location.getYaw()));
     }
 }

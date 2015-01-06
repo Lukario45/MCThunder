@@ -411,12 +411,12 @@ public class MCThunder {
                 for (World w : getWorlds())
                     if (!w.getEntities().isEmpty())
                         for (Entity e : w.getEntities()) {
-                            if (e instanceof Ageable) {
-                                Ageable a = (Ageable) e;
-                                a.setAge((byte) (a.getAge() + 1));
-                            }
                             if (e instanceof LivingEntity) {
                                 LivingEntity l = (LivingEntity) e;
+                                if (l instanceof Ageable) {
+                                    Ageable a = (Ageable) l;
+                                    a.setAge((byte) (a.getAge() + 1));
+                                }
                                 ArrayList<PotionEffectType> toRem = new ArrayList<>();
                                 for (PotionEffect p : l.getActiveEffects())
                                     if (p.getDuration() > 1)
@@ -425,8 +425,11 @@ public class MCThunder {
                                         toRem.add(p.getType());
                                 for (PotionEffectType t : toRem)
                                     l.removePotionEffect(t);
+                                l.ai();
                             }
                         }
+                for (Bot b : getBots())
+                    b.ai();
                 for (Player p : getPlayers()) {
                     ArrayList<PotionEffectType> toRem = new ArrayList<>();
                     for (PotionEffect e : p.getActiveEffects())
