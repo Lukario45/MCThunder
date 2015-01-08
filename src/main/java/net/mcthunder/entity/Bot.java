@@ -1,9 +1,10 @@
-package net.mcthunder.api;
+package net.mcthunder.entity;
 
 import net.mcthunder.MCThunder;
-import net.mcthunder.entity.Entity;
-import net.mcthunder.entity.LivingEntity;
-import net.mcthunder.entity.Player;
+import net.mcthunder.api.Location;
+import net.mcthunder.api.MessageFormat;
+import net.mcthunder.api.PotionEffectType;
+import net.mcthunder.api.Utils;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.mc.auth.util.Base64;

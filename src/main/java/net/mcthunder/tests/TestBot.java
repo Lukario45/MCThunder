@@ -1,7 +1,7 @@
 package net.mcthunder.tests;
 
-import net.mcthunder.api.Bot;
 import net.mcthunder.api.LoggingLevel;
+import net.mcthunder.entity.Bot;
 
 import static net.mcthunder.api.Utils.tellConsole;
 

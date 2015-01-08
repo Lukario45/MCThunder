@@ -36,7 +36,7 @@ public class Region {
         this.x = (int) (region >> 32);
         this.z = (int) region;
         this.world = w;
-        File f = new File("worlds/" + this.world.getName() + "/region/r." + this.x + "." + this.z + ".mca");
+        File f = new File(this.world.getPath() + "/region/r." + this.x + "." + this.z + ".mca");
         this.invalid = !f.exists();
         if (this.invalid) {
             //Create the region file
@@ -702,10 +702,11 @@ public class Region {
                     StringTag extraType = tile.get("ExtraType");//Legacy support for pre 1.8
                     ByteTag rotation = tile.get("Rot");
                     CompoundTag owner = tile.get("Owner");
-                    UUID uuid = UUID.fromString(((StringTag) owner.get("Id")).getValue());
-                    StringTag name = owner.get("Name");
-                    CompoundTag properties = owner.get("Properties");
-                    ListTag textures = properties.get("textures");
+                    StringTag ownerUUID = (owner == null ? null : (StringTag) owner.get("Id"));
+                    UUID uuid = ownerUUID != null ? UUID.fromString(ownerUUID.getValue()) : null;
+                    StringTag name = (owner == null ? null : (StringTag) owner.get("Name"));
+                    CompoundTag properties = (owner == null ? null : (CompoundTag) owner.get("Properties"));
+                    ListTag textures = (properties == null ? null : (ListTag) properties.get("textures"));
                     if (textures != null)
                         for (int j = 0; j < textures.size(); j++) {
                             CompoundTag texture = textures.get(j);

@@ -1,7 +1,7 @@
 package net.mcthunder.handlers;
 
 import net.mcthunder.MCThunder;
-import net.mcthunder.api.Bot;
+import net.mcthunder.entity.Bot;
 import net.mcthunder.entity.Player;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntryAction;

@@ -37,7 +37,7 @@ import static net.mcthunder.api.Utils.getLong;
 /**
  * Created by Kevin on 10/14/2014.
  */
-public class Player extends LivingEntity {
+public final class Player extends LivingEntity {
     private final UUID uuid;
     private final GameProfile origProfile;
     private final String name;
@@ -254,20 +254,22 @@ public class Player extends LivingEntity {
             for (long column : columns)
                 if (!isColumnLoaded(column)) {
                     Column c = getWorld().getColumn(column);
-                    sendPacket(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
-                    for (Player player1 : MCThunder.getPlayers())
-                        if (player1.getWorld().equals(getWorld()) && column == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
-                            for (Packet packet : player1.getPackets())
-                                sendPacket(packet);
-                    for (Bot b : MCThunder.getBots())
-                        if (b.getWorld().equals(getWorld()) && column == b.getChunk())
-                            for (Packet p : b.getPackets())
-                                sendPacket(p);
-                    for (Entity e : getWorld().getEntities())
-                        if (column == e.getChunk())
-                            for (Packet packet : e.getPackets())
-                                sendPacket(packet);
-                    this.loadedColumns.add(column);
+                    if (c != null) {
+                        sendPacket(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
+                        for (Player player1 : MCThunder.getPlayers())
+                            if (player1.getWorld().equals(getWorld()) && column == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
+                                for (Packet packet : player1.getPackets())
+                                    sendPacket(packet);
+                        for (Bot b : MCThunder.getBots())
+                            if (b.getWorld().equals(getWorld()) && column == b.getChunk())
+                                for (Packet p : b.getPackets())
+                                    sendPacket(p);
+                        for (Entity e : getWorld().getEntities())
+                            if (column == e.getChunk())
+                                for (Packet packet : e.getPackets())
+                                    sendPacket(packet);
+                    }
+                    this.loadedColumns.add(column);//Technically is loaded for other purposes
                 }
     }
 

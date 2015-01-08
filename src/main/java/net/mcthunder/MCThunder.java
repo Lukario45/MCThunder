@@ -150,10 +150,13 @@ public class MCThunder {
         players = new HashMap<>(conf.getSlots());
         worlds = new HashMap<>();
         bots = new ArrayList<>();
-
-        final World world = new World(conf.getWorldName());
-        worlds.put(conf.getWorldName(), world);
-        world.loadWorld();
+        //Load the world files and check for subdirectories recursively if it is not a world folder
+        File dir = new File("worlds");
+        File[] files = dir.listFiles();
+        if (files != null)
+            for (File f : files)
+                if (f.exists())
+                    loadWorld(f);
 
         server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
         server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 256);//Default is 256 not 100
@@ -596,7 +599,7 @@ public class MCThunder {
     }
 
     public static World getWorld(String name) {
-        return worlds.get(name);
+        return worlds.get(name.toLowerCase());
     }
 
     public static Collection<World> getWorlds() {
@@ -633,5 +636,23 @@ public class MCThunder {
 
     public static MetadataChangeEventSource getMetadataChangeEventSource() {
         return metadataChangeEventSource;
+    }
+
+    public static void loadWorld(File f) {
+        File level = new File(f.getPath() + "/level.dat");
+        if (!level.exists()) {
+            File[] files = f.listFiles();
+            if (files != null)
+                for (File file : files)
+                    if (!file.isFile())
+                        loadWorld(file);
+        } else {
+            worlds.put(f.getName().toLowerCase(), new World(f.getName(), f.getPath()));
+            try {
+                worlds.get(f.getName().toLowerCase()).loadWorld();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

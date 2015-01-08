@@ -28,7 +28,7 @@ import static net.mcthunder.api.Utils.tellConsole;
  * Created by Kevin on 10/19/2014.
  */
 public class World {
-    private String name;
+    private String name, path;
     private long seed;
     private int dimension;
     private boolean hardcore;
@@ -44,10 +44,15 @@ public class World {
     private WorldType worldType;
 
     public World(String name) {
+        this(name, "worlds/" + name);
+    }
+
+    public World(String name, String path) {
         this.name = name;
+        this.path = path;
         this.dimension = 0;
         try {
-            CompoundTag tag = NBTIO.readFile(new File("worlds/" + this.name + "/level.dat"));
+            CompoundTag tag = NBTIO.readFile(new File(this.path + "/level.dat"));
             CompoundTag data = tag.get("Data");
             IntTag xTag = data.get("SpawnX");
             IntTag yTag = data.get("SpawnY");
@@ -276,6 +281,10 @@ public class World {
             if (i.equals(l))
                 return this.chestData.get(i);
         return this.chestData.get(l);
+    }
+
+    public String getPath() {
+        return this.path;
     }
 
     public Collection<Sign> getSigns() {

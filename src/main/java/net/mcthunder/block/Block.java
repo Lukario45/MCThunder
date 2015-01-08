@@ -124,7 +124,8 @@ public class Block {
         //12 sun during rain or snow
         //10 sun during thunderstorm
         //4 moon
-        return this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY].getSkyLight().get(this.blockX, this.blockY, this.blockZ);
+        Chunk c = this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ)).getChunks()[this.chunkY];
+        return c == null ? 0 : c.getSkyLight().get(this.blockX, this.blockY, this.blockZ);
     }
 
     public int getLightLevel() {

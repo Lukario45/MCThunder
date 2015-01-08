@@ -1,10 +1,10 @@
 package net.mcthunder.events.listeners;
 
 import net.mcthunder.MCThunder;
-import net.mcthunder.api.Bot;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.block.Sign;
+import net.mcthunder.entity.Bot;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
 import org.spacehq.mc.auth.GameProfile;
