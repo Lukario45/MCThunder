@@ -24,7 +24,7 @@ public class TestBot extends Bot {
     @Override
     public void ai() {//Random test ai for testing entity movement for when I get around to making entity ais
         moveUp(0.1);
-        moveForward(0.5);
+        moveForward(0.1);
         turnRight(5);
     }
 }

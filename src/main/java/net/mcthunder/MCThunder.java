@@ -413,24 +413,26 @@ public class MCThunder {
                 //TODO: Add a way to register events to happen after certain number of ticks
                 for (World w : getWorlds())
                     if (!w.getEntities().isEmpty())
-                        for (Entity e : w.getEntities()) {
-                            if (e instanceof LivingEntity) {
-                                LivingEntity l = (LivingEntity) e;
-                                if (l instanceof Ageable) {
-                                    Ageable a = (Ageable) l;
-                                    a.setAge((byte) (a.getAge() + 1));
+                        try {
+                            for (Entity e : w.getEntities()) {
+                                if (e instanceof LivingEntity) {
+                                    LivingEntity l = (LivingEntity) e;
+                                    if (l instanceof Ageable) {
+                                        Ageable a = (Ageable) l;
+                                        a.setAge((byte) (a.getAge() + 1));
+                                    }
+                                    ArrayList<PotionEffectType> toRem = new ArrayList<>();
+                                    for (PotionEffect p : l.getActiveEffects())
+                                        if (p.getDuration() > 1)
+                                            p.setDuration(p.getDuration() - 1);
+                                        else
+                                            toRem.add(p.getType());
+                                    for (PotionEffectType t : toRem)
+                                        l.removePotionEffect(t);
+                                    l.ai();
                                 }
-                                ArrayList<PotionEffectType> toRem = new ArrayList<>();
-                                for (PotionEffect p : l.getActiveEffects())
-                                    if (p.getDuration() > 1)
-                                        p.setDuration(p.getDuration() - 1);
-                                    else
-                                        toRem.add(p.getType());
-                                for (PotionEffectType t : toRem)
-                                    l.removePotionEffect(t);
-                                l.ai();
                             }
-                        }
+                        } catch (Exception ignored) { }//Entity added at exact same time it checked for entities
                 for (Bot b : getBots())
                     b.ai();
                 for (Player p : getPlayers()) {

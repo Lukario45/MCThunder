@@ -29,14 +29,15 @@ public abstract class Bot extends LivingEntity {
 
     public Bot(String name) {
         super(null);
-        this.metadata.setMetadata(2, this.name = name);
-        this.metadata.setMetadata(3, (byte) 1);//Always show name
         this.uuid = UUID.randomUUID();
+        this.name = name;
         String uncoloredName = MessageFormat.formatMessage(this.name).getFullText().trim();
+        this.metadata.setMetadata(2, uncoloredName.length() > 16 ? uncoloredName.substring(0, 16) : uncoloredName);
+        this.metadata.setMetadata(3, (byte) 1);//Always show name
         this.skinUUID = Utils.getUUIDfromString(uncoloredName);
         if (this.skinUUID == null)
             this.skinUUID = this.uuid;
-        this.botProfile = new GameProfile(this.uuid, uncoloredName);
+        this.botProfile = new GameProfile(this.uuid, uncoloredName.length() > 16 ? uncoloredName.substring(0, 16) : uncoloredName);
         setSkin(this.skinUUID);
         this.metadata.setMetadata(10, this.skinFlags = (byte) 127);
         this.metadata.setBit(16, 0x02, this.hideCape = false);
@@ -53,11 +54,28 @@ public abstract class Bot extends LivingEntity {
     }
 
     public void setName(String newName) {
-        super.setCustomName(newName);
-        this.metadata.setMetadata(2, this.name = newName);
-        this.botProfile = new GameProfile(this.uuid, MessageFormat.formatMessage(this.name).getFullText().trim());
-        this.botProfile.getProperties().put("textures", this.skin);
-        updateMetadata();
+        if (this.name == null)
+            return;
+        String nick = MessageFormat.formatMessage(this.name = newName).getFullText().trim();
+        if (nick.length() < 17) {
+            super.setCustomName(nick);
+            this.metadata.setMetadata(2, nick);
+            this.botProfile = new GameProfile(this.uuid, nick);
+            this.botProfile.getProperties().put("textures", this.skin);
+            updateMetadata();
+        }
+        MCThunder.getEntryListHandler().refresh(this);
+        if (nick.length() < 17) {
+            ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+            this.entityID = getNextID();
+            long chunk = getChunk();
+            for (Player pl : MCThunder.getPlayers()) {
+                pl.sendPacket(destroyEntitiesPacket);
+                if (pl.getWorld().equals(getWorld()) && pl.isColumnLoaded(chunk))
+                    for (Packet packet : getPackets())
+                        pl.sendPacket(packet);
+            }
+        }
     }
 
     public GameProfile getGameProfile() {

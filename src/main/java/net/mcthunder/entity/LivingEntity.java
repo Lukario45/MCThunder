@@ -99,6 +99,8 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
     }
 
     protected void moveForward(double distance) {
+        if (this.location == null)
+            return;
         Location old = getLocation();
         this.location.setX(this.location.getX() - distance * Math.sin(Math.toRadians(this.location.getYaw())));
         this.location.setZ(this.location.getZ() + distance * Math.cos(Math.toRadians(this.location.getYaw())));
@@ -119,6 +121,8 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
     }
 
     protected void moveRight(double distance) {
+        if (this.location == null)
+            return;
         Location old = getLocation();
         this.location.setX(this.location.getX() - distance * Math.cos(Math.toRadians(this.location.getYaw())));
         this.location.setZ(this.location.getZ() + distance * Math.sin(Math.toRadians(this.location.getYaw())));
@@ -139,6 +143,8 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
     }
 
     protected void moveUp(double distance) {
+        if (this.location == null)
+            return;
         Location old = getLocation();
         this.location.setY(this.location.getY() + distance);
         Packet update;
@@ -158,6 +164,8 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
     }
 
     protected void turnRight(double angle) {
+        if (this.location == null)
+            return;
         this.location.setYaw((float) ((this.location.getYaw() + angle) % 360));
         Collection<Packet> packets = Arrays.asList(new ServerEntityRotationPacket(this.entityID, this.location.getYaw(), this.location.getPitch(), isOnGround()),
                 new ServerEntityHeadLookPacket(this.entityID, this.location.getYaw()));
@@ -173,6 +181,8 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
     }
 
     protected void lookUp(double angle) {
+        if (this.location == null)
+            return;
         this.location.setPitch((float) ((this.location.getPitch() + 90 + angle) % 180) - 90);
         Packet update = new ServerEntityRotationPacket(this.entityID, this.location.getYaw(), this.location.getPitch(), isOnGround());
         long chunk = getChunk();

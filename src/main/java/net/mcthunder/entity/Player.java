@@ -274,9 +274,10 @@ public final class Player extends LivingEntity {
     }
 
     public void teleport(Location l) {
-        long chunk = getChunk();
         if (!l.getWorld().equals(getWorld())) {
             ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+            setLocation(l);
+            long chunk = getChunk();
             this.entityID = getNextID();//Is this needed? depends on how when going back and forth between worlds we do it
             for (Player p : MCThunder.getPlayers()) {
                 p.sendPacket(destroyEntitiesPacket);
@@ -284,14 +285,21 @@ public final class Player extends LivingEntity {
                     for (Packet packet : getPackets())
                         p.sendPacket(packet);
             }
-            sendPacket(new ServerRespawnPacket(l.getWorld().getDimension(), l.getWorld().getDifficulty(), getGameMode(), l.getWorld().getWorldType()));
+            this.northColumns.clear();
+            this.eastColumns.clear();
+            this.westColumns.clear();
+            this.southColumns.clear();
+            this.loadedColumns.clear();
+            sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
+            loadChunks(null);
         } else {
+            setLocation(l);
             ServerEntityTeleportPacket packet = new ServerEntityTeleportPacket(getEntityID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), isOnGround());
+            long chunk = getChunk();
             for (Player p : MCThunder.getPlayers())
                 if (p.getWorld().equals(l.getWorld()) && p.isColumnLoaded(chunk))
                     p.sendPacket(packet);
         }
-        setLocation(l);
         sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
         sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
     }
@@ -338,24 +346,32 @@ public final class Player extends LivingEntity {
 
     public void setDisplayName(String displayName) {//TODO: Save nick to file
         this.displayName = displayName == null ? this.name : displayName;
-        PropertyMap properties = (PropertyMap) this.profile.getProperties().clone();
-        this.profile = this.displayName == null ? this.origProfile : new GameProfile(this.uuid, MessageFormat.formatMessage(getDisplayName()).getFullText().trim());
-        for (String key : properties.keySet())
-            this.profile.getProperties().put(key, properties.get(key));
+        String uncolored = MessageFormat.formatMessage(getDisplayName()).getFullText().trim();
+        if (uncolored.length() < 17) {
+            super.setCustomName(uncolored);
+            this.metadata.setMetadata(2, uncolored);
+            PropertyMap properties = (PropertyMap) this.profile.getProperties().clone();
+            this.profile = this.displayName == null ? this.origProfile : new GameProfile(this.uuid, uncolored);
+            for (String key : properties.keySet())
+                this.profile.getProperties().put(key, properties.get(key));
+            updateMetadata();
+        }
         MCThunder.getEntryListHandler().refresh(this);
-        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
-        this.entityID = getNextID();
-        long chunk = getChunk();
-        for (Player pl : MCThunder.getPlayers())
-            if (!pl.getUniqueID().equals(getUniqueID())) {
-                pl.sendPacket(destroyEntitiesPacket);
-                if (pl.getWorld().equals(getWorld()) && pl.isColumnLoaded(chunk))
-                    for (Packet packet : getPackets())
-                        pl.sendPacket(packet);
-            }
-        sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
-        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
-        sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
+        if (uncolored.length() < 17) {
+            ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+            this.entityID = getNextID();
+            long chunk = getChunk();
+            for (Player pl : MCThunder.getPlayers())
+                if (!pl.getUniqueID().equals(getUniqueID())) {
+                    pl.sendPacket(destroyEntitiesPacket);
+                    if (pl.getWorld().equals(getWorld()) && pl.isColumnLoaded(chunk))
+                        for (Packet packet : getPackets())
+                            pl.sendPacket(packet);
+                }
+            sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
+            sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
+            sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
+        }
     }
 
     public Inventory getInventory() {
