@@ -31,14 +31,12 @@ public class World {
     private String name, path;
     private long seed;
     private int dimension;
-    private boolean hardcore;
-    private boolean generateStructures;
-    private boolean dimensionRead = false;
+    private boolean hardcore, generateStructures, dimensionRead = false;
     private Location spawn;
     private Difficulty difficulty;
     private HashMap<Long, Region> regionHashMap = new HashMap<>();
     private HashMap<Long, Column> columnHashMap = new HashMap<>();
-    private HashMap<Integer,Entity> loadedEntities = new HashMap<>();
+    private HashMap<Integer, Entity> loadedEntities = new HashMap<>();
     private HashMap<Location, Chest> chestData = new HashMap<>();
     private ArrayList<Sign> signs = new ArrayList<>();//TEMP arraylist
     private WorldType worldType;

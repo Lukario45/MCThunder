@@ -185,7 +185,6 @@ public class Region {
                 if (type == null)
                     continue;
                 Location loc = null;
-                Vector vec = null;
                 ListTag pos = entity.get("Pos");
                 if (pos != null) {
                     DoubleTag posX = pos.get(0);

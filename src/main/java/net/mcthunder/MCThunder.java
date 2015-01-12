@@ -261,9 +261,10 @@ public class MCThunder {
                             ItemStack old = player.getHeldItem();
                             player.getInventory().setSlot(packet.getSlot(), new ItemStack(packet.getClickedItem() == null ? Material.AIR :
                                     Material.fromData(packet.getClickedItem().getId(), (short) packet.getClickedItem().getData()),
-                                    packet.getClickedItem() == null ? 0 : packet.getClickedItem().getAmount()));
+                                    packet.getClickedItem() == null ? 0 : packet.getClickedItem().getAmount(), packet.getClickedItem() == null ?
+                                    null : packet.getClickedItem().getNBT()));
                             if (packet.getSlot() == player.getSlot() && !old.equals(player.getHeldItem())) {
-                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), 0, player.getHeldItem().getIS());
+                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), 0, player.getHeldItem().getItemStack());
                                 long chunk = player.getChunk();
                                 for (Player p : getPlayers())
                                     if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()) && p.isColumnLoaded(chunk))
@@ -286,7 +287,7 @@ public class MCThunder {
                             ItemStack old = player.getHeldItem();
                             player.setSlot(packet.getSlot() + 36);
                             if (!old.equals(player.getHeldItem())) {
-                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), 0, player.getHeldItem().getIS());
+                                Packet pack = new ServerEntityEquipmentPacket(player.getEntityID(), 0, player.getHeldItem().getItemStack());
                                 long chunk = player.getChunk();
                                 for (Player p : getPlayers())
                                     if (p.getWorld().equals(player.getWorld()) && !player.getUniqueID().equals(p.getUniqueID()) && p.isColumnLoaded(chunk))
@@ -409,8 +410,8 @@ public class MCThunder {
         while (server.isListening()) {
             try {
                 long startTime = System.currentTimeMillis();
-                //TODO: put things to happen each tick such as either physics checks or entity ai ect.
-                //TODO: Add a way to register events to happen after certain number of ticks
+                //TODO: put things to happen each tick such as either physics checks ect.
+                //TODO: Add a way to register events to happen after certain number of ticks will be implemented in prep for physics engine
                 for (World w : getWorlds())
                     if (!w.getEntities().isEmpty())
                         try {

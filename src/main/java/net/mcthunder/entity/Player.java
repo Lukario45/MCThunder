@@ -43,26 +43,20 @@ public final class Player extends LivingEntity {
     private final String name;
     private final Property origSkin;
     private final String capeURL = null;
+    private ArrayList<Long> loadedColumns = new ArrayList<>(), northColumns = new ArrayList<>(), eastColumns = new ArrayList<>(),
+            southColumns = new ArrayList<>(), westColumns = new ArrayList<>();
     private GameProfile profile;
     private UUID skinUUID;
     private Property skin;
-    private byte skinFlags;
+    private byte skinFlags = 127;
     private NBTFile playerFile;
-    private Inventory openInventory = null;
-    private ArrayList<Long> loadedColumns = new ArrayList<>();
-    private ArrayList<Long> northColumns = new ArrayList<>();
-    private ArrayList<Long> eastColumns = new ArrayList<>();
-    private ArrayList<Long> southColumns = new ArrayList<>();
-    private ArrayList<Long> westColumns = new ArrayList<>();
-    private Inventory inv;
-    private int viewDistance = 9;
-    private int slot, ping, score;
-    private String displayName;
+    private Inventory openInventory = null, inv;
+    private int viewDistance = 9, slot = 36, ping, score = 0;
+    private String displayName, appended = "";
     private GameMode gamemode;
     private Session session;
-    private boolean moveable, hideCape;
-    private Player lastPmPerson;
-    private String appended = "";
+    private boolean moveable, hideCape = false;
+    private UUID lastPmPerson;
 
     public Player(Session session) {
         super(null);
@@ -72,7 +66,6 @@ public final class Player extends LivingEntity {
         this.uuid = getGameProfile().getId();
         this.metadata.setMetadata(2, this.name = getGameProfile().getName());
         this.metadata.setMetadata(3, (byte) 1);//Always show name
-        this.slot = 36;
         this.displayName = this.name;
         this.gamemode = GameMode.CREATIVE;
         this.moveable = false;
@@ -82,11 +75,11 @@ public final class Player extends LivingEntity {
         this.skinUUID = this.uuid;
         this.origSkin = getGameProfile().getProperties().get("textures");
         this.skin = this.origSkin;
-        this.metadata.setMetadata(10, this.skinFlags = (byte) 127);
+        this.metadata.setMetadata(10, this.skinFlags);
         this.metadata.setMetadata(15, (byte) 1);//Assumes the player has a brain
-        this.metadata.setBit(16, 0x02, this.hideCape = false);
+        this.metadata.setBit(16, 0x02, this.hideCape);
         this.metadata.setMetadata(17, (float) (this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));
-        this.metadata.setMetadata(18, this.score = 0);
+        this.metadata.setMetadata(18, this.score);
     }
 
     public NBTFile getPlayerFile() {
@@ -275,6 +268,7 @@ public final class Player extends LivingEntity {
 
     public void teleport(Location l) {
         if (!l.getWorld().equals(getWorld())) {
+            toggleMoveable();
             ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
             setLocation(l);
             long chunk = getChunk();
@@ -292,7 +286,8 @@ public final class Player extends LivingEntity {
             this.loadedColumns.clear();
             sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
             loadChunks(null);
-        } else {
+            toggleMoveable();
+        } else {//TODO: Unload and load new chunks if tp to far
             setLocation(l);
             ServerEntityTeleportPacket packet = new ServerEntityTeleportPacket(getEntityID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), isOnGround());
             long chunk = getChunk();
@@ -407,11 +402,11 @@ public final class Player extends LivingEntity {
     }
 
     public Player getLastPmPerson() {
-        return this.lastPmPerson;
+        return MCThunder.getPlayer(this.lastPmPerson);
     }
 
     public void setLastPmPerson(Player lastPmPerson) {
-        this.lastPmPerson = lastPmPerson;
+        this.lastPmPerson = lastPmPerson.getUniqueID();
     }
 
     public void unloadChunks() {
@@ -500,8 +495,8 @@ public final class Player extends LivingEntity {
             return;
         this.openInventory = inv;
         sendPacket(this.openInventory.getView());
-        for (int i = 0; i < this.openInventory.getItems().length; i++)
-            sendPacket(new ServerSetSlotPacket(this.openInventory.getID(), i, this.openInventory.getItemAt(i).getIS()));
+        for (int i = 0; i < this.openInventory.getItems().size(); i++)
+            sendPacket(new ServerSetSlotPacket(this.openInventory.getID(), i, this.openInventory.getItemAt(i).getItemStack()));
     }
 
     public Inventory getEnderChest() {
@@ -517,7 +512,7 @@ public final class Player extends LivingEntity {
     }
 
     public void showJacket(boolean show) {
-        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? (this.skinFlags | 2) : this.skinFlags & ~2));
+        this.metadata.setMetadata(10, this.skinFlags = (byte) (show ? this.skinFlags | 2 : this.skinFlags & ~2));
         updateMetadata();
     }
 

@@ -9,12 +9,14 @@ import org.spacehq.opennbt.tag.builtin.*;
 
 public class Chest {
     private final Location l;
+    private final Block block;
     private String customName;
     private Inventory inv;
 
     public Chest(Location l, ListTag items, String customName) {
         this.customName = customName == null ? "Chest" : customName;
         this.l = l;
+        this.block = new Block(this.l);
         this.inv = new ChestInventory(this.customName);
         if (items != null)
             setItems(items);
@@ -24,19 +26,15 @@ public class Chest {
         for (int i = 0; i < items.size(); i++) {
             CompoundTag item = items.get(i);
             if (item != null) {
-                ByteTag amount = item.get("Count");
-                ByteTag slot = item.get("Slot");
-                ShortTag data = item.get("Damage");
+                ByteTag slot = item.get("Slot");//What is the point of this anyways
                 int id;
                 try {
-                    StringTag itemID = item.get("id");
-                    id = Material.fromString(itemID.getValue().split("minecraft:")[1]).getParent().getID();
+                    id = Material.fromString(((StringTag) item.get("id")).getValue().split("minecraft:")[1]).getParent().getID();
                 } catch (Exception e) {//pre 1.8 loading should be ShortTag instead
-                    ShortTag itemID = item.get("id");
-                    id = Integer.parseInt(itemID.getValue().toString());
+                    id = Integer.parseInt(((ShortTag) item.get("id")).getValue().toString());
                 }
-                CompoundTag info = item.get("tag");
-                this.inv.setSlot(i, new ItemStack(Material.fromData(id, data.getValue()), amount.getValue()));
+                this.inv.setSlot(i, new ItemStack(Material.fromData(id, ((ShortTag) item.get("Damage")).getValue()),
+                        ((ByteTag) item.get("Count")).getValue(), (CompoundTag) item.get("tag")));
             }
         }
     }
@@ -51,5 +49,9 @@ public class Chest {
 
     public String getName() {
         return this.customName;
+    }
+
+    public Block getBlock() {
+        return block;
     }
 }

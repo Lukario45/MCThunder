@@ -21,6 +21,9 @@ public class Block {
         this.loc = loc;
         if (this.loc == null)
             return;
+        this.loc.setX((int) this.loc.getX());
+        this.loc.setY((int) this.loc.getY());
+        this.loc.setZ((int) this.loc.getZ());
         int columnX = (int)this.loc.getX() >> 4;
         int columnZ = (int)this.loc.getZ() >> 4;
         int chunkY = (int)this.loc.getY() >> 4;
@@ -99,6 +102,8 @@ public class Block {
         this.type = type;
         if (isInvalid())
             return;
+        if (this.type.getParent().equals(Material.CHEST) || this.type.getParent().equals(Material.TRAPPED_CHEST))
+            this.loc.getWorld().registerChest(new Chest(this.loc, null, null));
         Column column = this.loc.getWorld().getColumn(getLong(this.columnX, this.columnZ));
         Chunk[] chunks = column.getChunks();
         ShortArray3d blocks = chunks[this.chunkY] != null ? chunks[this.chunkY].getBlocks() : new ShortArray3d(4096);

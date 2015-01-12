@@ -3,13 +3,12 @@ package net.mcthunder.api;
 public class PotionEffect {
     private PotionEffectType type;
     private int duration, amplifier;
-    private boolean ambient;
+    private boolean ambient = false, showParticles = true;
 
     public PotionEffect(PotionEffectType type, int duration, int amplifier) {
         this.type = type;
         this.duration = duration;
         this.amplifier = amplifier;
-        this.ambient = false;
     }
 
     public PotionEffectType getType() {
@@ -34,5 +33,13 @@ public class PotionEffect {
 
     public void setAmbient(boolean ambient) {
         this.ambient = ambient;
+    }
+
+    public boolean showParticles() {
+        return this.showParticles;
+    }
+
+    public void setShowParticles(boolean showParticles) {
+        this.showParticles = showParticles;
     }
 }

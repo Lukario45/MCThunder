@@ -4,6 +4,7 @@ import net.mcthunder.material.Material;
 import org.spacehq.mc.protocol.data.game.values.window.WindowType;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerOpenWindowPacket;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 public class Inventory {
@@ -43,10 +44,8 @@ public class Inventory {
             }
     }
 
-    public ItemStack[] getItems() {
-        ItemStack[] i = new ItemStack[this.size];
-        this.contents.values().toArray(i);
-        return i;
+    public Collection<ItemStack> getItems() {
+        return this.contents.values();
     }
 
     public String getName() {

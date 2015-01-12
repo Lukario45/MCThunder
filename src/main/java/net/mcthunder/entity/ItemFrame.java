@@ -2,6 +2,7 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 import net.mcthunder.inventory.ItemStack;
+import net.mcthunder.material.Material;
 import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
 import org.spacehq.packetlib.packet.Packet;
@@ -13,7 +14,9 @@ public class ItemFrame extends Entity {
     public ItemFrame(Location location, ItemStack i) {
         super(location);
         this.type = EntityType.ITEM_FRAME;
-        this.metadata.setMetadata(8, (this.i = i).getIS());
+        this.i = i;
+        if (this.i.getType() != null && !this.i.getType().equals(Material.AIR))
+            this.metadata.setMetadata(8, this.i.getItemStack());
         this.metadata.setMetadata(9, this.rotation = (byte) 0);
     }
 
@@ -24,7 +27,9 @@ public class ItemFrame extends Entity {
     }
 
     public void setItemStack(ItemStack i) {
-        this.metadata.setMetadata(8, (this.i = i).getIS());
+        this.i = i;
+        if (this.i.getType() != null && !this.i.getType().equals(Material.AIR))
+            this.metadata.setMetadata(8, this.i.getItemStack());
         updateMetadata();
     }
 

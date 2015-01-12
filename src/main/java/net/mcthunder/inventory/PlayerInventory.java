@@ -32,7 +32,7 @@ public class PlayerInventory extends Inventory {
 
     public void setSlot(int slot, ItemStack i) {
         this.contents.put(slot, i == null ? new ItemStack(Material.AIR) : i);
-        this.p.sendPacket(new ServerSetSlotPacket(0, slot, i.getIS()));
+        this.p.sendPacket(new ServerSetSlotPacket(0, slot, i.getItemStack()));
     }
     //0 = craft output
     //1-4 = craft input

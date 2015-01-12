@@ -17,15 +17,12 @@ import org.spacehq.packetlib.packet.Packet;
 import java.util.UUID;
 
 public abstract class Bot extends LivingEntity {
+    private boolean entitySpawned = false, hideCape = false;
+    private String name, capeURL = null;
     private GameProfile botProfile;
-    private byte skinFlags;
-    private boolean hideCape;
-    private String capeURL = null;
-    private boolean entitySpawned = false;
     private Property skin = null;
-    private String name;
-    private UUID skinUUID;
-    private UUID uuid;
+    private byte skinFlags = 127;
+    private UUID skinUUID, uuid;
 
     public Bot(String name) {
         super(null);
@@ -39,8 +36,8 @@ public abstract class Bot extends LivingEntity {
             this.skinUUID = this.uuid;
         this.botProfile = new GameProfile(this.uuid, uncoloredName.length() > 16 ? uncoloredName.substring(0, 16) : uncoloredName);
         setSkin(this.skinUUID);
-        this.metadata.setMetadata(10, this.skinFlags = (byte) 127);
-        this.metadata.setBit(16, 0x02, this.hideCape = false);
+        this.metadata.setMetadata(10, this.skinFlags);
+        this.metadata.setBit(16, 0x02, this.hideCape);
         this.metadata.setMetadata(17, (float) (this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));
         this.metadata.setMetadata(18, 0);//score
     }

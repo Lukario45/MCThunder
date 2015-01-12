@@ -32,6 +32,17 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
         MCThunder.addPlayer(player);
         CompoundTag c = (CompoundTag) MCThunder.getProfileHandler().getAttribute(player, "SpawnPosition");
         Location l = null;
+        /*ListTag pos = (ListTag) MCThunder.getProfileHandler().getAttribute(player, "Pos");
+        StringTag w = (StringTag) MCThunder.getProfileHandler().getAttribute(player, "World");
+        if (pos != null) {
+            l = new Location(w != null ? MCThunder.getWorld(w.getValue()) : MCThunder.getWorld(MCThunder.getConfig().getWorldName()), ((DoubleTag) pos.get(0)).getValue(),
+                    ((DoubleTag) pos.get(1)).getValue(), ((DoubleTag) pos.get(2)).getValue());
+            ListTag rotation = (ListTag) MCThunder.getProfileHandler().getAttribute(player, "Rotation");
+            if (rotation != null) {
+                l.setYaw(((FloatTag) rotation.get(0)).getValue());
+                l.setPitch(((FloatTag) rotation.get(1)).getValue());
+            }
+        }*/
         if (c != null)
             l = new Location(MCThunder.getWorld((String) c.get("World").getValue()), (double) c.get("X").getValue(), (double) c.get("Y").getValue(), (double) c.get("Z").getValue(), (float) c.get("Yaw").getValue(), (float) c.get("Pitch").getValue());
         player.setLocation((l == null || l.getWorld() == null) ? MCThunder.getWorld(MCThunder.getConfig().getWorldName()).getSpawnLocation() : l);
