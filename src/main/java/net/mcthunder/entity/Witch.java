@@ -1,8 +1,10 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.MobType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Witch extends LivingEntity {
@@ -11,6 +13,11 @@ public class Witch extends LivingEntity {
     public Witch(Location location) {
         super(location);
         this.type = EntityType.WITCH;
+        this.metadata.setMetadata(21, (byte) ((this.aggressive = false) ? 1 : 0));
+    }
+
+    public Witch(World w, CompoundTag tag) {
+        super(w, tag);
         this.metadata.setMetadata(21, (byte) ((this.aggressive = false) ? 1 : 0));
     }
 

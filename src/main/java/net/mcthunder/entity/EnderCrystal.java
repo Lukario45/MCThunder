@@ -1,8 +1,10 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class EnderCrystal extends Entity {
@@ -11,6 +13,11 @@ public class EnderCrystal extends Entity {
     public EnderCrystal(Location location) {
         super(location);
         this.type = EntityType.ENDER_CRYSTAL;
+        this.metadata.setMetadata(8, this.health = 1);
+    }
+
+    public EnderCrystal(World w, CompoundTag tag) {
+        super(w, tag);
         this.metadata.setMetadata(8, this.health = 1);
     }
 

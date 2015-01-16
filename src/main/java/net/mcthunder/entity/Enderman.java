@@ -2,8 +2,11 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 import net.mcthunder.material.Material;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.MobType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.ShortTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Enderman extends LivingEntity {
@@ -14,6 +17,16 @@ public class Enderman extends LivingEntity {
         super(location);
         this.type = EntityType.ENDERMAN;
         this.blockType = Material.AIR;
+        this.metadata.setMetadata(16, this.blockType.getParent().getID().shortValue());
+        this.metadata.setMetadata(17, (byte) this.blockType.getData());
+        this.metadata.setMetadata(18, (byte) ((this.screaming = false) ? 1 : 0));
+    }
+
+    public Enderman(World w, CompoundTag tag) {
+        super(w, tag);
+        ShortTag carried = tag.get("carried");
+        ShortTag carriedData = tag.get("carriedData");
+        this.blockType = Material.fromData(carried == null ? 0 : carried.getValue(), carriedData == null ? 0 : carriedData.getValue());
         this.metadata.setMetadata(16, this.blockType.getParent().getID().shortValue());
         this.metadata.setMetadata(17, (byte) this.blockType.getData());
         this.metadata.setMetadata(18, (byte) ((this.screaming = false) ? 1 : 0));

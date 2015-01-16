@@ -2,19 +2,40 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 import net.mcthunder.material.Material;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
+import org.spacehq.opennbt.tag.builtin.ByteTag;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.IntTag;
+import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Minecart extends Entity {
     protected int shakingPower, shakingDirection;
     protected float shakingMultiplier;
-    protected boolean showBlock;
     protected Material blockType;
+    protected boolean showBlock;
 
     public Minecart(Location location) {
         super(location);
         this.type = EntityType.MINECART;
+        this.blockType = Material.AIR;
+        this.metadata.setMetadata(17, this.shakingPower = 0);
+        this.metadata.setMetadata(18, this.shakingDirection = 0);
+        this.metadata.setMetadata(19, this.shakingMultiplier = 0);
+        this.metadata.setMetadata(20, 0);
+        this.metadata.setMetadata(21, (int) this.location.getY());
+        this.metadata.setMetadata(22, (byte) ((this.showBlock = true) ? 1 : 0));
+    }
+
+    public Minecart(World w, CompoundTag tag) {
+        super(w, tag);
+        ByteTag customDisplayTile = tag.get("CustomDisplayTile");
+        StringTag displayTile = tag.get("DisplayTile");
+        IntTag displayData = tag.get("DisplayData");
+        IntTag displayOffset = tag.get("DisplayOffset");
+        StringTag minecartName = tag.get("CustomName");
         this.blockType = Material.AIR;
         this.metadata.setMetadata(17, this.shakingPower = 0);
         this.metadata.setMetadata(18, this.shakingDirection = 0);

@@ -7,7 +7,7 @@ import org.spacehq.opennbt.tag.builtin.*;
 
 import java.util.*;
 
-public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once I do more tile entities
+public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once I do more with tile entities
     private HashMap<Enchantment, Integer> storedEnchants = new HashMap<>(), enchantments = new HashMap<>();
     private ArrayList<Material> canBeDestroyed = new ArrayList<>(), canBePlacedOn = new ArrayList<>();
     private HashMap<PotionEffectType, PotionEffect> potionEffects = new HashMap<>();
@@ -517,7 +517,13 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
             this.hideFlags += 32;
     }
 
-    public org.spacehq.mc.protocol.data.game.ItemStack getItemStack() {
+    public boolean canStack(ItemStack other) {//TODO: Check max stack size
+        CompoundTag nbt = getNBT();
+        CompoundTag otherNBT = other.getNBT();
+        return ((nbt == null && otherNBT == null) || (nbt != null && nbt.equals(otherNBT))) && this.type.equals(other.getType());
+    }
+
+    public CompoundTag getNBT() {
         if (this.type == null || this.type.equals(Material.AIR))
             return null;
         CompoundTag nbt = new CompoundTag("tag");
@@ -674,6 +680,11 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
             if (!temp.isEmpty())
                 nbt.put(new ListTag("Decorations", temp));
         }
-        return new org.spacehq.mc.protocol.data.game.ItemStack(this.type.getParent().getID(), this.amount, this.type.getData(), nbt.getValue().isEmpty() ? null : nbt);
+        return nbt;
+    }
+
+    public org.spacehq.mc.protocol.data.game.ItemStack getItemStack() {
+        CompoundTag nbt = getNBT();
+        return nbt == null ? null : new org.spacehq.mc.protocol.data.game.ItemStack(this.type.getParent().getID(), this.amount, this.type.getData(), nbt.getValue().isEmpty() ? null : nbt);
     }
 }

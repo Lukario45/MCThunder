@@ -2,11 +2,18 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 import net.mcthunder.api.MetadataConstants;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.MobType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.opennbt.tag.builtin.ByteTag;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.IntTag;
+import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
-public class Horse extends LivingEntity {
+import java.util.UUID;
+
+public class Horse extends Ageable {
     private boolean isTame, hasSaddle, hasChest, isBred, isEating, isRearing, mouthOpen;
     private HorseType horseType;
     private String ownerName;
@@ -25,6 +32,35 @@ public class Horse extends LivingEntity {
         this.metadata.setMetadata(19, (this.horseType = HorseType.HORSE).getID());
         this.metadata.setMetadata(20, (this.color = HorseColor.WHITE) | (this.style = HorseStyle.NONE) << 8);
         this.metadata.setMetadata(21, this.ownerName = "");
+        this.metadata.setMetadata(22, this.armorType = ArmorType.NONE);
+    }
+
+    public Horse(World w, CompoundTag tag) {
+        super(w, tag);
+        ByteTag bred = tag.get("Bred");
+        ByteTag chestedHorse = tag.get("ChestedHorse");//1 true, 0 false
+        ByteTag eatingHaystack = tag.get("EatingHaystack");//1 true, 0 false
+        ByteTag hasReproduced = tag.get("HasReproduced");//1 true, 0 false
+        ByteTag tame = tag.get("Tame");//1 true, 0 false
+        IntTag temper = tag.get("Temper");
+        IntTag horseType = tag.get("Type");
+        IntTag variant = tag.get("Variant");
+        StringTag tamerName = tag.get("OwnerName");
+        UUID tamerUUID = UUID.fromString(((StringTag) tag.get("OwnerUUID")).getValue());
+        //this.inv.setItems((ListTag) tag.get("Items"));
+        CompoundTag armorItem = tag.get("ArmorItem");
+        CompoundTag saddleItem = tag.get("SaddleItem");
+        ByteTag saddle = tag.get("Saddle");//1 true, 0 false
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.TAME, this.isTame = tame != null && tame.getValue() == (byte) 1);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.SADDLE, this.hasSaddle = saddle != null && saddle.getValue() == (byte) 1);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.CHEST, this.hasChest = chestedHorse != null && chestedHorse.getValue() == (byte) 1);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.BRED, this.isBred = bred != null && bred.getValue() == (byte) 1);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.EATING, this.isEating = eatingHaystack != null && eatingHaystack.getValue() == (byte) 1);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.REARING, this.isRearing = false);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.MOUTH_OPEN, this.mouthOpen = false);
+        this.metadata.setMetadata(19, (this.horseType = HorseType.fromID((byte) (horseType == null ? 0 : horseType.getValue()))).getID());
+        this.metadata.setMetadata(20, (this.color = HorseColor.WHITE) | (this.style = HorseStyle.NONE) << 8);
+        this.metadata.setMetadata(21, this.ownerName = tamerName == null ? "" : tamerName.getValue());
         this.metadata.setMetadata(22, this.armorType = ArmorType.NONE);
     }
 
@@ -165,6 +201,13 @@ public class Horse extends LivingEntity {
 
         public byte getID() {
             return this.horseID;
+        }
+
+        public static HorseType fromID(byte id) {
+            for (HorseType h : values())
+                if (h.getID() == id)
+                    return h;
+            return HORSE;
         }
     }
 

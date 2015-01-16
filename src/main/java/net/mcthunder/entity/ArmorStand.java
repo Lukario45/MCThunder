@@ -2,18 +2,21 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 import net.mcthunder.api.MetadataConstants;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
+import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.packet.Packet;
 
-public class ArmorStand extends LivingEntity {
-    private boolean small, gravity, arms, baseplate;
+public class ArmorStand extends Entity {
     private float headPitch, headYaw, headRoll, bodyPitch, bodyYaw, bodyRoll, leftArmPitch, leftArmYaw, leftArmRoll,
             rightArmPitch, rightArmYaw, rightArmRoll, leftLegPitch, leftLegYaw, leftLegRoll, rightLegPitch, rightLegYaw, rightLegRoll;
+    private boolean small, gravity, arms, baseplate, marker;
 
     public ArmorStand(Location location) {
         super(location);
         this.type = EntityType.ARMOR_STAND;
+        this.marker = false;
         this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.SMALL, this.small = false);
         this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.GRAVITY, this.gravity = true);
         this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.ARMS, this.arms = true);
@@ -39,14 +42,91 @@ public class ArmorStand extends LivingEntity {
         this.metadata.setMetadata(1011, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegRoll = 0));
     }
 
-    @Override
-    public Packet getPacket() {
-        return null;
+    public ArmorStand(World w, CompoundTag tag) {
+        super(w, tag);
+        IntTag disabledSlots = tag.get("DisabledSlots");
+        ListTag equipment = tag.get("Equipment");
+        if (equipment != null) {
+            CompoundTag hand = equipment.get(0);
+            CompoundTag boots = equipment.get(1);
+            CompoundTag leggings = equipment.get(2);
+            CompoundTag chestplate = equipment.get(3);
+            CompoundTag helmet = equipment.get(4);
+        }
+        ByteTag marker = tag.get("Marker");//1 true, 0 false
+        ByteTag invisible = tag.get("Invisible");//1 true, 0 false
+        ByteTag noBasePlate = tag.get("NoBasePlate");//1 true, 0 false
+        ByteTag noGravity = tag.get("NoGravity");//1 true, 0 false
+        CompoundTag pose = tag.get("Pose");
+        ByteTag showArms = tag.get("ShowArms");//1 true, 0 false
+        ByteTag small = tag.get("Small");//1 true, 0 false
+        this.marker = marker != null && marker.getValue() == (byte) 1;
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, this.invisible = invisible != null && invisible.getValue() == (byte) 1);
+        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.SMALL, this.small = small != null && small.getValue() == (byte) 1);
+        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.GRAVITY, this.gravity = noGravity != null && noGravity.getValue() == (byte) 0);
+        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.ARMS, this.arms = showArms != null && showArms.getValue() == (byte) 1);
+        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.BASEPLATE, this.baseplate = noBasePlate != null && noBasePlate.getValue() == (byte) 0);
+        //ID is just to store in a random spot sorta since multiple per same metadata id
+        FloatTag xRot = null, yRot = null, zRot = null;
+        ListTag head = pose.get("Head");
+        if (head != null) {
+            xRot = head.get(0);
+            yRot = head.get(1);
+            zRot = head.get(2);
+        }
+        this.metadata.setMetadata(11, this.headPitch = xRot == null ? 0 : xRot.getValue());
+        this.metadata.setMetadata(1000, new EntityMetadata(11, MetadataType.FLOAT, this.headYaw = yRot == null ? 0 : yRot.getValue()));
+        this.metadata.setMetadata(1001, new EntityMetadata(11, MetadataType.FLOAT, this.headRoll = zRot == null ? 0 : zRot.getValue()));
+        ListTag body = pose.get("Body");
+        if (body != null) {
+            xRot = body.get(0);
+            yRot = body.get(1);
+            zRot = body.get(2);
+        }
+        this.metadata.setMetadata(12, this.bodyPitch = xRot == null ? 0 : xRot.getValue());
+        this.metadata.setMetadata(1002, new EntityMetadata(12, MetadataType.FLOAT, this.bodyYaw = yRot == null ? 0 : yRot.getValue()));
+        this.metadata.setMetadata(1003, new EntityMetadata(12, MetadataType.FLOAT, this.bodyRoll = zRot == null ? 0 : zRot.getValue()));
+        ListTag leftArm = pose.get("LeftArm");
+        if (leftArm != null) {
+            xRot = leftArm.get(0);
+            yRot = leftArm.get(1);
+            zRot = leftArm.get(2);
+        }
+        this.metadata.setMetadata(13, this.leftArmPitch = xRot == null ? 0 : xRot.getValue());
+        this.metadata.setMetadata(1004, new EntityMetadata(13, MetadataType.FLOAT, this.leftArmYaw = yRot == null ? 0 : yRot.getValue()));
+        this.metadata.setMetadata(1005, new EntityMetadata(13, MetadataType.FLOAT, this.leftArmRoll = zRot == null ? 0 : zRot.getValue()));
+        ListTag rightArm = pose.get("RightArm");
+        if (rightArm != null) {
+            xRot = rightArm.get(0);
+            yRot = rightArm.get(1);
+            zRot = rightArm.get(2);
+        }
+        this.metadata.setMetadata(14, this.rightArmPitch = xRot == null ? 0 : xRot.getValue());
+        this.metadata.setMetadata(1006, new EntityMetadata(14, MetadataType.FLOAT, this.rightArmYaw = yRot == null ? 0 : yRot.getValue()));
+        this.metadata.setMetadata(1007, new EntityMetadata(14, MetadataType.FLOAT, this.rightArmRoll = zRot == null ? 0 : zRot.getValue()));
+        ListTag leftLeg = pose.get("LeftLeg");
+        if (leftLeg != null) {
+            xRot = leftLeg.get(0);
+            yRot = leftLeg.get(1);
+            zRot = leftLeg.get(2);
+        }
+        this.metadata.setMetadata(15, this.leftLegPitch = xRot == null ? 0 : xRot.getValue());
+        this.metadata.setMetadata(1008, new EntityMetadata(15, MetadataType.FLOAT, this.leftLegYaw = yRot == null ? 0 : yRot.getValue()));
+        this.metadata.setMetadata(1009, new EntityMetadata(15, MetadataType.FLOAT, this.leftLegRoll = zRot == null ? 0 : zRot.getValue()));
+        ListTag rightLeg = pose.get("RightLeg");
+        if (rightLeg != null) {
+            xRot = rightLeg.get(0);
+            yRot = rightLeg.get(1);
+            zRot = rightLeg.get(2);
+        }
+        this.metadata.setMetadata(16, this.rightLegPitch = xRot == null ? 0 : xRot.getValue());
+        this.metadata.setMetadata(1010, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegYaw = yRot == null ? 0 : yRot.getValue()));
+        this.metadata.setMetadata(1011, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegRoll = zRot == null ? 0 : zRot.getValue()));
     }
 
     @Override
-    public void ai() {
-
+    public Packet getPacket() {
+        return null;
     }
 
     public void setSmall(boolean small) {
@@ -74,6 +154,14 @@ public class ArmorStand extends LivingEntity {
 
     public boolean showArms() {
         return this.arms;
+    }
+
+    public void setMarker(boolean marker) {
+        this.marker = marker;
+    }
+
+    public boolean hasMarker() {
+        return this.marker;
     }
 
     public void setHasBaseplate(boolean baseplate) {

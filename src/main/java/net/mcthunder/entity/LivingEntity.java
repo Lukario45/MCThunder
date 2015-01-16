@@ -2,23 +2,28 @@ package net.mcthunder.entity;
 
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Location;
+import net.mcthunder.api.Modifier;
 import net.mcthunder.api.PotionEffect;
 import net.mcthunder.api.PotionEffectType;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
+import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.packet.Packet;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
 public abstract class LivingEntity extends Entity {//TODO: set default max healths for each living entity type
     protected HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
-    private PotionEffectType latest;
+    private ArrayList<Modifier> modifiers = new ArrayList<>();
     private boolean alwaysShowName, hasAI;
     protected float health, maxHealth;
+    private PotionEffectType latest;
     private byte arrows;
 
-    public LivingEntity(Location location) {
+    protected LivingEntity(Location location) {
         super(location);
         this.maxHealth = 20;
         this.latest = null;
@@ -28,7 +33,91 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
         this.metadata.setMetadata(7, 0);//No color until a potion is set
         this.metadata.setMetadata(8, (byte) 0);//False until potion effects are set
         this.metadata.setMetadata(9, this.arrows = (byte) 0);
-        this.metadata.setMetadata(15, (byte) ((this.hasAI = false) ? 1 : 0));
+        this.metadata.setMetadata(15, (byte) ((this.hasAI = true) ? 1 : 0));
+    }
+
+    protected LivingEntity(World w, CompoundTag tag) {
+        super(w, tag);
+        this.latest = null;
+        FloatTag healF = tag.get("HealF");
+        ShortTag health = tag.get("Health");
+        FloatTag absorptionAmount = tag.get("AbsorptionAmount");
+        ShortTag attackTime = tag.get("AttackTime");
+        ShortTag hurtTime = tag.get("HurtTime");
+        IntTag hurtByTimestamp = tag.get("HurtByTimestamp");
+        ShortTag deathTime = tag.get("DeathTime");
+        ListTag attributes = tag.get("Attributes");
+        if (attributes != null)
+            for (int j = 0; j < attributes.size(); j++) {
+                CompoundTag attribute = attributes.get(j);
+                StringTag name = attribute.get("Name");
+                DoubleTag base = attribute.get("Base");
+                ListTag modifiers = attribute.get("Modifiers");
+                if (modifiers != null)
+                    for (int k = 0; k < modifiers.size(); k++) {
+                        CompoundTag modifier = modifiers.get(k);
+                        StringTag modName = modifier.get("Name");
+                        DoubleTag amount = modifier.get("Amount");
+                        IntTag operation = modifier.get("Operation");
+                        LongTag modUUIDMost = modifier.get("UUIDMost");
+                        LongTag modUUIDLeast = modifier.get("UUIDLeast");
+                        if (modName != null && name != null && amount != null && operation != null && modUUIDMost != null && modUUIDLeast != null)
+                            this.modifiers.add(new Modifier(name.getValue(), modName.getValue(), amount.getValue(), operation.getValue(),
+                                    modUUIDMost.getValue(), modUUIDLeast.getValue()));
+                    }
+            }
+        ListTag activeEffects = tag.get("ActiveEffects");
+        if (activeEffects != null)
+            for (int j = 0; j < activeEffects.size(); j++) {
+                CompoundTag activeEffect = activeEffects.get(j);
+                ByteTag effectID = activeEffect.get("Id");
+                ByteTag amplifier = activeEffect.get("Amplifier");
+                IntTag duration = activeEffect.get("Duration");
+                ByteTag ambient = activeEffect.get("Ambient");//1 true, 0 false
+                ByteTag showParticles = activeEffect.get("ShowParticles");//1 true, 0 false
+                if (effectID == null || amplifier == null || duration == null)
+                    continue;
+                PotionEffect potion = new PotionEffect(PotionEffectType.fromID(effectID.getValue()), duration.getValue(), amplifier.getValue());
+                potion.setAmbient(ambient != null && ambient.getValue() == (byte) 1);
+                potion.setShowParticles(showParticles != null && showParticles.getValue() == (byte) 1);
+                this.activeEffects.put(this.latest = potion.getType(), potion);
+            }
+        ListTag equipment = tag.get("Equipment");
+        if (equipment != null) {
+            CompoundTag hand = equipment.get(0);
+            CompoundTag boots = equipment.get(1);
+            CompoundTag leggings = equipment.get(2);
+            CompoundTag chestplate = equipment.get(3);
+            CompoundTag helmet = equipment.get(4);
+        }
+        ListTag dropChances = tag.get("DropChances");
+        if (dropChances != null) {
+            FloatTag hand = dropChances.get(0);
+            FloatTag boots = dropChances.get(1);
+            FloatTag leggings = dropChances.get(2);
+            FloatTag chestplate = dropChances.get(3);
+            FloatTag helmet = dropChances.get(4);
+        }
+        ByteTag canPickUpLoot = tag.get("CanPickUpLoot");//1 true, 0 false
+        ByteTag noAI = tag.get("NoAI");//1 true, 0 false
+        ByteTag persistenceRequired = tag.get("PersistenceRequired");//1 true, 0 false
+        ByteTag leashed = tag.get("Leashed");//1 true, 0 false
+        CompoundTag leash = tag.get("Leash");
+        if (leash != null) {
+            LongTag leashUUIDMost = leash.get("UUIDMost");
+            LongTag leashUUIDLeast = leash.get("UUIDLeast");
+            IntTag leashX = leash.get("X");
+            IntTag leashY = leash.get("Y");
+            IntTag leashZ = leash.get("Z");
+        }
+        this.maxHealth = healF == null ? health == null ? 20 : health.getValue() : healF.getValue();
+        this.metadata.setMetadata(2, this.customName);
+        this.metadata.setMetadata(3, (byte) ((this.alwaysShowName = false) ? 1 : 0));
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
+        this.metadata.setMetadata(7, this.activeEffects.size() == 0 ? 0 : this.latest.getColor());//No color until a potion is set
+        this.metadata.setMetadata(8, (byte) (this.activeEffects.size() == 0 ? 0 : this.activeEffects.get(this.latest).isAmbient() ? 1 : 0));//False until potion effects are set
+        this.metadata.setMetadata(9, this.arrows = (byte) 0);
+        this.metadata.setMetadata(15, (byte) ((this.hasAI = noAI != null && noAI.getValue() == (byte) 0) ? 1 : 0));
     }
 
     public abstract void ai();
@@ -199,5 +288,27 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
         return Arrays.asList(getPacket(), new ServerEntityMetadataPacket(this.entityID, getMetadata().getMetadataArray()),
                 new ServerEntityPositionRotationPacket(this.entityID, 0, 0, 0, this.location.getYaw(), this.location.getPitch(), isOnGround()),
                 new ServerEntityHeadLookPacket(this.entityID, this.location.getYaw()));
+    }
+
+    private byte getArrows() {
+        return this.arrows;
+    }
+
+    private void setArrows(byte number) {
+        this.arrows = number;
+    }
+
+    public Collection<Modifier> getModifiers() {
+        return this.modifiers;
+    }
+
+    public void addModifier(Modifier m) {
+        if (!this.modifiers.contains(m))
+            this.modifiers.add(m);
+    }
+
+    public void removeModifier(Modifier m) {
+        if (this.modifiers.contains(m))
+            this.modifiers.remove(m);
     }
 }

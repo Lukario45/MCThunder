@@ -76,7 +76,6 @@ public final class Player extends LivingEntity {
         this.origSkin = getGameProfile().getProperties().get("textures");
         this.skin = this.origSkin;
         this.metadata.setMetadata(10, this.skinFlags);
-        this.metadata.setMetadata(15, (byte) 1);//Assumes the player has a brain
         this.metadata.setBit(16, 0x02, this.hideCape);
         this.metadata.setMetadata(17, (float) (this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));
         this.metadata.setMetadata(18, this.score);
@@ -497,6 +496,10 @@ public final class Player extends LivingEntity {
         sendPacket(this.openInventory.getView());
         for (int i = 0; i < this.openInventory.getItems().size(); i++)
             sendPacket(new ServerSetSlotPacket(this.openInventory.getID(), i, this.openInventory.getItemAt(i).getItemStack()));
+    }
+
+    public Inventory getOpenInventory() {
+        return this.openInventory;
     }
 
     public Inventory getEnderChest() {

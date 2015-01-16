@@ -1,8 +1,11 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.MobType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Wither extends LivingEntity {
@@ -15,6 +18,15 @@ public class Wither extends LivingEntity {
         this.metadata.setMetadata(18, this.watched2 = 0);
         this.metadata.setMetadata(19, this.watched3 = 0);
         this.metadata.setMetadata(20, this.invulnerableTime = 0);
+    }
+
+    public Wither(World w, CompoundTag tag) {
+        super(w, tag);
+        IntTag invul = tag.get("Invul");
+        this.metadata.setMetadata(17, this.watched1 = 0);
+        this.metadata.setMetadata(18, this.watched2 = 0);
+        this.metadata.setMetadata(19, this.watched3 = 0);
+        this.metadata.setMetadata(20, this.invulnerableTime = invul == null ? 0 : invul.getValue());
     }
 
     public Packet getPacket() {

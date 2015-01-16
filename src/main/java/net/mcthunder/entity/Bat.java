@@ -1,8 +1,11 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.MobType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.opennbt.tag.builtin.ByteTag;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Bat extends LivingEntity {
@@ -12,6 +15,12 @@ public class Bat extends LivingEntity {
         super(location);
         this.type = EntityType.BAT;
         this.metadata.setMetadata(16, (byte) ((this.hanging = false) ? 1 : 0));
+    }
+
+    public Bat(World w, CompoundTag tag) {
+        super(w, tag);
+        ByteTag batFlags = tag.get("BatFlags");//1 hanging, 0 flying
+        this.metadata.setMetadata(16, (byte) ((this.hanging = batFlags != null && batFlags.getValue() == (byte) 1) ? 1 : 0));
     }
 
     public Packet getPacket() {

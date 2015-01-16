@@ -1,8 +1,11 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.MobType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Ocelot extends Tameable {
@@ -12,6 +15,12 @@ public class Ocelot extends Tameable {
         super(location);
         this.type = EntityType.OCELOT;
         this.metadata.setMetadata(18, this.catType = (byte) 0);
+    }
+
+    public Ocelot(World w, CompoundTag tag) {
+        super(w, tag);
+        IntTag catType = tag.get("CatType");
+        this.metadata.setMetadata(18, this.catType = (byte) (catType == null ? 0 : catType.getValue()));
     }
 
     public Packet getPacket() {

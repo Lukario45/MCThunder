@@ -1,13 +1,22 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
+import net.mcthunder.world.World;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
 public abstract class Tameable extends Ageable {
     private boolean sitting, tame;
     private String ownerName;
 
-    public Tameable(Location location) {
+    protected Tameable(Location location) {
         super(location);
+        this.metadata.setBit(16, 0x01, this.sitting = false);
+        this.metadata.setBit(16, 0x04, this.tame = false);
+        this.metadata.setMetadata(17, this.ownerName = "");
+    }
+
+    protected Tameable(World w, CompoundTag tag) {
+        super(w, tag);
         this.metadata.setBit(16, 0x01, this.sitting = false);
         this.metadata.setBit(16, 0x04, this.tame = false);
         this.metadata.setMetadata(17, this.ownerName = "");

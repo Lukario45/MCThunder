@@ -2,8 +2,11 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 import net.mcthunder.api.MetadataConstants;
+import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.MobType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
+import org.spacehq.opennbt.tag.builtin.ByteTag;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Sheep extends Ageable {
@@ -14,6 +17,14 @@ public class Sheep extends Ageable {
         super(location);
         this.type = EntityType.SHEEP;
         this.metadata.setMetadata(16, (byte) (((byte)((this.sheared = false) ? 16 : 0))&240 | (this.color = MetadataConstants.ColorFlags.WHITE)&15));
+    }
+
+    public Sheep(World w, CompoundTag tag) {
+        super(w, tag);
+        ByteTag sheared = tag.get("Sheared");//1 true, 0 false
+        ByteTag color = tag.get("Color");
+        this.metadata.setMetadata(16, (byte) (((byte)((this.sheared = sheared != null && sheared.getValue() ==
+                (byte) 1) ? 16 : 0))&240 | (this.color = color == null ? MetadataConstants.ColorFlags.WHITE : color.getValue())&15));
     }
 
     public Packet getPacket() {

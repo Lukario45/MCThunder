@@ -18,16 +18,13 @@ public class PlayerInventory extends Inventory {
             if (this.contents.get(i) == null || this.contents.get(i).getType().equals(Material.AIR)) {
                 setSlot(i, is);
                 return;
-            } else {//if (this.contents.get(i).canStack(is))
-                //combine them
-            }
+            } else if (this.contents.get(i).canStack(is))
+                this.contents.get(i).setAmount(this.contents.get(i).getAmount() + is.getAmount());
         for (int i = 9; i < 35; i++)
-            if (this.contents.get(i) == null || this.contents.get(i).getType().equals(Material.AIR)) {
+            if (this.contents.get(i) == null || this.contents.get(i).getType().equals(Material.AIR))
                 setSlot(i, is);
-                break;
-            } else {//if (this.contents.get(i).canStack(is))
-                //combine them
-            }
+            else if (this.contents.get(i).canStack(is))
+                this.contents.get(i).setAmount(this.contents.get(i).getAmount() + is.getAmount());
     }
 
     public void setSlot(int slot, ItemStack i) {
