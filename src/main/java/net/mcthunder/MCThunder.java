@@ -47,6 +47,7 @@ import org.spacehq.mc.protocol.packet.ingame.client.window.ClientCreativeInvento
 import org.spacehq.mc.protocol.packet.ingame.client.window.ClientWindowActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
+import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
@@ -393,14 +394,19 @@ public class MCThunder {
                         p.sendPacket(destroyEntitiesPacket);
                     player.setAppended("");
                     player.unloadChunks();
-                    Map<String, Tag> map = new HashMap<>();
-                    map.put("World", new StringTag("World", player.getWorld().getName()));
-                    map.put("X", new DoubleTag("X", player.getLocation().getX()));
-                    map.put("Y", new DoubleTag("Y", player.getLocation().getY()));
-                    map.put("Z", new DoubleTag("Z", player.getLocation().getZ()));
-                    map.put("Yaw", new FloatTag("Yaw", player.getLocation().getYaw()));
-                    map.put("Pitch", new FloatTag("Pitch", player.getLocation().getPitch()));
-                    playerProfileHandler.changeAttribute(player, new CompoundTag("SpawnPosition", map));
+                    //NBTIO.writeFile(player.getNBT(), player.getPlayerFile().getNbtFile());
+                    //This will be in .getNBT() but until then temporary thing here
+                    try {
+                        CompoundTag tag = NBTIO.readFile(player.getPlayerFile().getNbtFile());
+                        ListTag pos = new ListTag("Pos", Arrays.<Tag>asList(new DoubleTag("X", player.getLocation().getX()),
+                                new DoubleTag("Y", player.getLocation().getY()), new DoubleTag("Z", player.getLocation().getZ())));
+                        ListTag rotation = new ListTag("Rotation", Arrays.<Tag>asList(new FloatTag("Yaw", player.getLocation().getYaw()),
+                                new FloatTag("Pitch", player.getLocation().getPitch())));
+                        tag.put(pos);
+                        tag.put(rotation);
+                        tag.put(new StringTag("SpawnWorld", player.getWorld().getName()));
+                        NBTIO.writeFile(tag, player.getPlayerFile().getNbtFile());
+                    } catch (Exception ignored) { }
                     players.remove(player.getUniqueID());
                 }
             }

@@ -25,7 +25,6 @@ public abstract class Entity {
     LivingEntity
     Minecart
     SpawnerMinecart
-    ThrownSplashPotion
     Villager*/
     protected boolean sneaking, sprinting, invisible, onGround;
     protected short fireTicks, airLeft;
@@ -365,5 +364,9 @@ public abstract class Entity {
 
     protected void updateMetadata() {
         MCThunder.getMetadataChangeEventSource().fireEvent(this);
+    }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt as well as have all subclasses do as well
+        return null;
     }
 }

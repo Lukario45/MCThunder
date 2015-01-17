@@ -1,15 +1,19 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
+import net.mcthunder.api.PotionEffect;
+import net.mcthunder.api.PotionEffectType;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class ThrownSplashPotion extends Projectile {
+    private PotionEffect potionEffect;
     private String ownerName;
     private byte shake;
 
@@ -18,6 +22,7 @@ public class ThrownSplashPotion extends Projectile {
         this.type = EntityType.THROWN_SPLASH_POTION;
         this.shake = 0;
         this.ownerName = "";
+        this.potionEffect = null;
     }
 
     public ThrownSplashPotion(World w, CompoundTag tag) {
@@ -26,7 +31,17 @@ public class ThrownSplashPotion extends Projectile {
         StringTag ownerName = tag.get("ownerName");
         this.shake = shake == null ? 0 : shake.getValue();
         this.ownerName = ownerName == null ? "" : ownerName.getValue();
-        CompoundTag potion = tag.get("Potion");
+        CompoundTag potionEffect = tag.get("Potion");
+        ByteTag id = potionEffect.get("Id");
+        ByteTag amplifier = potionEffect.get("Amplifier");
+        IntTag duration = potionEffect.get("Duration");
+        ByteTag ambient = potionEffect.get("Ambient");
+        ByteTag showParticles = potionEffect.get("ShowParticles");
+        if (id == null || amplifier == null || duration == null)
+            return;
+        this.potionEffect = new PotionEffect(PotionEffectType.fromID(id.getValue()), duration.getValue(), amplifier.getValue());
+        this.potionEffect.setAmbient(ambient != null && ambient.getValue() == (byte) 1);
+        this.potionEffect.setShowParticles(showParticles != null && showParticles.getValue() == (byte) 1);
     }
 
     @Override
@@ -49,5 +64,13 @@ public class ThrownSplashPotion extends Projectile {
 
     public byte getShake() {
         return this.shake;
+    }
+
+    public void setPotionEffect(PotionEffect potionEffect) {
+        this.potionEffect = potionEffect;
+    }
+
+    public PotionEffect getPotionEffect() {
+        return this.potionEffect;
     }
 }
