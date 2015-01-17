@@ -74,4 +74,9 @@ public class Wither extends LivingEntity {
     public int getInvulnerableTime() {
         return this.invulnerableTime;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

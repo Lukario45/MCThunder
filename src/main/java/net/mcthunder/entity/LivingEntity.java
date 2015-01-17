@@ -311,4 +311,9 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
         if (this.modifiers.contains(m))
             this.modifiers.remove(m);
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

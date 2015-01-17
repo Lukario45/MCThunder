@@ -39,4 +39,9 @@ public class Witch extends LivingEntity {
     public boolean isAggressive() {
         return this.aggressive;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

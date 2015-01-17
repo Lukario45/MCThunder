@@ -36,4 +36,9 @@ public class ThrownEyeOfEnder extends Projectile {
     public byte getShake() {
         return this.shake;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

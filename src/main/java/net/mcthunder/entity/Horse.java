@@ -182,6 +182,11 @@ public class Horse extends Ageable {
         updateMetadata();
     }
 
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
+
     public int getArmorType() {
         return this.armorType;
     }

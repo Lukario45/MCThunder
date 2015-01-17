@@ -58,4 +58,9 @@ public class Boat extends Entity {
     public float getDamageTaken() {
         return this.damageTaken;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

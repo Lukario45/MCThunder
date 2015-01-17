@@ -61,4 +61,9 @@ public class Enderman extends LivingEntity {
     public boolean isScreaming() {
         return this.screaming;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

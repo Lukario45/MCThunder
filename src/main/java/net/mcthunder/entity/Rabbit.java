@@ -53,4 +53,9 @@ public class Rabbit extends Ageable {
     public int getMoreCarrotTicks() {
         return this.moreCarrotTicks;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

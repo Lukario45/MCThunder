@@ -13,12 +13,12 @@ import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
-import org.spacehq.opennbt.NBTIO;
-import org.spacehq.opennbt.tag.builtin.*;
+import org.spacehq.opennbt.tag.builtin.DoubleTag;
+import org.spacehq.opennbt.tag.builtin.FloatTag;
+import org.spacehq.opennbt.tag.builtin.ListTag;
+import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.packet.Packet;
-
-import java.io.IOException;
 
 import static net.mcthunder.api.Utils.tellConsole;
 
@@ -36,22 +36,19 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
         player.setLocation(MCThunder.getWorld(MCThunder.getConfig().getWorldName()).getSpawnLocation());
         MCThunder.getProfileHandler().checkPlayer(player);
         Location l = null;
-        try {
-            CompoundTag tag = NBTIO.readFile(player.getPlayerFile().getNbtFile());
-            ListTag pos = tag.get("Pos");
-            StringTag w = tag.get("SpawnWorld");
-            if (pos != null) {
-                l = new Location(w != null ? MCThunder.getWorld(w.getValue()) : MCThunder.getWorld(MCThunder.getConfig().getWorldName()), ((DoubleTag) pos.get(0)).getValue(),
-                        ((DoubleTag) pos.get(1)).getValue(), ((DoubleTag) pos.get(2)).getValue());
-                ListTag rotation = tag.get("Rotation");
-                if (rotation != null) {
-                    l.setYaw(((FloatTag) rotation.get(0)).getValue());
-                    l.setPitch(((FloatTag) rotation.get(1)).getValue());
-                }
+        ListTag pos = (ListTag) MCThunder.getProfileHandler().getAttribute(player, "Pos");
+        StringTag w = (StringTag) MCThunder.getProfileHandler().getAttribute(player, "SpawnWorld");
+        if (pos != null) {
+            l = new Location(w != null ? MCThunder.getWorld(w.getValue()) : MCThunder.getWorld(MCThunder.getConfig().getWorldName()), ((DoubleTag) pos.get(0)).getValue(),
+                    ((DoubleTag) pos.get(1)).getValue(), ((DoubleTag) pos.get(2)).getValue());
+            ListTag rotation = (ListTag) MCThunder.getProfileHandler().getAttribute(player, "Rotation");
+            if (rotation != null) {
+                l.setYaw(((FloatTag) rotation.get(0)).getValue());
+                l.setPitch(((FloatTag) rotation.get(1)).getValue());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        player.getInventory().setItems((ListTag) MCThunder.getProfileHandler().getAttribute(player, "Inventory"));
+        player.getEnderChest().setItems((ListTag) MCThunder.getProfileHandler().getAttribute(player, "EnderItems"));
         player.setLocation((l == null || l.getWorld() == null) ? MCThunder.getWorld(MCThunder.getConfig().getWorldName()).getSpawnLocation() : l);
         player.sendPacket(new ServerJoinGamePacket(player.getEntityID(), player.getWorld().isHardcore(), player.getGameMode(), player.getWorld().getDimension(), player.getWorld().getDifficulty(), MCThunder.getConfig().getSlots(), player.getWorld().getWorldType(), false));
         tellConsole(LoggingLevel.INFO, String.format("User %s is connecting from %s:%s", player.getName(), session.getHost(), session.getPort()));
@@ -61,8 +58,6 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
         player.sendPacket(new ServerPlayerPositionRotationPacket(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch()));
         player.sendPacket(new ServerSpawnPositionPacket(player.getLocation().getPosition()));
         MCThunder.broadcast("&7&o" + profile.getName() + " connected");
-        //StringTag test = (StringTag) playerProfileHandler.getAttribute(player,"test");
-        // tellConsole(LoggingLevel.DEBUG,test.getValue());
 
         ServerSpawnPlayerPacket toAllPlayers = (ServerSpawnPlayerPacket) player.getPacket();
         for (Player player1 : MCThunder.getPlayers())
@@ -80,6 +75,8 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
                     player.sendPacket(packet);
         for (Sign s : player.getWorld().getSigns())
             player.sendPacket(s.getPacket());
+
+        player.updateInventory();
         player.toggleMoveable();
     }
 }

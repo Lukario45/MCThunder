@@ -41,4 +41,9 @@ public class Bat extends LivingEntity {
     public boolean isHanging() {
         return this.hanging;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

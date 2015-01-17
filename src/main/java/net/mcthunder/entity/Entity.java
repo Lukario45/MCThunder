@@ -367,6 +367,11 @@ public abstract class Entity {
     }
 
     public CompoundTag getNBT() {//TODO: Return the nbt as well as have all subclasses do as well
-        return null;
+        CompoundTag nbt = new CompoundTag("");
+        nbt.put(new ListTag("Pos", Arrays.<Tag>asList(new DoubleTag("X", this.location.getX()),
+                new DoubleTag("Y", this.location.getY()), new DoubleTag("Z", this.location.getZ()))));
+        nbt.put(new ListTag("Rotation", Arrays.<Tag>asList(new FloatTag("Yaw", this.location.getYaw()),
+                new FloatTag("Pitch", this.location.getPitch()))));
+        return nbt;
     }
 }

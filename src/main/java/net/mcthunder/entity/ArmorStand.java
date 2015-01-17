@@ -334,4 +334,9 @@ public class ArmorStand extends Entity {
     public float getRightLegRoll() {
         return this.rightLegRoll;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

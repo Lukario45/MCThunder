@@ -77,4 +77,9 @@ public class Zombie extends LivingEntity {
     public boolean canBreakDoors() {
         return this.canBreakDoors;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

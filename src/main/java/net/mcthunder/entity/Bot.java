@@ -12,6 +12,7 @@ import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 import java.util.UUID;
@@ -182,4 +183,9 @@ public abstract class Bot extends LivingEntity {
     public abstract void unload();
 
     public abstract void load();
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

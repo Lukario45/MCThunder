@@ -40,4 +40,9 @@ public class ZombiePigman extends Zombie {
     public short getAnger() {
         return this.anger;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

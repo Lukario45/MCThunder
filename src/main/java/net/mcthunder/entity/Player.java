@@ -1,6 +1,5 @@
 package net.mcthunder.entity;
 
-import com.Lukario45.NBTFile.NBTFile;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.*;
 import net.mcthunder.inventory.ChestInventory;
@@ -25,10 +24,11 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlay
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.packet.Packet;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -49,8 +49,7 @@ public final class Player extends LivingEntity {
     private UUID skinUUID;
     private Property skin;
     private byte skinFlags = 127;
-    private NBTFile playerFile;
-    private Inventory openInventory = null, inv;
+    private Inventory openInventory = null, inv, enderchest;
     private int viewDistance = 9, slot = 36, ping, score = 0;
     private String displayName, appended = "";
     private GameMode gamemode;
@@ -69,9 +68,9 @@ public final class Player extends LivingEntity {
         this.displayName = this.name;
         this.gamemode = GameMode.CREATIVE;
         this.moveable = false;
-        this.inv = new PlayerInventory(44, this.name, this);
+        this.inv = new PlayerInventory(this.name, this);
+        this.enderchest = new ChestInventory("EnderChest");
         this.ping = getSession().getFlag(ProtocolConstants.PING_KEY);
-        this.playerFile = new NBTFile(new File("PlayerFiles", this.uuid + ".dat"), "Player");
         this.skinUUID = this.uuid;
         this.origSkin = getGameProfile().getProperties().get("textures");
         this.skin = this.origSkin;
@@ -79,10 +78,6 @@ public final class Player extends LivingEntity {
         this.metadata.setBit(16, 0x02, this.hideCape);
         this.metadata.setMetadata(17, (float) (this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));
         this.metadata.setMetadata(18, this.score);
-    }
-
-    public NBTFile getPlayerFile() {
-        return this.playerFile;
     }
 
     public void loadChunks(Direction d) {
@@ -284,6 +279,7 @@ public final class Player extends LivingEntity {
             this.southColumns.clear();
             this.loadedColumns.clear();
             sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
+            updateInventory();
             loadChunks(null);
             toggleMoveable();
         } else {//TODO: Unload and load new chunks if tp to far
@@ -363,6 +359,7 @@ public final class Player extends LivingEntity {
                             pl.sendPacket(packet);
                 }
             sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
+            updateInventory();
             sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
             sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
         }
@@ -424,6 +421,7 @@ public final class Player extends LivingEntity {
         this.loadedColumns.clear();
         super.setWorld(w);
         sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
+        updateInventory();
         sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
         sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
         loadChunks(null);
@@ -473,6 +471,7 @@ public final class Player extends LivingEntity {
                         pl.sendPacket(packet);
             }
         sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
+        updateInventory();
         sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
         sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
     }
@@ -494,8 +493,13 @@ public final class Player extends LivingEntity {
             return;
         this.openInventory = inv;
         sendPacket(this.openInventory.getView());
-        for (int i = 0; i < this.openInventory.getItems().size(); i++)
+        for (int i = 0; i < this.openInventory.getSize(); i++)
             sendPacket(new ServerSetSlotPacket(this.openInventory.getID(), i, this.openInventory.getItemAt(i).getItemStack()));
+    }
+
+    public void updateInventory() {
+        for (int i = 0; i < this.inv.getSize(); i++)
+            sendPacket(new ServerSetSlotPacket(0, i, this.inv.getItemAt(i).getItemStack()));
     }
 
     public Inventory getOpenInventory() {
@@ -503,9 +507,7 @@ public final class Player extends LivingEntity {
     }
 
     public Inventory getEnderChest() {
-        Inventory e = new ChestInventory("EnderChest");
-        //TODO: Retrieve enderchest data
-        return e;
+        return this.enderchest;
     }
 
     public void showCape(boolean show) {
@@ -546,4 +548,10 @@ public final class Player extends LivingEntity {
 
     @Override
     public void ai() { }//Do nothing as the player themselves is the intelligence
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        nbt.put(new StringTag("SpawnWorld", getWorld().getName()));
+        return nbt;
+    }
 }

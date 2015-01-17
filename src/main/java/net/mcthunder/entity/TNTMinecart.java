@@ -32,4 +32,9 @@ public class TNTMinecart extends Minecart {
     public void setFuse(int fuse) {
         this.fuse = fuse;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

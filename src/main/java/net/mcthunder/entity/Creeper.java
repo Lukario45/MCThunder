@@ -77,4 +77,9 @@ public class Creeper extends LivingEntity {
     public boolean isIgnited() {
         return this.ignited;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

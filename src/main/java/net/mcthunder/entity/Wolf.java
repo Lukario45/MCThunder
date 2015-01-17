@@ -79,4 +79,9 @@ public class Wolf extends Tameable {
     public byte getCollarColor() {
         return this.collarColor;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

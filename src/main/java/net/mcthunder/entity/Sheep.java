@@ -54,4 +54,9 @@ public class Sheep extends Ageable {
     public boolean getSheared() {
         return this.sheared;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

@@ -36,4 +36,9 @@ public abstract class Ageable extends LivingEntity {
     public byte getAge() {
         return this.age;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

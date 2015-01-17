@@ -29,4 +29,9 @@ public class ChestMinecart extends Minecart {
     public ChestInventory getInventory() {
         return this.inv;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

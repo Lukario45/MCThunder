@@ -53,4 +53,9 @@ public class Chicken extends Ageable {
     public void setLayTime(int layTime) {
         this.layTime = layTime;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

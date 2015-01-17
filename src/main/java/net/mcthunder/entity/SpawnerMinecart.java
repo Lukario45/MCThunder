@@ -47,4 +47,9 @@ public class SpawnerMinecart extends Minecart {
     public EntityType getSpawnType() {
         return this.spawnType;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

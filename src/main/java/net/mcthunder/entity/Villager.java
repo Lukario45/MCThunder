@@ -61,6 +61,11 @@ public class Villager extends Ageable {//TODO: Add a villager inventory with it 
         return this.villagerType;
     }
 
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
+
     public class VillagerType {
         public static final int FARMER = 0;
         public static final int LIBRARIAN = 1;

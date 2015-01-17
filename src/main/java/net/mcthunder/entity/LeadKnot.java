@@ -22,4 +22,9 @@ public class LeadKnot extends Entity {
         return new ServerSpawnObjectPacket(this.entityID, ObjectType.LEASH_KNOT, this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

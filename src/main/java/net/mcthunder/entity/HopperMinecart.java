@@ -31,4 +31,9 @@ public class HopperMinecart extends Minecart {
     public HopperInventory getInventory() {
         return this.inv;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

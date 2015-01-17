@@ -47,7 +47,6 @@ import org.spacehq.mc.protocol.packet.ingame.client.window.ClientCreativeInvento
 import org.spacehq.mc.protocol.packet.ingame.client.window.ClientWindowActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
-import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
@@ -259,6 +258,7 @@ public class MCThunder {
                         else if (event.getPacket() instanceof ClientCreativeInventoryActionPacket) {
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ClientCreativeInventoryActionPacket packet = event.getPacket();
+                            //tellConsole(LoggingLevel.DEBUG, packet.getSlot());
                             ItemStack old = player.getHeldItem();
                             player.getInventory().setSlot(packet.getSlot(), new ItemStack(packet.getClickedItem() == null ? Material.AIR :
                                     Material.fromData(packet.getClickedItem().getId(), (short) packet.getClickedItem().getData()),
@@ -394,19 +394,12 @@ public class MCThunder {
                         p.sendPacket(destroyEntitiesPacket);
                     player.setAppended("");
                     player.unloadChunks();
-                    //NBTIO.writeFile(player.getNBT(), player.getPlayerFile().getNbtFile());
-                    //This will be in .getNBT() but until then temporary thing here
-                    try {
-                        CompoundTag tag = NBTIO.readFile(player.getPlayerFile().getNbtFile());
-                        ListTag pos = new ListTag("Pos", Arrays.<Tag>asList(new DoubleTag("X", player.getLocation().getX()),
-                                new DoubleTag("Y", player.getLocation().getY()), new DoubleTag("Z", player.getLocation().getZ())));
-                        ListTag rotation = new ListTag("Rotation", Arrays.<Tag>asList(new FloatTag("Yaw", player.getLocation().getYaw()),
-                                new FloatTag("Pitch", player.getLocation().getPitch())));
-                        tag.put(pos);
-                        tag.put(rotation);
-                        tag.put(new StringTag("SpawnWorld", player.getWorld().getName()));
-                        NBTIO.writeFile(tag, player.getPlayerFile().getNbtFile());
-                    } catch (Exception ignored) { }
+                    //TODO update other changed nbt things on logout
+                    playerProfileHandler.changeAttribute(player, new ListTag("Pos", Arrays.<Tag>asList(new DoubleTag("X", player.getLocation().getX()),
+                            new DoubleTag("Y", player.getLocation().getY()), new DoubleTag("Z", player.getLocation().getZ()))));
+                    playerProfileHandler.changeAttribute(player, new ListTag("Rotation", Arrays.<Tag>asList(new FloatTag("Yaw", player.getLocation().getYaw()),
+                            new FloatTag("Pitch", player.getLocation().getPitch()))));
+                    playerProfileHandler.changeAttribute(player, new StringTag("SpawnWorld", player.getWorld().getName()));
                     players.remove(player.getUniqueID());
                 }
             }

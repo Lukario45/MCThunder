@@ -56,4 +56,9 @@ public class ExperienceOrb extends Entity {
     public short setHealth() {
         return this.health;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

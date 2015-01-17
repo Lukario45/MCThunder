@@ -69,4 +69,9 @@ public class CommandBlockMinecart extends Minecart {
     public int getSuccessCount() {
         return this.successCount;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

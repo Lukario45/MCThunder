@@ -113,4 +113,9 @@ public class DroppedItem extends Entity {
     public void setThrower(String thrower) {
         this.thrower = thrower;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

@@ -53,4 +53,9 @@ public class Endermite extends Silverfish {
     public void setLifeTime(int lifeTime) {
         this.lifeTime = lifeTime;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

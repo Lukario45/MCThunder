@@ -41,4 +41,9 @@ public abstract class Projectile extends Entity {
     public void setHasOwner(boolean hasOwner) {
         this.hasOwner = hasOwner;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

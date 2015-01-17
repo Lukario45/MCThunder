@@ -96,4 +96,9 @@ public class Minecart extends Entity {
     public boolean showBlock() {
         return this.showBlock;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

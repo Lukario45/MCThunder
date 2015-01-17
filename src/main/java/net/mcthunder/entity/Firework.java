@@ -76,4 +76,9 @@ public class Firework extends Entity {
     public int getLifeTime() {
         return this.lifeTime;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

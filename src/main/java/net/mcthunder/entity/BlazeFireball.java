@@ -32,4 +32,9 @@ public class BlazeFireball extends Projectile {
         return new ServerSpawnObjectPacket(this.entityID, ObjectType.BLAZE_FIREBALL, this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

@@ -41,4 +41,9 @@ public class Skeleton extends LivingEntity {
     public byte getSkeletonType() {
         return this.skeletonType;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

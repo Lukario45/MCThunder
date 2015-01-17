@@ -41,4 +41,9 @@ public class Pig extends Ageable {
     public boolean hasSaddle() {
         return this.hasSaddle;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

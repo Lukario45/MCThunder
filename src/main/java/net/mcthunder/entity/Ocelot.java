@@ -41,4 +41,9 @@ public class Ocelot extends Tameable {
     public byte getCatType() {
         return this.catType;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

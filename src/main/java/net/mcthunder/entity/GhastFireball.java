@@ -34,4 +34,9 @@ public class GhastFireball extends Projectile {
         return new ServerSpawnObjectPacket(this.entityID, ObjectType.GHAST_FIREBALL, this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

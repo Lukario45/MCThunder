@@ -48,4 +48,9 @@ public abstract class Tameable extends Ageable {
     public String getOwnerName() {
         return this.ownerName;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

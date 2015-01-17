@@ -73,4 +73,9 @@ public class ThrownSplashPotion extends Projectile {
     public PotionEffect getPotionEffect() {
         return this.potionEffect;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

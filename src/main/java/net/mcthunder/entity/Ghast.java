@@ -41,4 +41,9 @@ public class Ghast extends LivingEntity {
     public boolean isAttacking() {
         return this.attacking;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

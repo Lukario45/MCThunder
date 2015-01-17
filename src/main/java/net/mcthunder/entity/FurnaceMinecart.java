@@ -44,4 +44,9 @@ public class FurnaceMinecart extends Minecart {
     public int getTransferCooldown() {
         return this.transferCooldown;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }

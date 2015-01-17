@@ -56,4 +56,9 @@ public class Painting extends Entity {
     public HangingDirection getHangingDirection() {
         return this.direction;
     }
+
+    public CompoundTag getNBT() {//TODO: Return the nbt
+        CompoundTag nbt = super.getNBT();
+        return nbt;
+    }
 }
