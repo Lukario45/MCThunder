@@ -2,6 +2,7 @@ package net.mcthunder.entity;
 
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.*;
+import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.inventory.ChestInventory;
 import net.mcthunder.inventory.Inventory;
 import net.mcthunder.inventory.ItemStack;
@@ -24,8 +25,7 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlay
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import org.spacehq.opennbt.tag.builtin.StringTag;
+import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.packet.Packet;
 
@@ -50,15 +50,17 @@ public final class Player extends LivingEntity {
     private Property skin;
     private byte skinFlags = 127;
     private Inventory openInventory = null, inv, enderchest;
-    private int viewDistance = 9, slot = 36, ping, score = 0;
+    private int viewDistance = 9, slot = 36, ping, score = 0, hunger = 20;
     private String displayName, appended = "";
     private GameMode gamemode;
     private Session session;
     private boolean moveable, hideCape = false;
     private UUID lastPmPerson;
+    private Location bedSpawn = null;
 
     public Player(Session session) {
         super(null);
+        this.type = EntityType.PLAYER;
         this.session = session;
         this.profile = getSession().getFlag(ProtocolConstants.PROFILE_KEY);
         this.origProfile = this.profile;
@@ -261,8 +263,8 @@ public final class Player extends LivingEntity {
     }
 
     public void teleport(Location l) {
+        toggleMoveable();
         if (!l.getWorld().equals(getWorld())) {
-            toggleMoveable();
             ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
             setLocation(l);
             long chunk = getChunk();
@@ -280,9 +282,7 @@ public final class Player extends LivingEntity {
             this.loadedColumns.clear();
             sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
             updateInventory();
-            loadChunks(null);
-            toggleMoveable();
-        } else {//TODO: Unload and load new chunks if tp to far
+        } else {//TODO: Unload and the old chunks if tp is to far
             setLocation(l);
             ServerEntityTeleportPacket packet = new ServerEntityTeleportPacket(getEntityID(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), isOnGround());
             long chunk = getChunk();
@@ -290,6 +290,8 @@ public final class Player extends LivingEntity {
                 if (p.getWorld().equals(l.getWorld()) && p.isColumnLoaded(chunk))
                     p.sendPacket(packet);
         }
+        loadChunks(null);//Load the needed chunks
+        toggleMoveable();
         sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
         sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
     }
@@ -549,9 +551,62 @@ public final class Player extends LivingEntity {
     @Override
     public void ai() { }//Do nothing as the player themselves is the intelligence
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {//TODO: Correct the values that are just 0 to be based on variables
         CompoundTag nbt = super.getNBT();
+        nbt.remove("id");
+        nbt.remove("CustomName");
+        nbt.remove("CustomNameVisible");
+        nbt.remove("Equipment");
+        nbt.remove("DropChances");
+        nbt.remove("CanPickUpLoot");
+        nbt.remove("PersistenceRequired");
+        nbt.remove("Leashed");
+        nbt.remove("Leash");
+        nbt.put(new IntTag("playerGameType", this.gamemode.equals(GameMode.CREATIVE) ? 1 : this.gamemode.equals(GameMode.ADVENTURE) ? 2 :
+                this.gamemode.equals(GameMode.SPECTATOR) ? 3 : 0));
+        nbt.put(new IntTag("Score", this.score));
+        nbt.put(new IntTag("SelectedItemSlot", this.slot));
+        CompoundTag selectedItem = new CompoundTag("SelectedItem");
+        selectedItem.put(new ByteTag("Count", (byte) this.getHeldItem().getAmount()));
+        selectedItem.put(new ShortTag("Damage", this.getHeldItem().getType().getData()));
+        selectedItem.put(new StringTag("id", "minecraft:" + this.getHeldItem().getType().getParent().getName().toLowerCase()));
+        nbt.put(selectedItem);
+        if (this.bedSpawn != null) {
+            nbt.put(new IntTag("SpawnX", (int) this.bedSpawn.getX()));
+            nbt.put(new IntTag("SpawnY", (int) this.bedSpawn.getY()));
+            nbt.put(new IntTag("SpawnZ", (int) this.bedSpawn.getZ()));
+        }
+        nbt.put(new ByteTag("SpawnForced", (byte) 0));
+        nbt.put(new ByteTag("Sleeping", (byte) 0));
+        nbt.put(new ShortTag("SleepTimer", (short) 0));
+        nbt.put(new IntTag("foodLevel", this.hunger));
+        nbt.put(new FloatTag("foodExhaustionLevel", 0));
+        nbt.put(new FloatTag("foodSaturationLevel", 0));
+        nbt.put(new IntTag("foodTickTimer", 0));
+        nbt.put(new IntTag("XpLevel", 0));
+        nbt.put(new FloatTag("XpP", 0));
+        nbt.put(new IntTag("XpTotal", 0));
+        nbt.put(new IntTag("XpSeed", 0));
+        nbt.put(this.inv.getItemList("Inventory"));
+        nbt.put(this.enderchest.getItemList("EnderItems"));
+        CompoundTag abilities = new CompoundTag("abilities");
+        abilities.put(new FloatTag("walkSpeed", (float) 0.1));
+        abilities.put(new FloatTag("flySpeed", (float) 0.05));
+        abilities.put(new ByteTag("mayfly", (byte) 0));
+        abilities.put(new ByteTag("flying", (byte) 0));
+        abilities.put(new ByteTag("invulnerable", (byte) 0));
+        abilities.put(new ByteTag("mayBuild", (byte) 0));
+        abilities.put(new ByteTag("instabuild", (byte) 0));
+        nbt.put(abilities);
         nbt.put(new StringTag("SpawnWorld", getWorld().getName()));
+        nbt.put(new StringTag("UUID", this.uuid.toString()));//Overrides entity tag with this name
         return nbt;
+    }
+
+    public void saveToFile() {
+        PlayerProfileHandler profileHandler = MCThunder.getProfileHandler();
+        CompoundTag nbt = getNBT();
+        for (Tag value : nbt.getValue().values())
+            profileHandler.changeAttribute(this, value);
     }
 }

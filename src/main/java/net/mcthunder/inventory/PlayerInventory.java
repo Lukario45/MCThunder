@@ -6,6 +6,8 @@ import org.spacehq.mc.protocol.data.game.values.window.WindowType;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
 import org.spacehq.opennbt.tag.builtin.*;
 
+import java.util.ArrayList;
+
 public class PlayerInventory extends Inventory {
     private Player p;
 
@@ -66,6 +68,38 @@ public class PlayerInventory extends Inventory {
                 }
             }
         }
+    }
+
+    public ListTag getItemList(String tagName) {
+        if (tagName == null)
+            return null;
+        ArrayList<Tag> items = new ArrayList<>();
+        for (int i = 0; i < this.contents.size(); i++) {
+            ItemStack is = getItemAt(i);
+            if (is == null || is.getType().equals(Material.AIR))
+                continue;
+            CompoundTag item = new CompoundTag("Item");
+            int s = i;
+            if (s == 5)
+                s = 103;
+            else if (s == 6)
+                s = 102;
+            else if (s == 7)
+                s = 101;
+            else if (s == 8)
+                s = 100;
+            else if (s > 35)
+                s -= 36;
+            item.put(new ByteTag("Slot", (byte) s));
+            item.put(new StringTag("id", "minecraft:" + is.getType().getParent().getName().toLowerCase()));
+            item.put(new ShortTag("Damage", is.getType().getData()));
+            item.put(new ByteTag("Count", (byte) is.getAmount()));
+            CompoundTag nbt = is.getNBT();
+            if (nbt != null)
+                item.put(nbt);
+            items.add(item);
+        }
+        return new ListTag(tagName, items);
     }
 
     public void setSlot(int slot, ItemStack i) {

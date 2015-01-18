@@ -27,6 +27,7 @@ public abstract class Bot extends LivingEntity {
 
     public Bot(String name) {
         super(null);
+        this.type = EntityType.PLAYER;
         this.uuid = UUID.randomUUID();
         this.name = name;
         String uncoloredName = MessageFormat.formatMessage(this.name).getFullText().trim();

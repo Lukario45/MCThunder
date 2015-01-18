@@ -47,7 +47,6 @@ import org.spacehq.mc.protocol.packet.ingame.client.window.ClientCreativeInvento
 import org.spacehq.mc.protocol.packet.ingame.client.window.ClientWindowActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerKeepAlivePacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
-import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.Server;
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.event.server.ServerAdapter;
@@ -394,12 +393,7 @@ public class MCThunder {
                         p.sendPacket(destroyEntitiesPacket);
                     player.setAppended("");
                     player.unloadChunks();
-                    //TODO update other changed nbt things on logout
-                    playerProfileHandler.changeAttribute(player, new ListTag("Pos", Arrays.<Tag>asList(new DoubleTag("X", player.getLocation().getX()),
-                            new DoubleTag("Y", player.getLocation().getY()), new DoubleTag("Z", player.getLocation().getZ()))));
-                    playerProfileHandler.changeAttribute(player, new ListTag("Rotation", Arrays.<Tag>asList(new FloatTag("Yaw", player.getLocation().getYaw()),
-                            new FloatTag("Pitch", player.getLocation().getPitch()))));
-                    playerProfileHandler.changeAttribute(player, new StringTag("SpawnWorld", player.getWorld().getName()));
+                    player.saveToFile();
                     players.remove(player.getUniqueID());
                 }
             }

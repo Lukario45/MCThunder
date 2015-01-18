@@ -33,8 +33,8 @@ public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.Pl
             MCThunder.getPlayer(profile.getId()).disconnect("You logged in from another location!");
         Player player = new Player(session);
         MCThunder.addPlayer(player);
-        player.setLocation(MCThunder.getWorld(MCThunder.getConfig().getWorldName()).getSpawnLocation());
         MCThunder.getProfileHandler().checkPlayer(player);
+        //TODO: Read other nbt aspects from file and set them for player
         Location l = null;
         ListTag pos = (ListTag) MCThunder.getProfileHandler().getAttribute(player, "Pos");
         StringTag w = (StringTag) MCThunder.getProfileHandler().getAttribute(player, "SpawnWorld");

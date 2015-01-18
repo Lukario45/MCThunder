@@ -35,7 +35,7 @@ public class Zombie extends LivingEntity {
 
     public Packet getPacket() {
         return new ServerSpawnMobPacket(this.entityID, MobType.ZOMBIE, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
-                this.location.getPitch(), this.location.getYaw(), this.motion.getdX(), this.motion.getdY(), this.motion.getdZ(), getMetadata().getMetadataArray());
+                this.location.getPitch(), this.location.getYaw(), getMotion().getdX(), getMotion().getdY(), getMotion().getdZ(), getMetadata().getMetadataArray());
     }
 
     @Override

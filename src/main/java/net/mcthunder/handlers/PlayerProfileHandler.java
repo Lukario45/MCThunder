@@ -20,9 +20,10 @@ public class PlayerProfileHandler {
         tellConsole(LoggingLevel.INFO, p.getName() + " logged in with an ID of " + p.getUniqueID());
         File file = new File("PlayerFiles", p.getUniqueID() + ".dat");
         if (!file.exists()) {
-            tellConsole(LoggingLevel.DEBUG, "Player: " + p.getName() + "'s file does not exist yet, creating file!");
+            //tellConsole(LoggingLevel.DEBUG, "Player: " + p.getName() + "'s file does not exist yet, creating file!");
             try {
-                //TODO: have the nbt be all of entity nbt not just spawn location
+                file.createNewFile();
+                p.setLocation(MCThunder.getWorld(MCThunder.getConfig().getWorldName()).getSpawnLocation());
                 NBTIO.writeFile(p.getNBT(), file);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -69,9 +70,7 @@ public class PlayerProfileHandler {
     }
 
     public Tag getAttribute(Player p, String t) {
-        if (!tagExists(p, t))
-            tellConsole(LoggingLevel.ERROR, "Something tried to get a nonexistant attribute from player file: " + t);
-        else
+        if (tagExists(p, t))//No sense in telling the console if something tried to get a tag that does no exist
             try {
                 return NBTIO.readFile(new File("PlayerFiles", p.getUniqueID() + ".dat")).get(t);
             } catch (IOException e) {

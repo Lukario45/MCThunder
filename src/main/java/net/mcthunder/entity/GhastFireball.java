@@ -24,7 +24,7 @@ public class GhastFireball extends Projectile {
             DoubleTag dX = direction.get(0);
             DoubleTag dY = direction.get(1);
             DoubleTag dZ = direction.get(2);
-            this.location.setVector(this.motion = new Vector(dX.getValue(), dY.getValue(), dZ.getValue()));
+            this.location.setVector(new Vector(dX.getValue(), dY.getValue(), dZ.getValue()));
         }
         IntTag explosionPower = tag.get("ExplosionPower");
     }

@@ -110,9 +110,10 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
             IntTag leashY = leash.get("Y");
             IntTag leashZ = leash.get("Z");
         }
+        ByteTag customNameVisible = tag.get("CustomNameVisible");//1 true, 0 false
         this.maxHealth = healF == null ? health == null ? 20 : health.getValue() : healF.getValue();
         this.metadata.setMetadata(2, this.customName);
-        this.metadata.setMetadata(3, (byte) ((this.alwaysShowName = false) ? 1 : 0));
+        this.metadata.setMetadata(3, (byte) ((this.alwaysShowName = customNameVisible != null && customNameVisible.getValue() == (byte) 1) ? 1 : 0));
         this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(7, this.activeEffects.size() == 0 ? 0 : this.latest.getColor());//No color until a potion is set
         this.metadata.setMetadata(8, (byte) (this.activeEffects.size() == 0 ? 0 : this.activeEffects.get(this.latest).isAmbient() ? 1 : 0));//False until potion effects are set
@@ -312,8 +313,65 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
             this.modifiers.remove(m);
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {//TODO: Correct the values that are just 0 to be based on variables
         CompoundTag nbt = super.getNBT();
+        nbt.put(new FloatTag("HealF", this.health));
+        nbt.put(new FloatTag("AbsorptionAmount", this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));
+        nbt.put(new ShortTag("AttackTime", (short) 0));
+        nbt.put(new ShortTag("HurtTime", (short) 0));
+        nbt.put(new IntTag("HurtByTimestamp", 0));
+        nbt.put(new ShortTag("DeathTime", (short) 0));
+        ArrayList<Tag> temp = new ArrayList<>();
+        for (int i = 0; i < 1/*attributes.size()*/; i++) {
+            CompoundTag attribute = new CompoundTag("Attribute");
+            attribute.put(new StringTag("Name"));
+            attribute.put(new DoubleTag("Base"));
+            ArrayList<Tag> mods = new ArrayList<>();
+            for (Modifier mod : this.modifiers) {
+                CompoundTag modifier = new CompoundTag("Modifier");//Is this proper tag name and does it matter
+                modifier.put(new StringTag("AttributeName", mod.getAttributeName()));
+                modifier.put(new StringTag("Name", mod.getName()));
+                modifier.put(new DoubleTag("Amount", mod.getAmount()));
+                modifier.put(new IntTag("Operation", mod.getOperation()));
+                modifier.put(new LongTag("UUIDMost", mod.getUUIDMost()));
+                modifier.put(new LongTag("UUIDLeast", mod.getUUIDLeast()));
+                mods.add(modifier);
+            }
+            if (!mods.isEmpty())
+                attribute.put(new ListTag("Modifiers", mods));
+            temp.add(attribute);
+        }
+        if (!temp.isEmpty())
+            nbt.put(new ListTag("Attributes", temp));
+        temp.clear();
+        for (PotionEffect p : this.activeEffects.values()) {
+            CompoundTag potion = new CompoundTag("customPotionEffect");//Is this proper tag name and does it matter
+            potion.put(new ByteTag("Id", (byte) p.getType().getID()));
+            potion.put(new ByteTag("Amplifier", (byte) p.getAmplifier()));
+            potion.put(new IntTag("Duration", p.getDuration()));
+            potion.put(new ByteTag("Ambient", (byte) (p.isAmbient() ? 1 : 0)));
+            potion.put(new ByteTag("ShowParticles", (byte) (p.showParticles() ? 1 : 0)));
+            temp.add(potion);
+        }
+        if (!temp.isEmpty())
+            nbt.put(new ListTag("ActiveEffects", temp));
+
+        nbt.put(new ListTag("Equipment", Arrays.<Tag>asList(new CompoundTag("Hand"), new CompoundTag("Boots"), new CompoundTag("Leggings"),
+                new CompoundTag("Chestplate"), new CompoundTag("Helmet"))));
+        nbt.put(new ListTag("DropChances", Arrays.<Tag>asList(new FloatTag("Hand", 0), new FloatTag("Boots", 0), new FloatTag("Leggings", 0),
+                new FloatTag("Chestplate", 0), new FloatTag("Helmet", 0))));
+        nbt.put(new ByteTag("CanPickUpLoot", (byte) 0));
+        nbt.put(new ByteTag("NoAI", (byte) (this.hasAI ? 0 : 1)));
+        nbt.put(new ByteTag("PersistenceRequired", (byte) 0));
+        nbt.put(new ByteTag("Leased", (byte) 0));
+        CompoundTag leash = new CompoundTag("Leash");
+        leash.put(new LongTag("UUIDMost", 0));
+        leash.put(new LongTag("UUIDLeast", 0));
+        leash.put(new IntTag("X", 0));
+        leash.put(new IntTag("Y", 0));
+        leash.put(new IntTag("Z", 0));
+        nbt.put(leash);
+        nbt.put(new ByteTag("CustomNameVisible", (byte) (this.alwaysShowName ? 1 : 0)));
         return nbt;
     }
 }

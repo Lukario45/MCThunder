@@ -33,7 +33,6 @@ public abstract class Entity {
     protected String customName;
     protected Location location;
     protected EntityType type;
-    protected Vector motion;
     protected Entity riding;
     protected int entityID;
 
@@ -181,8 +180,6 @@ public abstract class Entity {
         this.entityID = getNextID();
         this.location = location;
         this.riding = null;
-        if (this.location != null)
-            this.location.setVector(this.motion = new Vector(0, 0, 0));
         this.customName = "";
         this.metadata = new MetadataMap();
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, (this.fireTicks = -20) >= 0);
@@ -218,7 +215,7 @@ public abstract class Entity {
             DoubleTag dX = motion.get(0);
             DoubleTag dY = motion.get(1);
             DoubleTag dZ = motion.get(2);
-            this.location.setVector(this.motion = new Vector(dX.getValue(), dY.getValue(), dZ.getValue()));
+            this.location.setVector(new Vector(dX.getValue(), dY.getValue(), dZ.getValue()));
         }
         ShortTag fire = tag.get("Fire");
         this.metadata = new MetadataMap();
@@ -237,7 +234,6 @@ public abstract class Entity {
         UUID uuid = tag.get("UUID") != null ? UUID.fromString(((StringTag) tag.get("UUID")).getValue()) : null;
         StringTag customName = tag.get("CustomName");
         this.customName = customName != null ? customName.getValue() : "";
-        ByteTag customNameVisible = tag.get("CustomNameVisible");//1 true, 0 false
         ByteTag silent = tag.get("Silent");//1 true, 0 false
         CompoundTag riding = tag.get("Riding");
         CompoundTag commandStats = tag.get("CommandStats");
@@ -362,16 +358,47 @@ public abstract class Entity {
         updateMetadata();
     }
 
+    public Vector getMotion() {
+        return this.location.getVector();
+    }
+
     protected void updateMetadata() {
         MCThunder.getMetadataChangeEventSource().fireEvent(this);
     }
 
     public CompoundTag getNBT() {//TODO: Return the nbt as well as have all subclasses do as well
+        //TODO: Correct the values that are just 0 to be based on variables
         CompoundTag nbt = new CompoundTag("");
+        nbt.put(new StringTag("id", this.type.getSavegameID()));
         nbt.put(new ListTag("Pos", Arrays.<Tag>asList(new DoubleTag("X", this.location.getX()),
                 new DoubleTag("Y", this.location.getY()), new DoubleTag("Z", this.location.getZ()))));
         nbt.put(new ListTag("Rotation", Arrays.<Tag>asList(new FloatTag("Yaw", this.location.getYaw()),
                 new FloatTag("Pitch", this.location.getPitch()))));
+        nbt.put(new ListTag("Motion", Arrays.<Tag>asList(new DoubleTag("dX", this.location.getVector().getdX()),
+                new DoubleTag("dY", this.location.getVector().getdY()), new DoubleTag("dZ", this.location.getVector().getdZ()))));
+        nbt.put(new ShortTag("Fire", this.fireTicks));
+        nbt.put(new ByteTag("OnGround", (byte) (this.onGround ? 1 : 0)));
+        nbt.put(new IntTag("Dimension", getWorld().getDimension()));
+        nbt.put(new ByteTag("Invulnerable", (byte) 0));
+        nbt.put(new IntTag("PortalCooldown", 0));
+        nbt.put(new LongTag("UUIDMost", 0));
+        nbt.put(new LongTag("UUIDLeast", 0));
+        nbt.put(new StringTag("UUID", UUID.randomUUID().toString()));//unset at the moment
+        nbt.put(new StringTag("CustomName", this.customName));
+        nbt.put(new ByteTag("Silent", (byte) 0));
+        //nbt.put(new CompoundTag("Riding"));
+        CompoundTag commandStats = new CompoundTag("CommandStats");
+        commandStats.put(new StringTag("SuccessCountName"));
+        commandStats.put(new StringTag("SuccessCountObjective"));
+        commandStats.put(new StringTag("AffectedBlocksName"));
+        commandStats.put(new StringTag("AffectedBlocksObjective"));
+        commandStats.put(new StringTag("AffectedEntitiesName"));
+        commandStats.put(new StringTag("AffectedEntitiesObjective"));
+        commandStats.put(new StringTag("AffectedItemsName"));
+        commandStats.put(new StringTag("AffectedItemsObjective"));
+        commandStats.put(new StringTag("QueryResultName"));
+        commandStats.put(new StringTag("QueryResultObjective"));
+        //nbt.put(commandStats);
         return nbt;
     }
 }

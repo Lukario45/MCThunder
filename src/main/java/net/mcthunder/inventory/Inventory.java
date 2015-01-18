@@ -5,6 +5,7 @@ import org.spacehq.mc.protocol.data.game.values.window.WindowType;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerOpenWindowPacket;
 import org.spacehq.opennbt.tag.builtin.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -85,5 +86,26 @@ public class Inventory {
                             ((ByteTag) item.get("Count")).getValue(), (CompoundTag) item.get("tag")));
             }
         }
+    }
+
+    public ListTag getItemList(String tagName) {
+        if (tagName == null)
+            return null;
+        ArrayList<Tag> items = new ArrayList<>();
+        for (int i = 0; i < this.contents.size(); i++) {
+            ItemStack is = getItemAt(i);
+            if (is == null || is.getType().equals(Material.AIR))
+                continue;
+            CompoundTag item = new CompoundTag("Item");
+            item.put(new ByteTag("Slot", (byte) i));
+            item.put(new StringTag("id", "minecraft:" + is.getType().getParent().getName().toLowerCase()));
+            item.put(new ShortTag("Damage", is.getType().getData()));
+            item.put(new ByteTag("Count", (byte) is.getAmount()));
+            CompoundTag nbt = is.getNBT();
+            if (nbt != null)
+                item.put(nbt);
+            items.add(item);
+        }
+        return new ListTag(tagName, items);
     }
 }
