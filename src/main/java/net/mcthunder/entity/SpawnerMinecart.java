@@ -6,13 +6,12 @@ import net.mcthunder.world.World;
 import org.spacehq.opennbt.tag.builtin.*;
 
 public class SpawnerMinecart extends Minecart {
-    private EntityType spawnType;
+    private EntityType spawnType = EntityType.PIG;
 
     public SpawnerMinecart(Location location) {
         super(location);
         this.type = EntityType.MINECART_SPAWNER;
         this.blockType = Material.MOB_SPAWNER;
-        this.spawnType = EntityType.PIG;
         this.metadata.setMetadata(20, 3407872);
     }
 
@@ -36,7 +35,6 @@ public class SpawnerMinecart extends Minecart {
         ShortTag maxNearbyEntities = tag.get("MaxNearbyEntities");
         ShortTag requiredPlayerRange = tag.get("RequiredPlayerRange");
         this.blockType = Material.MOB_SPAWNER;
-        this.spawnType = EntityType.PIG;
         this.metadata.setMetadata(20, 3407872);
     }
 

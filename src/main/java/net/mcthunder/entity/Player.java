@@ -45,18 +45,18 @@ public final class Player extends LivingEntity {
     private final String capeURL = null;
     private ArrayList<Long> loadedColumns = new ArrayList<>(), northColumns = new ArrayList<>(), eastColumns = new ArrayList<>(),
             southColumns = new ArrayList<>(), westColumns = new ArrayList<>();
+    private int viewDistance = 9, slot = 36, ping, score = 0, hunger = 20;
+    private Inventory openInventory = null, inv, enderchest;
+    private boolean moveable = false, hideCape = false;
+    private GameMode gamemode = GameMode.SURVIVAL;
+    private String displayName, appended = "";
+    private Location bedSpawn = null;
+    private byte skinFlags = 127;
     private GameProfile profile;
+    private UUID lastPmPerson;
+    private Session session;
     private UUID skinUUID;
     private Property skin;
-    private byte skinFlags = 127;
-    private Inventory openInventory = null, inv, enderchest;
-    private int viewDistance = 9, slot = 36, ping, score = 0, hunger = 20;
-    private String displayName, appended = "";
-    private GameMode gamemode;
-    private Session session;
-    private boolean moveable, hideCape = false;
-    private UUID lastPmPerson;
-    private Location bedSpawn = null;
 
     public Player(Session session) {
         super(null);
@@ -68,8 +68,6 @@ public final class Player extends LivingEntity {
         this.metadata.setMetadata(2, this.name = getGameProfile().getName());
         this.metadata.setMetadata(3, (byte) 1);//Always show name
         this.displayName = this.name;
-        this.gamemode = GameMode.CREATIVE;
-        this.moveable = false;
         this.inv = new PlayerInventory(this.name, this);
         this.enderchest = new ChestInventory("EnderChest");
         this.ping = getSession().getFlag(ProtocolConstants.PING_KEY);
@@ -80,6 +78,109 @@ public final class Player extends LivingEntity {
         this.metadata.setBit(16, 0x02, this.hideCape);
         this.metadata.setMetadata(17, (float) (this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));
         this.metadata.setMetadata(18, this.score);
+        readFromFile();
+    }
+
+    public void readFromFile() {//TODO: Read other entity things once I make variables to store them
+        PlayerProfileHandler profileHandler = MCThunder.getProfileHandler();
+        profileHandler.checkPlayer(this);
+        Location l = null;
+        ListTag pos = (ListTag) profileHandler.getAttribute(this, "Pos");
+        StringTag w = (StringTag) profileHandler.getAttribute(this, "SpawnWorld");
+        if (pos != null) {
+            l = new Location(w != null ? MCThunder.getWorld(w.getValue()) : MCThunder.getWorld(MCThunder.getConfig().getWorldName()), ((DoubleTag) pos.get(0)).getValue(),
+                    ((DoubleTag) pos.get(1)).getValue(), ((DoubleTag) pos.get(2)).getValue());
+            ListTag rotation = (ListTag) profileHandler.getAttribute(this, "Rotation");
+            if (rotation != null) {
+                l.setYaw(((FloatTag) rotation.get(0)).getValue());
+                l.setPitch(((FloatTag) rotation.get(1)).getValue());
+            }
+        }
+        setLocation((l == null || l.getWorld() == null) ? MCThunder.getWorld(MCThunder.getConfig().getWorldName()).getSpawnLocation() : l);
+        ListTag motion = (ListTag) profileHandler.getAttribute(this, "Motion");
+        if (motion != null && this.location != null) {
+            DoubleTag dX = motion.get(0);
+            DoubleTag dY = motion.get(1);
+            DoubleTag dZ = motion.get(2);
+            this.location.setVector(new Vector(dX.getValue(), dY.getValue(), dZ.getValue()));
+        }
+        ShortTag fire = (ShortTag) profileHandler.getAttribute(this, "Fire");
+        if (fire != null)
+            this.fireTicks = fire.getValue();
+        ShortTag air = (ShortTag) profileHandler.getAttribute(this, "Air");
+        if (air != null)
+            this.airLeft = air.getValue();
+        ByteTag onGround = (ByteTag) profileHandler.getAttribute(this, "OnGround");//1 true, 0 false
+        this.onGround = onGround != null && onGround.getValue() == (byte) 1;
+        IntTag dim = (IntTag) profileHandler.getAttribute(this, "Dimension");
+        if (dim != null)
+            getWorld().setDimension(dim.getValue());//-1 nether, 0 overworld, 1 end
+        FloatTag healF = (FloatTag) profileHandler.getAttribute(this, "HealF");
+        ShortTag health = (ShortTag) profileHandler.getAttribute(this, "Health");
+        this.maxHealth = healF == null ? health == null ? 20 : health.getValue() : healF.getValue();
+        ListTag activeEffects = (ListTag) profileHandler.getAttribute(this, "ActiveEffects");
+        if (activeEffects != null)
+            for (int j = 0; j < activeEffects.size(); j++) {
+                CompoundTag activeEffect = activeEffects.get(j);
+                ByteTag effectID = activeEffect.get("Id");
+                ByteTag amplifier = activeEffect.get("Amplifier");
+                IntTag duration = activeEffect.get("Duration");
+                ByteTag ambient = activeEffect.get("Ambient");//1 true, 0 false
+                ByteTag showParticles = activeEffect.get("ShowParticles");//1 true, 0 false
+                if (effectID == null || amplifier == null || duration == null)
+                    continue;
+                PotionEffect potion = new PotionEffect(PotionEffectType.fromID(effectID.getValue()), duration.getValue(), amplifier.getValue());
+                potion.setAmbient(ambient != null && ambient.getValue() == (byte) 1);
+                potion.setShowParticles(showParticles != null && showParticles.getValue() == (byte) 1);
+                this.activeEffects.put(this.latest = potion.getType(), potion);
+            }
+        IntTag gm = (IntTag) profileHandler.getAttribute(this, "playerGameType");
+        if (gm != null)
+            this.gamemode = gm.getValue() == 1 ? GameMode.CREATIVE : gm.getValue() == 2 ? GameMode.ADVENTURE : gm.getValue() == 3 ? GameMode.ADVENTURE : GameMode.SURVIVAL;
+        IntTag score = (IntTag) profileHandler.getAttribute(this, "Score");
+        if (score != null)
+            this.score = score.getValue();
+        IntTag slot = (IntTag) profileHandler.getAttribute(this, "SelectedItemSlot");
+        if (slot != null)
+            this.slot = slot.getValue() + 36;
+        IntTag x = (IntTag) profileHandler.getAttribute(this, "SpawnX");
+        IntTag y = (IntTag) profileHandler.getAttribute(this, "SpawnY");
+        IntTag z = (IntTag) profileHandler.getAttribute(this, "SpawnZ");
+        StringTag bw = (StringTag) profileHandler.getAttribute(this, "BedSpawnWorld");
+        if (x != null && y != null && z != null)
+            this.bedSpawn = new Location(bw != null ? MCThunder.getWorld(bw.getValue()) : MCThunder.getWorld(MCThunder.getConfig().getWorldName()), x.getValue(),
+                    y.getValue(), z.getValue());
+        ByteTag spawnForced = (ByteTag) profileHandler.getAttribute(this, "SpawnForced");//1 true 0 false
+        ByteTag sleeping = (ByteTag) profileHandler.getAttribute(this, "Sleeping");//1 true 0 false
+        ShortTag sleepTimer = (ShortTag) profileHandler.getAttribute(this, "SleepTimer");
+        IntTag foodLevel = (IntTag) profileHandler.getAttribute(this, "foodLevel");
+        if (foodLevel != null)
+            this.hunger = foodLevel.getValue();
+        FloatTag foodExhaustionLevel = (FloatTag) profileHandler.getAttribute(this, "foodExhaustionLevel");
+        FloatTag foodSaturationLevel = (FloatTag) profileHandler.getAttribute(this, "foodSaturationLevel");
+        IntTag foodTickTimer = (IntTag) profileHandler.getAttribute(this, "foodTickTimer");
+        IntTag xpLevel = (IntTag) profileHandler.getAttribute(this, "XpLevel");
+        FloatTag xpP = (FloatTag) profileHandler.getAttribute(this, "XpP");
+        IntTag xpTotal = (IntTag) profileHandler.getAttribute(this, "XpTotal");
+        IntTag xpSeed = (IntTag) profileHandler.getAttribute(this, "XpSeed");
+        this.inv.setItems((ListTag) profileHandler.getAttribute(this, "Inventory"));
+        this.enderchest.setItems((ListTag) profileHandler.getAttribute(this, "EnderItems"));
+        CompoundTag abilities = (CompoundTag) profileHandler.getAttribute(this, "abilities");
+        if (abilities != null) {
+            FloatTag walkSpeed = abilities.get("walkSpeed");
+            FloatTag flySpeed = abilities.get("flySpeed");
+            ByteTag mayfly = abilities.get("mayfly");//1 true 0 false
+            ByteTag flying = abilities.get("flying");//1 true 0 false
+            ByteTag invulnerable = abilities.get("invulnerable");//1 true 0 false
+            ByteTag mayBuild = abilities.get("mayBuild");//1 true 0 false
+            ByteTag instabuild = abilities.get("instabuild");//1 true 0 false
+        }
+        StringTag skinUUID = (StringTag) profileHandler.getAttribute(this, "SkinUUID");
+        if (skinUUID != null)
+            this.profile.getProperties().put("textures", this.skin = Utils.getSkin(this.skinUUID = UUID.fromString(skinUUID.getValue())));
+        StringTag displayName = (StringTag) profileHandler.getAttribute(this, "DisplayName");
+        if (displayName != null)
+            this.displayName = displayName.getValue();
     }
 
     public void loadChunks(Direction d) {
@@ -336,7 +437,7 @@ public final class Player extends LivingEntity {
         return (this.displayName.equals(this.name) ? "" : "~") + this.displayName;
     }
 
-    public void setDisplayName(String displayName) {//TODO: Save nick to file
+    public void setDisplayName(String displayName) {
         this.displayName = displayName == null ? this.name : displayName;
         String uncolored = MessageFormat.formatMessage(getDisplayName()).getFullText().trim();
         if (uncolored.length() < 17) {
@@ -393,6 +494,14 @@ public final class Player extends LivingEntity {
 
     public GameMode getGameMode() {
         return this.gamemode;
+    }
+
+    public void setGameMode(GameMode gm) {
+        this.gamemode = gm;
+        sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
+        updateInventory();
+        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
+        sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
     }
 
     public void sendMessage(String message) {
@@ -565,7 +674,7 @@ public final class Player extends LivingEntity {
         nbt.put(new IntTag("playerGameType", this.gamemode.equals(GameMode.CREATIVE) ? 1 : this.gamemode.equals(GameMode.ADVENTURE) ? 2 :
                 this.gamemode.equals(GameMode.SPECTATOR) ? 3 : 0));
         nbt.put(new IntTag("Score", this.score));
-        nbt.put(new IntTag("SelectedItemSlot", this.slot));
+        nbt.put(new IntTag("SelectedItemSlot", this.slot - 36));
         CompoundTag selectedItem = new CompoundTag("SelectedItem");
         selectedItem.put(new ByteTag("Count", (byte) this.getHeldItem().getAmount()));
         selectedItem.put(new ShortTag("Damage", this.getHeldItem().getType().getData()));
@@ -599,7 +708,10 @@ public final class Player extends LivingEntity {
         abilities.put(new ByteTag("instabuild", (byte) 0));
         nbt.put(abilities);
         nbt.put(new StringTag("SpawnWorld", getWorld().getName()));
+        nbt.put(new StringTag("BedSpawnWorld", getWorld().getName()));
         nbt.put(new StringTag("UUID", this.uuid.toString()));//Overrides entity tag with this name
+        nbt.put(new StringTag("SkinUUID", this.skinUUID.toString()));
+        nbt.put(new StringTag("DisplayName", this.displayName));
         return nbt;
     }
 

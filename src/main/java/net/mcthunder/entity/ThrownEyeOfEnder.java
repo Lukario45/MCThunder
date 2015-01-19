@@ -9,18 +9,18 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class ThrownEyeOfEnder extends Projectile {
-    private byte shake;
+    private byte shake = 0;
 
     public ThrownEyeOfEnder(Location location) {
         super(location);
         this.type = EntityType.THROWN_EYE_OF_ENDER;
-        this.shake = 0;
     }
 
     public ThrownEyeOfEnder(World w, CompoundTag tag) {
         super(w, tag);
         ByteTag shake = tag.get("shake");
-        this.shake = shake == null ? 0 : shake.getValue();
+        if (shake != null)
+            this.shake = shake.getValue();
     }
 
     @Override
@@ -37,8 +37,9 @@ public class ThrownEyeOfEnder extends Projectile {
         return this.shake;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("shake", this.shake));
         return nbt;
     }
 }

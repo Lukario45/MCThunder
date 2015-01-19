@@ -12,21 +12,20 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Minecart extends Entity {
-    protected int shakingPower, shakingDirection;
-    protected float shakingMultiplier;
-    protected Material blockType;
-    protected boolean showBlock;
+    protected int shakingPower = 0, shakingDirection = 0;
+    protected float shakingMultiplier = 0;
+    protected Material blockType = Material.AIR;
+    protected boolean showBlock = true;
 
     public Minecart(Location location) {
         super(location);
         this.type = EntityType.MINECART;
-        this.blockType = Material.AIR;
-        this.metadata.setMetadata(17, this.shakingPower = 0);
-        this.metadata.setMetadata(18, this.shakingDirection = 0);
-        this.metadata.setMetadata(19, this.shakingMultiplier = 0);
+        this.metadata.setMetadata(17, this.shakingPower);
+        this.metadata.setMetadata(18, this.shakingDirection);
+        this.metadata.setMetadata(19, this.shakingMultiplier);
         this.metadata.setMetadata(20, 0);
         this.metadata.setMetadata(21, (int) this.location.getY());
-        this.metadata.setMetadata(22, (byte) ((this.showBlock = true) ? 1 : 0));
+        this.metadata.setMetadata(22, (byte) (this.showBlock ? 1 : 0));
     }
 
     public Minecart(World w, CompoundTag tag) {
@@ -36,13 +35,12 @@ public class Minecart extends Entity {
         IntTag displayData = tag.get("DisplayData");
         IntTag displayOffset = tag.get("DisplayOffset");
         StringTag minecartName = tag.get("CustomName");
-        this.blockType = Material.AIR;
-        this.metadata.setMetadata(17, this.shakingPower = 0);
-        this.metadata.setMetadata(18, this.shakingDirection = 0);
-        this.metadata.setMetadata(19, this.shakingMultiplier = 0);
-        this.metadata.setMetadata(20, (this.blockType.getParent().getID().shortValue() << 16) | (this.blockType.getData()&0xFFFF));
+        this.metadata.setMetadata(17, this.shakingPower);
+        this.metadata.setMetadata(18, this.shakingDirection);
+        this.metadata.setMetadata(19, this.shakingMultiplier);
+        this.metadata.setMetadata(20, (this.blockType.getID() << 16) | (this.blockType.getData()&0xFFFF));
         this.metadata.setMetadata(21, (int) this.location.getY());
-        this.metadata.setMetadata(22, (byte) ((this.showBlock = true) ? 1 : 0));
+        this.metadata.setMetadata(22, (byte) (this.showBlock ? 1 : 0));
     }
 
     @Override
@@ -80,7 +78,7 @@ public class Minecart extends Entity {
 
     public void setBlockType(Material type) {
         this.blockType = type;
-        this.metadata.setMetadata(20, (this.blockType.getParent().getID().shortValue() << 16) | (this.blockType.getData()&0xFFFF));
+        this.metadata.setMetadata(20, (this.blockType.getID() << 16) | (this.blockType.getData()&0xFFFF));
         updateMetadata();
     }
 

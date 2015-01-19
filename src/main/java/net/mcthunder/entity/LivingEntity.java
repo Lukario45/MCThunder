@@ -18,27 +18,25 @@ import java.util.HashMap;
 public abstract class LivingEntity extends Entity {//TODO: set default max healths for each living entity type
     protected HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
     private ArrayList<Modifier> modifiers = new ArrayList<>();
-    private boolean alwaysShowName, hasAI;
+    private boolean alwaysShowName = false, hasAI = true;
+    protected PotionEffectType latest = null;
     protected float health, maxHealth;
-    private PotionEffectType latest;
-    private byte arrows;
+    private byte arrows = 0;
 
     protected LivingEntity(Location location) {
         super(location);
         this.maxHealth = 20;
-        this.latest = null;
         this.metadata.setMetadata(2, this.customName);
-        this.metadata.setMetadata(3, (byte) ((this.alwaysShowName = false) ? 1 : 0));
+        this.metadata.setMetadata(3, (byte) (this.alwaysShowName ? 1 : 0));
         this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(7, 0);//No color until a potion is set
         this.metadata.setMetadata(8, (byte) 0);//False until potion effects are set
-        this.metadata.setMetadata(9, this.arrows = (byte) 0);
-        this.metadata.setMetadata(15, (byte) ((this.hasAI = true) ? 1 : 0));
+        this.metadata.setMetadata(9, this.arrows);
+        this.metadata.setMetadata(15, (byte) (this.hasAI ? 1 : 0));
     }
 
     protected LivingEntity(World w, CompoundTag tag) {
         super(w, tag);
-        this.latest = null;
         FloatTag healF = tag.get("HealF");
         ShortTag health = tag.get("Health");
         FloatTag absorptionAmount = tag.get("AbsorptionAmount");
@@ -117,7 +115,7 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
         this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(7, this.activeEffects.size() == 0 ? 0 : this.latest.getColor());//No color until a potion is set
         this.metadata.setMetadata(8, (byte) (this.activeEffects.size() == 0 ? 0 : this.activeEffects.get(this.latest).isAmbient() ? 1 : 0));//False until potion effects are set
-        this.metadata.setMetadata(9, this.arrows = (byte) 0);
+        this.metadata.setMetadata(9, this.arrows);
         this.metadata.setMetadata(15, (byte) ((this.hasAI = noAI != null && noAI.getValue() == (byte) 0) ? 1 : 0));
     }
 

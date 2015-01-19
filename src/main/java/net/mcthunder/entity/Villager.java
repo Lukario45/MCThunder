@@ -11,12 +11,12 @@ import org.spacehq.opennbt.tag.builtin.ListTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Villager extends Ageable {//TODO: Add a villager inventory with it calculating things
-    private int villagerType;
+    private int villagerType = VillagerType.FARMER;
 
     public Villager(Location location) {
         super(location);
         this.type = EntityType.VILLAGER;
-        this.metadata.setMetadata(16, this.villagerType = VillagerType.FARMER);
+        this.metadata.setMetadata(16, this.villagerType);
     }
 
     public Villager(World w, CompoundTag tag) {
@@ -39,7 +39,7 @@ public class Villager extends Ageable {//TODO: Add a villager inventory with it 
                 CompoundTag buyB = recipe.get("buyB");
                 CompoundTag sell = recipe.get("sell");
             }
-        this.metadata.setMetadata(16, this.villagerType = VillagerType.FARMER);
+        this.metadata.setMetadata(16, this.villagerType);
     }
 
     public Packet getPacket() {

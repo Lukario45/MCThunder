@@ -16,6 +16,10 @@ public abstract class Command {
     private final String permissionNode;
     private final String arguments;
 
+    public Command(String name, String information, String arguments, int rankPoints, String permissionNode) {
+        this(name, null, information, arguments, rankPoints, permissionNode);
+    }
+
     public Command(String name, List<String> aliases, String information, String arguments, int rankPoints, String permissionNode) {
         this.name = name;
         this.aliases = (aliases == null ? new ArrayList<String>() : aliases);

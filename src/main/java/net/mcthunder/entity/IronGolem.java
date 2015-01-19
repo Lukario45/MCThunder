@@ -9,12 +9,12 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class IronGolem extends LivingEntity {
-    private boolean playerCreated;
+    private boolean playerCreated = false;
 
     public IronGolem(Location location) {
         super(location);
         this.type = EntityType.IRON_GOLEM;
-        this.metadata.setMetadata(16, (byte) ((this.playerCreated = false) ? 1 : 0));
+        this.metadata.setMetadata(16, (byte) (this.playerCreated ? 1 : 0));
     }
 
     public IronGolem(World w, CompoundTag tag) {
@@ -42,8 +42,9 @@ public class IronGolem extends LivingEntity {
         return this.playerCreated;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("PlayerCreated", (byte) (this.playerCreated ? 1 : 0)));
         return nbt;
     }
 }

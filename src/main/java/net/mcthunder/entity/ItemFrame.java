@@ -11,20 +11,18 @@ import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.packet.Packet;
 
 public class ItemFrame extends Entity {
-    private HangingDirection direction;
-    private float itemDropChance;
-    private byte rotation;
+    private HangingDirection direction = HangingDirection.SOUTH;
+    private float itemDropChance = 1;
+    private byte rotation = 0;
     private ItemStack i;
 
     public ItemFrame(Location location, ItemStack i) {
         super(location);
         this.type = EntityType.ITEM_FRAME;
-        this.direction = HangingDirection.SOUTH;
         this.i = i;
         if (this.i.getType() != null && !this.i.getType().equals(Material.AIR))
             this.metadata.setMetadata(8, this.i.getItemStack());
-        this.metadata.setMetadata(9, this.rotation = (byte) 0);
-        this.itemDropChance = 1;
+        this.metadata.setMetadata(9, this.rotation);
     }
 
     public ItemFrame(World w, CompoundTag tag) {
@@ -38,13 +36,14 @@ public class ItemFrame extends Entity {
                 HangingDirection.NORTH : HangingDirection.EAST;
         CompoundTag item = tag.get("Item");
         FloatTag itemDropChance = tag.get("ItemDropChance");
-        this.itemDropChance = itemDropChance == null ? 1 : itemDropChance.getValue();
+        if (itemDropChance != null)
+            this.itemDropChance = itemDropChance.getValue();
         ByteTag itemRotation = tag.get("ItemRotation");
         if (item != null) {
             ByteTag slot = item.get("Slot");//What is the point of this anyways
             int id;
             try {
-                id = Material.fromString(((StringTag) item.get("id")).getValue().split("minecraft:")[1]).getParent().getID();
+                id = Material.fromString(((StringTag) item.get("id")).getValue().split("minecraft:")[1]).getID();
             } catch (Exception e) {//pre 1.8 loading should be ShortTag instead
                 id = Integer.parseInt(((ShortTag) item.get("id")).getValue().toString());
             }
@@ -52,7 +51,9 @@ public class ItemFrame extends Entity {
         }
         if (this.i.getType() != null && !this.i.getType().equals(Material.AIR))
             this.metadata.setMetadata(8, this.i.getItemStack());
-        this.metadata.setMetadata(9, this.rotation = itemRotation == null ? (byte) 0 : itemRotation.getValue());
+        if (itemRotation != null)
+            this.rotation = itemRotation.getValue();
+        this.metadata.setMetadata(9, this.rotation);
     }
 
     @Override
@@ -97,8 +98,20 @@ public class ItemFrame extends Entity {
         return this.direction;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new IntTag("TileX", (int) this.location.getX()));
+        nbt.put(new IntTag("TileY", (int) this.location.getY()));
+        nbt.put(new IntTag("TileZ", (int) this.location.getZ()));
+        nbt.put(new ByteTag("Facing", (byte) (this.direction.equals(HangingDirection.SOUTH) ? 0 : this.direction.equals(HangingDirection.WEST) ? 1 :
+                this.direction.equals(HangingDirection.NORTH) ? 2 : 4)));
+        CompoundTag item = new CompoundTag("Item");
+        item.put(new ByteTag("Count", (byte) this.i.getAmount()));
+        item.put(new ShortTag("Damage", this.i.getType().getData()));
+        item.put(new StringTag("id", "minecraft:" + this.i.getType().getParent().getName().toLowerCase()));
+        nbt.put(item);
+        nbt.put(new FloatTag("ItemDropChance", this.itemDropChance));
+        nbt.put(new ByteTag("ItemRotation", this.rotation));
         return nbt;
     }
 }

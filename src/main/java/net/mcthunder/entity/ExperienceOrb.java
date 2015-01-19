@@ -8,14 +8,11 @@ import org.spacehq.opennbt.tag.builtin.ShortTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class ExperienceOrb extends Entity {
-    private short age, value, health;
+    private short age = 0, value = 1, health = 1;
 
     public ExperienceOrb(Location location) {
         super(location);
         this.type = EntityType.XP_ORB;
-        this.value = 1;
-        this.health = 1;
-        this.age = 0;
     }
 
     public ExperienceOrb(World w, CompoundTag tag) {
@@ -23,9 +20,12 @@ public class ExperienceOrb extends Entity {
         ShortTag age = tag.get("Age");
         ShortTag health = tag.get("Health");
         ShortTag value = tag.get("Value");
-        this.value = value == null ? 1 : value.getValue();
-        this.health = health == null ? 1 : health.getValue();
-        this.age = age == null ? 0 : age.getValue();
+        if (value != null)
+            this.value = value.getValue();
+        if (health != null)
+            this.health = health.getValue();
+        if (age != null)
+            this.age = age.getValue();
     }
 
     @Override
@@ -57,8 +57,11 @@ public class ExperienceOrb extends Entity {
         return this.health;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ShortTag("Age", this.age));
+        nbt.put(new ShortTag("Health", this.health));
+        nbt.put(new ShortTag("Value", this.value));
         return nbt;
     }
 }

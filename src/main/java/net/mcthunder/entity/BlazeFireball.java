@@ -8,7 +8,10 @@ import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObje
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.DoubleTag;
 import org.spacehq.opennbt.tag.builtin.ListTag;
+import org.spacehq.opennbt.tag.builtin.Tag;
 import org.spacehq.packetlib.packet.Packet;
+
+import java.util.Arrays;
 
 public class BlazeFireball extends Projectile {
     public BlazeFireball(Location location) {
@@ -33,8 +36,10 @@ public class BlazeFireball extends Projectile {
                 this.location.getYaw(), this.location.getPitch());
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ListTag("direction", Arrays.<Tag>asList(new DoubleTag("dX", this.location.getVector().getdX()),
+                new DoubleTag("dY", this.location.getVector().getdY()), new DoubleTag("dZ", this.location.getVector().getdZ()))));
         return nbt;
     }
 }

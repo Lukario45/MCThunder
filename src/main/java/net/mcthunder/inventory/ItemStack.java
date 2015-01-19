@@ -107,24 +107,30 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
             CompoundTag display = nbt.get("display");
             if (display != null) {
                 IntTag color = display.get("color");
-                this.color = color == null ? 0 : color.getValue();
+                if (color != null)
+                    this.color = color.getValue();
                 StringTag name = display.get("Name");
-                this.displayName = name == null ? this.displayName : name.getValue();
+                if (name != null)
+                    this.displayName = name.getValue();
                 ListTag lore = display.get("Lore");
                 if (lore != null)
                     for (int i = 0; i < lore.size(); i++)
                         this.lore.add(((StringTag) lore.get(i)).getValue());
             }
             IntTag hide = nbt.get("HideFlags");
-            this.hideFlags = hide == null ? 0 : hide.getValue();
+            if (hide != null)
+                this.hideFlags = hide.getValue();
             ByteTag resolved = nbt.get("resolved");
             this.resolved = resolved != null && resolved.getValue() == (byte) 1;
             IntTag generation = nbt.get("generation");
-            this.generation = generation == null ? 0 : generation.getValue();
+            if (generation != null)
+                this.generation = generation.getValue();
             StringTag author = nbt.get("author");
-            this.author = author == null ? null : author.getValue();
+            if (author != null)
+                this.author = author.getValue();
             StringTag title = nbt.get("title");
-            this.title = title == null ? null : title.getValue();
+            if (title != null)
+                this.title = title.getValue();
             ListTag pages = nbt.get("pages");
             if (pages != null)
                 for (int i = 0; i < pages.size(); i++)
@@ -132,8 +138,10 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
             try {
                 CompoundTag owner = nbt.get("SkullOwner");
                 StringTag uuidString = (owner == null ? null : (StringTag) owner.get("Id"));
-                this.ownerUUID = uuidString == null ? null : UUID.fromString(uuidString.getValue());
-                this.ownerName = (owner == null ? null : ((StringTag) owner.get("Name")).getValue());
+                if (uuidString != null)
+                    this.ownerUUID = UUID.fromString(uuidString.getValue());
+                if (owner != null)
+                    this.ownerName = ((StringTag) owner.get("Name")).getValue();
                 CompoundTag properties = (owner == null ? null : (CompoundTag) owner.get("Properties"));
                 ListTag text = (properties == null ? null : (ListTag) properties.get("textures"));
                 if (text != null)
@@ -145,7 +153,8 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
                     }
             } catch (Exception e) {
                 StringTag skullOwner = nbt.get("SkullOwner");
-                this.ownerName = skullOwner == null ? null : skullOwner.getValue();
+                if (skullOwner != null)
+                    this.ownerName = skullOwner.getValue();
             }
             CompoundTag explosion = nbt.get("Explosion");
             if (explosion != null) {
@@ -685,6 +694,6 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
 
     public org.spacehq.mc.protocol.data.game.ItemStack getItemStack() {
         CompoundTag nbt = getNBT();
-        return nbt == null ? null : new org.spacehq.mc.protocol.data.game.ItemStack(this.type.getParent().getID(), this.amount, this.type.getData(), nbt.getValue().isEmpty() ? null : nbt);
+        return nbt == null ? null : new org.spacehq.mc.protocol.data.game.ItemStack(this.type.getID(), this.amount, this.type.getData(), nbt.getValue().isEmpty() ? null : nbt);
     }
 }

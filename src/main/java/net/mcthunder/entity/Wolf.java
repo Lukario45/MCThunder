@@ -10,16 +10,16 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Wolf extends Tameable {
-    private boolean angry, begging;
-    private byte collarColor;
+    private boolean angry = false, begging = false;
+    private byte collarColor = MetadataConstants.ColorFlags.RED;
 
     public Wolf(Location location) {
         super(location);
         this.type = EntityType.WOLF;
-        this.metadata.setBit(16, 0x02, this.angry = false);
+        this.metadata.setBit(16, 0x02, this.angry);
         this.metadata.setMetadata(18, this.health);
-        this.metadata.setMetadata(19, (byte) ((this.begging = false) ? 1 : 0));
-        this.metadata.setMetadata(20, this.collarColor = MetadataConstants.ColorFlags.RED);
+        this.metadata.setMetadata(19, (byte) (this.begging ? 1 : 0));
+        this.metadata.setMetadata(20, this.collarColor);
     }
 
     public Wolf(World w, CompoundTag tag) {
@@ -28,8 +28,10 @@ public class Wolf extends Tameable {
         ByteTag collarColor = tag.get("CollarColor");
         this.metadata.setBit(16, 0x02, this.angry = angry != null && angry.getValue() == (byte) 1);
         this.metadata.setMetadata(18, this.health);
-        this.metadata.setMetadata(19, (byte) ((this.begging = false) ? 1 : 0));
-        this.metadata.setMetadata(20, this.collarColor = collarColor == null ? MetadataConstants.ColorFlags.RED : collarColor.getValue());
+        this.metadata.setMetadata(19, (byte) (this.begging ? 1 : 0));
+        if (collarColor != null)
+            this.collarColor = collarColor.getValue();
+        this.metadata.setMetadata(20, this.collarColor);
     }
 
     public Packet getPacket() {
@@ -80,8 +82,10 @@ public class Wolf extends Tameable {
         return this.collarColor;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("Angry", (byte) (this.angry ? 1 : 0)));
+        nbt.put(new ByteTag("CollarColor", this.collarColor));
         return nbt;
     }
 }

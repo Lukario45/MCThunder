@@ -9,37 +9,37 @@ import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.packet.Packet;
 
 public class ArmorStand extends Entity {
-    private float headPitch, headYaw, headRoll, bodyPitch, bodyYaw, bodyRoll, leftArmPitch, leftArmYaw, leftArmRoll,
-            rightArmPitch, rightArmYaw, rightArmRoll, leftLegPitch, leftLegYaw, leftLegRoll, rightLegPitch, rightLegYaw, rightLegRoll;
-    private boolean small, gravity, arms, baseplate, marker;
+    private float headPitch = 0, headYaw = 0, headRoll = 0, bodyPitch = 0, bodyYaw = 0, bodyRoll = 0, leftArmPitch = 0, leftArmYaw = 0,
+            leftArmRoll = 0, rightArmPitch = 0, rightArmYaw = 0, rightArmRoll = 0, leftLegPitch = 0, leftLegYaw = 0, leftLegRoll = 0,
+            rightLegPitch = 0, rightLegYaw = 0, rightLegRoll = 0;
+    private boolean small = false, gravity = true, arms = true, baseplate = true, marker = false;
 
     public ArmorStand(Location location) {
         super(location);
         this.type = EntityType.ARMOR_STAND;
-        this.marker = false;
-        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.SMALL, this.small = false);
-        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.GRAVITY, this.gravity = true);
-        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.ARMS, this.arms = true);
-        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.BASEPLATE, this.baseplate = true);
+        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.SMALL, this.small);
+        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.GRAVITY, this.gravity);
+        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.ARMS, this.arms);
+        this.metadata.setBit(MetadataConstants.ARMOR_STAND, MetadataConstants.ArmorFlags.BASEPLATE, this.baseplate);
         //ID is just to store in a random spot sorta since multiple per same metadata id
-        this.metadata.setMetadata(11, this.headPitch = 0);
-        this.metadata.setMetadata(1000, new EntityMetadata(11, MetadataType.FLOAT, this.headYaw = 0));
-        this.metadata.setMetadata(1001, new EntityMetadata(11, MetadataType.FLOAT, this.headRoll = 0));
-        this.metadata.setMetadata(12, this.bodyPitch = 0);
-        this.metadata.setMetadata(1002, new EntityMetadata(12, MetadataType.FLOAT, this.bodyYaw = 0));
-        this.metadata.setMetadata(1003, new EntityMetadata(12, MetadataType.FLOAT, this.bodyRoll = 0));
-        this.metadata.setMetadata(13, this.leftArmPitch = 0);
-        this.metadata.setMetadata(1004, new EntityMetadata(13, MetadataType.FLOAT, this.leftArmYaw = 0));
-        this.metadata.setMetadata(1005, new EntityMetadata(13, MetadataType.FLOAT, this.leftArmRoll = 0));
-        this.metadata.setMetadata(14, this.rightArmPitch = 0);
-        this.metadata.setMetadata(1006, new EntityMetadata(14, MetadataType.FLOAT, this.rightArmYaw = 0));
-        this.metadata.setMetadata(1007, new EntityMetadata(14, MetadataType.FLOAT, this.rightArmRoll = 0));
-        this.metadata.setMetadata(15, this.leftLegPitch = 0);
-        this.metadata.setMetadata(1008, new EntityMetadata(15, MetadataType.FLOAT, this.leftLegYaw = 0));
-        this.metadata.setMetadata(1009, new EntityMetadata(15, MetadataType.FLOAT, this.leftLegRoll = 0));
-        this.metadata.setMetadata(16, this.rightLegPitch = 0);
-        this.metadata.setMetadata(1010, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegYaw = 0));
-        this.metadata.setMetadata(1011, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegRoll = 0));
+        this.metadata.setMetadata(11, this.headPitch);
+        this.metadata.setMetadata(1000, new EntityMetadata(11, MetadataType.FLOAT, this.headYaw));
+        this.metadata.setMetadata(1001, new EntityMetadata(11, MetadataType.FLOAT, this.headRoll));
+        this.metadata.setMetadata(12, this.bodyPitch);
+        this.metadata.setMetadata(1002, new EntityMetadata(12, MetadataType.FLOAT, this.bodyYaw));
+        this.metadata.setMetadata(1003, new EntityMetadata(12, MetadataType.FLOAT, this.bodyRoll));
+        this.metadata.setMetadata(13, this.leftArmPitch);
+        this.metadata.setMetadata(1004, new EntityMetadata(13, MetadataType.FLOAT, this.leftArmYaw));
+        this.metadata.setMetadata(1005, new EntityMetadata(13, MetadataType.FLOAT, this.leftArmRoll));
+        this.metadata.setMetadata(14, this.rightArmPitch);
+        this.metadata.setMetadata(1006, new EntityMetadata(14, MetadataType.FLOAT, this.rightArmYaw));
+        this.metadata.setMetadata(1007, new EntityMetadata(14, MetadataType.FLOAT, this.rightArmRoll));
+        this.metadata.setMetadata(15, this.leftLegPitch);
+        this.metadata.setMetadata(1008, new EntityMetadata(15, MetadataType.FLOAT, this.leftLegYaw));
+        this.metadata.setMetadata(1009, new EntityMetadata(15, MetadataType.FLOAT, this.leftLegRoll));
+        this.metadata.setMetadata(16, this.rightLegPitch);
+        this.metadata.setMetadata(1010, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegYaw));
+        this.metadata.setMetadata(1011, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegRoll));
     }
 
     public ArmorStand(World w, CompoundTag tag) {

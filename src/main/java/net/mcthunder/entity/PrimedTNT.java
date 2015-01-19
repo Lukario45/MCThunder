@@ -9,18 +9,18 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class PrimedTNT extends Entity {
-    private byte fuse;
+    private byte fuse = 0;
 
     public PrimedTNT(Location location) {
         super(location);
         this.type = EntityType.PRIMED_TNT;
-        this.fuse = 0;
     }
 
     public PrimedTNT(World w, CompoundTag tag) {
         super(w, tag);
         ByteTag fuse = tag.get("Fuse");
-        this.fuse = fuse == null ? 0 : fuse.getValue();
+        if (fuse != null)
+            this.fuse = fuse.getValue();
     }
 
     @Override
@@ -37,8 +37,9 @@ public class PrimedTNT extends Entity {
         this.fuse = fuse;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("Fuse", this.fuse));
         return nbt;
     }
 }

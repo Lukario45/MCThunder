@@ -992,8 +992,12 @@ public enum Material {//http://minecraft.gamepedia.com/Id
         return this.name;
     }
 
-    public Integer getID() {
-        return this.id;
+    public int getID() {
+        return this.parent.id;
+    }
+
+    private boolean mapID() {
+        return this.id != null;
     }
 
     public short getData() {
@@ -1013,11 +1017,11 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     }
 
     public boolean isBlock() {
-        return this.getParent().id < 256;
+        return getID() < 256;
     }
 
     public boolean isRecord() {
-        return this.getParent().id > 2255;
+        return getID() > 2255;
     }
 
     public boolean isLiquid() {
@@ -1084,7 +1088,7 @@ public enum Material {//http://minecraft.gamepedia.com/Id
 
     public static void mapMaterials() {
         for(Material m : values()) {
-            if (m.getID() != null)
+            if (m.mapID())
                 idMap.put(m.getID(), m);
             nameMap.put(m.getName().replaceAll("_", ""), m);
             for(String alias : m.getAliases())

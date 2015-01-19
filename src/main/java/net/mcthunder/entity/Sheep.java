@@ -10,21 +10,22 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Sheep extends Ageable {
-    private boolean sheared;
-    private byte color;
+    private boolean sheared = false;
+    private byte color = MetadataConstants.ColorFlags.WHITE;
 
     public Sheep(Location location) {
         super(location);
         this.type = EntityType.SHEEP;
-        this.metadata.setMetadata(16, (byte) (((byte)((this.sheared = false) ? 16 : 0))&240 | (this.color = MetadataConstants.ColorFlags.WHITE)&15));
+        this.metadata.setMetadata(16, (byte) (((byte)(this.sheared ? 16 : 0))&240 | this.color&15));
     }
 
     public Sheep(World w, CompoundTag tag) {
         super(w, tag);
         ByteTag sheared = tag.get("Sheared");//1 true, 0 false
         ByteTag color = tag.get("Color");
-        this.metadata.setMetadata(16, (byte) (((byte)((this.sheared = sheared != null && sheared.getValue() ==
-                (byte) 1) ? 16 : 0))&240 | (this.color = color == null ? MetadataConstants.ColorFlags.WHITE : color.getValue())&15));
+        if (color != null)
+            this.color = color.getValue();
+        this.metadata.setMetadata(16, (byte) (((byte)((this.sheared = sheared != null && sheared.getValue() == (byte) 1) ? 16 : 0))&240 | this.color&15));
     }
 
     public Packet getPacket() {
@@ -55,8 +56,10 @@ public class Sheep extends Ageable {
         return this.sheared;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("Sheared", (byte) (this.sheared ? 1 : 0)));
+        nbt.put(new ByteTag("Color", this.color));
         return nbt;
     }
 }

@@ -9,18 +9,20 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Skeleton extends LivingEntity {
-    private byte skeletonType;//0 normal, 1 wither
+    private byte skeletonType = 0;//0 normal, 1 wither
 
     public Skeleton(Location location) {
         super(location);
         this.type = EntityType.SKELETON;
-        this.metadata.setMetadata(13, this.skeletonType = (byte) 0);
+        this.metadata.setMetadata(13, this.skeletonType);
     }
 
     public Skeleton(World w, CompoundTag tag) {
         super(w, tag);
         ByteTag skeletonType = tag.get("SkeletonType");
-        this.metadata.setMetadata(13, this.skeletonType = (byte) (skeletonType == null ? 0 : skeletonType.getValue()));
+        if (skeletonType != null)
+            this.skeletonType = skeletonType.getValue();
+        this.metadata.setMetadata(13, this.skeletonType);
     }
 
     public Packet getPacket() {
@@ -42,8 +44,9 @@ public class Skeleton extends LivingEntity {
         return this.skeletonType;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("SkeletonType", this.skeletonType));
         return nbt;
     }
 }

@@ -10,15 +10,13 @@ import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Firework extends Entity {
-    private int life, lifeTime;
+    private int life = 0, lifeTime = 0;
     private ItemStack i;
 
     public Firework(Location location, ItemStack i) {
         super(location);
         this.type = EntityType.FIREWORKS_ROCKET;
         this.i = i;
-        this.life = 0;
-        this.lifeTime = 0;
         if (this.i.getType() != null && this.i.getType().getParent().equals(Material.FIREWORKS))
             this.metadata.setMetadata(8, this.i.getItemStack());
     }
@@ -27,14 +25,16 @@ public class Firework extends Entity {
         super(w, tag);
         IntTag life = tag.get("Life");
         IntTag lifeTime = tag.get("LifeTime");
-        this.life = life == null ? 0 : life.getValue();
-        this.lifeTime = lifeTime == null ? 0 : lifeTime.getValue();
+        if (life != null)
+            this.life = life.getValue();
+        if (lifeTime != null)
+            this.lifeTime = lifeTime.getValue();
         CompoundTag item = tag.get("FireworksItem");
         if (item != null) {
             ByteTag slot = item.get("Slot");//What is the point of this anyways
             int id;
             try {
-                id = Material.fromString(((StringTag) item.get("id")).getValue().split("minecraft:")[1]).getParent().getID();
+                id = Material.fromString(((StringTag) item.get("id")).getValue().split("minecraft:")[1]).getID();
             } catch (Exception e) {//pre 1.8 loading should be ShortTag instead
                 id = Integer.parseInt(((ShortTag) item.get("id")).getValue().toString());
             }
@@ -77,8 +77,15 @@ public class Firework extends Entity {
         return this.lifeTime;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new IntTag("Life", this.life));
+        nbt.put(new IntTag("LifeTime", this.lifeTime));
+        CompoundTag item = new CompoundTag("FireworksItem");
+        item.put(new ByteTag("Count", (byte) this.i.getAmount()));
+        item.put(new ShortTag("Damage", this.i.getType().getData()));
+        item.put(new StringTag("id", "minecraft:" + this.i.getType().getParent().getName().toLowerCase()));
+        nbt.put(item);
         return nbt;
     }
 }

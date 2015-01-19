@@ -9,18 +9,21 @@ import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Ghast extends LivingEntity {
-    private boolean attacking;
+    private boolean attacking = false;
+    private int explosionPower = 0;
 
     public Ghast(Location location) {
         super(location);
         this.type = EntityType.GHAST;
-        this.metadata.setMetadata(16, (byte) ((this.attacking = false) ? 1 : 0));
+        this.metadata.setMetadata(16, (byte) (this.attacking ? 1 : 0));
     }
 
     public Ghast(World w, CompoundTag tag) {
         super(w, tag);
         IntTag explosionPower = tag.get("ExplosionPower");
-        this.metadata.setMetadata(16, (byte) ((this.attacking = false) ? 1 : 0));
+        if (explosionPower != null)
+            this.explosionPower = explosionPower.getValue();
+        this.metadata.setMetadata(16, (byte) (this.attacking ? 1 : 0));
     }
 
     public Packet getPacket() {
@@ -42,8 +45,17 @@ public class Ghast extends LivingEntity {
         return this.attacking;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public void setExplosionPower(int power) {
+        this.explosionPower = power;
+    }
+
+    public int getExplosionPower() {
+        return this.explosionPower;
+    }
+
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new IntTag("ExplosionPower", this.explosionPower));
         return nbt;
     }
 }

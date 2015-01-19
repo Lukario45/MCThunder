@@ -9,12 +9,12 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Pig extends Ageable {
-    private boolean hasSaddle;
+    private boolean hasSaddle = false;
 
     public Pig(Location location) {
         super(location);
         this.type = EntityType.PIG;
-        this.metadata.setMetadata(16, (byte) ((this.hasSaddle = false) ? 1 : 0));
+        this.metadata.setMetadata(16, (byte) (this.hasSaddle ? 1 : 0));
     }
 
     public Pig(World w, CompoundTag tag) {
@@ -42,8 +42,9 @@ public class Pig extends Ageable {
         return this.hasSaddle;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("Saddle", (byte) (this.hasSaddle ? 1 : 0)));
         return nbt;
     }
 }

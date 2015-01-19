@@ -46,7 +46,7 @@ public class PlayerInventory extends Inventory {
                 ByteTag slot = item.get("Slot");
                 int id;
                 try {
-                    id = Material.fromString(((StringTag) item.get("id")).getValue().split("minecraft:")[1]).getParent().getID();
+                    id = Material.fromString(((StringTag) item.get("id")).getValue().split("minecraft:")[1]).getID();
                 } catch (Exception e) {//pre 1.8 loading should be ShortTag instead
                     id = Integer.parseInt(((ShortTag) item.get("id")).getValue().toString());
                 }

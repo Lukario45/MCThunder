@@ -10,27 +10,28 @@ import org.spacehq.opennbt.tag.builtin.ShortTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Creeper extends LivingEntity {
-    private byte fuse, explosionRadius;
-    private boolean powered, ignited;
+    private byte fuse = -1, explosionRadius = 0;
+    private boolean powered = false, ignited = false;
 
     public Creeper(Location location) {
         super(location);
         this.type = EntityType.CREEPER;
-        this.explosionRadius = 0;
-        this.ignited = false;
-        this.metadata.setMetadata(16, this.fuse = (byte) -1);
-        this.metadata.setMetadata(17, (byte) ((this.powered = false) ? 1 : 0));
+        this.metadata.setMetadata(16, this.fuse);
+        this.metadata.setMetadata(17, (byte) (this.powered ? 1 : 0));
     }
 
     public Creeper(World w, CompoundTag tag) {
         super(w, tag);
         ByteTag powered = tag.get("powered");//1 true, 0 false
         ByteTag explosionRadius = tag.get("ExplosionRadius");
-        this.explosionRadius = explosionRadius == null ? (byte) 0 : explosionRadius.getValue();
+        if (explosionRadius != null)
+            this.explosionRadius = explosionRadius.getValue();
         ShortTag fuse = tag.get("Fuse");
         ByteTag ignited = tag.get("ignited");//1 true, 0 false
         this.ignited = ignited != null && ignited.getValue() == (byte) 1;
-        this.metadata.setMetadata(16, this.fuse = (byte) (fuse == null ? -1 : (short) fuse.getValue()));
+        if (fuse != null)
+            this.fuse = (byte)(short) fuse.getValue();
+        this.metadata.setMetadata(16, this.fuse);
         this.metadata.setMetadata(17, (byte) ((this.powered = powered != null && powered.getValue() == (byte) 1) ? 1 : 0));
     }
 
@@ -78,8 +79,12 @@ public class Creeper extends LivingEntity {
         return this.ignited;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("powered", (byte) (this.powered ? 1 : 0)));
+        nbt.put(new ByteTag("ExplosionRadius", this.explosionRadius));
+        nbt.put(new ShortTag("Fuse", this.fuse));
+        nbt.put(new ByteTag("ignited", (byte) (this.ignited ? 1 : 0)));
         return nbt;
     }
 }

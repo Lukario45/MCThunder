@@ -9,18 +9,18 @@ import org.spacehq.opennbt.tag.builtin.ShortTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class ZombiePigman extends Zombie {
-    private short anger;
+    private short anger = 0;
 
     public ZombiePigman(Location location) {
         super(location);
         this.type = EntityType.ZOMBIE_PIGMAN;
-        this.anger = 0;
     }
 
     public ZombiePigman(World w, CompoundTag tag) {
         super(w, tag);
         ShortTag anger = tag.get("Anger");
-        this.anger = anger == null ? 0 : anger.getValue();
+        if (anger != null)
+            this.anger = anger.getValue();
     }
 
     public Packet getPacket() {
@@ -41,8 +41,9 @@ public class ZombiePigman extends Zombie {
         return this.anger;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ShortTag("Anger", this.anger));
         return nbt;
     }
 }

@@ -8,17 +8,17 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class EnderCrystal extends Entity {
-    private int health;
+    private int health = 1;
 
     public EnderCrystal(Location location) {
         super(location);
         this.type = EntityType.ENDER_CRYSTAL;
-        this.metadata.setMetadata(8, this.health = 1);
+        this.metadata.setMetadata(8, this.health);
     }
 
     public EnderCrystal(World w, CompoundTag tag) {
         super(w, tag);
-        this.metadata.setMetadata(8, this.health = 1);
+        this.metadata.setMetadata(8, this.health);
     }
 
     @Override
@@ -34,10 +34,5 @@ public class EnderCrystal extends Entity {
 
     public int getHealth() {
         return this.health;
-    }
-
-    public CompoundTag getNBT() {//TODO: Return the nbt
-        CompoundTag nbt = super.getNBT();
-        return nbt;
     }
 }

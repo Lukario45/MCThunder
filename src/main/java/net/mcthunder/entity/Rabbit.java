@@ -9,22 +9,23 @@ import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Rabbit extends Ageable {
-    private int moreCarrotTicks;
-    private byte rabbitType;
+    private int moreCarrotTicks = 0, rabbitType = 0;
 
     public Rabbit(Location location) {
         super(location);
         this.type = EntityType.RABBIT;
-        this.moreCarrotTicks = 0;
-        this.metadata.setMetadata(18, this.rabbitType = (byte) 0);
+        this.metadata.setMetadata(18, (byte) this.rabbitType);
     }
 
     public Rabbit(World w, CompoundTag tag) {
         super(w, tag);
         IntTag rabbitType = tag.get("RabbitType");
         IntTag moreCarrotTicks = tag.get("MoreCarrotTicks");
-        this.moreCarrotTicks = moreCarrotTicks == null ? 0 : moreCarrotTicks.getValue();
-        this.metadata.setMetadata(18, this.rabbitType = (byte) (rabbitType == null ? 0 : rabbitType.getValue()));
+        if (moreCarrotTicks != null)
+            this.moreCarrotTicks = moreCarrotTicks.getValue();
+        if (rabbitType != null)
+            this.rabbitType = rabbitType.getValue();
+        this.metadata.setMetadata(18, (byte) this.rabbitType);
     }
 
     public Packet getPacket() {
@@ -37,12 +38,12 @@ public class Rabbit extends Ageable {
 
     }
 
-    public void setRabbitType(byte rabbitType) {
-        this.metadata.setMetadata(18, this.rabbitType = rabbitType);
+    public void setRabbitType(int rabbitType) {
+        this.metadata.setMetadata(18, (byte) (this.rabbitType = rabbitType));
         updateMetadata();
     }
 
-    public byte getRabbitType() {
+    public int getRabbitType() {
         return this.rabbitType;
     }
 
@@ -54,8 +55,10 @@ public class Rabbit extends Ageable {
         return this.moreCarrotTicks;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new IntTag("RabbitType", this.rabbitType));
+        nbt.put(new IntTag("MoreCarrotTicks", this.moreCarrotTicks));
         return nbt;
     }
 }

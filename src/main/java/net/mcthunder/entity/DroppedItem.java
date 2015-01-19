@@ -13,19 +13,14 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class DroppedItem extends Entity {
-    private short age, health, pickupDelay;
-    private String owner, thrower;
+    private short age = 0, health = 1, pickupDelay = 0;
+    private String owner = "", thrower = "";
     private ItemStack i;
 
     public DroppedItem(Location location, ItemStack i) {
         super(location);
         this.type = EntityType.ITEM;
         this.i = i;
-        this.age = 0;
-        this.health = 1;
-        this.pickupDelay = 0;
-        this.owner = "";
-        this.thrower = "";
         if (this.i.getType() != null && !this.i.getType().equals(Material.AIR))
             this.metadata.setMetadata(10, this.i.getItemStack());
     }
@@ -37,17 +32,21 @@ public class DroppedItem extends Entity {
         ShortTag pickupDelay = tag.get("PickupDelay");
         StringTag owner = tag.get("Owner");
         StringTag thrower = tag.get("Thrower");
-        this.age = age == null ? 0 : age.getValue();
+        if (age != null)
+            this.age = age.getValue();
         this.health = health == null ? 1 : health.getValue();
-        this.pickupDelay = pickupDelay == null ? 0 : pickupDelay.getValue();
-        this.owner = owner == null ? "" : owner.getValue();
-        this.thrower = thrower == null ? "" : thrower.getValue();
+        if (pickupDelay != null)
+            this.pickupDelay = pickupDelay.getValue();
+        if (owner != null)
+            this.owner = owner.getValue();
+        if (thrower != null)
+            this.thrower = thrower.getValue();
         CompoundTag item = tag.get("Item");
         if (item != null) {
-            ByteTag slot = item.get("Slot");//What is the point of this anyways
+            ByteTag slot = item.get("Slot");//What is the point of this anyways for a dropped item
             int id;
             try {
-                id = Material.fromString(((StringTag) item.get("id")).getValue().split("minecraft:")[1]).getParent().getID();
+                id = Material.fromString(((StringTag) item.get("id")).getValue().split("minecraft:")[1]).getID();
             } catch (Exception e) {//pre 1.8 loading should be ShortTag instead
                 id = Integer.parseInt(((ShortTag) item.get("id")).getValue().toString());
             }
@@ -114,8 +113,20 @@ public class DroppedItem extends Entity {
         this.thrower = thrower;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ShortTag("Age", this.age));
+        nbt.put(new ShortTag("Health", this.health));
+        nbt.put(new ShortTag("PickupDelay", this.pickupDelay));
+        if (this.owner != null && !this.owner.equals(""))
+            nbt.put(new StringTag("Owner", this.owner));
+        if (this.thrower != null && !this.thrower.equals(""))
+            nbt.put(new StringTag("Thrower", this.thrower));
+        CompoundTag item = new CompoundTag("Item");
+        item.put(new ByteTag("Count", (byte) this.i.getAmount()));
+        item.put(new ShortTag("Damage", this.i.getType().getData()));
+        item.put(new StringTag("id", "minecraft:" + this.i.getType().getParent().getName().toLowerCase()));
+        nbt.put(item);
         return nbt;
     }
 }

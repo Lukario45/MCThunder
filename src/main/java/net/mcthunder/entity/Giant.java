@@ -21,9 +21,4 @@ public class Giant extends Zombie {
         return new ServerSpawnMobPacket(this.entityID, MobType.GIANT_ZOMBIE, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
                 this.location.getPitch(), this.location.getYaw(), getMotion().getdX(), getMotion().getdY(), getMotion().getdZ(), getMetadata().getMetadataArray());
     }
-
-    public CompoundTag getNBT() {//TODO: Return the nbt
-        CompoundTag nbt = super.getNBT();
-        return nbt;
-    }
 }

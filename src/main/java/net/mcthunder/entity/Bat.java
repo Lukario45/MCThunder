@@ -9,12 +9,12 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Bat extends LivingEntity {
-    private boolean hanging;
+    private boolean hanging = false;
 
     public Bat(Location location) {
         super(location);
         this.type = EntityType.BAT;
-        this.metadata.setMetadata(16, (byte) ((this.hanging = false) ? 1 : 0));
+        this.metadata.setMetadata(16, (byte) (this.hanging ? 1 : 0));
     }
 
     public Bat(World w, CompoundTag tag) {
@@ -42,8 +42,9 @@ public class Bat extends LivingEntity {
         return this.hanging;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("BatFlags", (byte) (this.hanging ? 1 : 0)));
         return nbt;
     }
 }

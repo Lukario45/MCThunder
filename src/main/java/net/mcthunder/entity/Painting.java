@@ -12,14 +12,12 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Painting extends Entity {
-    private HangingDirection direction;
-    private Art picture;
+    private HangingDirection direction = HangingDirection.SOUTH;
+    private Art picture = Art.ALBAN;
 
     public Painting(Location location) {
         super(location);
         this.type = EntityType.PAINTING;
-        this.direction = HangingDirection.SOUTH;
-        this.picture = Art.ALBAN;
     }
 
     public Painting(World w, CompoundTag tag) {
@@ -57,8 +55,14 @@ public class Painting extends Entity {
         return this.direction;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new IntTag("TileX", (int) this.location.getX()));
+        nbt.put(new IntTag("TileY", (int) this.location.getY()));
+        nbt.put(new IntTag("TileZ", (int) this.location.getZ()));
+        nbt.put(new ByteTag("Facing", (byte) (this.direction.equals(HangingDirection.SOUTH) ? 0 : this.direction.equals(HangingDirection.WEST) ? 1 :
+                this.direction.equals(HangingDirection.NORTH) ? 2 : 4)));
+        nbt.put(new StringTag("Motive", this.picture.name()));
         return nbt;
     }
 }

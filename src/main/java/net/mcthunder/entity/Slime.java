@@ -57,8 +57,10 @@ public class Slime extends LivingEntity {
         return this.wasOnGround;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new IntTag("Size", this.size));
+        nbt.put(new ByteTag("wasOnGround", (byte) (this.wasOnGround ? 1 : 0)));
         return nbt;
     }
 }

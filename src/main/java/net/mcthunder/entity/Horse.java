@@ -14,25 +14,25 @@ import org.spacehq.packetlib.packet.Packet;
 import java.util.UUID;
 
 public class Horse extends Ageable {
-    private boolean isTame, hasSaddle, hasChest, isBred, isEating, isRearing, mouthOpen;
-    private HorseType horseType;
-    private String ownerName;
-    private int color, style, armorType;
+    private boolean isTame = false, hasSaddle = false, hasChest = false, isBred = false, isEating = false, isRearing = false, mouthOpen = false;
+    private int color = HorseColor.WHITE, style = HorseStyle.NONE, armorType = ArmorType.NONE;
+    private HorseType horseType = HorseType.HORSE;
+    private String ownerName = "";
 
     public Horse(Location location) {
         super(location);
         this.type = EntityType.HORSE;
-        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.TAME, this.isTame = false);
-        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.SADDLE, this.hasSaddle = false);
-        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.CHEST, this.hasChest = false);
-        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.BRED, this.isBred = false);
-        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.EATING, this.isEating = false);
-        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.REARING, this.isRearing = false);
-        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.MOUTH_OPEN, this.mouthOpen = false);
-        this.metadata.setMetadata(19, (this.horseType = HorseType.HORSE).getID());
-        this.metadata.setMetadata(20, (this.color = HorseColor.WHITE) | (this.style = HorseStyle.NONE) << 8);
-        this.metadata.setMetadata(21, this.ownerName = "");
-        this.metadata.setMetadata(22, this.armorType = ArmorType.NONE);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.TAME, this.isTame);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.SADDLE, this.hasSaddle);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.CHEST, this.hasChest);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.BRED, this.isBred);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.EATING, this.isEating);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.REARING, this.isRearing);
+        this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.MOUTH_OPEN, this.mouthOpen);
+        this.metadata.setMetadata(19, this.horseType.getID());
+        this.metadata.setMetadata(20, this.color | this.style << 8);
+        this.metadata.setMetadata(21, this.ownerName);
+        this.metadata.setMetadata(22, this.armorType);
     }
 
     public Horse(World w, CompoundTag tag) {
@@ -58,10 +58,14 @@ public class Horse extends Ageable {
         this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.EATING, this.isEating = eatingHaystack != null && eatingHaystack.getValue() == (byte) 1);
         this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.REARING, this.isRearing = false);
         this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.MOUTH_OPEN, this.mouthOpen = false);
-        this.metadata.setMetadata(19, (this.horseType = HorseType.fromID((byte) (horseType == null ? 0 : horseType.getValue()))).getID());
-        this.metadata.setMetadata(20, (this.color = HorseColor.WHITE) | (this.style = HorseStyle.NONE) << 8);
-        this.metadata.setMetadata(21, this.ownerName = tamerName == null ? "" : tamerName.getValue());
-        this.metadata.setMetadata(22, this.armorType = ArmorType.NONE);
+        if (horseType != null)
+            this.horseType = HorseType.fromID((byte)(int) horseType.getValue());
+        this.metadata.setMetadata(19, this.horseType.getID());
+        this.metadata.setMetadata(20, this.color | this.style << 8);
+        if (tamerName != null)
+            this.ownerName = tamerName.getValue();
+        this.metadata.setMetadata(21, this.ownerName);
+        this.metadata.setMetadata(22, this.armorType);
     }
 
     public Packet getPacket() {

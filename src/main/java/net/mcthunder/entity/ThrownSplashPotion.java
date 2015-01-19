@@ -13,24 +13,23 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class ThrownSplashPotion extends Projectile {
-    private PotionEffect potionEffect;
-    private String ownerName;
-    private byte shake;
+    private PotionEffect potionEffect = null;
+    private String ownerName = "";
+    private byte shake = 0;
 
     public ThrownSplashPotion(Location location) {
         super(location);
         this.type = EntityType.THROWN_SPLASH_POTION;
-        this.shake = 0;
-        this.ownerName = "";
-        this.potionEffect = null;
     }
 
     public ThrownSplashPotion(World w, CompoundTag tag) {
         super(w, tag);
         ByteTag shake = tag.get("shake");
         StringTag ownerName = tag.get("ownerName");
-        this.shake = shake == null ? 0 : shake.getValue();
-        this.ownerName = ownerName == null ? "" : ownerName.getValue();
+        if (shake != null)
+            this.shake = shake.getValue();
+        if (ownerName != null)
+            this.ownerName = ownerName.getValue();
         CompoundTag potionEffect = tag.get("Potion");
         ByteTag id = potionEffect.get("Id");
         ByteTag amplifier = potionEffect.get("Amplifier");
@@ -74,8 +73,20 @@ public class ThrownSplashPotion extends Projectile {
         return this.potionEffect;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        if (this.ownerName != null && !this.ownerName.equals(""))
+            nbt.put(new StringTag("ownerName", this.ownerName));
+        nbt.put(new ByteTag("shake", this.shake));
+        if (this.potionEffect != null) {
+            CompoundTag potion = new CompoundTag("Potion");
+            potion.put(new ByteTag("Id", (byte) this.potionEffect.getType().getID()));
+            potion.put(new ByteTag("Amplifier", (byte) this.potionEffect.getAmplifier()));
+            potion.put(new IntTag("Duration", this.potionEffect.getDuration()));
+            potion.put(new ByteTag("Ambient", (byte) (this.potionEffect.isAmbient() ? 1 : 0)));
+            potion.put(new ByteTag("ShowParticles", (byte) (this.potionEffect.showParticles() ? 1 : 0)));
+            nbt.put(potion);
+        }
         return nbt;
     }
 }

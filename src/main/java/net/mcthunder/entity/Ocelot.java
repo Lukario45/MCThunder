@@ -9,18 +9,20 @@ import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Ocelot extends Tameable {
-    private byte catType;
+    private int catType = 0;
 
     public Ocelot(Location location) {
         super(location);
         this.type = EntityType.OCELOT;
-        this.metadata.setMetadata(18, this.catType = (byte) 0);
+        this.metadata.setMetadata(18, (byte) this.catType);
     }
 
     public Ocelot(World w, CompoundTag tag) {
         super(w, tag);
         IntTag catType = tag.get("CatType");
-        this.metadata.setMetadata(18, this.catType = (byte) (catType == null ? 0 : catType.getValue()));
+        if (catType != null)
+            this.catType = catType.getValue();
+        this.metadata.setMetadata(18, (byte) this.catType);
     }
 
     public Packet getPacket() {
@@ -33,17 +35,18 @@ public class Ocelot extends Tameable {
 
     }
 
-    public void setCatType(byte catType) {
-        this.metadata.setMetadata(18, this.catType = catType);
+    public void setCatType(int catType) {
+        this.metadata.setMetadata(18, (byte) (this.catType = catType));
         updateMetadata();
     }
 
-    public byte getCatType() {
+    public int getCatType() {
         return this.catType;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new IntTag("CatType", this.catType));
         return nbt;
     }
 }

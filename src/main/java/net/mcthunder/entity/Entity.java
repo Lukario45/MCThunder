@@ -16,7 +16,17 @@ import java.util.Collection;
 import java.util.UUID;
 
 public abstract class Entity {
-    /*TODO: Finish storing the information from the tags for the following entity types
+    private static int nextID = 0;
+    protected boolean sneaking = false, sprinting = false, invisible = false, onGround;
+    protected MetadataMap metadata = new MetadataMap();
+    protected short fireTicks = -20, airLeft = 0;
+    protected String customName = "";
+    protected Entity riding = null;
+    protected Location location;
+    protected EntityType type;
+    protected int entityID;
+    /*TODO: Finish storing and returning the information from the tags for the following entity types
+    Ageable
     ArmorStand
     Arrow
     Entity
@@ -24,170 +34,19 @@ public abstract class Entity {
     Horse
     LivingEntity
     Minecart
+    Projectile
     SpawnerMinecart
     Villager*/
-    protected boolean sneaking, sprinting, invisible, onGround;
-    protected short fireTicks, airLeft;
-    protected MetadataMap metadata;
-    private static int nextID = 0;
-    protected String customName;
-    protected Location location;
-    protected EntityType type;
-    protected Entity riding;
-    protected int entityID;
-
-    public static Entity fromType(EntityType t, Location l) {
-        if (t == null)
-            return null;
-        switch (t) {
-            case ITEM: return new DroppedItem(l, new ItemStack(Material.STONE));
-            case XP_ORB: return new ExperienceOrb(l);
-            case LEAD_KNOT: return new LeadKnot(l);
-            case PAINTING: return new Painting(l);
-            case ITEM_FRAME: return new ItemFrame(l, new ItemStack(Material.AIR));
-            case ARMOR_STAND: return new ArmorStand(l);
-            case ENDER_CRYSTAL: return new EnderCrystal(l);
-            case ARROW: return new Arrow(l);
-            case SNOWBALL: return new Snowball(l);
-            case GHAST_FIREBALL: return new GhastFireball(l);
-            case BLAZE_FIREBALL: return new BlazeFireball(l);
-            case THROWN_ENDER_PEARL: return new ThrownEnderPearl(l);
-            case THROWN_EYE_OF_ENDER: return new ThrownEyeOfEnder(l);
-            case THROWN_SPLASH_POTION: return new ThrownSplashPotion(l);
-            case THROWN_EXP_BOTTLE: return new ThrownExpBottle(l);
-            case WITHER_SKULL: return new WitherSkull(l);
-            case FIREWORKS_ROCKET: return new Firework(l, new ItemStack(Material.FIREWORKS));
-            case PRIMED_TNT: return new PrimedTNT(l);
-            case FALLING_SAND: return new FallingSand(l);
-            case MINECART_COMMAND_BLOCK: return new CommandBlockMinecart(l);
-            case BOAT: return new Boat(l);
-            case MINECART: return new Minecart(l);
-            case MINECART_CHEST: return new ChestMinecart(l);
-            case MINECART_FURNACE: return new FurnaceMinecart(l);
-            case MINECART_TNT: return new TNTMinecart(l);
-            case MINECART_HOPPER: return new HopperMinecart(l);
-            case MINECART_SPAWNER: return new SpawnerMinecart(l);
-            case CREEPER: return new Creeper(l);
-            case SKELETON: return new Skeleton(l);
-            case SPIDER: return new Spider(l);
-            case GIANT: return new Giant(l);
-            case ZOMBIE: return new Zombie(l);
-            case SLIME: return new Slime(l);
-            case GHAST: return new Ghast(l);
-            case ZOMBIE_PIGMAN: return new ZombiePigman(l);
-            case ENDERMAN: return new Enderman(l);
-            case CAVESPIDER: return new CaveSpider(l);
-            case SILVERFISH: return new Silverfish(l);
-            case BLAZE: return new Blaze(l);
-            case MAGMA_CUBE: return new MagmaCube(l);
-            case ENDER_DRAGON: return new EnderDragon(l);
-            case WITHER: return new Wither(l);
-            case WITCH: return new Witch(l);
-            case ENDERMITE: return new Endermite(l);
-            case GUARDIAN: return new Guardian(l);
-            case BAT: return new Bat(l);
-            case PIG: return new Pig(l);
-            case SHEEP: return new Sheep(l);
-            case COW: return new Cow(l);
-            case CHICKEN: return new Chicken(l);
-            case SQUID: return new Squid(l);
-            case WOLF: return new Wolf(l);
-            case MOOSHROOM: return new Mooshroom(l);
-            case SNOW_GOLEM: return new SnowGolem(l);
-            case OCELOT: return new Ocelot(l);
-            case IRON_GOLEM: return new IronGolem(l);
-            case HORSE: return new Horse(l);
-            case RABBIT: return new Rabbit(l);
-            case VILLAGER: return new Villager(l);
-            case MOB: case MONSTER: case PLAYER://Cannot be created
-                break;
-        }
-        return null;
-    }
-
-    public static Entity fromTag(World w, CompoundTag tag) {
-        StringTag id = tag.get("id");
-        EntityType t = id == null ? null : EntityType.fromSavegameId(id.getValue());
-        if (t == null)
-            return null;
-        switch (t) {
-            case ITEM: return new DroppedItem(w, tag);
-            case XP_ORB: return new ExperienceOrb(w, tag);
-            case LEAD_KNOT: return new LeadKnot(w, tag);
-            case PAINTING: return new Painting(w, tag);
-            case ITEM_FRAME: return new ItemFrame(w, tag);
-            case ARMOR_STAND: return new ArmorStand(w, tag);
-            case ENDER_CRYSTAL: return new EnderCrystal(w, tag);
-            case ARROW: return new Arrow(w, tag);
-            case SNOWBALL: return new Snowball(w, tag);
-            case GHAST_FIREBALL: return new GhastFireball(w, tag);
-            case BLAZE_FIREBALL: return new BlazeFireball(w, tag);
-            case THROWN_ENDER_PEARL: return new ThrownEnderPearl(w, tag);
-            case THROWN_EYE_OF_ENDER: return new ThrownEyeOfEnder(w, tag);
-            case THROWN_SPLASH_POTION: return new ThrownSplashPotion(w, tag);
-            case THROWN_EXP_BOTTLE: return new ThrownExpBottle(w, tag);
-            case WITHER_SKULL: return new WitherSkull(w, tag);
-            case FIREWORKS_ROCKET: return new Firework(w, tag);
-            case PRIMED_TNT: return new PrimedTNT(w, tag);
-            case FALLING_SAND: return new FallingSand(w, tag);
-            case MINECART_COMMAND_BLOCK: return new CommandBlockMinecart(w, tag);
-            case BOAT: return new Boat(w, tag);
-            case MINECART: return new Minecart(w, tag);
-            case MINECART_CHEST: return new ChestMinecart(w, tag);
-            case MINECART_FURNACE: return new FurnaceMinecart(w, tag);
-            case MINECART_TNT: return new TNTMinecart(w, tag);
-            case MINECART_HOPPER: return new HopperMinecart(w, tag);
-            case MINECART_SPAWNER: return new SpawnerMinecart(w, tag);
-            case CREEPER: return new Creeper(w, tag);
-            case SKELETON: return new Skeleton(w, tag);
-            case SPIDER: return new Spider(w, tag);
-            case GIANT: return new Giant(w, tag);
-            case ZOMBIE: return new Zombie(w, tag);
-            case SLIME: return new Slime(w, tag);
-            case GHAST: return new Ghast(w, tag);
-            case ZOMBIE_PIGMAN: return new ZombiePigman(w, tag);
-            case ENDERMAN: return new Enderman(w, tag);
-            case CAVESPIDER: return new CaveSpider(w, tag);
-            case SILVERFISH: return new Silverfish(w, tag);
-            case BLAZE: return new Blaze(w, tag);
-            case MAGMA_CUBE: return new MagmaCube(w, tag);
-            case ENDER_DRAGON: return new EnderDragon(w, tag);
-            case WITHER: return new Wither(w, tag);
-            case WITCH: return new Witch(w, tag);
-            case ENDERMITE: return new Endermite(w, tag);
-            case GUARDIAN: return new Guardian(w, tag);
-            case BAT: return new Bat(w, tag);
-            case PIG: return new Pig(w, tag);
-            case SHEEP: return new Sheep(w, tag);
-            case COW: return new Cow(w, tag);
-            case CHICKEN: return new Chicken(w, tag);
-            case SQUID: return new Squid(w, tag);
-            case WOLF: return new Wolf(w, tag);
-            case MOOSHROOM: return new Mooshroom(w, tag);
-            case SNOW_GOLEM: return new SnowGolem(w, tag);
-            case OCELOT: return new Ocelot(w, tag);
-            case IRON_GOLEM: return new IronGolem(w, tag);
-            case HORSE: return new Horse(w, tag);
-            case RABBIT: return new Rabbit(w, tag);
-            case VILLAGER: return new Villager(w, tag);
-            case MOB: case MONSTER: case PLAYER://Cannot be created
-                break;
-        }
-        return null;
-    }
 
     protected Entity(Location location) {
         this.entityID = getNextID();
         this.location = location;
-        this.riding = null;
-        this.customName = "";
-        this.metadata = new MetadataMap();
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, (this.fireTicks = -20) >= 0);
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, this.sneaking = false);
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, this.sprinting = false);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, this.fireTicks >= 0);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, this.sneaking);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, this.sprinting);
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ARM_UP, false);//Eating, drinking, blocking
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, this.invisible = false);
-        this.metadata.setMetadata(1, this.airLeft = 0);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, this.invisible);
+        this.metadata.setMetadata(1, this.airLeft);
     }
 
     protected Entity(World w, CompoundTag tag) {
@@ -218,15 +77,19 @@ public abstract class Entity {
             this.location.setVector(new Vector(dX.getValue(), dY.getValue(), dZ.getValue()));
         }
         ShortTag fire = tag.get("Fire");
-        this.metadata = new MetadataMap();
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, (this.fireTicks = fire == null ? -20 : fire.getValue()) >= 0);
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, this.sneaking = false);
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, this.sprinting = false);
+        if (fire != null)
+            this.fireTicks = fire.getValue();
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ON_FIRE, this.fireTicks >= 0);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SNEAKING, this.sneaking);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.SPRINTING, this.sprinting);
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ARM_UP, false);//Eating, drinking, blocking
-        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, this.invisible = false);
+        this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, this.invisible);
         this.metadata.setMetadata(1, this.airLeft = ((ShortTag) tag.get("Air")).getValue());
         ByteTag onGround = tag.get("OnGround");//1 true, 0 false
-        getWorld().setDimension(((IntTag) tag.get("Dimension")).getValue());//-1 nether, 0 overworld, 1 end
+        this.onGround = onGround != null && onGround.getValue() == (byte) 1;
+        IntTag dim = tag.get("Dimension");
+        if (dim != null)
+            getWorld().setDimension(dim.getValue());//-1 nether, 0 overworld, 1 end
         ByteTag invulnerable = tag.get("Invulnerable");//1 true, 0 false
         IntTag portalCooldown = tag.get("PortalCooldown");
         LongTag uuidMost = tag.get("UUIDMost");
@@ -384,9 +247,11 @@ public abstract class Entity {
         nbt.put(new LongTag("UUIDMost", 0));
         nbt.put(new LongTag("UUIDLeast", 0));
         nbt.put(new StringTag("UUID", UUID.randomUUID().toString()));//unset at the moment
-        nbt.put(new StringTag("CustomName", this.customName));
+        if (this.customName != null && !this.customName.equals(""))
+            nbt.put(new StringTag("CustomName", this.customName));
         nbt.put(new ByteTag("Silent", (byte) 0));
-        //nbt.put(new CompoundTag("Riding"));
+        if (this.riding != null)
+            nbt.put(new CompoundTag("Riding", this.riding.getNBT().getValue()));
         CompoundTag commandStats = new CompoundTag("CommandStats");
         commandStats.put(new StringTag("SuccessCountName"));
         commandStats.put(new StringTag("SuccessCountObjective"));
@@ -400,5 +265,145 @@ public abstract class Entity {
         commandStats.put(new StringTag("QueryResultObjective"));
         //nbt.put(commandStats);
         return nbt;
+    }
+
+    public static Entity fromType(EntityType t, Location l) {
+        if (t == null)
+            return null;
+        switch (t) {
+            case ITEM: return new DroppedItem(l, new ItemStack(Material.STONE));
+            case XP_ORB: return new ExperienceOrb(l);
+            case LEAD_KNOT: return new LeadKnot(l);
+            case PAINTING: return new Painting(l);
+            case ITEM_FRAME: return new ItemFrame(l, new ItemStack(Material.AIR));
+            case ARMOR_STAND: return new ArmorStand(l);
+            case ENDER_CRYSTAL: return new EnderCrystal(l);
+            case ARROW: return new Arrow(l);
+            case SNOWBALL: return new Snowball(l);
+            case GHAST_FIREBALL: return new GhastFireball(l);
+            case BLAZE_FIREBALL: return new BlazeFireball(l);
+            case THROWN_ENDER_PEARL: return new ThrownEnderPearl(l);
+            case THROWN_EYE_OF_ENDER: return new ThrownEyeOfEnder(l);
+            case THROWN_SPLASH_POTION: return new ThrownSplashPotion(l);
+            case THROWN_EXP_BOTTLE: return new ThrownExpBottle(l);
+            case WITHER_SKULL: return new WitherSkull(l);
+            case FIREWORKS_ROCKET: return new Firework(l, new ItemStack(Material.FIREWORKS));
+            case PRIMED_TNT: return new PrimedTNT(l);
+            case FALLING_SAND: return new FallingSand(l);
+            case MINECART_COMMAND_BLOCK: return new CommandBlockMinecart(l);
+            case BOAT: return new Boat(l);
+            case MINECART: return new Minecart(l);
+            case MINECART_CHEST: return new ChestMinecart(l);
+            case MINECART_FURNACE: return new FurnaceMinecart(l);
+            case MINECART_TNT: return new TNTMinecart(l);
+            case MINECART_HOPPER: return new HopperMinecart(l);
+            case MINECART_SPAWNER: return new SpawnerMinecart(l);
+            case CREEPER: return new Creeper(l);
+            case SKELETON: return new Skeleton(l);
+            case SPIDER: return new Spider(l);
+            case GIANT: return new Giant(l);
+            case ZOMBIE: return new Zombie(l);
+            case SLIME: return new Slime(l);
+            case GHAST: return new Ghast(l);
+            case ZOMBIE_PIGMAN: return new ZombiePigman(l);
+            case ENDERMAN: return new Enderman(l);
+            case CAVESPIDER: return new CaveSpider(l);
+            case SILVERFISH: return new Silverfish(l);
+            case BLAZE: return new Blaze(l);
+            case MAGMA_CUBE: return new MagmaCube(l);
+            case ENDER_DRAGON: return new EnderDragon(l);
+            case WITHER: return new Wither(l);
+            case WITCH: return new Witch(l);
+            case ENDERMITE: return new Endermite(l);
+            case GUARDIAN: return new Guardian(l);
+            case BAT: return new Bat(l);
+            case PIG: return new Pig(l);
+            case SHEEP: return new Sheep(l);
+            case COW: return new Cow(l);
+            case CHICKEN: return new Chicken(l);
+            case SQUID: return new Squid(l);
+            case WOLF: return new Wolf(l);
+            case MOOSHROOM: return new Mooshroom(l);
+            case SNOW_GOLEM: return new SnowGolem(l);
+            case OCELOT: return new Ocelot(l);
+            case IRON_GOLEM: return new IronGolem(l);
+            case HORSE: return new Horse(l);
+            case RABBIT: return new Rabbit(l);
+            case VILLAGER: return new Villager(l);
+            case MOB: case MONSTER: case PLAYER://Cannot be created
+                break;
+        }
+        return null;
+    }
+
+    public static Entity fromTag(World w, CompoundTag tag) {
+        StringTag id = tag.get("id");
+        EntityType t = id == null ? null : EntityType.fromSavegameId(id.getValue());
+        if (t == null)
+            return null;
+        switch (t) {
+            case ITEM: return new DroppedItem(w, tag);
+            case XP_ORB: return new ExperienceOrb(w, tag);
+            case LEAD_KNOT: return new LeadKnot(w, tag);
+            case PAINTING: return new Painting(w, tag);
+            case ITEM_FRAME: return new ItemFrame(w, tag);
+            case ARMOR_STAND: return new ArmorStand(w, tag);
+            case ENDER_CRYSTAL: return new EnderCrystal(w, tag);
+            case ARROW: return new Arrow(w, tag);
+            case SNOWBALL: return new Snowball(w, tag);
+            case GHAST_FIREBALL: return new GhastFireball(w, tag);
+            case BLAZE_FIREBALL: return new BlazeFireball(w, tag);
+            case THROWN_ENDER_PEARL: return new ThrownEnderPearl(w, tag);
+            case THROWN_EYE_OF_ENDER: return new ThrownEyeOfEnder(w, tag);
+            case THROWN_SPLASH_POTION: return new ThrownSplashPotion(w, tag);
+            case THROWN_EXP_BOTTLE: return new ThrownExpBottle(w, tag);
+            case WITHER_SKULL: return new WitherSkull(w, tag);
+            case FIREWORKS_ROCKET: return new Firework(w, tag);
+            case PRIMED_TNT: return new PrimedTNT(w, tag);
+            case FALLING_SAND: return new FallingSand(w, tag);
+            case MINECART_COMMAND_BLOCK: return new CommandBlockMinecart(w, tag);
+            case BOAT: return new Boat(w, tag);
+            case MINECART: return new Minecart(w, tag);
+            case MINECART_CHEST: return new ChestMinecart(w, tag);
+            case MINECART_FURNACE: return new FurnaceMinecart(w, tag);
+            case MINECART_TNT: return new TNTMinecart(w, tag);
+            case MINECART_HOPPER: return new HopperMinecart(w, tag);
+            case MINECART_SPAWNER: return new SpawnerMinecart(w, tag);
+            case CREEPER: return new Creeper(w, tag);
+            case SKELETON: return new Skeleton(w, tag);
+            case SPIDER: return new Spider(w, tag);
+            case GIANT: return new Giant(w, tag);
+            case ZOMBIE: return new Zombie(w, tag);
+            case SLIME: return new Slime(w, tag);
+            case GHAST: return new Ghast(w, tag);
+            case ZOMBIE_PIGMAN: return new ZombiePigman(w, tag);
+            case ENDERMAN: return new Enderman(w, tag);
+            case CAVESPIDER: return new CaveSpider(w, tag);
+            case SILVERFISH: return new Silverfish(w, tag);
+            case BLAZE: return new Blaze(w, tag);
+            case MAGMA_CUBE: return new MagmaCube(w, tag);
+            case ENDER_DRAGON: return new EnderDragon(w, tag);
+            case WITHER: return new Wither(w, tag);
+            case WITCH: return new Witch(w, tag);
+            case ENDERMITE: return new Endermite(w, tag);
+            case GUARDIAN: return new Guardian(w, tag);
+            case BAT: return new Bat(w, tag);
+            case PIG: return new Pig(w, tag);
+            case SHEEP: return new Sheep(w, tag);
+            case COW: return new Cow(w, tag);
+            case CHICKEN: return new Chicken(w, tag);
+            case SQUID: return new Squid(w, tag);
+            case WOLF: return new Wolf(w, tag);
+            case MOOSHROOM: return new Mooshroom(w, tag);
+            case SNOW_GOLEM: return new SnowGolem(w, tag);
+            case OCELOT: return new Ocelot(w, tag);
+            case IRON_GOLEM: return new IronGolem(w, tag);
+            case HORSE: return new Horse(w, tag);
+            case RABBIT: return new Rabbit(w, tag);
+            case VILLAGER: return new Villager(w, tag);
+            case MOB: case MONSTER: case PLAYER://Cannot be created
+                break;
+        }
+        return null;
     }
 }

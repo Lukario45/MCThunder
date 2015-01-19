@@ -9,18 +9,17 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Guardian extends LivingEntity {
-    private boolean isElder;
+    private boolean isElder = false;
 
     public Guardian(Location location) {
         super(location);
         this.type = EntityType.GUARDIAN;
-        this.isElder = false;
     }
 
     public Guardian(World w, CompoundTag tag) {
         super(w, tag);
         ByteTag elder = tag.get("Elder");//1 true, 0 false
-        this.isElder = false;
+        this.isElder = elder != null && elder.getValue() == (byte) 1;
     }
 
     public Packet getPacket() {
@@ -33,8 +32,17 @@ public class Guardian extends LivingEntity {
 
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public void setElder(boolean elder) {
+        this.isElder = elder;
+    }
+
+    public boolean isElder() {
+        return this.isElder;
+    }
+
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("Elder", (byte) (this.isElder ? 1 : 0)));
         return nbt;
     }
 }

@@ -10,22 +10,22 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class ThrownExpBottle extends Projectile {
-    private String ownerName;
-    private byte shake;
+    private String ownerName = "";
+    private byte shake = 0;
 
     public ThrownExpBottle(Location location) {
         super(location);
         this.type = EntityType.THROWN_EXP_BOTTLE;
-        this.shake = 0;
-        this.ownerName = "";
     }
 
     public ThrownExpBottle(World w, CompoundTag tag) {
         super(w, tag);
         ByteTag shake = tag.get("shake");
         StringTag ownerName = tag.get("ownerName");
-        this.shake = shake == null ? 0 : shake.getValue();
-        this.ownerName = ownerName == null ? "" : ownerName.getValue();
+        if (shake != null)
+            this.shake = shake.getValue();
+        if (ownerName != null)
+            this.ownerName = ownerName.getValue();
     }
 
     @Override
@@ -50,8 +50,11 @@ public class ThrownExpBottle extends Projectile {
         return this.shake;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        if (this.ownerName != null && !this.ownerName.equals(""))
+            nbt.put(new StringTag("ownerName", this.ownerName));
+        nbt.put(new ByteTag("shake", this.shake));
         return nbt;
     }
 }

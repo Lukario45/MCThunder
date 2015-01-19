@@ -10,21 +10,20 @@ import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Endermite extends Silverfish {
-    private boolean playerSpawned;
-    private int lifeTime;
+    private boolean playerSpawned = false;
+    private int lifeTime = 0;
 
     public Endermite(Location location) {
         super(location);
         this.type = EntityType.ENDERMITE;
-        this.lifeTime = 0;
-        this.playerSpawned = false;
     }
 
     public Endermite(World w, CompoundTag tag) {
         super(w, tag);
         IntTag lifeTime = tag.get("Lifetime");
         ByteTag playerSpawned = tag.get("PlayerSpawned");
-        this.lifeTime = lifeTime == null ? 0 : lifeTime.getValue();
+        if (lifeTime != null)
+            this.lifeTime = lifeTime.getValue();
         this.playerSpawned = playerSpawned != null && playerSpawned.getValue() == (byte) 1;
     }
 
@@ -54,8 +53,10 @@ public class Endermite extends Silverfish {
         this.lifeTime = lifeTime;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new IntTag("Lifetime", this.lifeTime));
+        nbt.put(new ByteTag("PlayerSpawned", (byte) (this.playerSpawned ? 1 : 0)));
         return nbt;
     }
 }

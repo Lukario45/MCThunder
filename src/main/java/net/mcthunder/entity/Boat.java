@@ -8,22 +8,22 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Boat extends Entity {
-    private int timeSinceHit, forwardDirection;
-    private float damageTaken;
+    private int timeSinceHit = 0, forwardDirection = 0;
+    private float damageTaken = 0;
 
     public Boat(Location location) {
         super(location);
         this.type = EntityType.BOAT;
-        this.metadata.setMetadata(17, this.timeSinceHit = 0);
-        this.metadata.setMetadata(18, this.forwardDirection = 0);
-        this.metadata.setMetadata(19, this.damageTaken = 0);
+        this.metadata.setMetadata(17, this.timeSinceHit);
+        this.metadata.setMetadata(18, this.forwardDirection);
+        this.metadata.setMetadata(19, this.damageTaken);
     }
 
     public Boat(World w, CompoundTag tag) {
         super(w, tag);
-        this.metadata.setMetadata(17, this.timeSinceHit = 0);
-        this.metadata.setMetadata(18, this.forwardDirection = 0);
-        this.metadata.setMetadata(19, this.damageTaken = 0);
+        this.metadata.setMetadata(17, this.timeSinceHit);
+        this.metadata.setMetadata(18, this.forwardDirection);
+        this.metadata.setMetadata(19, this.damageTaken);
     }
 
     @Override
@@ -57,10 +57,5 @@ public class Boat extends Entity {
 
     public float getDamageTaken() {
         return this.damageTaken;
-    }
-
-    public CompoundTag getNBT() {//TODO: Return the nbt
-        CompoundTag nbt = super.getNBT();
-        return nbt;
     }
 }

@@ -11,19 +11,18 @@ import org.spacehq.opennbt.tag.builtin.ShortTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Arrow extends Projectile {
-    private boolean isCritical;
-    private byte shake;
+    private boolean isCritical = false;
+    private byte shake = 0;
 
     public Arrow(Location location) {
         super(location);
         this.type = EntityType.ARROW;
-        this.metadata.setMetadata(16, (byte) ((this.isCritical = false) ? 1 : 0));
-        this.shake = 0;
+        this.metadata.setMetadata(16, (byte) (this.isCritical ? 1 : 0));
     }
 
     public Arrow(World w, CompoundTag tag) {
         super(w, tag);
-        this.metadata.setMetadata(16, (byte) ((this.isCritical = false) ? 1 : 0));
+        this.metadata.setMetadata(16, (byte) (this.isCritical ? 1 : 0));
         ByteTag shake = tag.get("shake");
         ByteTag inData = tag.get("inData");
         ByteTag pickup = tag.get("pickup");
@@ -31,7 +30,8 @@ public class Arrow extends Projectile {
         ShortTag life = tag.get("life");
         DoubleTag damage = tag.get("damage");
         ByteTag inGround = tag.get("inGround");
-        this.shake = shake == null ? 0 : shake.getValue();
+        if (shake != null)
+            this.shake = shake.getValue();
     }
 
     @Override

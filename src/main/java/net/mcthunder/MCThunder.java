@@ -427,6 +427,9 @@ public class MCThunder {
                                 } else if (e instanceof ExperienceOrb) {
                                     ExperienceOrb x = (ExperienceOrb) e;
                                     x.setAge((byte) (x.getAge() + 1));
+                                } else if (e instanceof DroppedItem) {
+                                    DroppedItem d = (DroppedItem) e;
+                                    d.setAge((byte) (d.getAge() + 1));
                                 }
                             }
                         } catch (Exception ignored) { }//Entity added at exact same time it checked for entities

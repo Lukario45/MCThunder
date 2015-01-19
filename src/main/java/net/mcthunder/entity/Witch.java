@@ -8,17 +8,17 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Witch extends LivingEntity {
-    private boolean aggressive;
+    private boolean aggressive = false;
 
     public Witch(Location location) {
         super(location);
         this.type = EntityType.WITCH;
-        this.metadata.setMetadata(21, (byte) ((this.aggressive = false) ? 1 : 0));
+        this.metadata.setMetadata(21, (byte) (this.aggressive ? 1 : 0));
     }
 
     public Witch(World w, CompoundTag tag) {
         super(w, tag);
-        this.metadata.setMetadata(21, (byte) ((this.aggressive = false) ? 1 : 0));
+        this.metadata.setMetadata(21, (byte) (this.aggressive ? 1 : 0));
     }
 
     public Packet getPacket() {
@@ -38,10 +38,5 @@ public class Witch extends LivingEntity {
 
     public boolean isAggressive() {
         return this.aggressive;
-    }
-
-    public CompoundTag getNBT() {//TODO: Return the nbt
-        CompoundTag nbt = super.getNBT();
-        return nbt;
     }
 }

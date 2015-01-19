@@ -10,14 +10,12 @@ import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Chicken extends Ageable {
-    private boolean chickenJockey;
-    private int layTime;
+    private boolean chickenJockey = false;
+    private int layTime = 0;
 
     public Chicken(Location location) {
         super(location);
         this.type = EntityType.CHICKEN;
-        this.chickenJockey = false;
-        this.layTime = 0;
     }
 
     public Chicken(World w, CompoundTag tag) {
@@ -25,7 +23,8 @@ public class Chicken extends Ageable {
         ByteTag isChickenJockey = tag.get("IsChickenJockey");//1 true, 0 false
         IntTag eggLayTime = tag.get("EggLayTime");
         this.chickenJockey = isChickenJockey != null && isChickenJockey.getValue() == (byte) 1;
-        this.layTime = eggLayTime == null ? 0 : eggLayTime.getValue();
+        if (eggLayTime != null)
+            this.layTime = eggLayTime.getValue();
     }
 
     public Packet getPacket() {
@@ -54,8 +53,10 @@ public class Chicken extends Ageable {
         this.layTime = layTime;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("IsChickenJockey", (byte) (this.chickenJockey ? 1 : 0)));
+        nbt.put(new IntTag("EggLayTime", this.layTime));
         return nbt;
     }
 }

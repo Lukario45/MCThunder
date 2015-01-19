@@ -9,24 +9,26 @@ import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Wither extends LivingEntity {
-    private int watched1, watched2, watched3, invulnerableTime;
+    private int watched1 = 0, watched2 = 0, watched3 = 0, invulnerableTime = 0;
 
     public Wither(Location location) {
         super(location);
         this.type = EntityType.WITHER;
-        this.metadata.setMetadata(17, this.watched1 = 0);
-        this.metadata.setMetadata(18, this.watched2 = 0);
-        this.metadata.setMetadata(19, this.watched3 = 0);
-        this.metadata.setMetadata(20, this.invulnerableTime = 0);
+        this.metadata.setMetadata(17, this.watched1);
+        this.metadata.setMetadata(18, this.watched2);
+        this.metadata.setMetadata(19, this.watched3);
+        this.metadata.setMetadata(20, this.invulnerableTime);
     }
 
     public Wither(World w, CompoundTag tag) {
         super(w, tag);
         IntTag invul = tag.get("Invul");
-        this.metadata.setMetadata(17, this.watched1 = 0);
-        this.metadata.setMetadata(18, this.watched2 = 0);
-        this.metadata.setMetadata(19, this.watched3 = 0);
-        this.metadata.setMetadata(20, this.invulnerableTime = invul == null ? 0 : invul.getValue());
+        this.metadata.setMetadata(17, this.watched1);
+        this.metadata.setMetadata(18, this.watched2);
+        this.metadata.setMetadata(19, this.watched3);
+        if (invul != null)
+            this.invulnerableTime = invul.getValue();
+        this.metadata.setMetadata(20, this.invulnerableTime);
     }
 
     public Packet getPacket() {
@@ -75,8 +77,9 @@ public class Wither extends LivingEntity {
         return this.invulnerableTime;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new IntTag("Invul", this.invulnerableTime));
         return nbt;
     }
 }

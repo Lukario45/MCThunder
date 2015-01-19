@@ -8,17 +8,17 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Spider extends LivingEntity {
-    private boolean climbing;
+    private boolean climbing = false;
 
     public Spider(Location location) {
         super(location);
         this.type = EntityType.SPIDER;
-        this.metadata.setMetadata(16, (byte) ((this.climbing = false) ? 1 : 0));
+        this.metadata.setMetadata(16, (byte) (this.climbing ? 1 : 0));
     }
 
     public Spider(World w, CompoundTag tag) {
         super(w, tag);
-        this.metadata.setMetadata(16, (byte) ((this.climbing = false) ? 1 : 0));
+        this.metadata.setMetadata(16, (byte) (this.climbing ? 1 : 0));
     }
 
     public Packet getPacket() {
@@ -38,10 +38,5 @@ public class Spider extends LivingEntity {
 
     public boolean isClimbing() {
         return this.climbing;
-    }
-
-    public CompoundTag getNBT() {//TODO: Return the nbt
-        CompoundTag nbt = super.getNBT();
-        return nbt;
     }
 }

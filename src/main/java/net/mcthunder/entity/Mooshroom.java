@@ -26,9 +26,4 @@ public class Mooshroom extends Cow {
     public void ai() {
 
     }
-
-    public CompoundTag getNBT() {//TODO: Return the nbt
-        CompoundTag nbt = super.getNBT();
-        return nbt;
-    }
 }

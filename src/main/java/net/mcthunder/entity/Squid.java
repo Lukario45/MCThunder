@@ -26,9 +26,4 @@ public class Squid extends LivingEntity {
     public void ai() {
 
     }
-
-    public CompoundTag getNBT() {//TODO: Return the nbt
-        CompoundTag nbt = super.getNBT();
-        return nbt;
-    }
 }

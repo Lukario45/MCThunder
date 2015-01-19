@@ -10,15 +10,14 @@ import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Zombie extends LivingEntity {
-    private boolean child, villager, converting, canBreakDoors;
+    private boolean child = false, villager = false, converting = false, canBreakDoors = false;
 
     public Zombie(Location location) {
         super(location);
         this.type = EntityType.ZOMBIE;
-        this.metadata.setMetadata(12, (byte) ((this.child = false) ? 1 : 0));
-        this.metadata.setMetadata(13, (byte) ((this.villager = false) ? 1 : 0));
-        this.metadata.setMetadata(14, (byte) ((this.converting = false) ? 1 : 0));
-        this.canBreakDoors = false;
+        this.metadata.setMetadata(12, (byte) (this.child ? 1 : 0));
+        this.metadata.setMetadata(13, (byte) (this.villager ? 1 : 0));
+        this.metadata.setMetadata(14, (byte) (this.converting ? 1 : 0));
     }
 
     public Zombie(World w, CompoundTag tag) {
@@ -78,8 +77,12 @@ public class Zombie extends LivingEntity {
         return this.canBreakDoors;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("IsVillager", (byte) (this.villager ? 1 : 0)));
+        nbt.put(new ByteTag("IsBaby", (byte) (this.child ? 1 : 0)));
+        nbt.put(new IntTag("ConversionTime", this.converting ? 1 : 0));//TODO: Fix
+        nbt.put(new ByteTag("CanBreakDoors", (byte) (this.canBreakDoors ? 1 : 0)));
         return nbt;
     }
 }
