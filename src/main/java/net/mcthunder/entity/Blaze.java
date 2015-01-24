@@ -11,11 +11,15 @@ public class Blaze extends LivingEntity {
     public Blaze(Location location) {
         super(location);
         this.type = EntityType.BLAZE;
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(16, (byte) (this.fireTicks > 0 ? 1 : 0));
     }
 
     public Blaze(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(16, (byte) (this.fireTicks > 0 ? 1 : 0));
     }
 

@@ -8,7 +8,7 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class EnderCrystal extends Entity {
-    private int health = 1;
+    private int health = 5;
 
     public EnderCrystal(Location location) {
         super(location);

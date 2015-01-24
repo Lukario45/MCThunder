@@ -11,10 +11,14 @@ public class SnowGolem extends LivingEntity {
     public SnowGolem(Location location) {
         super(location);
         this.type = EntityType.SNOW_GOLEM;
+        this.maxHealth = 4;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public SnowGolem(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 4;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Packet getPacket() {

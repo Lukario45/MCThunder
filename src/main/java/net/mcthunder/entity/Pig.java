@@ -14,11 +14,15 @@ public class Pig extends Ageable {
     public Pig(Location location) {
         super(location);
         this.type = EntityType.PIG;
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(16, (byte) (this.hasSaddle ? 1 : 0));
     }
 
     public Pig(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ByteTag saddle = tag.get("Saddle");//1 true, 0 false
         this.metadata.setMetadata(16, (byte) ((this.hasSaddle = saddle != null && saddle.getValue() == (byte) 1) ? 1 : 0));
     }

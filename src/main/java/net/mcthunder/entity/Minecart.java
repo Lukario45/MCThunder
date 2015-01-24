@@ -3,6 +3,7 @@ package net.mcthunder.entity;
 import net.mcthunder.api.Location;
 import net.mcthunder.material.Material;
 import net.mcthunder.world.World;
+import org.spacehq.mc.protocol.data.game.values.entity.MinecartType;
 import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
@@ -12,7 +13,7 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class Minecart extends Entity {
-    protected int shakingPower = 0, shakingDirection = 0;
+    protected int shakingPower = 0, shakingDirection = 0, offset = 2;
     protected float shakingMultiplier = 0;
     protected Material blockType = Material.AIR;
     protected boolean showBlock = true;
@@ -24,7 +25,7 @@ public class Minecart extends Entity {
         this.metadata.setMetadata(18, this.shakingDirection);
         this.metadata.setMetadata(19, this.shakingMultiplier);
         this.metadata.setMetadata(20, 0);
-        this.metadata.setMetadata(21, (int) this.location.getY());
+        this.metadata.setMetadata(21, this.offset);
         this.metadata.setMetadata(22, (byte) (this.showBlock ? 1 : 0));
     }
 
@@ -35,17 +36,25 @@ public class Minecart extends Entity {
         IntTag displayData = tag.get("DisplayData");
         IntTag displayOffset = tag.get("DisplayOffset");
         StringTag minecartName = tag.get("CustomName");
+        if (minecartName != null)
+            this.customName = minecartName.getValue();
+        if (displayTile != null)
+            this.blockType = Material.fromString(displayTile.getValue().split("minecraft:")[1]);
+        if (displayData != null)
+            this.blockType = Material.fromData(this.blockType, (short) (int) displayData.getValue());
+        if (displayOffset != null)
+            this.offset = displayOffset.getValue();
         this.metadata.setMetadata(17, this.shakingPower);
         this.metadata.setMetadata(18, this.shakingDirection);
         this.metadata.setMetadata(19, this.shakingMultiplier);
-        this.metadata.setMetadata(20, (this.blockType.getID() << 16) | (this.blockType.getData()&0xFFFF));
-        this.metadata.setMetadata(21, (int) this.location.getY());
-        this.metadata.setMetadata(22, (byte) (this.showBlock ? 1 : 0));
+        this.metadata.setMetadata(20, this.blockType.getID() + (this.blockType.getData() << 12));
+        this.metadata.setMetadata(21, this.offset);
+        this.metadata.setMetadata(22, (byte) ((this.showBlock = customDisplayTile != null && customDisplayTile.getValue() == (byte) 1) ? 1 : 0));
     }
 
     @Override
     public Packet getPacket() {
-        return new ServerSpawnObjectPacket(this.entityID, ObjectType.MINECART, this.location.getX(), this.location.getY(), this.location.getZ(),
+        return new ServerSpawnObjectPacket(this.entityID, ObjectType.MINECART, MinecartType.NORMAL, this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
     }
 
@@ -78,7 +87,7 @@ public class Minecart extends Entity {
 
     public void setBlockType(Material type) {
         this.blockType = type;
-        this.metadata.setMetadata(20, (this.blockType.getID() << 16) | (this.blockType.getData()&0xFFFF));
+        this.metadata.setMetadata(20, this.blockType.getID() + (this.blockType.getData() << 12));
         updateMetadata();
     }
 
@@ -95,8 +104,16 @@ public class Minecart extends Entity {
         return this.showBlock;
     }
 
-    public CompoundTag getNBT() {//TODO: Return the nbt
+    public CompoundTag getNBT() {
         CompoundTag nbt = super.getNBT();
+        nbt.put(new ByteTag("CustomDisplayTile", (byte) (this.showBlock ? 1 : 0)));
+        if (!this.blockType.equals(Material.AIR))
+            nbt.put(new StringTag("DisplayTile", "minecraft:" + this.blockType.getParent().getName().toLowerCase()));
+        if (this.blockType.getData() != 0)
+            nbt.put(new IntTag("DisplayData", this.blockType.getData()));
+        nbt.put(new IntTag("DisplayOffset", this.offset));
+        if (this.customName != null && !this.customName.equals(""))
+            nbt.put(new StringTag("CustomName", this.customName));
         return nbt;
     }
 }

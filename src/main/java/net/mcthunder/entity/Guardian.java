@@ -14,12 +14,16 @@ public class Guardian extends LivingEntity {
     public Guardian(Location location) {
         super(location);
         this.type = EntityType.GUARDIAN;
+        this.maxHealth = this.isElder ? 80 : 30;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Guardian(World w, CompoundTag tag) {
         super(w, tag);
         ByteTag elder = tag.get("Elder");//1 true, 0 false
         this.isElder = elder != null && elder.getValue() == (byte) 1;
+        this.maxHealth = this.isElder ? 80 : 30;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Packet getPacket() {

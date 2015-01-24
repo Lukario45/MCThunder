@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public abstract class Entity {
     private static int nextID = 0;
-    protected boolean sneaking = false, sprinting = false, invisible = false, onGround;
+    protected boolean sneaking = false, sprinting = false, invisible = false, onGround = false;
     protected MetadataMap metadata = new MetadataMap();
     protected short fireTicks = -20, airLeft = 0;
     protected String customName = "";
@@ -26,14 +26,12 @@ public abstract class Entity {
     protected EntityType type;
     protected int entityID;
     /*TODO: Finish storing and returning the information from the tags for the following entity types
-    Ageable
     ArmorStand
     Arrow
     Entity
-    FallingSand
     Horse
     LivingEntity
-    Minecart
+    Player
     Projectile
     SpawnerMinecart
     Villager*/
@@ -99,6 +97,8 @@ public abstract class Entity {
         this.customName = customName != null ? customName.getValue() : "";
         ByteTag silent = tag.get("Silent");//1 true, 0 false
         CompoundTag riding = tag.get("Riding");
+        if (riding != null)
+            this.riding = Entity.fromTag(getWorld(), riding);
         CompoundTag commandStats = tag.get("CommandStats");
         StringTag successCountName = commandStats != null ? (StringTag) commandStats.get("SuccessCountName") : null;
         StringTag successCountObjective = commandStats != null ? (StringTag) commandStats.get("SuccessCountObjective") : null;

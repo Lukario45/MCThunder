@@ -11,10 +11,14 @@ public class Giant extends Zombie {
     public Giant(Location location) {
         super(location);
         this.type = EntityType.GIANT;
+        this.maxHealth = 100;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Giant(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 100;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Packet getPacket() {

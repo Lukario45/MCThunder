@@ -16,6 +16,8 @@ public class Enderman extends LivingEntity {
     public Enderman(Location location) {
         super(location);
         this.type = EntityType.ENDERMAN;
+        this.maxHealth = 40;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(16, (short) this.blockType.getID());
         this.metadata.setMetadata(17, (byte) this.blockType.getData());
         this.metadata.setMetadata(18, (byte) (this.screaming ? 1 : 0));
@@ -23,6 +25,8 @@ public class Enderman extends LivingEntity {
 
     public Enderman(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 40;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ShortTag carried = tag.get("carried");
         ShortTag carriedData = tag.get("carriedData");
         this.blockType = Material.fromData(carried == null ? 0 : carried.getValue(), carriedData == null ? 0 : carriedData.getValue());

@@ -13,7 +13,7 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class DroppedItem extends Entity {
-    private short age = 0, health = 1, pickupDelay = 0;
+    private short age = 0, health = 5, pickupDelay = 0;
     private String owner = "", thrower = "";
     private ItemStack i;
 

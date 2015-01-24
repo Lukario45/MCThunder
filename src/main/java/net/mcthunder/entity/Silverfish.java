@@ -11,10 +11,14 @@ public class Silverfish extends LivingEntity {
     public Silverfish(Location location) {
         super(location);
         this.type = EntityType.SILVERFISH;
+        this.maxHealth = 8;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Silverfish(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 8;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Packet getPacket() {

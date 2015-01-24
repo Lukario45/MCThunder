@@ -14,11 +14,15 @@ public class IronGolem extends LivingEntity {
     public IronGolem(Location location) {
         super(location);
         this.type = EntityType.IRON_GOLEM;
+        this.maxHealth = 100;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(16, (byte) (this.playerCreated ? 1 : 0));
     }
 
     public IronGolem(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 100;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ByteTag playerCreated = tag.get("PlayerCreated");//1 true, 0 false
         this.metadata.setMetadata(16, (byte) ((this.playerCreated = playerCreated != null && playerCreated.getValue() == (byte) 1) ? 1 : 0));
     }

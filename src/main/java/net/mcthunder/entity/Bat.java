@@ -14,11 +14,15 @@ public class Bat extends LivingEntity {
     public Bat(Location location) {
         super(location);
         this.type = EntityType.BAT;
+        this.maxHealth = 6;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(16, (byte) (this.hanging ? 1 : 0));
     }
 
     public Bat(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 6;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ByteTag batFlags = tag.get("BatFlags");//1 hanging, 0 flying
         this.metadata.setMetadata(16, (byte) ((this.hanging = batFlags != null && batFlags.getValue() == (byte) 1) ? 1 : 0));
     }

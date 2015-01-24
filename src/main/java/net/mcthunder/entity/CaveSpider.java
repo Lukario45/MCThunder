@@ -11,10 +11,14 @@ public class CaveSpider extends Spider {
     public CaveSpider(Location location) {
         super(location);
         this.type = EntityType.CAVESPIDER;
+        this.maxHealth = 12;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public CaveSpider(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 12;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Packet getPacket() {

@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
-public abstract class LivingEntity extends Entity {//TODO: set default max healths for each living entity type
+public abstract class LivingEntity extends Entity {
     protected HashMap<PotionEffectType, PotionEffect> activeEffects = new HashMap<>();
     private ArrayList<Modifier> modifiers = new ArrayList<>();
     private boolean alwaysShowName = false, hasAI = true;
@@ -25,10 +25,8 @@ public abstract class LivingEntity extends Entity {//TODO: set default max healt
 
     protected LivingEntity(Location location) {
         super(location);
-        this.maxHealth = 20;
         this.metadata.setMetadata(2, this.customName);
         this.metadata.setMetadata(3, (byte) (this.alwaysShowName ? 1 : 0));
-        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(7, 0);//No color until a potion is set
         this.metadata.setMetadata(8, (byte) 0);//False until potion effects are set
         this.metadata.setMetadata(9, this.arrows);

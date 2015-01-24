@@ -15,6 +15,8 @@ public class Zombie extends LivingEntity {
     public Zombie(Location location) {
         super(location);
         this.type = EntityType.ZOMBIE;
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(12, (byte) (this.child ? 1 : 0));
         this.metadata.setMetadata(13, (byte) (this.villager ? 1 : 0));
         this.metadata.setMetadata(14, (byte) (this.converting ? 1 : 0));
@@ -22,6 +24,8 @@ public class Zombie extends LivingEntity {
 
     public Zombie(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ByteTag isVillager = tag.get("IsVillager");//1 true, 0 false
         ByteTag isBaby = tag.get("IsBaby");//1 true, 0 false
         IntTag conversionTime = tag.get("ConversionTime");

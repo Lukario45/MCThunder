@@ -7,23 +7,19 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.ShortTag;
 
 public abstract class Projectile extends Entity {
-    private int ownerID;
-    private boolean hasOwner;
+    private boolean hasOwner = false;
+    private int ownerID = 0;
 
     protected Projectile(Location location) {
         super(location);
-        this.ownerID = 0;
-        this.hasOwner = false;
     }
 
     protected Projectile(World w, CompoundTag tag) {
         super(w, tag);
-        this.ownerID = 0;
-        this.hasOwner = false;
         ShortTag xTile = tag.get("xTile");//Is retrieving this needed
         ShortTag yTile = tag.get("yTile");//Is retrieving this needed
         ShortTag zTile = tag.get("zTile");//Is retrieving this needed
-        ByteTag inTile = tag.get("inTile");//1 true, 0 false. Is retrieving this needed
+        ByteTag inTile = tag.get("inTile");
     }
 
     public int getOwnerID() {

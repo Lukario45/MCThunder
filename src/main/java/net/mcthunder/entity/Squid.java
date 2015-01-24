@@ -11,10 +11,14 @@ public class Squid extends LivingEntity {
     public Squid(Location location) {
         super(location);
         this.type = EntityType.SQUID;
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Squid(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Packet getPacket() {

@@ -3,6 +3,7 @@ package net.mcthunder.entity;
 import net.mcthunder.api.Location;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
+import org.spacehq.mc.protocol.data.game.values.entity.ProjectileData;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -30,7 +31,7 @@ public class ThrownEnderPearl extends Projectile {
 
     @Override
     public Packet getPacket() {
-        return new ServerSpawnObjectPacket(this.entityID, ObjectType.ENDER_PEARL, this.location.getX(), this.location.getY(), this.location.getZ(),
+        return new ServerSpawnObjectPacket(this.entityID, ObjectType.ENDER_PEARL, new ProjectileData(getOwnerID()), this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
     }
 

@@ -13,11 +13,15 @@ public class Witch extends LivingEntity {
     public Witch(Location location) {
         super(location);
         this.type = EntityType.WITCH;
+        this.maxHealth = 26;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(21, (byte) (this.aggressive ? 1 : 0));
     }
 
     public Witch(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 26;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(21, (byte) (this.aggressive ? 1 : 0));
     }
 

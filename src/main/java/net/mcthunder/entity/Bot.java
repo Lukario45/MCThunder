@@ -38,6 +38,8 @@ public abstract class Bot extends LivingEntity {
             this.skinUUID = this.uuid;
         this.botProfile = new GameProfile(this.uuid, uncoloredName.length() > 16 ? uncoloredName.substring(0, 16) : uncoloredName);
         setSkin(this.skinUUID);
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(10, this.skinFlags);
         this.metadata.setBit(16, 0x02, this.hideCape);
         this.metadata.setMetadata(17, (float) (this.activeEffects.containsKey(PotionEffectType.ABSORPTION) ? this.activeEffects.get(PotionEffectType.ABSORPTION).getAmplifier() : 0));

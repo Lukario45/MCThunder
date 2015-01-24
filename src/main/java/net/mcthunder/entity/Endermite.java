@@ -16,10 +16,14 @@ public class Endermite extends Silverfish {
     public Endermite(Location location) {
         super(location);
         this.type = EntityType.ENDERMITE;
+        this.maxHealth = 8;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Endermite(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 8;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         IntTag lifeTime = tag.get("Lifetime");
         ByteTag playerSpawned = tag.get("PlayerSpawned");
         if (lifeTime != null)

@@ -16,11 +16,15 @@ public class Villager extends Ageable {//TODO: Add a villager inventory with it 
     public Villager(Location location) {
         super(location);
         this.type = EntityType.VILLAGER;
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(16, this.villagerType);
     }
 
     public Villager(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         IntTag profession = tag.get("Profession");
         IntTag riches = tag.get("Riches");
         IntTag career = tag.get("Career");

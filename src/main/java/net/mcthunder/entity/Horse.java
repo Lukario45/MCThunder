@@ -11,17 +11,21 @@ import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.packetlib.packet.Packet;
 
+import java.util.Random;
 import java.util.UUID;
 
 public class Horse extends Ageable {
-    private boolean isTame = false, hasSaddle = false, hasChest = false, isBred = false, isEating = false, isRearing = false, mouthOpen = false;
-    private int color = HorseColor.WHITE, style = HorseStyle.NONE, armorType = ArmorType.NONE;
+    private boolean isTame = false, hasSaddle = false, hasChest = false, isBred = false, isEating = false, isRearing = false, mouthOpen = false,
+            hasReproduced = false;
+    private int color = HorseColor.WHITE, style = HorseStyle.NONE, armorType = ArmorType.NONE, temper = 0;
     private HorseType horseType = HorseType.HORSE;
     private String ownerName = "";
 
     public Horse(Location location) {
         super(location);
         this.type = EntityType.HORSE;
+        this.maxHealth = new Random().nextInt(16) + 15;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.TAME, this.isTame);
         this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.SADDLE, this.hasSaddle);
         this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.CHEST, this.hasChest);
@@ -37,6 +41,8 @@ public class Horse extends Ageable {
 
     public Horse(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = new Random().nextInt(16) + 15;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ByteTag bred = tag.get("Bred");
         ByteTag chestedHorse = tag.get("ChestedHorse");//1 true, 0 false
         ByteTag eatingHaystack = tag.get("EatingHaystack");//1 true, 0 false
@@ -51,6 +57,9 @@ public class Horse extends Ageable {
         CompoundTag armorItem = tag.get("ArmorItem");
         CompoundTag saddleItem = tag.get("SaddleItem");
         ByteTag saddle = tag.get("Saddle");//1 true, 0 false
+        this.hasReproduced = hasReproduced != null && hasReproduced.getValue() == (byte) 1;
+        if (temper != null)
+            this.temper = temper.getValue();
         this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.TAME, this.isTame = tame != null && tame.getValue() == (byte) 1);
         this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.SADDLE, this.hasSaddle = saddle != null && saddle.getValue() == (byte) 1);
         this.metadata.setBitOfInt(MetadataConstants.HORSE, MetadataConstants.HorseFlags.CHEST, this.hasChest = chestedHorse != null && chestedHorse.getValue() == (byte) 1);
@@ -76,6 +85,14 @@ public class Horse extends Ageable {
     @Override
     public void ai() {
 
+    }
+
+    public void setHasReproduced(boolean hasReproduced) {
+        this.hasReproduced = hasReproduced;
+    }
+
+    public boolean hasReproduced() {
+        return this.hasReproduced;
     }
 
     public void setTame(boolean isTame) {
@@ -157,6 +174,14 @@ public class Horse extends Ageable {
 
     public int getColor() {
         return this.color;
+    }
+
+    public void setTemper(int temper) {
+        this.temper = temper;
+    }
+
+    public int getTemper() {
+        return this.temper;
     }
 
     public void setStyle(int style) {

@@ -11,10 +11,14 @@ public class Mooshroom extends Cow {
     public Mooshroom(Location location) {
         super(location);
         this.type = EntityType.MOOSHROOM;
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Mooshroom(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Packet getPacket() {

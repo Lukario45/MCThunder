@@ -16,10 +16,14 @@ public class Chicken extends Ageable {
     public Chicken(Location location) {
         super(location);
         this.type = EntityType.CHICKEN;
+        this.maxHealth = 4;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Chicken(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 4;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ByteTag isChickenJockey = tag.get("IsChickenJockey");//1 true, 0 false
         IntTag eggLayTime = tag.get("EggLayTime");
         this.chickenJockey = isChickenJockey != null && isChickenJockey.getValue() == (byte) 1;

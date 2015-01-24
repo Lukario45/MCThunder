@@ -14,10 +14,14 @@ public class ZombiePigman extends Zombie {
     public ZombiePigman(Location location) {
         super(location);
         this.type = EntityType.ZOMBIE_PIGMAN;
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public ZombiePigman(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ShortTag anger = tag.get("Anger");
         if (anger != null)
             this.anger = anger.getValue();

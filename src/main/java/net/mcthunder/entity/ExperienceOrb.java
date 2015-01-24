@@ -8,7 +8,7 @@ import org.spacehq.opennbt.tag.builtin.ShortTag;
 import org.spacehq.packetlib.packet.Packet;
 
 public class ExperienceOrb extends Entity {
-    private short age = 0, value = 1, health = 1;
+    private short age = 0, value = 1, health = 5;
 
     public ExperienceOrb(Location location) {
         super(location);

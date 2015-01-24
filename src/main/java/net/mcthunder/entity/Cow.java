@@ -11,10 +11,14 @@ public class Cow extends Ageable {
     public Cow(Location location) {
         super(location);
         this.type = EntityType.COW;
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Cow(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Packet getPacket() {

@@ -16,6 +16,8 @@ public class Wolf extends Tameable {
     public Wolf(Location location) {
         super(location);
         this.type = EntityType.WOLF;
+        this.maxHealth = isTame() ? 20 : 8;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setBit(16, 0x02, this.angry);
         this.metadata.setMetadata(18, this.health);
         this.metadata.setMetadata(19, (byte) (this.begging ? 1 : 0));
@@ -24,6 +26,8 @@ public class Wolf extends Tameable {
 
     public Wolf(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = isTame() ? 20 : 8;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ByteTag angry = tag.get("Angry");//1 true, 0 false
         ByteTag collarColor = tag.get("CollarColor");
         this.metadata.setBit(16, 0x02, this.angry = angry != null && angry.getValue() == (byte) 1);

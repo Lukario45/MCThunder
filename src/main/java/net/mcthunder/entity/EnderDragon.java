@@ -10,11 +10,15 @@ import org.spacehq.packetlib.packet.Packet;
 public class EnderDragon extends LivingEntity {
     public EnderDragon(Location location) {
         super(location);
+        this.maxHealth = 200;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.type = EntityType.ENDER_DRAGON;
     }
 
     public EnderDragon(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 200;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Packet getPacket() {

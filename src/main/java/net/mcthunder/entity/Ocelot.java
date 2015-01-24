@@ -14,11 +14,15 @@ public class Ocelot extends Tameable {
     public Ocelot(Location location) {
         super(location);
         this.type = EntityType.OCELOT;
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(18, (byte) this.catType);
     }
 
     public Ocelot(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         IntTag catType = tag.get("CatType");
         if (catType != null)
             this.catType = catType.getValue();

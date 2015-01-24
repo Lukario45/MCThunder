@@ -20,6 +20,8 @@ public class Slime extends LivingEntity {
         this.type = EntityType.SLIME;
         this.wasOnGround = !this.onGround;
         this.metadata.setMetadata(16, this.size = (byte) (new Random().nextInt(4) + 1));
+        this.maxHealth = this.size^2;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Slime(World w, CompoundTag tag) {
@@ -28,6 +30,8 @@ public class Slime extends LivingEntity {
         ByteTag wasOnGround = tag.get("wasOnGround");//1 true, 0 false
         this.wasOnGround = wasOnGround == null ? !this.onGround : wasOnGround.getValue() == (byte) 1;
         this.metadata.setMetadata(16, this.size = (byte) (size == null ? 1 : size.getValue()));
+        this.maxHealth = this.size^2;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
     }
 
     public Packet getPacket() {

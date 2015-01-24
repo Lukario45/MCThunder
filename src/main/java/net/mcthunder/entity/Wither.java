@@ -14,6 +14,8 @@ public class Wither extends LivingEntity {
     public Wither(Location location) {
         super(location);
         this.type = EntityType.WITHER;
+        this.maxHealth = 300;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(17, this.watched1);
         this.metadata.setMetadata(18, this.watched2);
         this.metadata.setMetadata(19, this.watched3);
@@ -22,6 +24,8 @@ public class Wither extends LivingEntity {
 
     public Wither(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 300;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         IntTag invul = tag.get("Invul");
         this.metadata.setMetadata(17, this.watched1);
         this.metadata.setMetadata(18, this.watched2);

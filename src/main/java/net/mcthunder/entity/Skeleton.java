@@ -14,11 +14,15 @@ public class Skeleton extends LivingEntity {
     public Skeleton(Location location) {
         super(location);
         this.type = EntityType.SKELETON;
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(13, this.skeletonType);
     }
 
     public Skeleton(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ByteTag skeletonType = tag.get("SkeletonType");
         if (skeletonType != null)
             this.skeletonType = skeletonType.getValue();

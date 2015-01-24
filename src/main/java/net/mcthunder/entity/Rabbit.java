@@ -14,11 +14,15 @@ public class Rabbit extends Ageable {
     public Rabbit(Location location) {
         super(location);
         this.type = EntityType.RABBIT;
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(18, (byte) this.rabbitType);
     }
 
     public Rabbit(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         IntTag rabbitType = tag.get("RabbitType");
         IntTag moreCarrotTicks = tag.get("MoreCarrotTicks");
         if (moreCarrotTicks != null)

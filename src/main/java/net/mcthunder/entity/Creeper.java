@@ -16,12 +16,16 @@ public class Creeper extends LivingEntity {
     public Creeper(Location location) {
         super(location);
         this.type = EntityType.CREEPER;
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(16, this.fuse);
         this.metadata.setMetadata(17, (byte) (this.powered ? 1 : 0));
     }
 
     public Creeper(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 20;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         ByteTag powered = tag.get("powered");//1 true, 0 false
         ByteTag explosionRadius = tag.get("ExplosionRadius");
         if (explosionRadius != null)

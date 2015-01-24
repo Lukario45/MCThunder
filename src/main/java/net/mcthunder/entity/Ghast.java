@@ -15,11 +15,15 @@ public class Ghast extends LivingEntity {
     public Ghast(Location location) {
         super(location);
         this.type = EntityType.GHAST;
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         this.metadata.setMetadata(16, (byte) (this.attacking ? 1 : 0));
     }
 
     public Ghast(World w, CompoundTag tag) {
         super(w, tag);
+        this.maxHealth = 10;
+        this.metadata.setMetadata(6, this.health = this.maxHealth);
         IntTag explosionPower = tag.get("ExplosionPower");
         if (explosionPower != null)
             this.explosionPower = explosionPower.getValue();
