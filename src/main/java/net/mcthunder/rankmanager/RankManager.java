@@ -32,10 +32,12 @@ public class RankManager {
         makeDir("RankManager");
         ranks = new NBTFile(new File("RankManager/ranks.dat"), "Ranks");
         try {
-            ranks.createFile();
-            rank.newRank("Default", 1);
-            rank.newRank("Moderator", 5000);
-            rank.newRank("Owner", 9999);
+            if (ranks.getNbtFile().exists()) {
+                ranks.createFile();
+                rank.newRank("Default", 1,true);
+                rank.newRank("Moderator", 5000,false);
+                rank.newRank("Owner", 9999,false);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
