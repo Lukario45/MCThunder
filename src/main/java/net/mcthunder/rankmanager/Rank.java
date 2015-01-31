@@ -1,10 +1,13 @@
 package net.mcthunder.rankmanager;
 
 import com.Lukario45.NBTFile.NBTFile;
+import com.Lukario45.NBTFile.Utilities;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.opennbt.tag.builtin.Tag;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,17 +18,15 @@ public class Rank {
 
     public void newRank(String name, int points) {
         RankManager rm = new RankManager();
-        NBTFile rankFile = rm.getRanks();
-        Map<String, Tag> compoundTaghashMap = new HashMap<>();
-        IntTag level = new IntTag("CommandLevel", points);
-        compoundTaghashMap.put(level.getName(), level);
-        CompoundTag c = new CompoundTag(name, compoundTaghashMap);
-        //  try {
-        //NBTIO.writeFile(c,rankFile,false);
-        // } catch (IOException e) {
+        NBTFile rankFile = new NBTFile(new File("RankManager/ranks.dat"), "Ranks");
+        CompoundTag compoundTag = new CompoundTag(name);
+        compoundTag.put(Utilities.makeIntTag("CommandLevel", points));
+        try {
 
-        //  }
-
+            rankFile.write(compoundTag);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void getRanks() {

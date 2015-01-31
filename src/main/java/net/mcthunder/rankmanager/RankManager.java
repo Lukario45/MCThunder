@@ -24,23 +24,24 @@ public class RankManager {
     private PlayerLoggingInEventSource loggingInEventSource;
 
     public void load() {
-        this.loggingInEventSource = new PlayerLoggingInEventSource();
-        this.loginEventListener = new RankManagerLoggingInEventListener();
+        loggingInEventSource = new PlayerLoggingInEventSource();
+        loginEventListener = new RankManagerLoggingInEventListener();
         MCThunder.addLoginEventListener(this.loginEventListener);
         Rank rank = new Rank();
         tellConsole(LoggingLevel.INFO, "Loading Rank Manager");
         makeDir("RankManager");
-        this.ranks = new NBTFile(new File("RankManager/ranks.dat"), "Ranks");
+        ranks = new NBTFile(new File("RankManager/ranks.dat"), "Ranks");
         try {
-            this.ranks.createFile();
+            ranks.createFile();
             rank.newRank("Default", 1);
             rank.newRank("Moderator", 5000);
             rank.newRank("Owner", 9999);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.config = new Config();
-        this.config.loadConfig();
+
+        config = new Config();
+        config.loadConfig();
 
     }
 
@@ -49,7 +50,7 @@ public class RankManager {
     }
 
     public NBTFile getRanks() {
-        return this.ranks;
+        return ranks;
     }
 
     public void deny(Player player, Command command) {
