@@ -126,7 +126,8 @@ public class ArmorStand extends Entity {
 
     @Override
     public Packet getPacket() {
-        return null;
+        return null;//new ServerSpawnObjectPacket(this.entityID, ObjectType.ARMOR_STAND, this.location.getX(), this.location.getY(), this.location.getZ(),
+                //this.location.getYaw(), this.location.getPitch());
     }
 
     public void setSmall(boolean small) {

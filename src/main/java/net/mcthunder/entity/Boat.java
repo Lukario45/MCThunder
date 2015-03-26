@@ -14,7 +14,6 @@ public class Boat extends Entity {
     public Boat(Location location) {
         super(location);
         this.type = EntityType.BOAT;
-
         this.metadata.setMetadata(17, this.timeSinceHit);
         this.metadata.setMetadata(18, this.forwardDirection);
         this.metadata.setMetadata(19, this.damageTaken);

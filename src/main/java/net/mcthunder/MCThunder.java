@@ -142,8 +142,8 @@ public class MCThunder {
         loggingInEventSource.addEventListener(loggingInEventListener);
         metadataChangeEventSource.addEventListener(metadataChangeEventListener);
         if (conf.getUseRankManager()) {
-           RankManager rankManager = new RankManager();
-           rankManager.load();
+            RankManager rankManager = new RankManager();
+            rankManager.load();
         }
 
         players = new HashMap<>(conf.getSlots());
