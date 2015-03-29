@@ -19,6 +19,7 @@ import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerRespawnPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityPositionPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
@@ -328,15 +329,15 @@ public final class Player extends LivingEntity {
     public void refreshColumn(Column c) {
         sendPacket(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
         for (Player player1 : MCThunder.getPlayers())
-            if (player1.getWorld().equals(getWorld()) && isColumnLoaded(player1.getChunk()) && !player1.getUniqueID().equals(getUniqueID()))
+            if (player1.getWorld().equals(getWorld()) && c.getLong() == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
                 for (Packet packet : player1.getPackets())
                     sendPacket(packet);
         for (Bot b : MCThunder.getBots())
-            if (b.getWorld().equals(getWorld()) && isColumnLoaded(b.getChunk()))
+            if (b.getWorld().equals(getWorld()) && c.getLong() == b.getChunk())
                 for (Packet p : b.getPackets())
                     sendPacket(p);
         for (Entity e : getWorld().getEntities())
-            if (isColumnLoaded(e.getChunk()))
+            if (c.getLong() == e.getChunk())
                 for (Packet packet : e.getPackets())
                     sendPacket(packet);
     }

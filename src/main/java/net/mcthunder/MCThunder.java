@@ -118,7 +118,7 @@ public class MCThunder {
             Reflections reflections = new Reflections(path);
             Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
             for (Class c : subTypes)
-                if (CommandRegistry.getCommand(c.getSimpleName(), path + ".") != null)
+                if (CommandRegistry.loadCommand(c.getSimpleName(), path + ".") != null)
                     commands++;
         }
         tellConsole(LoggingLevel.INFO, commands + " command" + (commands != 1 ? "s " : "") + "were loaded.");
