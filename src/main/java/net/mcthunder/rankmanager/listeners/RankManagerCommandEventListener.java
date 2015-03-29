@@ -4,9 +4,12 @@ import com.Lukario45.NBTFile.Utilities;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.CommandRegistry;
+import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.entity.Player;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
+
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/13/2014.
@@ -31,6 +34,9 @@ public class RankManagerCommandEventListener implements net.mcthunder.interfaces
         if (MCThunder.getRankManager().getCommandLevelFromRank(playerRank) >= cmd.getRankPoints()){
             if (!cmd.execute(player, packet.getMessage().contains(" ") ? packet.getMessage().trim().substring(packet.getMessage().trim().indexOf(" ")).trim().split(" ") : new String[0]))
                 player.sendMessage("&4" + cmd.getArguments());
+            StringBuilder sb = new StringBuilder();
+
+            tellConsole(LoggingLevel.COMMAND, "Player " + player.getDisplayName() + " " + packet.getMessage());
         } else
             MCThunder.getRankManager().deny(player, cmd);
         //commandHandler.handlePlayerCommand(player, packet);
