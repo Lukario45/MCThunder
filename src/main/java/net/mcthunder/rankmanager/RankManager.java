@@ -7,6 +7,7 @@ import net.mcthunder.api.Command;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.entity.Player;
 import net.mcthunder.events.source.PlayerLoggingInEventSource;
+import net.mcthunder.rankmanager.listeners.RankManagerCommandEventListener;
 import net.mcthunder.rankmanager.listeners.RankManagerLoggingInEventListener;
 
 import java.io.File;
@@ -21,13 +22,11 @@ import static net.mcthunder.api.Utils.tellConsole;
 public class RankManager {
     private Config config;
     private NBTFile ranks;
-    private RankManagerLoggingInEventListener loginEventListener;
-    private PlayerLoggingInEventSource loggingInEventSource;
 
     public void load() {
-        loggingInEventSource = new PlayerLoggingInEventSource();
-        loginEventListener = new RankManagerLoggingInEventListener();
-        MCThunder.addLoginEventListener(this.loginEventListener);
+        MCThunder.addLoginEventListener(new RankManagerLoggingInEventListener());
+        MCThunder.addCommandEventListener(new RankManagerCommandEventListener());
+
         Rank rank = new Rank();
         tellConsole(LoggingLevel.INFO, "Loading Rank Manager");
         makeDir("RankManager");

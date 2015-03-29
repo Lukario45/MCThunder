@@ -621,6 +621,9 @@ public class MCThunder {
     public static void addLoginEventListener(net.mcthunder.interfaces.PlayerLoggingInEventListener listener) {
         loggingInEventSource.addEventListener(listener);
     }
+    public static void addCommandEventListener(net.mcthunder.interfaces.PlayerCommandEventListener listener){
+        playerCommandEventSource.addEventListener(listener);
+    }
 
     public static PlayerProfileHandler getProfileHandler() {
         return playerProfileHandler;
