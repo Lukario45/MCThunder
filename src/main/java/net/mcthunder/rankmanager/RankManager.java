@@ -15,6 +15,7 @@ import org.spacehq.opennbt.tag.builtin.Tag;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import static net.mcthunder.api.Utils.makeDir;
 import static net.mcthunder.api.Utils.tellConsole;
@@ -63,6 +64,11 @@ public class RankManager {
         config = new Config();
         config.loadConfig();
 
+    }
+    public void setPlayerRank(Player p, String rank){
+        Map<String, Tag> tagMap = new HashMap<String,Tag>();
+        tagMap.put("RankName",Utilities.makeStringTag("RankName", rank));
+        MCThunder.getProfileHandler().changeAttribute(p,new CompoundTag("RankManager",tagMap));
     }
 
     public Config getConfig() {
