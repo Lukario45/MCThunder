@@ -85,6 +85,7 @@ public class MCThunder {
     private static PlayerCommandEventSource playerCommandEventSource;
     private static PlayerLoggingInEventSource loggingInEventSource;
     private static MetadataChangeEventSource metadataChangeEventSource;
+    private static RankManager rankManager;
 
     public static void main(String args[]) {
         AnsiConsole.systemInstall();
@@ -142,7 +143,7 @@ public class MCThunder {
         loggingInEventSource.addEventListener(loggingInEventListener);
         metadataChangeEventSource.addEventListener(metadataChangeEventListener);
         if (conf.getUseRankManager()) {
-            RankManager rankManager = new RankManager();
+           rankManager = new RankManager();
             rankManager.load();
         }
 
@@ -614,6 +615,8 @@ public class MCThunder {
     public static Config getConfig() {
         return conf;
     }
+
+    public static RankManager getRankManager(){return rankManager;}
 
     public static void addLoginEventListener(net.mcthunder.interfaces.PlayerLoggingInEventListener listener) {
         loggingInEventSource.addEventListener(listener);

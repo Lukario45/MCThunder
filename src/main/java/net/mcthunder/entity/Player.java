@@ -48,7 +48,7 @@ public final class Player extends LivingEntity {
     private int viewDistance = 9, slot = 36, ping, score = 0, hunger = 20;
     private Inventory openInventory = null, inv, enderchest;
     private boolean moveable = false, hideCape = false;
-    private GameMode gamemode = GameMode.SURVIVAL;
+    private GameMode gamemode = GameMode.CREATIVE;
     private String displayName, appended = "";
     private Location bedSpawn = null;
     private byte skinFlags = 127;

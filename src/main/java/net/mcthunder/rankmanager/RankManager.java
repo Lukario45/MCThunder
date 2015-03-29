@@ -1,6 +1,7 @@
 package net.mcthunder.rankmanager;
 
 import com.Lukario45.NBTFile.NBTFile;
+import com.Lukario45.NBTFile.Utilities;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.LoggingLevel;
@@ -30,13 +31,15 @@ public class RankManager {
         Rank rank = new Rank();
         tellConsole(LoggingLevel.INFO, "Loading Rank Manager");
         makeDir("RankManager");
-        ranks = new NBTFile(new File("RankManager/ranks.dat"), "Ranks");
+
+        this.ranks = new NBTFile(new File("RankManager/ranks.dat"), "Ranks");
         try {
-            if (ranks.getNbtFile().exists()) {
+            if (!ranks.getNbtFile().exists()) {
                 ranks.createFile();
-                rank.newRank("Default", 1,true);
-                rank.newRank("Moderator", 5000,false);
-                rank.newRank("Owner", 9999,false);
+                ranks.write(Utilities.makeStringTag("DefaultRank", "Default"));
+                rank.newRank("Default", 1);
+                rank.newRank("Moderator", 5000);
+                rank.newRank("Owner", 9999);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -52,7 +55,16 @@ public class RankManager {
     }
 
     public NBTFile getRanks() {
-        return ranks;
+        return this.ranks;
+    }
+
+    public String getDefaultRank(){
+        try {
+            return ranks.read("DefaultRank").getValue().toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void deny(Player player, Command command) {
