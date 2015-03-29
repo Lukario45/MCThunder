@@ -25,7 +25,7 @@ public class SetRank extends Command {
 
                 Player p = MCThunder.getPlayer(args[0]);
                 if (((CompoundTag) MCThunder.getProfileHandler().getAttribute(p, "RankManager")).get("RankName").getValue().toString().equalsIgnoreCase(args[1])) {
-                    player.sendMessage("&cYou cannot change a player to a rank they already are at!");
+                    player.sendMessage("&cPlayer is already at that rank!");
                     return true;
                 } else if (!MCThunder.getRankManager().getRankHashMap().containsKey(args[1])) {
                     p.sendMessage("&cRank does not exist!");
@@ -38,7 +38,7 @@ public class SetRank extends Command {
                 }
             }
         } catch (NullPointerException e){
-            player.sendMessage("&cThat Player does not exist!");
+            player.sendMessage("&cThat Player is not online!");
             return true;
         }
 
