@@ -26,12 +26,13 @@ public class RankManager {
     private Config config;
     private NBTFile ranks;
     private HashMap<String, Integer> rankHashmap;
+    private Rank rank;
 
     public void load() {
         MCThunder.addLoginEventListener(new RankManagerLoggingInEventListener());
         MCThunder.addCommandEventListener(new RankManagerCommandEventListener());
         rankHashmap = new HashMap<>();
-        Rank rank = new Rank();
+        rank = new Rank();
         tellConsole(LoggingLevel.INFO, "Loading Rank Manager");
         makeDir("RankManager");
 
@@ -54,6 +55,7 @@ public class RankManager {
 
                 }
             }
+            tellConsole(LoggingLevel.INFO,"Loaded " + rankHashmap.size() + " Rank(s)");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -70,6 +72,8 @@ public class RankManager {
     public NBTFile getRanks() {
         return this.ranks;
     }
+
+    public Rank getRank() {return this.rank;}
 
     public int getCommandLevelFromRank(String rank){
         return rankHashmap.get(rank);

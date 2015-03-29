@@ -58,7 +58,7 @@ public class Help extends Command {//Ported by pup from Necessities
             player.sendMessage("&cError: Input a number from 1 to " + Integer.toString(totalpages));
             return true;
         }
-        player.sendMessage("&e---- &3Help" + (search.equals("") ? "" : ": " + search) + " &e-- &3Page&4 " + Integer.toString(page) + "&3/&4" + Integer.toString(totalpages) + " &e----");
+        player.sendMessage("&e-- &3RankManager's Help Board" + (search.equals("") ? "" : ": " + search) + " &e-- &3Page&4 " + Integer.toString(page) + "&3/&4" + Integer.toString(totalpages) + " &e--");
         page -= 1;
         String message = getHelp(page, time, helpList);
         while (message != null) {
