@@ -2,10 +2,9 @@ package net.mcthunder.rankmanager.commands;
 
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
-import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.entity.Player;
 
-import static net.mcthunder.api.Utils.tellConsole;
+
 
 /**
  * Created by conno_000 on 3/29/2015.
@@ -22,12 +21,20 @@ public class NewRank extends Command {
             return false;
         } else {
             try {
-                MCThunder.getRankManager().getRank().newRank(args[0] ,Integer.parseInt(args[1]));
+                if (MCThunder.getRankManager().getRankHashMap().containsKey(args[0])) {
+                   player.sendMessage("&cRank &a'" + args[0] + "' &calready exists!");
+                    return true;
+                } else {
+                    MCThunder.getRankManager().getRank().newRank(args[0], Integer.parseInt(args[1]));
+                    MCThunder.getRankManager().getRankHashMap().put(args[0], Integer.parseInt(args[1]));
+                    player.sendMessage("&aNew rank has successfully been created!");
+                    return true;
+                }
 
-                return true;
+
             } catch (NumberFormatException e){
                 player.sendMessage("&cCommandlevel must be an Integer!");
-                return false;
+                return true;
             }
 
 

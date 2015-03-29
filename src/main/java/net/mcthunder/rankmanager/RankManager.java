@@ -73,6 +73,8 @@ public class RankManager {
         return this.ranks;
     }
 
+    public HashMap getRankHashMap() {return this.rankHashmap;}
+
     public Rank getRank() {return this.rank;}
 
     public int getCommandLevelFromRank(String rank){
