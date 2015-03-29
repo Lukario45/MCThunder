@@ -27,7 +27,9 @@ public class CommandRegistry {
         if (commands.containsKey(name.toLowerCase()))
             return commands.get(name.toLowerCase());
         try {
-            commands.put(name.toLowerCase(), (Command) Command.class.getClassLoader().loadClass(pkg + StringUtils.capitalize(name)).newInstance());
+            //Add a better way to replace to get plugin name or things
+            String header = commands.containsKey(name.toLowerCase()) ? pkg.replaceFirst("net.mcthunder.", "").replace("commands", "") : "";
+            commands.put(header + name.toLowerCase(), (Command) Command.class.getClassLoader().loadClass(pkg + StringUtils.capitalize(name)).newInstance());
             return commands.get(name.toLowerCase());
         } catch (Exception ignored) { }
         for (Command c : commands.values())

@@ -6,7 +6,6 @@ import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.entity.Player;
-import net.mcthunder.events.source.PlayerLoggingInEventSource;
 import net.mcthunder.rankmanager.listeners.RankManagerCommandEventListener;
 import net.mcthunder.rankmanager.listeners.RankManagerLoggingInEventListener;
 import org.spacehq.opennbt.NBTIO;
@@ -15,7 +14,7 @@ import org.spacehq.opennbt.tag.builtin.Tag;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
 
 import static net.mcthunder.api.Utils.makeDir;
 import static net.mcthunder.api.Utils.tellConsole;

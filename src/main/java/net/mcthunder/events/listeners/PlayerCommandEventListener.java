@@ -3,7 +3,6 @@ package net.mcthunder.events.listeners;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.CommandRegistry;
 import net.mcthunder.entity.Player;
-
 import org.apache.commons.lang.StringUtils;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 

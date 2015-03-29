@@ -112,12 +112,15 @@ public class MCThunder {
          * Based of of Alphabot/Lukabot code that was created by zack6849
          */
         Reflections.log = null;
-        Reflections reflections = new Reflections("net.mcthunder.commands");
-        Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
         int commands = 0;
-        for (Class c : subTypes)
-            if (CommandRegistry.getCommand(c.getSimpleName(), "net.mcthunder.commands.") != null)
-                commands++;
+        List<String> paths = Arrays.asList("net.mcthunder.commands", "net.mcthunder.rankmanager.commands");
+        for (String path : paths) {
+            Reflections reflections = new Reflections(path);
+            Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
+            for (Class c : subTypes)
+                if (CommandRegistry.getCommand(c.getSimpleName(), path + ".") != null)
+                    commands++;
+        }
         tellConsole(LoggingLevel.INFO, commands + " command" + (commands != 1 ? "s " : "") + "were loaded.");
         //Done
 

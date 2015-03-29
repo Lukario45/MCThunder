@@ -5,9 +5,7 @@ import com.Lukario45.NBTFile.Utilities;
 import net.mcthunder.MCThunder;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
 /**
  * Created by Kevin on 11/12/2014.
