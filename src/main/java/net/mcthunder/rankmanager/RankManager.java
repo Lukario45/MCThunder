@@ -9,9 +9,13 @@ import net.mcthunder.entity.Player;
 import net.mcthunder.events.source.PlayerLoggingInEventSource;
 import net.mcthunder.rankmanager.listeners.RankManagerCommandEventListener;
 import net.mcthunder.rankmanager.listeners.RankManagerLoggingInEventListener;
+import org.spacehq.opennbt.NBTIO;
+import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.Tag;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
 
 import static net.mcthunder.api.Utils.makeDir;
 import static net.mcthunder.api.Utils.tellConsole;
@@ -22,11 +26,12 @@ import static net.mcthunder.api.Utils.tellConsole;
 public class RankManager {
     private Config config;
     private NBTFile ranks;
+    private HashMap<String, Integer> rankHashmap;
 
     public void load() {
         MCThunder.addLoginEventListener(new RankManagerLoggingInEventListener());
         MCThunder.addCommandEventListener(new RankManagerCommandEventListener());
-
+        rankHashmap = new HashMap<>();
         Rank rank = new Rank();
         tellConsole(LoggingLevel.INFO, "Loading Rank Manager");
         makeDir("RankManager");
@@ -39,6 +44,16 @@ public class RankManager {
                 rank.newRank("Default", 1);
                 rank.newRank("Moderator", 5000);
                 rank.newRank("Owner", 9999);
+            }
+            for (Tag t : NBTIO.readFile(ranks.getNbtFile(), false)){
+                if (t.getName().equalsIgnoreCase("DefaultRank")){
+
+
+                } else {
+                    rankHashmap.put(t.getName(),  Integer.parseInt(Utilities.getFromCompound((CompoundTag) t,"CommandLevel").getValue().toString()));
+
+
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -55,6 +70,10 @@ public class RankManager {
 
     public NBTFile getRanks() {
         return this.ranks;
+    }
+
+    public int getCommandLevelFromRank(String rank){
+        return rankHashmap.get(rank);
     }
 
     public String getDefaultRank(){

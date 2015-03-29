@@ -24,6 +24,7 @@ public class PlayerCommandEventListener implements net.mcthunder.interfaces.Play
         try {
             String command = StringUtils.lowerCase(packet.getMessage().split(" ")[0].split("/")[1]);
             Command cmd = CommandRegistry.getCommand(command, "net.mcthunder.commands.");
+
             if (!cmd.execute(player, packet.getMessage().contains(" ") ? packet.getMessage().trim().substring(packet.getMessage().trim().indexOf(" ")).trim().split(" ") : new String[0]))
                 player.sendMessage("&4" + cmd.getArguments());
         } catch (NullPointerException e) {

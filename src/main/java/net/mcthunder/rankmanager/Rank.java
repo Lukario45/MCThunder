@@ -7,11 +7,13 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * Created by Kevin on 11/12/2014.
  */
 public class Rank {
+
     public void newRank(String name, int points) {
         RankManager rm = MCThunder.getRankManager();
         NBTFile rankFile = rm.getRanks();
