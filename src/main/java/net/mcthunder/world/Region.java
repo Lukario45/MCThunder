@@ -95,7 +95,7 @@ public class Region {
                                 for (int cZ = 0; cZ < 16; cZ++) { //Loop through z
                                     int index = 256*cY + 16*cZ + cX;
                                     int id = chunks[i].getBlocks().getBlock(cX, cY, cZ);//TODO: Use add where needed
-                                    if (id > 128)
+                                    if (id >= 128)
                                         id -= 256;
                                     blocks.setValue(index, Byte.parseByte(id + ""));
                                     if(index%2 == 0)
