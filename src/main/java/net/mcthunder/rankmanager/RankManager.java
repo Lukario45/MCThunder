@@ -27,12 +27,14 @@ public class RankManager {
     private Config config;
     private NBTFile ranks;
     private HashMap<String, Integer> rankHashmap;
+    private HashMap<Integer, String> reverseRankHashMap;
     private Rank rank;
 
     public void load() {
         MCThunder.addLoginEventListener(new RankManagerLoggingInEventListener());
         MCThunder.addCommandEventListener(new RankManagerCommandEventListener());
         rankHashmap = new HashMap<>();
+        reverseRankHashMap = new HashMap<>();
         rank = new Rank();
         tellConsole(LoggingLevel.INFO, "Loading Rank Manager");
         makeDir("RankManager");
@@ -52,6 +54,7 @@ public class RankManager {
 
                 } else {
                     rankHashmap.put(t.getName(),  Integer.parseInt(Utilities.getFromCompound((CompoundTag) t,"CommandLevel").getValue().toString()));
+                    reverseRankHashMap.put(Integer.parseInt(Utilities.getFromCompound((CompoundTag) t,"CommandLevel").getValue().toString()),t.getName());
 
 
                 }
@@ -68,7 +71,7 @@ public class RankManager {
     public void setPlayerRank(Player p, String rank){
         Map<String, Tag> tagMap = new HashMap<String,Tag>();
         tagMap.put("RankName",Utilities.makeStringTag("RankName", rank));
-        MCThunder.getProfileHandler().changeAttribute(p,new CompoundTag("RankManager",tagMap));
+        MCThunder.getProfileHandler().changeAttribute(p, new CompoundTag("RankManager", tagMap));
     }
 
     public Config getConfig() {
@@ -80,6 +83,7 @@ public class RankManager {
     }
 
     public HashMap getRankHashMap() {return this.rankHashmap;}
+    public HashMap getReverseRankHashMap() {return this.reverseRankHashMap;}
 
     public Rank getRank() {return this.rank;}
 

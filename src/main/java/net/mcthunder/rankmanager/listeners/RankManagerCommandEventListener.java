@@ -34,7 +34,7 @@ public class RankManagerCommandEventListener implements net.mcthunder.interfaces
         if (MCThunder.getRankManager().getCommandLevelFromRank(playerRank) >= cmd.getRankPoints()){
             if (!cmd.execute(player, packet.getMessage().contains(" ") ? packet.getMessage().trim().substring(packet.getMessage().trim().indexOf(" ")).trim().split(" ") : new String[0]))
                 player.sendMessage("&4" + cmd.getArguments());
-            StringBuilder sb = new StringBuilder();
+
 
             tellConsole(LoggingLevel.COMMAND, "Player " + player.getDisplayName() + " " + packet.getMessage());
         } else

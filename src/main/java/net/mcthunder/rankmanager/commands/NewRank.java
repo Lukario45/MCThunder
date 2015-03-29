@@ -27,6 +27,7 @@ public class NewRank extends Command {
                 } else {
                     MCThunder.getRankManager().getRank().newRank(args[0], Integer.parseInt(args[1]));
                     MCThunder.getRankManager().getRankHashMap().put(args[0], Integer.parseInt(args[1]));
+                    MCThunder.getRankManager().getReverseRankHashMap().put(Integer.parseInt(args[1]),args[0]);
                     player.sendMessage("&aNew rank has successfully been created!");
                     return true;
                 }
