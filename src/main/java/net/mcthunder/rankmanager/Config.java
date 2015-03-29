@@ -36,6 +36,8 @@ public class Config {
             getConf().save();
             //Set all of the values from the config
             getConf().load();
+            setDenyMessage(getConf().getString("DENY-MESSAGE"));
+            setDenyColor(getConf().getString("DENY-COLOR"));
 
         } catch (ConfigurationException e) {
             Utils.tellConsole(LoggingLevel.ERROR, "Check RankManager's Config File!");
