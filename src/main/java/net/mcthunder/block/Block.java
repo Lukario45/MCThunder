@@ -9,7 +9,8 @@ import net.mcthunder.world.Column;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
-
+import org.spacehq.mc.protocol.data.game.values.world.block.BlockChangeRecord;
+import org.spacehq.mc.protocol.packet.ingame.server.world.ServerBlockChangePacket;
 import static net.mcthunder.api.Utils.getLong;
 
 public class Block {
@@ -118,7 +119,7 @@ public class Block {
         this.loc.getWorld().addColumn(c);
         for (Player p : MCThunder.getPlayers())
             if (p.getWorld().equals(this.loc.getWorld()) && p.isColumnLoaded(getLong(this.columnX, this.columnZ)))
-                p.refreshColumn(c);
+                p.sendPacket(new ServerBlockChangePacket(new BlockChangeRecord(this.loc.getPosition(), this.type.getID() << 4 | this.type.getData())));
         updatePhys();
     }
 
