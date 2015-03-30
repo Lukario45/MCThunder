@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class Seed extends Command {
     public Seed() {
-        super("seed", Arrays.asList(""), "Retrieves the world seed", "/seed", 9999, "command.seed");
+        super("seed", "Retrieves the world seed", "/seed", 9999, "command.seed");
     }
 
     @Override

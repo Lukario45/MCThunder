@@ -8,7 +8,7 @@ import net.mcthunder.entity.Player;
  */
 public class SetCommandPermLevel extends Command {
     public SetCommandPermLevel() {
-        super("SetCommandPermLevel", "Change the Default perm level for any command", "/setcommandpermlevel command level", 9999, "rankmanager.setcmdpermlevel");
+        super("SetCommandPermLevel", "Change the Default perm level for any command", "/setcommandpermlevel <command> <level>", 9999, "rankmanager.setcmdpermlevel");
     }
 
     @Override

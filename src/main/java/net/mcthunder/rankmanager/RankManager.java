@@ -33,41 +33,38 @@ public class RankManager {
     public void load() {
         MCThunder.addLoginEventListener(new RankManagerLoggingInEventListener());
         MCThunder.addCommandEventListener(new RankManagerCommandEventListener());
-        rankHashmap = new HashMap<>();
-        reverseRankHashMap = new HashMap<>();
-        rank = new Rank();
+        this.rankHashmap = new HashMap<>();
+        this.reverseRankHashMap = new HashMap<>();
+        this.rank = new Rank();
         tellConsole(LoggingLevel.INFO, "Loading Rank Manager");
         makeDir("RankManager");
 
         this.ranks = new NBTFile(new File("RankManager/ranks.dat"), "Ranks");
         try {
-            if (!ranks.getNbtFile().exists()) {
-                ranks.createFile();
-                ranks.write(Utilities.makeStringTag("DefaultRank", "Default"));
-                rank.newRank("Default", 1);
-                rank.newRank("Moderator", 5000);
-                rank.newRank("Owner", 9999);
+            if (!this.ranks.getNbtFile().exists()) {
+                this.ranks.createFile();
+                this.ranks.write(Utilities.makeStringTag("DefaultRank", "Default"));
+                this.rank.newRank("Default", 1);
+                this.rank.newRank("Moderator", 5000);
+                this.rank.newRank("Owner", 9999);
             }
-            for (Tag t : NBTIO.readFile(ranks.getNbtFile(), false)){
+            for (Tag t : NBTIO.readFile(this.ranks.getNbtFile(), false)){
                 if (t.getName().equalsIgnoreCase("DefaultRank")){
 
 
                 } else {
-                    rankHashmap.put(t.getName(),  Integer.parseInt(Utilities.getFromCompound((CompoundTag) t,"CommandLevel").getValue().toString()));
-                    reverseRankHashMap.put(Integer.parseInt(Utilities.getFromCompound((CompoundTag) t,"CommandLevel").getValue().toString()),t.getName());
-
-
+                    this.rankHashmap.put(t.getName(),  Integer.parseInt(Utilities.getFromCompound((CompoundTag) t,"CommandLevel").getValue().toString()));
+                    this.reverseRankHashMap.put(Integer.parseInt(Utilities.getFromCompound((CompoundTag) t,"CommandLevel").getValue().toString()),t.getName());
                 }
             }
-            tellConsole(LoggingLevel.INFO,"Loaded " + rankHashmap.size() + " Rank(s)");
+            tellConsole(LoggingLevel.INFO,"Loaded " + this.rankHashmap.size() + " Rank(s)");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        config = new Config();
-        config.loadConfig();
-
+        this.config = new Config();
+        this.config.loadConfig();
     }
+
     public void setPlayerRank(Player p, String rank){
         Map<String, Tag> tagMap = new HashMap<String,Tag>();
         tagMap.put("RankName",Utilities.makeStringTag("RankName", rank));
@@ -93,7 +90,7 @@ public class RankManager {
 
     public String getDefaultRank(){
         try {
-            return ranks.read("DefaultRank").getValue().toString();
+            return this.ranks.read("DefaultRank").getValue().toString();
         } catch (IOException e) {
             e.printStackTrace();
             return null;

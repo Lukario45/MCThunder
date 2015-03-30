@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public class DeleteRank extends Command {
     public DeleteRank() {
-        super("DeleteRank", Arrays.asList("delrank"), "Delete a rank", "/deleterank rank", 9999, "rankmanager.editrank.delete");
+        super("DeleteRank", Arrays.asList("delrank"), "Delete a rank", "/deleterank <rank>", 9999, "rankmanager.editrank.delete");
     }
 
     @Override
