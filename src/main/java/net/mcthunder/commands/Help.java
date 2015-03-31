@@ -10,7 +10,7 @@ import java.util.Collections;
 
 public class Help extends Command {//Ported by pup from Necessities
     public Help() {
-        super("help", Arrays.asList(""), "Shows help messages", "/help <commandname>", 0, "core.help");
+        super("help", "Shows help messages", "/help <commandname>", 0, "command.help");
     }
 
     @Override

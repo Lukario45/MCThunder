@@ -14,7 +14,7 @@ import java.util.Collections;
 public class Help extends Command {//Ported by pup from Necessities
 
     public Help() {
-        super("help", Arrays.asList(""), "Shows help messages", "/help <commandname>", 0, "command.help");
+        super("help", "Shows help messages", "/help <commandname>", 0, "command.help");
     }
 
     @Override
@@ -84,8 +84,7 @@ public class Help extends Command {//Ported by pup from Necessities
         try {
             Double.parseDouble(toCheck);
             return true;
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) { }
         return false;
     }
 }

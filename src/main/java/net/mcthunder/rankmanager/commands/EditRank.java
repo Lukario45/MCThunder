@@ -8,7 +8,7 @@ import net.mcthunder.entity.Player;
  */
 public class EditRank extends Command {
     public EditRank() {
-        super("EditRank", "Edit specific rank variables.", "/editrank rank variable value", 9999, "rankmanager.editrank");
+        super("EditRank", "Edit specific rank variables.", "/editrank <rank> <variable> <value>", 9999, "rankmanager.editrank");
     }
 
     @Override

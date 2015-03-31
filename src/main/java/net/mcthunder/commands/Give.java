@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class Give extends Command {
     public Give() {
-        super("give", Arrays.asList(""), "Gives a player an item", "/give <player> <item> <amount>", 9999, "core.give");
+        super("give", "Gives a player an item", "/give <player> <item> <amount>", 9999, "command.give");
     }
 
     @Override

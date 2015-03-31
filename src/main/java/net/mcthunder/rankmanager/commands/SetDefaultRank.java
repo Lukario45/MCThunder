@@ -15,29 +15,25 @@ import static net.mcthunder.api.Utils.tellConsole;
  */
 public class SetDefaultRank extends Command {
     public SetDefaultRank() {
-        super("SetDefaultRank", "Set the default rank", "/setdefaultrank rank", 9999, "rankmanager.setdefaultrank");
+        super("SetDefaultRank", "Set the default rank", "/setdefaultrank <rank>", 9999, "rankmanager.setdefaultrank");
     }
 
     @Override
     public boolean execute(Player player, String[] args) {
-        if (args.length < 1){
+        if (args.length == 0)
             return false;
-        } else {
-            if  (!MCThunder.getRankManager().getRankHashMap().containsKey(args[0])){
-                player.sendMessage("&cThat rank does not exist yet!");
-                return true;
-            } else {
-                try {
-                    MCThunder.getRankManager().getRanks().write(Utilities.makeStringTag("DefaultRank", args[0]));
-                    player.sendMessage("&bDefault rank has been changed to " + args[0] + "!");
-                    tellConsole(LoggingLevel.INFO,"&bDefault rank has been changed to " + args[0] + "!");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return true;
+        String name = args[0];
+        if (!MCThunder.getRankManager().getRankHashMap().containsKey(name))
+            player.sendMessage("&cThat rank does not exist yet!");
+        else {
+            try {
+                MCThunder.getRankManager().getRanks().write(Utilities.makeStringTag("DefaultRank", name));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-
+            player.sendMessage("&bDefault rank has been changed to " + name + "!");
+            tellConsole(LoggingLevel.INFO, "&bDefault rank has been changed to " + name + "!");
         }
+        return true;
     }
 }
