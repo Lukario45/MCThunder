@@ -2,14 +2,10 @@ package net.mcthunder.rankmanager.commands;
 
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
-import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.entity.Player;
-import net.mcthunder.rankmanager.Rank;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
 import java.util.Arrays;
-
-import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by conno_000 on 3/29/2015.

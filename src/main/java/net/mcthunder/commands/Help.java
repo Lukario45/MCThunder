@@ -5,7 +5,6 @@ import net.mcthunder.api.CommandRegistry;
 import net.mcthunder.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class Help extends Command {//Ported by pup from Necessities

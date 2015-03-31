@@ -1,6 +1,7 @@
 package net.mcthunder.api;
 
 import org.apache.commons.lang.StringUtils;
+
 import java.util.HashMap;
 
 /**

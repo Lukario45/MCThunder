@@ -4,8 +4,6 @@ import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
 
-import java.util.Arrays;
-
 /**
  * Created by Kevin on 10/13/2014.
  */

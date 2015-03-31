@@ -6,8 +6,6 @@ import net.mcthunder.entity.Player;
 import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.material.Material;
 
-import java.util.Arrays;
-
 public class Give extends Command {
     public Give() {
         super("give", "Gives a player an item", "/give <player> <item> <amount>", 9999, "command.give");
