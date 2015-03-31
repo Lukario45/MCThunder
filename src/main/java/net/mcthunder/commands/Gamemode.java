@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class Gamemode extends Command {
     public Gamemode() {
-        super("gamemode", Arrays.asList("gm"), "Changes your gamemode", "/gamemode <GameMode>", 9999, "command.gamemode");
+        super("gamemode", Arrays.asList("gm"), "Changes your gamemode", "/gamemode <GameMode>", 9999, "core.gamemode");
     }
 
     @Override

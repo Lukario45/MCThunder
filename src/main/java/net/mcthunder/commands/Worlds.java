@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class Worlds extends Command {
     public Worlds() {
-        super("worlds", Arrays.asList("levels"), "Lists the loaded worlds.", "/worlds", 0, "command.worlds");
+        super("worlds", Arrays.asList("levels"), "Lists the loaded worlds.", "/worlds", 0, "core.worlds");
     }
 
     @Override

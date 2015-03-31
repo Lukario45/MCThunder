@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public class PrivateMessage extends Command {
     public PrivateMessage() {
-        super("privatemessage", Arrays.asList("message", "msg", "pm", "tell"), "Sends a private message to a player", "/privatemessage <player> <message to send>", 0, "command.privatemessage");
+        super("privatemessage", Arrays.asList("message", "msg", "pm", "tell"), "Sends a private message to a player", "/privatemessage <player> <message to send>", 0, "core.privatemessage");
     }
 
     @Override

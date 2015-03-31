@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public class Kick extends Command {
     public Kick() {
-        super("kick", Arrays.asList(""), "Kicks a player from the server!", "/kick <player> <reason> ", 9999, "command.kick");
+        super("kick", Arrays.asList(""), "Kicks a player from the server!", "/kick <player> <reason> ", 9999, "core.kick");
     }
 
     @Override

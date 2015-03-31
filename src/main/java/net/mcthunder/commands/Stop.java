@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public class Stop extends Command {
     public Stop() {
-        super("stop", Arrays.asList(""), "Stops the server", "/stop <message>", 9999, "command.stop");
+        super("stop", Arrays.asList(""), "Stops the server", "/stop <message>", 9999, "core.stop");
     }
 
     @Override

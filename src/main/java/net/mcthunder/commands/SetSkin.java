@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class SetSkin extends Command {
     public SetSkin() {
-        super("setskin", Arrays.asList("skin"), "Sets your skin to another players", "/setskin <optional player>", 9999, "command.setskin");
+        super("setskin", Arrays.asList("skin"), "Sets your skin to another players", "/setskin <optional player>", 9999, "core.setskin");
     }
 
     @Override

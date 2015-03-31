@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class Goto extends Command {
     public Goto() {
-        super("goto", Arrays.asList("world", "g", "level", "l"), "Teleports you to the specified world.", "/goto <worldname>", 9999, "command.goto");
+        super("goto", Arrays.asList("world", "g", "level", "l"), "Teleports you to the specified world.", "/goto <worldname>", 9999, "core.goto");
     }
 
     @Override

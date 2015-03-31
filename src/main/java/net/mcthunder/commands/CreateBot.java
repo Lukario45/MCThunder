@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class CreateBot extends Command {
     public CreateBot() {
-        super("createbot", Arrays.asList("bot"), "Creates a bot. Temporary command", "/createbot <name>", 9999, "command.createbot");
+        super("createbot", Arrays.asList("bot"), "Creates a bot. Temporary command", "/createbot <name>", 9999, "core.createbot");
     }
 
     @Override

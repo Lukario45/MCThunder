@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public class GetUUID extends Command {
     public GetUUID() {
-        super("getuuid", Arrays.asList("uuid"), "Gets the UUID of a player", "/getuuid <player>", 9999, "command.getuuid");
+        super("getuuid", Arrays.asList("uuid"), "Gets the UUID of a player", "/getuuid <player>", 9999, "core.getuuid");
     }
 
     @Override

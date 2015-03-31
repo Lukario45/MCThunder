@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public class Teleport extends Command {
     public Teleport() {
-        super("teleport", Arrays.asList("tp"), "teleports players", "/tp player toplayer", 9999, "commands.teleport");
+        super("teleport", Arrays.asList("tp"), "teleports players", "/tp player toplayer", 9999, "core.teleport");
     }
 
     @Override

@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public class Respond extends Command {
     public Respond() {
-        super("respond", Arrays.asList("reply", "r"), "responds to the last persion who pmed you", "/r message", 0, "command.respond");
+        super("respond", Arrays.asList("reply", "r"), "responds to the last persion who pmed you", "/r message", 0, "core.respond");
     }
 
     @Override

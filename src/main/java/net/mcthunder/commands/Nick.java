@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class Nick extends Command {
     public Nick() {
-        super("nick", Arrays.asList("nickname"), "Changes your nickname", "/nick <newname>", 9999, "command.nick");
+        super("nick", Arrays.asList("nickname"), "Changes your nickname", "/nick <newname>", 9999, "core.nick");
     }
 
     @Override
