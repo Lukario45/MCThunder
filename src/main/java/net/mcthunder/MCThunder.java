@@ -170,8 +170,8 @@ public class MCThunder {
                 int i = 0;
                 for (Player p : getPlayers())
                     gameProfiles[i++] = p.getGameProfile();
-                for (Bot b : getBots())
-                    gameProfiles[i++] = b.getGameProfile();
+                for (int j = 0; j < bots.size(); j++)
+                    gameProfiles[i++] = bots.get(j).getGameProfile();
                 BufferedImage icon = null;
                 try {
                     icon = ImageIO.read(new File("server-icon.png"));
@@ -440,8 +440,8 @@ public class MCThunder {
                                 }
                             }
                         } catch (Exception ignored) { }//Entity added at exact same time it checked for entities
-                for (Bot b : getBots())
-                    b.ai();
+                for (int i = 0; i < bots.size(); i++)
+                    bots.get(i).ai();
                 for (Player p : getPlayers()) {
                     ArrayList<PotionEffectType> toRem = new ArrayList<>();
                     for (PotionEffect e : p.getActiveEffects())
@@ -565,8 +565,8 @@ public class MCThunder {
             p.disconnect(args);
         for (World w : getWorlds())
             w.unloadWorld();
-        for (Bot b : getBots())
-            b.unload();
+        for (int i = 0; i < bots.size(); i++)
+            bots.get(i).unload();
         AnsiConsole.systemUninstall();
         server.close();
     }
