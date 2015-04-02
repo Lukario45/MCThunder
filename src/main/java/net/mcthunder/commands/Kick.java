@@ -9,7 +9,7 @@ import net.mcthunder.entity.Player;
  */
 public class Kick extends Command {
     public Kick() {
-        super("kick", "Kicks a player from the server!", "/kick <player> <reason> ", 9999, "command.kick");
+        super("kick", "Kicks a player from the server!", "/kick <player> <reason> ", 9999, "core.kick");
     }
 
     @Override

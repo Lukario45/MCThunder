@@ -29,16 +29,32 @@ public class RankManagerCommandEventListener implements net.mcthunder.interfaces
             player.sendMessage("&4Unknown Command!");
             return;
         }
+
+
         if (CommandRegistry.getCommand("rankmanager:" + command) != null)//Overide default commands with rankmanager ones
             cmd = CommandRegistry.getCommand("rankmanager:" + command);
-        if (MCThunder.getRankManager().getCommandLevelFromRank(playerRank) >= cmd.getRankPoints()){
-            if (!cmd.execute(player, packet.getMessage().contains(" ") ? packet.getMessage().trim().substring(packet.getMessage().trim().indexOf(" ")).trim().split(" ") : new String[0]))
+
+
+        if (MCThunder.getRankManager().getPlayerRankMap().get(player).containsSpecialPerm(cmd.getPermissionNode()) == 0){
+            if (!cmd.execute(player, packet.getMessage().contains(" ") ? packet.getMessage().trim().substring(packet.getMessage().trim().indexOf(" ")).trim().split(" ") : new String[0])){
                 player.sendMessage("&4" + cmd.getArguments());
+            }
 
-
-            tellConsole(LoggingLevel.COMMAND, "Player " + player.getDisplayName() + " " + packet.getMessage());
-        } else
+        } else if(MCThunder.getRankManager().getPlayerRankMap().get(player).containsSpecialPerm(cmd.getPermissionNode()) == 1){
             MCThunder.getRankManager().deny(player, cmd);
-        //commandHandler.handlePlayerCommand(player, packet);
+
+        } else if(MCThunder.getRankManager().getPlayerRankMap().get(player).containsSpecialPerm(cmd.getPermissionNode()) == 2){
+
+            if (MCThunder.getRankManager().getPlayerRankMap().get(player).getRankLevel() >= cmd.getRankPoints()){
+                if (!cmd.execute(player, packet.getMessage().contains(" ") ? packet.getMessage().trim().substring(packet.getMessage().trim().indexOf(" ")).trim().split(" ") : new String[0])){
+                    player.sendMessage("&4" + cmd.getArguments());
+                }
+                tellConsole(LoggingLevel.COMMAND, "Player " + player.getDisplayName() + " " + packet.getMessage());
+            } else {
+                MCThunder.getRankManager().deny(player, cmd);
+            }
+
+            }
+
     }
 }

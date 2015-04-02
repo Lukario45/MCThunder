@@ -13,7 +13,7 @@ import java.util.Collections;
 public class Help extends Command {//Ported by pup from Necessities
 
     public Help() {
-        super("help", "Shows help messages", "/help <commandname>", 0, "command.help");
+        super("help", "Shows help messages", "/help <commandname>", 0, "rankmanager.help");
     }
 
     @Override

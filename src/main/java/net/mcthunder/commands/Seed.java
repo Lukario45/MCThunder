@@ -5,7 +5,7 @@ import net.mcthunder.entity.Player;
 
 public class Seed extends Command {
     public Seed() {
-        super("seed", "Retrieves the world seed", "/seed", 9999, "command.seed");
+        super("seed", "Retrieves the world seed", "/seed", 9999, "core.seed");
     }
 
     @Override

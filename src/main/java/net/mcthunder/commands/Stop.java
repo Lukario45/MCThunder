@@ -9,7 +9,7 @@ import net.mcthunder.entity.Player;
  */
 public class Stop extends Command {
     public Stop() {
-        super("stop", "Stops the server", "/stop <message>", 9999, "command.stop");
+        super("stop", "Stops the server", "/stop <message>", 9999, "core.stop");
     }
 
     @Override

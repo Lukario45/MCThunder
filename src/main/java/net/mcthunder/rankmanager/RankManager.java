@@ -10,11 +10,14 @@ import net.mcthunder.rankmanager.listeners.RankManagerCommandEventListener;
 import net.mcthunder.rankmanager.listeners.RankManagerLoggingInEventListener;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
+import org.spacehq.opennbt.tag.builtin.ListTag;
+import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.opennbt.tag.builtin.Tag;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static net.mcthunder.api.Utils.makeDir;
@@ -28,6 +31,7 @@ public class RankManager {
     private NBTFile ranks;
     private HashMap<String, Integer> rankHashmap;
     private HashMap<Integer, String> reverseRankHashMap;
+    private HashMap<Player,PlayerRank> playerRankMap;
     private Rank rank;
 
     public void load() {
@@ -35,6 +39,7 @@ public class RankManager {
         MCThunder.addCommandEventListener(new RankManagerCommandEventListener());
         this.rankHashmap = new HashMap<>();
         this.reverseRankHashMap = new HashMap<>();
+        this.playerRankMap = new HashMap<>();
         this.rank = new Rank();
         tellConsole(LoggingLevel.INFO, "Loading Rank Manager");
         makeDir("RankManager");
@@ -81,6 +86,17 @@ public class RankManager {
 
     public HashMap getRankHashMap() {return this.rankHashmap;}
     public HashMap getReverseRankHashMap() {return this.reverseRankHashMap;}
+    public HashMap<Player,PlayerRank> getPlayerRankMap() {return this.playerRankMap;}
+
+    public void addSpecialNodeToFile(Player p ,String node){
+        CompoundTag c = (CompoundTag) MCThunder.getProfileHandler().getAttribute(p, "RankManager");
+        List<Tag> l = (List<Tag>) Utilities.getFromCompound(c, "SpecialPerms").getValue();
+        l.add(Utilities.makeStringTag("SpecialPerm", node));
+        Map<String,Tag> map = c.getValue();
+        map.remove("SpecialPerms");
+        map.put("SpecialPerms", Utilities.makeListTag("SpecialPerms", l));
+        MCThunder.getProfileHandler().changeAttribute(p,new CompoundTag("RankManager",map));
+    }
 
     public Rank getRank() {return this.rank;}
 

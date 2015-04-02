@@ -8,7 +8,7 @@ import net.mcthunder.material.Material;
 
 public class Give extends Command {
     public Give() {
-        super("give", "Gives a player an item", "/give <player> <item> <amount>", 9999, "command.give");
+        super("give", "Gives a player an item", "/give <player> <item> <amount>", 9999, "core.give");
     }
 
     @Override
