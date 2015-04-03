@@ -68,7 +68,7 @@ public class Utils {
 
     public static void tellConsole(LoggingLevel level, String message) {
         message = String.format("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), message);
-        System.out.print(message);
+        System.out.print(MessageFormat.toConsole(message));
 
 
 

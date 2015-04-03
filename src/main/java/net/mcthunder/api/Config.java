@@ -66,7 +66,7 @@ public class Config {
             if (!getConf().containsKey("SERVER-MOTD"))
                 getConf().setProperty("SERVER-MOTD", "A MCThunder Minecraft Server");
             if (!getConf().containsKey("SERVER-ONLINE-MODE"))
-                getConf().setProperty("SERVER-ONLINE-MODE", false);
+                getConf().setProperty("SERVER-ONLINE-MODE", true);
             if (!getConf().containsKey("ALLOW-FLYING"))
                 getConf().setProperty("ALLOW-FLYING", false);
             if (!getConf().containsKey("ALLOW-NETHER"))
