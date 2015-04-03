@@ -2,18 +2,18 @@ package net.mcthunder.rankmanager.listeners;
 
 import com.Lukario45.NBTFile.Utilities;
 
-import com.sun.xml.internal.fastinfoset.util.StringArray;
+
 import net.mcthunder.MCThunder;
 import net.mcthunder.entity.Player;
 import net.mcthunder.rankmanager.PlayerRank;
-import net.mcthunder.rankmanager.RankManager;
+
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.ListTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.opennbt.tag.builtin.Tag;
-import org.spacehq.opennbt.tag.builtin.custom.StringArrayTag;
+;
 import org.spacehq.packetlib.Session;
 
 import java.util.*;
