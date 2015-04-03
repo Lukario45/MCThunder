@@ -27,7 +27,7 @@ public class CommandRegistry {
         if (commands.containsKey(name.toLowerCase()))
             return commands.get(name.toLowerCase());
         for (Command c : commands.values())
-            if (c.getAliases().contains(name))
+            if (c.getAliases().contains(name.toLowerCase()))
                 return c;
         return null;
     }

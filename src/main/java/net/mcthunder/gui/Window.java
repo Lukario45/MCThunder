@@ -14,8 +14,6 @@ import javax.swing.GroupLayout;
 public class Window extends JFrame {
     public Window() {
         initComponents();
-
-
     }
 
     private void initComponents() {
@@ -53,13 +51,10 @@ public class Window extends JFrame {
                         javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Dialog", java.awt.Font.BOLD, 12),
                         java.awt.Color.red), MCThunder.getBorder())); MCThunder.addPropertyChangeListener(new java.beans.PropertyChangeListener(){public void propertyChange(java.beans.PropertyChangeEvent e){if("border".equals(e.getPropertyName()))throw new RuntimeException();}});
 
-
                 //======== allPanels ========
                 {
-
                     //======== mainPanel ========
                     {
-
                         //======== mainScrollPane ========
                         {
                             mainScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

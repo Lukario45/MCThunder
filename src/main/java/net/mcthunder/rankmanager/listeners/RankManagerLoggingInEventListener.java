@@ -29,18 +29,12 @@ public class RankManagerLoggingInEventListener implements net.mcthunder.interfac
             Map<String, Tag> map = new HashMap<>();
             map.put("RankName", new StringTag("RankName", MCThunder.getRankManager().getDefaultRank()));
             map.put("SpecialPerms", new ListTag("SpecialPerms", new ArrayList()));
-
             MCThunder.getProfileHandler().addAttribute(player, new CompoundTag("RankManager", map));
         }
         CompoundTag rankManager = (CompoundTag) MCThunder.getProfileHandler().getAttribute(player,"RankManager");
         List<Tag> nodes = (List) Utilities.getFromCompound(rankManager,"SpecialPerms").getValue();
         MCThunder.getRankManager().getPlayerRankMap().put(player, new PlayerRank(Utilities.getFromCompound(rankManager, "RankName").getValue().toString()));
-        for (Tag t : nodes){
+        for (Tag t : nodes)
             MCThunder.getRankManager().getPlayerRankMap().get(player).addSpecialPerm(t.getValue().toString());
-        }
-
-
-
-
     }
 }

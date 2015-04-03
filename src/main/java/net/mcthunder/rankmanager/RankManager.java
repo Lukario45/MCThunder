@@ -56,7 +56,6 @@ public class RankManager {
             for (Tag t : NBTIO.readFile(this.ranks.getNbtFile(), false)){
                 if (t.getName().equalsIgnoreCase("DefaultRank")){
 
-
                 } else {
                     this.rankHashmap.put(t.getName(),  Integer.parseInt(Utilities.getFromCompound((CompoundTag) t,"CommandLevel").getValue().toString()));
                     this.reverseRankHashMap.put(Integer.parseInt(Utilities.getFromCompound((CompoundTag) t,"CommandLevel").getValue().toString()),t.getName());

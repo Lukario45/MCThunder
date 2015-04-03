@@ -19,7 +19,6 @@ public class Rank {
         compoundTag.put(Utilities.makeIntTag("CommandLevel", points));
         try {
             rankFile.write(compoundTag);
-
         } catch (IOException e) {
             e.printStackTrace();
         }

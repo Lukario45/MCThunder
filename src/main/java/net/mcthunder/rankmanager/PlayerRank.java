@@ -12,23 +12,13 @@ public class PlayerRank {
     private String rank;
     private List<String> specialPerms;
 
-
-    private PlayerRank(){//Not Used Ever ;)
-
-    }
     public PlayerRank(String rank){
         this.rank = rank;
-        this.specialPerms = new ArrayList<String>();
+        this.specialPerms = new ArrayList<>();
     }
 
     public int containsSpecialPerm(String node){
-        if (this.specialPerms.contains(node)){
-            return 0;
-        } if (this.specialPerms.contains("-" + node)){
-            return 1;
-        } else {
-            return 2;
-        }
+        return this.specialPerms.contains(node) ? 0 : this.specialPerms.contains("-" + node) ? 1 : 2;
     }
 
     public void addSpecialPerm(String node){
@@ -46,9 +36,4 @@ public class PlayerRank {
     public void setRank(String rank){
         this.rank = rank;
     }
-
-
-
-
-
 }
