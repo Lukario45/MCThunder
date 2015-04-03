@@ -4,11 +4,14 @@ import com.Lukario45.NBTFile.Utilities;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.CommandRegistry;
+import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.entity.Player;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
+import static net.mcthunder.api.Utils.tellConsole;
 
 public class Help extends Command {//Ported by pup from Necessities
 
@@ -45,8 +48,10 @@ public class Help extends Command {//Ported by pup from Necessities
             Command c = CommandRegistry.getCommands().get(name);
             if (c == null)
                 continue;
-            if (MCThunder.getRankManager().getCommandLevelFromRank(playerRank) >= c.getRankPoints() && (name.toLowerCase().contains(search) ||
-                            c.getInformation().toLowerCase().contains(search) || c.getAliases().contains(search) || search.equals(""))) {
+            if ((MCThunder.getRankManager().getPlayerRankMap().get(player).containsSpecialPerm(c.getPermissionNode()) == 0 ||
+                    (MCThunder.getRankManager().getPlayerRankMap().get(player).containsSpecialPerm(c.getPermissionNode()) == 2 &&
+                    MCThunder.getRankManager().getPlayerRankMap().get(player).getRankLevel() >= c.getRankPoints())) && (name.toLowerCase().contains(search) ||
+                    c.getInformation().toLowerCase().contains(search) || c.getAliases().contains(search) || search.equals(""))) {
                 helpList.add("&3/" + name + ": &e" + c.getInformation());
                 if (name.equalsIgnoreCase(search) || (c.getAliases().contains(search) && !search.equals(""))) {
                     usage = "&eUsage: &3" + c.getArguments();

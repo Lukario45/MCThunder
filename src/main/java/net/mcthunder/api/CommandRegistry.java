@@ -42,14 +42,14 @@ public class CommandRegistry {
         return null;
     }
 
-    /*public static Command getCommand(Node node) {//TODO: Create a node object
+    public static Command getFromNode(String node) {
         if (node == null)
             return null;
         for (Command c : commands.values())
             if (c.getPermissionNode().equals(node))
                 return c;
         return null;
-    }*/
+    }
 
     public static HashMap<String,Command> getCommands() {
         return commands;
