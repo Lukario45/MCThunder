@@ -14,40 +14,45 @@ import javax.swing.GroupLayout;
 public class Window extends JFrame {
     public Window() {
         initComponents();
+
+
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner Evaluation license - Connor Smith
-        frame1 = new JFrame();
+        mainFrame = new JFrame();
         MCThunder = new JPanel();
         allPanels = new JTabbedPane();
         mainPanel = new JPanel();
+        mainScrollPane = new JScrollPane();
+        consolePane = new JTextPane();
+        chatLabel = new JLabel();
+        Chat = new JTextField();
+        chatSendButton = new JButton();
         fileEditPanel = new JPanel();
         ipLabel = new JLabel();
         ipText = new JTextField();
         stopButton = new JButton();
         restartButton = new JButton();
 
-        //======== frame1 ========
+        //======== mainFrame ========
         {
-            frame1.setTitle("MCThunder");
-            frame1.setResizable(false);
-            frame1.setVisible(true);
-            frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            Container frame1ContentPane = frame1.getContentPane();
+            mainFrame.setTitle("MCThunder");
+            mainFrame.setResizable(false);
+            Container mainFrameContentPane = mainFrame.getContentPane();
 
             //======== MCThunder ========
             {
                 MCThunder.setMaximumSize(new Dimension(850, 500));
 
-                /* JFormDesigner evaluation mark
+                // JFormDesigner evaluation mark
                 MCThunder.setBorder(new javax.swing.border.CompoundBorder(
                     new javax.swing.border.TitledBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0),
                         "JFormDesigner Evaluation", javax.swing.border.TitledBorder.CENTER,
                         javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Dialog", java.awt.Font.BOLD, 12),
                         java.awt.Color.red), MCThunder.getBorder())); MCThunder.addPropertyChangeListener(new java.beans.PropertyChangeListener(){public void propertyChange(java.beans.PropertyChangeEvent e){if("border".equals(e.getPropertyName()))throw new RuntimeException();}});
-*/
+
 
                 //======== allPanels ========
                 {
@@ -55,15 +60,48 @@ public class Window extends JFrame {
                     //======== mainPanel ========
                     {
 
+                        //======== mainScrollPane ========
+                        {
+                            mainScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                            mainScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+                            //---- consolePane ----
+                            consolePane.setEditable(false);
+                            mainScrollPane.setViewportView(consolePane);
+                        }
+
+                        //---- chatLabel ----
+                        chatLabel.setText("Chat:");
+
+                        //---- chatSendButton ----
+                        chatSendButton.setText("Send");
+
                         GroupLayout mainPanelLayout = new GroupLayout(mainPanel);
                         mainPanel.setLayout(mainPanelLayout);
                         mainPanelLayout.setHorizontalGroup(
                             mainPanelLayout.createParallelGroup()
-                                .addGap(0, 811, Short.MAX_VALUE)
+                                .addGroup(mainPanelLayout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(mainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(mainPanelLayout.createSequentialGroup()
+                                            .addComponent(chatLabel)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(Chat)
+                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(chatSendButton))
+                                        .addComponent(mainScrollPane, GroupLayout.PREFERRED_SIZE, 645, GroupLayout.PREFERRED_SIZE))
+                                    .addContainerGap(160, Short.MAX_VALUE))
                         );
                         mainPanelLayout.setVerticalGroup(
                             mainPanelLayout.createParallelGroup()
-                                .addGap(0, 410, Short.MAX_VALUE)
+                                .addGroup(mainPanelLayout.createSequentialGroup()
+                                    .addComponent(mainScrollPane, GroupLayout.PREFERRED_SIZE, 367, GroupLayout.PREFERRED_SIZE)
+                                    .addGap(12, 12, 12)
+                                    .addGroup(mainPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(chatLabel)
+                                        .addComponent(chatSendButton)
+                                        .addComponent(Chat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         );
                     }
                     allPanels.addTab("Main", mainPanel);
@@ -88,6 +126,9 @@ public class Window extends JFrame {
                 //---- ipLabel ----
                 ipLabel.setText("Connect IP:");
 
+                //---- ipText ----
+                ipText.setEditable(false);
+
                 //---- stopButton ----
                 stopButton.setText("Stop");
 
@@ -104,8 +145,8 @@ public class Window extends JFrame {
                                 .addComponent(allPanels)
                                 .addGroup(MCThunderLayout.createSequentialGroup()
                                     .addComponent(ipLabel)
-                                    .addGap(12, 12, 12)
-                                    .addComponent(ipText, GroupLayout.PREFERRED_SIZE, 393, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(ipText, GroupLayout.PREFERRED_SIZE, 399, GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(stopButton)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
@@ -118,33 +159,33 @@ public class Window extends JFrame {
                             .addContainerGap()
                             .addGroup(MCThunderLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(ipLabel)
-                                .addComponent(ipText, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(stopButton)
-                                .addComponent(restartButton))
+                                .addComponent(restartButton)
+                                .addComponent(ipText, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(allPanels)
+                            .addComponent(allPanels, GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
                             .addContainerGap())
                 );
             }
 
-            GroupLayout frame1ContentPaneLayout = new GroupLayout(frame1ContentPane);
-            frame1ContentPane.setLayout(frame1ContentPaneLayout);
-            frame1ContentPaneLayout.setHorizontalGroup(
-                frame1ContentPaneLayout.createParallelGroup()
-                    .addGroup(frame1ContentPaneLayout.createSequentialGroup()
+            GroupLayout mainFrameContentPaneLayout = new GroupLayout(mainFrameContentPane);
+            mainFrameContentPane.setLayout(mainFrameContentPaneLayout);
+            mainFrameContentPaneLayout.setHorizontalGroup(
+                mainFrameContentPaneLayout.createParallelGroup()
+                    .addGroup(mainFrameContentPaneLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(MCThunder, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())
             );
-            frame1ContentPaneLayout.setVerticalGroup(
-                frame1ContentPaneLayout.createParallelGroup()
-                    .addGroup(frame1ContentPaneLayout.createSequentialGroup()
+            mainFrameContentPaneLayout.setVerticalGroup(
+                mainFrameContentPaneLayout.createParallelGroup()
+                    .addGroup(mainFrameContentPaneLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(MCThunder, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())
             );
-            frame1.pack();
-            frame1.setLocationRelativeTo(frame1.getOwner());
+            mainFrame.pack();
+            mainFrame.setLocationRelativeTo(mainFrame.getOwner());
         }
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -152,10 +193,15 @@ public class Window extends JFrame {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner Evaluation license - Connor Smith
-    private JFrame frame1;
+    private JFrame mainFrame;
     private JPanel MCThunder;
     private JTabbedPane allPanels;
     private JPanel mainPanel;
+    private JScrollPane mainScrollPane;
+    private JTextPane consolePane;
+    private JLabel chatLabel;
+    private JTextField Chat;
+    private JButton chatSendButton;
     private JPanel fileEditPanel;
     private JLabel ipLabel;
     private JTextField ipText;
@@ -165,7 +211,13 @@ public class Window extends JFrame {
     public JTextField getIpText(){
         return this.ipText;
     }
-    public void setIpText(JTextField text){
-        this.ipText = text;
+
+    public JTextPane getConsolePane(){
+        return this.consolePane;
+    }
+    public void startGUI(){
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setVisible(true);
+
     }
 }

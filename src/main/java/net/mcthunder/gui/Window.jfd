@@ -7,23 +7,43 @@ new FormModel {
 			"$horizontalGroup": "par l {seq l {space :::p, comp MCThunder:::::x, space :::p}}"
 			"$verticalGroup": "par l {seq l {space :::p, comp MCThunder:::::x, space :::p}}"
 		} ) {
-			name: "frame1"
+			name: "mainFrame"
 			"title": "MCThunder"
 			"$sizePolicy": 0
 			"resizable": false
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-				"$horizontalGroup": "par l {seq l {space :::p, par l {comp allPanels:::::x, seq {comp ipLabel:::p::p, space :p:12:p, comp ipText:::p:393:p, space :::p, comp stopButton:::p::p, space u:::p, comp restartButton:::p::p, space :::x}}}}"
-				"$verticalGroup": "par l {seq t {space :::p, par b {comp ipLabel::b:p::p, comp ipText::b:p::p, comp stopButton::b:p::p, comp restartButton::b:p::p}, space :::p, comp allPanels:::::x, space :::p}}"
+				"$horizontalGroup": "par l {seq l {space :::p, par l {comp allPanels:::::x, seq {comp ipLabel:::p::p, space :::p, comp ipText:::p:399:p, space :::p, comp stopButton:::p::p, space u:::p, comp restartButton:::p::p, space :::x}}}}"
+				"$verticalGroup": "par l {seq t {space :::p, par b {comp ipLabel::b:p::p, comp stopButton::b:p::p, comp restartButton::b:p::p, comp ipText::b:p::p}, space :::p, comp allPanels::::0:x, space :::p}}"
 			} ) {
 				name: "MCThunder"
 				"maximumSize": new java.awt.Dimension( 850, 500 )
 				add( new FormContainer( "javax.swing.JTabbedPane", new FormLayoutManager( class javax.swing.JTabbedPane ) ) {
 					name: "allPanels"
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-						"$horizontalGroup": "par l {space :0:811:x}"
-						"$verticalGroup": "par l {space :0:410:x}"
+						"$horizontalGroup": "par l {seq {space :::p, par l:::p {seq {comp chatLabel:::p::p, space :::p, comp Chat:::::x, space :::p, comp chatSendButton:::p::p}, comp mainScrollPane:::p:645:p}, space ::160:x}}"
+						"$verticalGroup": "par l {seq l {comp mainScrollPane:::p:367:p, space :p:12:p, par b {comp chatLabel::b:p::p, comp chatSendButton::b:p::p, comp Chat::b:p::p}, space :::x}}"
 					} ) {
 						name: "mainPanel"
+						add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+							name: "mainScrollPane"
+							"horizontalScrollBarPolicy": 31
+							"verticalScrollBarPolicy": 22
+							add( new FormComponent( "javax.swing.JTextPane" ) {
+								name: "consolePane"
+								"editable": false
+							} )
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "chatLabel"
+							"text": "Chat:"
+						} )
+						add( new FormComponent( "javax.swing.JTextField" ) {
+							name: "Chat"
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "chatSendButton"
+							"text": "Send"
+						} )
 					}, new FormLayoutConstraints( null ) {
 						"title": "Main"
 					} )
@@ -42,6 +62,7 @@ new FormModel {
 				} )
 				add( new FormComponent( "javax.swing.JTextField" ) {
 					name: "ipText"
+					"editable": false
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "stopButton"

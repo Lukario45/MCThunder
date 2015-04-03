@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.text.Format;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
@@ -66,7 +67,16 @@ public class Utils {
     }
 
     public static void tellConsole(LoggingLevel level, String message) {
-        System.out.printf("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), MessageFormat.toConsole(message));
+        message = String.format("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), message);
+        System.out.print(message);
+
+
+
+        if (MCThunder.getGuiMode()){
+            MCThunder.getGui().getConsolePane().setText(MCThunder.getGui().getConsolePane().getText() + message);
+            MCThunder.getGui().getConsolePane().setCaretPosition(MCThunder.getGui().getConsolePane().getDocument().getLength());
+
+        }
     }
 
     public static void tellConsole(LoggingLevel level, Object m) {

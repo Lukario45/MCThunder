@@ -105,6 +105,7 @@ public class MCThunder {
         //Done Set Server Data
         if (guiMODE){
             window = new Window();
+            window.startGUI();
         }
         tellConsole(LoggingLevel.INFO, "Internal IP " + HOST);
         createInitialDirs();
