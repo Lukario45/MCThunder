@@ -1,0 +1,60 @@
+JFDML JFormDesigner: "5.2.1.0.138" Java: "1.8.0_31" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+			"$horizontalGroup": "par l {seq l {space :::p, comp MCThunder:::::x, space :::p}}"
+			"$verticalGroup": "par l {seq l {space :::p, comp MCThunder:::::x, space :::p}}"
+		} ) {
+			name: "frame1"
+			"title": "MCThunder"
+			"$sizePolicy": 0
+			"resizable": false
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+				"$horizontalGroup": "par l {seq l {space :::p, par l {comp allPanels:::::x, seq {comp ipLabel:::p::p, space :p:12:p, comp ipText:::p:393:p, space :::p, comp stopButton:::p::p, space u:::p, comp restartButton:::p::p, space :::x}}}}"
+				"$verticalGroup": "par l {seq t {space :::p, par b {comp ipLabel::b:p::p, comp ipText::b:p::p, comp stopButton::b:p::p, comp restartButton::b:p::p}, space :::p, comp allPanels:::::x, space :::p}}"
+			} ) {
+				name: "MCThunder"
+				"maximumSize": new java.awt.Dimension( 850, 500 )
+				add( new FormContainer( "javax.swing.JTabbedPane", new FormLayoutManager( class javax.swing.JTabbedPane ) ) {
+					name: "allPanels"
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+						"$horizontalGroup": "par l {space :0:811:x}"
+						"$verticalGroup": "par l {space :0:410:x}"
+					} ) {
+						name: "mainPanel"
+					}, new FormLayoutConstraints( null ) {
+						"title": "Main"
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+						"$horizontalGroup": "par l {space :0:811:x}"
+						"$verticalGroup": "par l {space :0:410:x}"
+					} ) {
+						name: "fileEditPanel"
+					}, new FormLayoutConstraints( null ) {
+						"title": "File Edit"
+					} )
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "ipLabel"
+					"text": "Connect IP:"
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "ipText"
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "stopButton"
+					"text": "Stop"
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "restartButton"
+					"text": "Restart"
+				} )
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 145 )
+			"size": new java.awt.Dimension( 850, 530 )
+		} )
+	}
+}

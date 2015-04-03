@@ -20,6 +20,7 @@ public class Config {
     private boolean globalNickRegisterd;
     private boolean allowPVP;
     private boolean useRankManager;
+    private boolean guiMode;
     private String chatFormat;
     private String motd;
     private String world;
@@ -78,6 +79,8 @@ public class Config {
                 getConf().setProperty("USE-COMMAND-BLOCKS", false);
             if (!getConf().containsKey("useRankManager"))
                 getConf().setProperty("useRankManager", true);
+            if (!getConf().containsKey("GUI-MODE"))
+                getConf().setProperty("GUI-MODE",true);
             if (!getConf().containsKey("chatFormat"))
                 getConf().setProperty("chatFormat", "{WORLD} &e{NAME}:&r {MESSAGE}");
             getConf().save();
@@ -100,6 +103,7 @@ public class Config {
             setMaxRenderDistance(getConf().getInt("MAX-REBDER-DISTANCE"));
             setCommandBlocks(getConf().getBoolean("USE-COMMAND-BLOCKS"));
             setUseRankManager(getConf().getBoolean("useRankManager"));
+            setGuiMode(getConf().getBoolean("GUI-MODE"));
             setChatFormat(getConf().getString("chatFormat"));
         } catch (ConfigurationException e) {
             Utils.tellConsole(LoggingLevel.ERROR, "Check Config File!");
@@ -264,5 +268,11 @@ public class Config {
 
     public void setUseRankManager(boolean useRankManager) {
         this.useRankManager = useRankManager;
+    }
+
+    public boolean getGuiMode(){ return this.guiMode;}
+
+    public void setGuiMode(boolean guiMode){
+        this.guiMode = guiMode;
     }
 }

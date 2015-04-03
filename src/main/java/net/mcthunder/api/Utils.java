@@ -54,7 +54,11 @@ public class Utils {
     public static void tellPublicIpAddress() {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new URL("http://icanhazip.com/").openConnection().getInputStream()));
-            tellConsole(LoggingLevel.INFO, "People may connect to the server with " + in.readLine() + ":" + MCThunder.getPort());
+            String connectIP = in.readLine() + ":" + MCThunder.getPort();
+            tellConsole(LoggingLevel.INFO, "People may connect to the server with " + connectIP);
+            if (MCThunder.getGuiMode()){
+                MCThunder.getGui().getIpText().setText(connectIP);
+            }
             in.close();
         } catch (IOException e) {
             e.printStackTrace();

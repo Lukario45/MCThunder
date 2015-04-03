@@ -11,6 +11,7 @@ import net.mcthunder.events.source.MetadataChangeEventSource;
 import net.mcthunder.events.source.PlayerChatEventSource;
 import net.mcthunder.events.source.PlayerCommandEventSource;
 import net.mcthunder.events.source.PlayerLoggingInEventSource;
+import net.mcthunder.gui.Window;
 import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
@@ -58,6 +59,7 @@ import org.spacehq.packetlib.packet.Packet;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
@@ -86,6 +88,8 @@ public class MCThunder {
     private static PlayerLoggingInEventSource loggingInEventSource;
     private static MetadataChangeEventSource metadataChangeEventSource;
     private static RankManager rankManager;
+    private static boolean guiMODE;
+    private static Window window;
 
     public static void main(String args[]) {
         AnsiConsole.systemInstall();
@@ -97,7 +101,11 @@ public class MCThunder {
         HOST = getIP();
         PORT = conf.getPort();
         RENDER_DISTANCE = conf.getRenderDistance();
+        guiMODE = conf.getGuiMode();
         //Done Set Server Data
+        if (guiMODE){
+            window = new Window();
+        }
         tellConsole(LoggingLevel.INFO, "Internal IP " + HOST);
         createInitialDirs();
         Biome.mapBiomes();
@@ -108,6 +116,7 @@ public class MCThunder {
         Achievement.mapAchievements();
         tellPublicIpAddress();
         //Register Default Commands
+
         /**
          * Based of of Alphabot/Lukabot code that was created by zack6849
          */
@@ -552,6 +561,8 @@ public class MCThunder {
         return PORT;
     }
 
+    public static boolean getGuiMode(){return guiMODE;}
+
     public static String getIp() {
         return HOST;
     }
@@ -617,6 +628,10 @@ public class MCThunder {
 
     public static Config getConfig() {
         return conf;
+    }
+
+    public static Window getGui(){
+        return window;
     }
 
     public static RankManager getRankManager(){return rankManager;}
