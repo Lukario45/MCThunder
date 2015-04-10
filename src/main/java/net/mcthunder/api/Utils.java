@@ -4,6 +4,11 @@ import net.mcthunder.MCThunder;
 import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.opennbt.tag.builtin.Tag;
 
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +16,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.text.Format;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Kevin on 8/9/2014.
@@ -22,6 +24,7 @@ import java.util.UUID;
 
 public class Utils {
     private static HashMap<UUID,Property> skins = new HashMap<>();
+    private static int ln = 0;
 
     public static String getIP() {
         InetAddress ip = null;
@@ -67,15 +70,108 @@ public class Utils {
     }
 
     public static void tellConsole(LoggingLevel level, String message) {
-        message = String.format("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), message);
-        System.out.print(MessageFormat.toConsole(message));
-
-
-
-        if (MCThunder.getGuiMode()){
-            MCThunder.getGui().getConsolePane().setText(MCThunder.getGui().getConsolePane().getText() + message);
+        System.out.print(MessageFormat.toConsole(String.format("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), message.trim())));
+        if (MCThunder.getGuiMode()) {
+            MCThunder.getGui().getConsolePane().setText(MCThunder.getGui().getConsolePane().getText() + String.format("%tH:%<tM:%<TS [%s] %s\r\n", new Date(),
+                    level.getName(), MessageFormat.formatMessage(message).getFullText().trim()));
+            message = String.format("%tH:%<tM:%<TS [%s] %s\r\n", new Date(), level.getName(), message.trim());
+            for (String col : Arrays.asList("&A", "&B", "&C", "&D", "&E", "&F", "&L", "&N", "&M", "&O", "&K", "&R"))
+                message = message.replaceAll(col, col.toLowerCase());
+            int plength = message.length();
+            message = message.replaceAll("&r", "&0").replaceAll("&m", "").replaceAll("&n", "").replaceAll("&o", "").replaceAll("&l", "").replaceAll("&k", "");
+            ln += plength - message.length();
+            String[] brokenMessage = message.split("&");
+            StyledDocument sdoc = MCThunder.getGui().getConsolePane().getStyledDocument();
+            boolean first = true;
+            for (String m : brokenMessage) {
+                if (m.equals("")) {
+                    if (!first)
+                        ln--;
+                    first = false;
+                    continue;
+                }
+                Character color = m.charAt(0);
+                SimpleAttributeSet attrs = new SimpleAttributeSet();
+                if (!first || message.startsWith("&"))
+                    switch (color) {
+                        case 'a':
+                            StyleConstants.setForeground(attrs, new Color(85, 255, 85));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case 'b':
+                            StyleConstants.setForeground(attrs, new Color(85, 255, 255));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case 'c':
+                            StyleConstants.setForeground(attrs, new Color(255, 85, 85));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case 'd':
+                            StyleConstants.setForeground(attrs, new Color(255, 85, 255));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case 'e':
+                            StyleConstants.setForeground(attrs, new Color(255, 255, 85));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case 'f':
+                            StyleConstants.setForeground(attrs, new Color(255, 255, 255));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case '0':
+                            StyleConstants.setForeground(attrs, new Color(0, 0, 0));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case '1':
+                            StyleConstants.setForeground(attrs, new Color(0, 0, 170));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case '2':
+                            StyleConstants.setForeground(attrs, new Color(0, 170, 0));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case '3':
+                            StyleConstants.setForeground(attrs, new Color(0, 170, 170));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case '4':
+                            StyleConstants.setForeground(attrs, new Color(170, 0, 0));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case '5':
+                            StyleConstants.setForeground(attrs, new Color(170, 0, 170));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case '6':
+                            StyleConstants.setForeground(attrs, new Color(255, 170, 0));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case '7':
+                            StyleConstants.setForeground(attrs, new Color(170, 170, 170));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case '8':
+                            StyleConstants.setForeground(attrs, new Color(85, 85, 85));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        case '9':
+                            StyleConstants.setForeground(attrs, new Color(85, 85, 255));
+                            sdoc.setCharacterAttributes(ln, m.length() - 1, attrs, false);
+                            break;
+                        default:
+                            StyleConstants.setForeground(attrs, new Color(0, 0, 0));
+                            sdoc.setCharacterAttributes(ln, m.length(), attrs, false);
+                            ln += 2;
+                            break;
+                    }
+                if(!first)
+                    ln += m.length();
+                else
+                    ln += m.length() - 2;
+                first = false;
+            }
+            MCThunder.getGui().getConsolePane().setStyledDocument(sdoc);
             MCThunder.getGui().getConsolePane().setCaretPosition(MCThunder.getGui().getConsolePane().getDocument().getLength());
-
         }
     }
 

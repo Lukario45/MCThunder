@@ -39,6 +39,6 @@ public class ServerChatHandler {
         ServerChatPacket packet = new ServerChatPacket(MessageFormat.formatMessage(message));//Only create packet once
         for (Player p : MCThunder.getPlayers())
             p.sendPacket(packet);
-        tellConsole(LoggingLevel.CHAT, message);
+        tellConsole(LoggingLevel.CHAT, message.trim());
     }
 }

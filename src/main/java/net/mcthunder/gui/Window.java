@@ -185,7 +185,6 @@ public class Window extends JFrame {
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
-
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner Evaluation license - Connor Smith
     private JFrame mainFrame;
@@ -213,6 +212,5 @@ public class Window extends JFrame {
     public void startGUI(){
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setVisible(true);
-
     }
 }

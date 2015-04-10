@@ -14,7 +14,7 @@ public class MessageFormat {
             return new TextMessage(message);
         for (String col : Arrays.asList("&A", "&B", "&C", "&D", "&E", "&F", "&L", "&N", "&M", "&O", "&K", "&R"))
             message = message.replaceAll(col, col.toLowerCase());
-        message += " ";//Sneaky work around to get it to show if only &s
+        message = "&r" + message + " ";//Sneaky work around to get it to show if only &s
         String[] brokenMessage = message.split("&");
         Message msg = new TextMessage("");
         ChatColor prev = ChatColor.WHITE;
@@ -152,6 +152,6 @@ public class MessageFormat {
         message = message.replaceAll("&e", "\u001B[33;1m");
         message = message.replaceAll("&f", "\u001B[37;1m");
         message = message.replaceAll("&l", "").replaceAll("&n", "").replaceAll("&o", "").replaceAll("&k", "").replaceAll("&m", "");
-        return message;
+        return message.trim();
     }
 }
