@@ -53,7 +53,11 @@ public class Horse extends Ageable {
         IntTag variant = tag.get("Variant");
         StringTag tamerName = tag.get("OwnerName");
         StringTag ownerUUID = (StringTag) tag.get("OwnerUUID");
-        UUID tamerUUID = ownerUUID == null ? UUID.randomUUID() : UUID.fromString(ownerUUID.getValue());
+        UUID tamerUUID = UUID.randomUUID();
+        try {
+            if (ownerUUID != null)
+                tamerUUID = UUID.fromString(ownerUUID.getValue());
+        } catch (Exception e) { }
         //this.inv.setItems((ListTag) tag.get("Items"));
         CompoundTag armorItem = tag.get("ArmorItem");
         CompoundTag saddleItem = tag.get("SaddleItem");

@@ -1,7 +1,7 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
-import net.mcthunder.material.Material;
+import net.mcthunder.block.Material;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.FallingBlockData;
 import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;

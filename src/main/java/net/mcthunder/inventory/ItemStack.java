@@ -1,7 +1,7 @@
 package net.mcthunder.inventory;
 
 import net.mcthunder.api.*;
-import net.mcthunder.material.Material;
+import net.mcthunder.block.Material;
 import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.opennbt.tag.builtin.*;
 

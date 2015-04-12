@@ -14,7 +14,7 @@ import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
 import net.mcthunder.inventory.*;
-import net.mcthunder.material.Material;
+import net.mcthunder.block.Material;
 import net.mcthunder.rankmanager.RankManager;
 import net.mcthunder.world.Biome;
 import net.mcthunder.world.World;

@@ -3,7 +3,7 @@ package net.mcthunder.entity;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.*;
 import net.mcthunder.inventory.ItemStack;
-import net.mcthunder.material.Material;
+import net.mcthunder.block.Material;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityMetadataPacket;

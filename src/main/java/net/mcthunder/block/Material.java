@@ -1,4 +1,4 @@
-package net.mcthunder.material;
+package net.mcthunder.block;
 
 import java.util.ArrayList;
 import java.util.Arrays;

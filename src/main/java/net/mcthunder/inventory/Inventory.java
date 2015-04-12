@@ -1,6 +1,6 @@
 package net.mcthunder.inventory;
 
-import net.mcthunder.material.Material;
+import net.mcthunder.block.Material;
 import org.spacehq.mc.protocol.data.game.values.window.WindowType;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerOpenWindowPacket;
 import org.spacehq.opennbt.tag.builtin.*;

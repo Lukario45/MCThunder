@@ -1,6 +1,6 @@
 package net.mcthunder.crafting;
 
-import net.mcthunder.material.Material;
+import net.mcthunder.block.Material;
 
 /**
  * Created by Kevin on 12/12/2014.

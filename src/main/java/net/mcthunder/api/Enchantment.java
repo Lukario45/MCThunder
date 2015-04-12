@@ -1,6 +1,6 @@
 package net.mcthunder.api;
 
-import net.mcthunder.material.Material;
+import net.mcthunder.block.Material;
 
 import java.util.ArrayList;
 import java.util.Arrays;

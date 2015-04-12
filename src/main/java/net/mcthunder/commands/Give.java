@@ -4,7 +4,7 @@ import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.entity.Player;
 import net.mcthunder.inventory.ItemStack;
-import net.mcthunder.material.Material;
+import net.mcthunder.block.Material;
 
 public class Give extends Command {
     public Give() {
