@@ -278,7 +278,7 @@ public class MCThunder {
                                 case ATTACK:
                                     try {
 
-                                        playerAttackEntityEventSource.fireEvent(player, getEntity(packet.getEntityId()));
+                                        playerAttackEntityEventSource.fireEvent(player, player.getWorld().getEntityFromID(packet.getEntityId()));
                                     } catch (ClassNotFoundException e) {
                                         e.printStackTrace();
                                     }

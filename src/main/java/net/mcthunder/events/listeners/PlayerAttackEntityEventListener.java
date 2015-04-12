@@ -15,15 +15,16 @@ public class PlayerAttackEntityEventListener implements PlayerAttackEntityEventL
 
     @Override
     public void onAttackEntity(Player player, Entity entity) {
-        if (entity.getType().isCreature()){
+        if (entity.getType().isCreature() || entity instanceof Player){
             float health = (float) entity.getMetadata().getMetadata(6);
             health = health - player.getHeldItem().getType().getAttackDamnage();
             player.sendMessage("Health " + health);
-            MCThunder.getEntity(entity.getEntityID()).getMetadata().setMetadata(6, health);
-            if ((float) MCThunder.getEntity(entity.getEntityID()).getMetadata().getMetadata(6) <= 0f){
+           player.getWorld().getEntityFromID(entity.getEntityID()).getMetadata().setMetadata(6, health);
+            if ((float) player.getWorld().getEntityFromID(entity.getEntityID()).getMetadata().getMetadata(6) <= 0f){
                 ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(entity.getEntityID());
                 player.sendPacket(destroyEntitiesPacket);
-                MCThunder.removeEntity(entity.getEntityID());
+               player.getWorld().removeEntity(entity.getEntityID());
+
 
             }
 

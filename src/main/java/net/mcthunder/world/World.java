@@ -234,6 +234,10 @@ public class World {
         return this.difficulty;
     }
 
+    public void removeEntity(int e){
+        this.loadedEntities.remove(e);
+    }
+
     public WorldType getWorldType() {
         return this.worldType;
     }
@@ -252,6 +256,10 @@ public class World {
 
     public Collection<Entity> getEntities() {
         return this.loadedEntities.values();
+    }
+
+    public Entity getEntityFromID(int ID){
+        return this.loadedEntities.get(ID);
     }
 
     public void loadEntity(Entity e) {
