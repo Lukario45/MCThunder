@@ -21,8 +21,9 @@ public class PlayerAttackEntityEventListener implements PlayerAttackEntityEventL
             float health = e.getHealth() - 1 - player.getHeldItem().getBonusDamnage();
             player.sendMessage("Health " + health);
             e.setHealth(health);
-            if (e.getHealth() <= 0f)
+            if (e.getHealth() <= 0f) {
                 player.getWorld().removeEntity(entity.getEntityID());
+                 }
             /*else {
                 ServerEntityStatusPacket packet = new ServerEntityStatusPacket(e.getEntityID(), EntityStatus.HURT_OR_MINECART_SPAWNER_DELAY_RESET);
                 for (Player p : MCThunder.getPlayers())
