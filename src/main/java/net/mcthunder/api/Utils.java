@@ -4,7 +4,6 @@ import net.mcthunder.MCThunder;
 import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.opennbt.tag.builtin.Tag;
 
-import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -16,7 +15,10 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Created by Kevin on 8/9/2014.

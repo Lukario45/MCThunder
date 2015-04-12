@@ -4,14 +4,11 @@ import com.Lukario45.NBTFile.Utilities;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
 import net.mcthunder.api.CommandRegistry;
-import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.entity.Player;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 
 import java.util.ArrayList;
 import java.util.Collections;
-
-import static net.mcthunder.api.Utils.tellConsole;
 
 public class Help extends Command {//Ported by pup from Necessities
 

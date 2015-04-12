@@ -4,9 +4,8 @@
 
 package net.mcthunder.gui;
 
-import java.awt.*;
 import javax.swing.*;
-import javax.swing.GroupLayout;
+import java.awt.*;
 
 /**
  * @author unknown

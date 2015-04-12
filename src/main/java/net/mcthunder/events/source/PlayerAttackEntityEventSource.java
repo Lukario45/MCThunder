@@ -1,13 +1,9 @@
 package net.mcthunder.events.source;
 
-import net.mcthunder.MCThunder;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
 import net.mcthunder.events.PlayerAttackEntityEvent;
-import net.mcthunder.events.PlayerLoggingInEvent;
 import net.mcthunder.events.interfaces.PlayerAttackEntityEventListenerInterface;
-import net.mcthunder.events.interfaces.PlayerLoggingInEventListenerInterface;
-import org.spacehq.packetlib.Session;
 
 import java.util.ArrayList;
 import java.util.List;

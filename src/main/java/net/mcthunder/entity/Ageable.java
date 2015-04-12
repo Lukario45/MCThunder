@@ -36,10 +36,14 @@ public abstract class Ageable extends LivingEntity {
             this.forcedAge = forcedAge.getValue();
         if (forcedAge != null)
             this.forcedAge = forcedAge.getValue();
-        if (uuid != null)
-            this.ownerUUID = UUID.fromString(uuid.getValue());
-        else if (owner != null)
-            this.ownerUUID = Utils.getUUIDfromString(owner.getValue());
+        try {
+            if (uuid != null)
+                this.ownerUUID = UUID.fromString(uuid.getValue());
+            else if (owner != null)
+                this.ownerUUID = Utils.getUUIDfromString(owner.getValue());
+        } catch (Exception e) {
+            this.ownerUUID = UUID.randomUUID();
+        }
         this.sitting = sitting != null && sitting.getValue() == (byte) 1;
         this.metadata.setMetadata(12, (byte) this.age);//age in ticks, negative implies child
     }

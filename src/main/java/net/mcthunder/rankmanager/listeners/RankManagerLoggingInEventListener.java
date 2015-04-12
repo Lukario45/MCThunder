@@ -1,23 +1,24 @@
 package net.mcthunder.rankmanager.listeners;
 
 import com.Lukario45.NBTFile.Utilities;
-
-
 import net.mcthunder.MCThunder;
 import net.mcthunder.entity.Player;
 import net.mcthunder.events.interfaces.PlayerLoggingInEventListenerInterface;
 import net.mcthunder.rankmanager.PlayerRank;
-
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.ListTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.opennbt.tag.builtin.Tag;
-;
 import org.spacehq.packetlib.Session;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+;
 
 /**
  * Created by Kevin on 11/12/2014.

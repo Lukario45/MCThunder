@@ -10,8 +10,6 @@ import net.mcthunder.rankmanager.listeners.RankManagerCommandEventListener;
 import net.mcthunder.rankmanager.listeners.RankManagerLoggingInEventListener;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import org.spacehq.opennbt.tag.builtin.ListTag;
-import org.spacehq.opennbt.tag.builtin.StringTag;
 import org.spacehq.opennbt.tag.builtin.Tag;
 
 import java.io.File;
