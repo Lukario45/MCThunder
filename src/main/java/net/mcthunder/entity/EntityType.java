@@ -109,9 +109,8 @@ public enum EntityType {
     }
 
     public boolean isCreature() {
-        return this.id >= 48 || getName().equals("PLAYER");
+        return this.id >= 48;
     }
-
 
     public boolean isItem() {
         return this.id == 1 || this.id == 2;

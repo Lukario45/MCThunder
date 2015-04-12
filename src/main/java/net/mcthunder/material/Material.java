@@ -617,9 +617,9 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     ACACIA_DOOR_BLOCK("ACACIA_DOOR_BLOCK", 196),//Unobtainable
     DARK_OAK_DOOR_BLOCK("DARK_OAK_DOOR_BLOCK", 197),//Unobtainable
     //ITEM IDS
-    IRON_SHOVEL("IRON_SHOVEL", 256,4),
-    IRON_PICKAXE("IRON_PICKAXE", 257,5),
-    IRON_AXE("IRON_AXE", 258,6),
+    IRON_SHOVEL("IRON_SHOVEL", 256),
+    IRON_PICKAXE("IRON_PICKAXE", 257),
+    IRON_AXE("IRON_AXE", 258),
     FLINT_AND_STEEL("FLINT_AND_STEEL", 259),
     APPLE("APPLE", 260),
     BOW("BOW", 261),
@@ -628,19 +628,19 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     DIAMOND("DIAMOND", 264),
     IRON_INGOT("IRON_INGOT", 265 ,Arrays.asList("IRON")),
     GOLD_INGOT("GOLD_INGOT", 266,Arrays.asList("GOLD","BUTTER")),
-    IRON_SWORD("IRON_SWORD", 267,7),
-    WOODEN_SWORD("WOODEN_SWORD", 268,Arrays.asList("WOOD_SWORD"),5),
-    WOODEN_SHOVEL("WOODEN_SHOVEL", 269,Arrays.asList("WOOD_SHOVEL"),3),
-    WOODEN_PICKAXE("WOODEN_PICKAXE", 270,Arrays.asList("WOOD_PICKAXE","WOOD_PICK"),3),
-    WOODEN_AXE("WOODEN_AXE", 271,Arrays.asList("WOOD_AXE"),3),
-    STONE_SWORD("STONE_SWORD", 272,6),
-    STONE_SHOVEL("STONE_SHOVEL", 273,3),
-    STONE_PICKAXE("STONE_PICKAXE", 274,Arrays.asList("STONE_PICK"),4),
-    STONE_AXE("STONE_AXE", 275,5),
-    DIAMOND_SWORD("DIAMOND_SWORD", 276,8),
-    DIAMOND_SHOVEL("DIAMOND_SHOVEL", 277,5),
-    DIAMOND_PICKAXE("DIAMOND_PICKAXE", 278,Arrays.asList("DIAMOND_PICK"),6),
-    DIAMOND_AXE("DIAMOND_AXE", 279,7),
+    IRON_SWORD("IRON_SWORD", 267),
+    WOODEN_SWORD("WOODEN_SWORD", 268,Arrays.asList("WOOD_SWORD")),
+    WOODEN_SHOVEL("WOODEN_SHOVEL", 269,Arrays.asList("WOOD_SHOVEL")),
+    WOODEN_PICKAXE("WOODEN_PICKAXE", 270,Arrays.asList("WOOD_PICKAXE","WOOD_PICK")),
+    WOODEN_AXE("WOODEN_AXE", 271,Arrays.asList("WOOD_AXE")),
+    STONE_SWORD("STONE_SWORD", 272),
+    STONE_SHOVEL("STONE_SHOVEL", 273),
+    STONE_PICKAXE("STONE_PICKAXE", 274,Arrays.asList("STONE_PICK")),
+    STONE_AXE("STONE_AXE", 275),
+    DIAMOND_SWORD("DIAMOND_SWORD", 276),
+    DIAMOND_SHOVEL("DIAMOND_SHOVEL", 277),
+    DIAMOND_PICKAXE("DIAMOND_PICKAXE", 278,Arrays.asList("DIAMOND_PICK")),
+    DIAMOND_AXE("DIAMOND_AXE", 279),
     STICK("STICK", 280),
     BOWL("BOWL", 281),
     MUSHROOM_STEW("MUSHROOM_STEW", 282,Arrays.asList("STEW")),
@@ -950,15 +950,11 @@ public enum Material {//http://minecraft.gamepedia.com/Id
     private final Material parent;
     private final String name;
     private final Integer id;
-    private final Integer attackDamnage;
     private final short data;
     private List<String> aliases;
+
     private Material(String name, int id) {
         this(name, id, new ArrayList<String>());
-    }
-
-    private Material(String name, int id, int attackDamnage) {
-        this(name, id, new ArrayList<String>(), attackDamnage);
     }
 
     private Material(String name, int id, List<String> aliases) {
@@ -968,23 +964,10 @@ public enum Material {//http://minecraft.gamepedia.com/Id
         this.aliases = aliases;
         this.parent = this;
         this.children = new HashMap<>();
-        this.attackDamnage = 1;
-    }
-    private Material(String name, int id, List<String> aliases, int attackDamnage){
-        this.name = name;
-        this.id = id;
-        this.data = 0;
-        this.aliases = aliases;
-        this.parent = this;
-        this.children = new HashMap<>();
-        this.attackDamnage = attackDamnage;
     }
 
     private Material(String name, Material parent, short data) {
         this(name, parent, data, new ArrayList<String>());
-    }
-    private Material(String name, Material parent, short data,int attackDamnage) {
-        this(name, parent, data, new ArrayList<String>(), attackDamnage);
     }
 
     private Material(String name, Material parent, short data, List<String> aliases) {
@@ -995,18 +978,6 @@ public enum Material {//http://minecraft.gamepedia.com/Id
         this.parent = parent;
         this.children = new HashMap<>();
         this.parent.addChild(this.data, this);
-        this.attackDamnage = 1;
-    }
-
-    private Material(String name, Material parent, short data, List<String> aliases,int attackDamnage) {
-        this.name = name;
-        this.data = data;
-        this.id = null;
-        this.aliases = aliases;
-        this.parent = parent;
-        this.children = new HashMap<>();
-        this.parent.addChild(this.data, this);
-        this.attackDamnage = attackDamnage;
     }
 
     protected void addChild(short data, Material child) {
@@ -1055,10 +1026,6 @@ public enum Material {//http://minecraft.gamepedia.com/Id
 
     public boolean isLiquid() {
         return this.getParent().equals(WATER) || this.getParent().equals(FLOWING_WATER) || this.getParent().equals(LAVA) || this.getParent().equals(FLOWING_LAVA);
-    }
-
-    public float getAttackDamnage(){
-        return (float) attackDamnage;
     }
 
     public boolean isPotion() {

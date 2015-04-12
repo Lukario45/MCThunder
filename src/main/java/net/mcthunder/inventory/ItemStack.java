@@ -16,9 +16,9 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
     private List<String> pages = new ArrayList<>(), lore = new ArrayList<>();
     private boolean unbreakable = false, resolved = false, scaling = false;
     private ArrayList<Decoration> decorations = new ArrayList<>();
+    private HashMap<String,Modifier> modifiers = new HashMap<>();
     private ArrayList<Explosion> explosions = new ArrayList<>();
     private ArrayList<Property> textures = new ArrayList<>();
-    private ArrayList<Modifier> modifiers = new ArrayList<>();
     private CompoundTag blockEntityTag = null;
     private UUID ownerUUID = null;
     private byte flight = 0;
@@ -85,8 +85,8 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
                     LongTag modUUIDMost = modifier.get("UUIDMost");
                     LongTag modUUIDLeast = modifier.get("UUIDLeast");
                     if (attributeName != null && modName != null && modAmount != null && operation != null && modUUIDMost != null && modUUIDLeast != null)
-                        this.modifiers.add(new Modifier(attributeName.getValue(), modName.getValue(), modAmount.getValue(), operation.getValue(),
-                                modUUIDMost.getValue(), modUUIDLeast.getValue()));
+                        this.modifiers.put(attributeName.getValue().trim(), new Modifier(attributeName.getValue(), modName.getValue(), modAmount.getValue(), operation.getValue(),
+                            modUUIDMost.getValue(), modUUIDLeast.getValue()));
                 }
             ListTag customPotionEffects = nbt.get("CustomPotionEffects");
             if (customPotionEffects != null)
@@ -200,6 +200,32 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
                         this.decorations.add(new Decoration(id.getValue(), decorationType.getValue(), x.getValue(), z.getValue(), rotation.getValue()));
                 }
         }
+        if (!this.modifiers.containsKey("generic.attackDamage")) {
+            Modifier d = getDamage();
+            if (d != null)
+                modifiers.put(d.getAttributeName(), d);
+        }
+    }
+
+    private Modifier getDamage() {
+        UUID temp = UUID.randomUUID();
+        if (this.type.equals(Material.WOODEN_SHOVEL) || this.type.equals(Material.GOLDEN_SHOVEL))
+            return new Modifier("generic.attackDamage", "generic.attackDamage",1,0,temp.getLeastSignificantBits(), temp.getMostSignificantBits());
+        else if (this.type.equals(Material.WOODEN_PICKAXE) || this.type.equals(Material.GOLDEN_PICKAXE) || this.type.equals(Material.STONE_SHOVEL))
+            return new Modifier("generic.attackDamage", "generic.attackDamage",2,0,temp.getLeastSignificantBits(), temp.getMostSignificantBits());
+        else if (this.type.equals(Material.WOODEN_AXE) || this.type.equals(Material.GOLDEN_AXE) || this.type.equals(Material.STONE_PICKAXE) ||
+                this.type.equals(Material.IRON_SHOVEL))
+            return new Modifier("generic.attackDamage", "generic.attackDamage",3,0,temp.getLeastSignificantBits(), temp.getMostSignificantBits());
+        else if (this.type.equals(Material.WOODEN_SWORD) || this.type.equals(Material.GOLDEN_SWORD) || this.type.equals(Material.STONE_AXE) ||
+                this.type.equals(Material.IRON_PICKAXE) || this.type.equals(Material.DIAMOND_SHOVEL))
+            return new Modifier("generic.attackDamage", "generic.attackDamage",4,0,temp.getLeastSignificantBits(), temp.getMostSignificantBits());
+        else if (this.type.equals(Material.STONE_SWORD) || this.type.equals(Material.IRON_AXE) || this.type.equals(Material.DIAMOND_PICKAXE))
+            return new Modifier("generic.attackDamage", "generic.attackDamage",5,0,temp.getLeastSignificantBits(), temp.getMostSignificantBits());
+        else if (this.type.equals(Material.IRON_SWORD) || this.type.equals(Material.DIAMOND_AXE))
+            return new Modifier("generic.attackDamage", "generic.attackDamage",6,0,temp.getLeastSignificantBits(), temp.getMostSignificantBits());
+        else if (this.type.equals(Material.DIAMOND_SWORD))
+            return new Modifier("generic.attackDamage", "generic.attackDamage",7,0,temp.getLeastSignificantBits(), temp.getMostSignificantBits());
+        return null;
     }
 
     public Material getType() {
@@ -265,17 +291,19 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
     }
 
     public Collection<Modifier> getModifiers() {
-        return this.modifiers;
+        return this.modifiers.values();
+    }
+
+    public Modifier getModifier(String name) {
+        return this.modifiers.get(name);
     }
 
     public void addModifier(Modifier m) {
-        if (!this.modifiers.contains(m))
-            this.modifiers.add(m);
+        this.modifiers.put(m.getAttributeName(), m);
     }
 
     public void removeModifier(Modifier m) {
-        if (this.modifiers.contains(m))
-            this.modifiers.remove(m);
+        this.modifiers.remove(m.getAttributeName());
     }
 
     public Collection<Explosion> getExplosions() {
@@ -322,6 +350,10 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
     public void setLore(List<String> lore) {
         if (lore != null)
             this.lore = lore;
+    }
+
+    public float getBonusDamnage() {
+        return (float) (this.modifiers.get("generic.attackDamage") == null ? 0 : this.modifiers.get("generic.attackDamage").getAmount());
     }
 
     public Collection<Material> getCanBePlacedOn() {
@@ -573,7 +605,7 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
         if (this.repairCost > 0)
             nbt.put(new IntTag("RepairCost", this.repairCost));
         temp.clear();
-        for (Modifier mod : this.modifiers) {
+        for (Modifier mod : this.modifiers.values()) {
             CompoundTag modifier = new CompoundTag("Modifier");//Is this proper tag name and does it matter
             modifier.put(new StringTag("AttributeName", mod.getAttributeName()));
             modifier.put(new StringTag("Name", mod.getName()));

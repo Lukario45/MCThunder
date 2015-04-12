@@ -74,7 +74,6 @@ public class MCThunder {
     private static ArrayList<Bot> bots;
     private static HashMap<UUID, Player> players;
     private static HashMap<String, World> worlds;
-    private static HashMap<Integer, Entity> entities;
     private static Config conf;
     private static String serverName;
     private static String HOST;
@@ -173,7 +172,6 @@ public class MCThunder {
         players = new HashMap<>(conf.getSlots());
         worlds = new HashMap<>();
         bots = new ArrayList<>();
-        entities = new HashMap<>();
         //Load the world files and check for subdirectories recursively if it is not a world folder
         File dir = new File("worlds");
         File[] files = dir.listFiles();
@@ -277,7 +275,6 @@ public class MCThunder {
                                     break;
                                 case ATTACK:
                                     try {
-
                                         playerAttackEntityEventSource.fireEvent(player, player.getWorld().getEntityFromID(packet.getEntityId()));
                                     } catch (ClassNotFoundException e) {
                                         e.printStackTrace();
@@ -656,18 +653,6 @@ public class MCThunder {
 
     public static Collection<World> getWorlds() {
         return worlds.values();
-    }
-
-    public static void addEntity(int ID, Entity entity){
-        entities.put(ID,entity);
-    }
-
-    public static void removeEntity(int ID){
-        entities.remove(ID);
-    }
-
-    public static Entity getEntity(int ID){
-        return entities.get(ID);
     }
 
     public static Config getConfig() {
