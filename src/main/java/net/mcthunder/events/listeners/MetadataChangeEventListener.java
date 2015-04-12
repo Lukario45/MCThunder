@@ -3,10 +3,11 @@ package net.mcthunder.events.listeners;
 import net.mcthunder.MCThunder;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
+import net.mcthunder.events.interfaces.MetadataChangeEventListenerInterface;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityMetadataPacket;
 
-public class MetadataChangeEventListener implements net.mcthunder.interfaces.MetadataChangeEventListener {
+public class MetadataChangeEventListener implements MetadataChangeEventListenerInterface {
     @Override
     public boolean removeDefaultListener() {
         return false;

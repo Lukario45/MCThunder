@@ -40,6 +40,7 @@ public class ArmorStand extends Entity {
         this.metadata.setMetadata(16, this.rightLegPitch);
         this.metadata.setMetadata(1010, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegYaw));
         this.metadata.setMetadata(1011, new EntityMetadata(16, MetadataType.FLOAT, this.rightLegRoll));
+        
     }
 
     public ArmorStand(World w, CompoundTag tag) {

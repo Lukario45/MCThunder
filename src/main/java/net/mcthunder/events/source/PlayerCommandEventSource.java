@@ -2,7 +2,7 @@ package net.mcthunder.events.source;
 
 import net.mcthunder.entity.Player;
 import net.mcthunder.events.PlayerCommandEvent;
-import net.mcthunder.interfaces.PlayerCommandEventListener;
+import net.mcthunder.events.interfaces.PlayerCommandEventListenerInterface;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class PlayerCommandEventSource {
     private static boolean removeDefault = false;
     private List playerCommandEventListeners = new ArrayList();
 
-    public synchronized void addEventListener(PlayerCommandEventListener listener) {
+    public synchronized void addEventListener(PlayerCommandEventListenerInterface listener) {
         if (listener.removeDefaultListener() && !playerCommandEventListeners.isEmpty() && !removeDefault) {
             playerCommandEventListeners.remove(0);
             removeDefault = true;
@@ -24,7 +24,7 @@ public class PlayerCommandEventSource {
         playerCommandEventListeners.add(listener);
     }
 
-    public synchronized void removeEventListener(PlayerCommandEventListener listener) {
+    public synchronized void removeEventListener(PlayerCommandEventListenerInterface listener) {
         playerCommandEventListeners.remove(listener);
     }
 
@@ -33,7 +33,7 @@ public class PlayerCommandEventSource {
         Iterator iterator = playerCommandEventListeners.iterator();
         while (iterator.hasNext())
             try {
-                ((PlayerCommandEventListener) iterator.next()).onCommand(player, packet);
+                ((PlayerCommandEventListenerInterface) iterator.next()).onCommand(player, packet);
             } catch (ClassNotFoundException e) {
                 player.sendMessage("&4Unknown Command!");
             }

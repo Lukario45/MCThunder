@@ -6,6 +6,7 @@ import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Bot;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
+import net.mcthunder.events.interfaces.PlayerLoggingInEventListenerInterface;
 import org.spacehq.mc.auth.GameProfile;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
@@ -20,7 +21,7 @@ import static net.mcthunder.api.Utils.tellConsole;
 /**
  * Created by Kevin on 11/12/2014.
  */
-public class PlayerLoggingInEventListener implements net.mcthunder.interfaces.PlayerLoggingInEventListener {
+public class PlayerLoggingInEventListener implements PlayerLoggingInEventListenerInterface {
     @Override
     public void onLogin(Session session) throws ClassNotFoundException {
         GameProfile profile = session.getFlag(ProtocolConstants.PROFILE_KEY);

@@ -5,6 +5,7 @@ import com.Lukario45.NBTFile.Utilities;
 
 import net.mcthunder.MCThunder;
 import net.mcthunder.entity.Player;
+import net.mcthunder.events.interfaces.PlayerLoggingInEventListenerInterface;
 import net.mcthunder.rankmanager.PlayerRank;
 
 import org.spacehq.mc.auth.GameProfile;
@@ -21,7 +22,7 @@ import java.util.*;
 /**
  * Created by Kevin on 11/12/2014.
  */
-public class RankManagerLoggingInEventListener implements net.mcthunder.interfaces.PlayerLoggingInEventListener {
+public class RankManagerLoggingInEventListener implements PlayerLoggingInEventListenerInterface {
     @Override
     public void onLogin(Session session) throws ClassNotFoundException {
         Player player = MCThunder.getPlayer(session.<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());

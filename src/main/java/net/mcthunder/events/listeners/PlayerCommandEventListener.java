@@ -4,6 +4,7 @@ import net.mcthunder.api.Command;
 import net.mcthunder.api.CommandRegistry;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.entity.Player;
+import net.mcthunder.events.interfaces.PlayerCommandEventListenerInterface;
 import org.apache.commons.lang.StringUtils;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 
@@ -12,7 +13,7 @@ import static net.mcthunder.api.Utils.tellConsole;
 /**
  * Created by Kevin on 10/13/2014.
  */
-public class PlayerCommandEventListener implements net.mcthunder.interfaces.PlayerCommandEventListener {
+public class PlayerCommandEventListener implements PlayerCommandEventListenerInterface {
 
 
     @Override

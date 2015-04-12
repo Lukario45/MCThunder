@@ -25,6 +25,7 @@ public abstract class Entity {
     protected Location location;
     protected EntityType type;
     protected int entityID;
+    private boolean isLiving;
     /*TODO: Finish storing and returning the information from the tags for the following entity types
     ArmorStand
     Arrow
@@ -45,6 +46,11 @@ public abstract class Entity {
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.ARM_UP, false);//Eating, drinking, blocking
         this.metadata.setBit(MetadataConstants.STATUS, MetadataConstants.StatusFlags.INVISIBLE, this.invisible);
         this.metadata.setMetadata(1, this.airLeft);
+        MCThunder.addEntity(getEntityID(),this);
+    }
+
+    public EntityType getType(){
+        return type;
     }
 
     protected Entity(World w, CompoundTag tag) {
@@ -110,6 +116,7 @@ public abstract class Entity {
         StringTag affectedItemsObjective = commandStats != null ? (StringTag) commandStats.get("AffectedItemsObjective") : null;
         StringTag queryResultName = commandStats != null ? (StringTag) commandStats.get("QueryResultName") : null;
         StringTag queryResultObjective = commandStats != null ? (StringTag) commandStats.get("QueryResultObjective") : null;
+        MCThunder.addEntity(getEntityID(),this);
     }
 
     public static int getNextID() {

@@ -3,14 +3,16 @@ package net.mcthunder;
 import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
 import net.mcthunder.entity.*;
+import net.mcthunder.events.PlayerAttackEntityEvent;
+import net.mcthunder.events.interfaces.PlayerAttackEntityEventListenerInterface;
+import net.mcthunder.events.interfaces.PlayerCommandEventListenerInterface;
+import net.mcthunder.events.interfaces.PlayerLoggingInEventListenerInterface;
+import net.mcthunder.events.listeners.PlayerAttackEntityEventListener;
 import net.mcthunder.events.listeners.MetadataChangeEventListener;
 import net.mcthunder.events.listeners.PlayerChatEventListener;
 import net.mcthunder.events.listeners.PlayerCommandEventListener;
 import net.mcthunder.events.listeners.PlayerLoggingInEventListener;
-import net.mcthunder.events.source.MetadataChangeEventSource;
-import net.mcthunder.events.source.PlayerChatEventSource;
-import net.mcthunder.events.source.PlayerCommandEventSource;
-import net.mcthunder.events.source.PlayerLoggingInEventSource;
+import net.mcthunder.events.source.*;
 import net.mcthunder.gui.Window;
 import net.mcthunder.handlers.PlayerProfileHandler;
 import net.mcthunder.handlers.ServerChatHandler;
@@ -59,7 +61,6 @@ import org.spacehq.packetlib.packet.Packet;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
@@ -73,6 +74,7 @@ public class MCThunder {
     private static ArrayList<Bot> bots;
     private static HashMap<UUID, Player> players;
     private static HashMap<String, World> worlds;
+    private static HashMap<Integer, Entity> entities;
     private static Config conf;
     private static String serverName;
     private static String HOST;
@@ -87,6 +89,7 @@ public class MCThunder {
     private static PlayerCommandEventSource playerCommandEventSource;
     private static PlayerLoggingInEventSource loggingInEventSource;
     private static MetadataChangeEventSource metadataChangeEventSource;
+    private static PlayerAttackEntityEventSource playerAttackEntityEventSource;
     private static RankManager rankManager;
     private static boolean guiMODE;
     private static Window window;
@@ -147,14 +150,21 @@ public class MCThunder {
         PlayerCommandEventListener defaultPlayerCommandEventListener = new PlayerCommandEventListener();
         PlayerLoggingInEventListener loggingInEventListener = new PlayerLoggingInEventListener();
         MetadataChangeEventListener metadataChangeEventListener = new MetadataChangeEventListener();
+        PlayerAttackEntityEventListener playerAttackEntityEventListener = new PlayerAttackEntityEventListener();
+
         playerChatEventSource = new PlayerChatEventSource();
         playerCommandEventSource = new PlayerCommandEventSource();
         loggingInEventSource = new PlayerLoggingInEventSource();
         metadataChangeEventSource = new MetadataChangeEventSource();
+        playerAttackEntityEventSource = new PlayerAttackEntityEventSource();
+
         playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
         playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
         loggingInEventSource.addEventListener(loggingInEventListener);
         metadataChangeEventSource.addEventListener(metadataChangeEventListener);
+        playerAttackEntityEventSource.addEventListener(playerAttackEntityEventListener);
+
+
         if (conf.getUseRankManager()) {
            rankManager = new RankManager();
             rankManager.load();
@@ -163,6 +173,7 @@ public class MCThunder {
         players = new HashMap<>(conf.getSlots());
         worlds = new HashMap<>();
         bots = new ArrayList<>();
+        entities = new HashMap<>();
         //Load the world files and check for subdirectories recursively if it is not a world folder
         File dir = new File("worlds");
         File[] files = dir.listFiles();
@@ -257,6 +268,26 @@ public class MCThunder {
                                     }
                             } else
                                 playerChatEventSource.fireEvent(player, packet);
+                        } else if (event.getPacket() instanceof ClientPlayerInteractEntityPacket){
+                            Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
+                            ClientPlayerInteractEntityPacket packet = event.getPacket();
+                            switch (packet.getAction()) {
+                                 case INTERACT:
+                                   player.sendMessage("INTERACT/INTERACTAT");
+                                    break;
+                                case ATTACK:
+                                    try {
+
+                                        playerAttackEntityEventSource.fireEvent(player, getEntity(packet.getEntityId()));
+                                    } catch (ClassNotFoundException e) {
+                                        e.printStackTrace();
+                                    }
+                                    break;
+                                case INTERACT_AT:
+                                    //player.sendMessage("You have attacked an entity");
+                                    break;
+                            }
+
                         } else if (event.getPacket() instanceof ClientKeepAlivePacket)
                             event.getSession().send(new ServerKeepAlivePacket(event.<ClientKeepAlivePacket>getPacket().getPingId()));
                         else if (event.getPacket() instanceof ClientSettingsPacket) {
@@ -627,6 +658,18 @@ public class MCThunder {
         return worlds.values();
     }
 
+    public static void addEntity(int ID, Entity entity){
+        entities.put(ID,entity);
+    }
+
+    public static void removeEntity(int ID){
+        entities.remove(ID);
+    }
+
+    public static Entity getEntity(int ID){
+        return entities.get(ID);
+    }
+
     public static Config getConfig() {
         return conf;
     }
@@ -637,11 +680,14 @@ public class MCThunder {
 
     public static RankManager getRankManager(){return rankManager;}
 
-    public static void addLoginEventListener(net.mcthunder.interfaces.PlayerLoggingInEventListener listener) {
+    public static void addLoginEventListener(PlayerLoggingInEventListenerInterface listener) {
         loggingInEventSource.addEventListener(listener);
     }
-    public static void addCommandEventListener(net.mcthunder.interfaces.PlayerCommandEventListener listener){
+    public static void addCommandEventListener(PlayerCommandEventListenerInterface listener){
         playerCommandEventSource.addEventListener(listener);
+    }
+    public static void addPlayerEntityAttackListener(PlayerAttackEntityEventListenerInterface listener){
+        playerAttackEntityEventSource.addEventListener(listener);
     }
 
     public static PlayerProfileHandler getProfileHandler() {
