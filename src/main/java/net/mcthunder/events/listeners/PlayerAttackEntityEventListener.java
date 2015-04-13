@@ -18,7 +18,7 @@ public class PlayerAttackEntityEventListener implements PlayerAttackEntityEventL
 
     @Override
     public void onAttackEntity(Player player, Entity entity) {
-        if (entity instanceof LivingEntity && entity.getType().getName().equals("PLAYER")){
+        if (entity instanceof LivingEntity && !entity.getType().getName().equals("PLAYER")){
             LivingEntity e = (LivingEntity) player.getWorld().getEntityFromID(entity.getEntityID());
             health = e.getHealth() - 1 - player.getHeldItem().getBonusDamnage();
             e.setHealth(health);
