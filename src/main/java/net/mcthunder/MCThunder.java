@@ -2,6 +2,7 @@ package net.mcthunder;
 
 import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
+import net.mcthunder.block.Material;
 import net.mcthunder.entity.*;
 import net.mcthunder.events.interfaces.PlayerAttackEntityEventListenerInterface;
 import net.mcthunder.events.interfaces.PlayerCommandEventListenerInterface;
@@ -14,7 +15,6 @@ import net.mcthunder.handlers.ServerChatHandler;
 import net.mcthunder.handlers.ServerPlayerEntryListHandler;
 import net.mcthunder.handlers.ServerTabHandler;
 import net.mcthunder.inventory.*;
-import net.mcthunder.block.Material;
 import net.mcthunder.rankmanager.RankManager;
 import net.mcthunder.world.Biome;
 import net.mcthunder.world.World;
@@ -264,13 +264,27 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientPlayerInteractEntityPacket){
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ClientPlayerInteractEntityPacket packet = event.getPacket();
+                            Entity ent = player.getWorld().getEntityFromID(packet.getEntityId());
+                            if (ent == null) {
+                                for (Player p : MCThunder.getPlayers())
+                                    if (p.getEntityID() == packet.getEntityId()){
+                                        ent = p;
+                                        break;
+                                    }
+                                if (ent == null)
+                                    for (int i = 0; i < bots.size(); i++)
+                                        if (bots.get(i).getEntityID() == packet.getEntityId()){
+                                            ent = bots.get(i);
+                                            break;
+                                        }
+                            }
                             switch (packet.getAction()) {
                                  case INTERACT:
                                    player.sendMessage("INTERACT/INTERACTAT");
                                     break;
                                 case ATTACK:
                                     try {
-                                        playerAttackEntityEventSource.fireEvent(player, player.getWorld().getEntityFromID(packet.getEntityId()));
+                                        playerAttackEntityEventSource.fireEvent(player, ent);
                                     } catch (ClassNotFoundException e) {
                                         e.printStackTrace();
                                     }

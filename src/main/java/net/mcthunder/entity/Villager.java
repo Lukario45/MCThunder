@@ -3,6 +3,7 @@ package net.mcthunder.entity;
 import net.mcthunder.api.Location;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.MobType;
+import org.spacehq.mc.protocol.data.game.values.world.GenericSound;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -54,6 +55,16 @@ public class Villager extends Ageable {//TODO: Add a villager inventory with it 
     @Override
     public void ai() {
 
+    }
+
+    @Override
+    public GenericSound getDeathSound() {
+        return GenericSound.VILLAGER_DEATH;
+    }
+
+    @Override
+    public GenericSound getHurtSound() {
+        return GenericSound.VILLAGER_HURT;
     }
 
     public void setVillagerType(int villagerType) {

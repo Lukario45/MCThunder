@@ -2,8 +2,8 @@ package net.mcthunder.entity;
 
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.*;
-import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.block.Material;
+import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityMetadataPacket;
@@ -25,7 +25,6 @@ public abstract class Entity {
     protected Location location;
     protected EntityType type;
     protected int entityID;
-    private boolean isLiving;
     /*TODO: Finish storing and returning the information from the tags for the following entity types
     ArmorStand
     Arrow

@@ -16,11 +16,13 @@ import org.spacehq.mc.auth.util.Base64;
 import org.spacehq.mc.protocol.ProtocolConstants;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
+import org.spacehq.mc.protocol.data.game.values.world.GenericSound;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerRespawnPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerUpdateHealthPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
@@ -300,6 +302,26 @@ public final class Player extends LivingEntity {
                     sendPacket(new ServerDestroyEntitiesPacket(e.getEntityID()));*/
             //Only should destroy on worldchange
         }
+    }
+
+    @Override
+    public GenericSound getDeathSound() {
+        return GenericSound.PLAYER_DEATH;
+    }
+
+    @Override
+    public GenericSound getHurtSound() {
+        return GenericSound.PLAYER_HURT;
+    }
+
+    public void setHealth(float health) {
+        this.metadata.setMetadata(6, this.health = health);
+        updateMetadata();
+        sendPacket(new ServerUpdateHealthPacket(this.health, this.hunger, 0.5f));
+    }
+
+    public void respawn() {//TODO: Figure out if client already opens the button to respawn if so this is uneeded
+
     }
 
     public boolean isColumnLoaded(long l) {

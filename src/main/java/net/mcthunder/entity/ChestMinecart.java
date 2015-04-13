@@ -1,8 +1,8 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
-import net.mcthunder.inventory.ChestInventory;
 import net.mcthunder.block.Material;
+import net.mcthunder.inventory.ChestInventory;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.MinecartType;
 import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;

@@ -1,7 +1,7 @@
 package net.mcthunder.inventory;
 
-import net.mcthunder.entity.Player;
 import net.mcthunder.block.Material;
+import net.mcthunder.entity.Player;
 import org.spacehq.mc.protocol.data.game.values.window.WindowType;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
 import org.spacehq.opennbt.tag.builtin.*;
