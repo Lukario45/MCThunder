@@ -6,6 +6,7 @@ import net.mcthunder.api.Modifier;
 import net.mcthunder.api.PotionEffect;
 import net.mcthunder.api.PotionEffectType;
 import net.mcthunder.world.World;
+import org.spacehq.mc.protocol.data.game.values.world.GenericSound;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.*;
 import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.packet.Packet;
@@ -118,6 +119,10 @@ public abstract class LivingEntity extends Entity {
     }
 
     public abstract void ai();
+
+    public abstract GenericSound getDeathSound();
+
+    public abstract GenericSound getHurtSound();
 
     public void setCustomName(String name) {
         this.metadata.setMetadata(2, this.customName = name);

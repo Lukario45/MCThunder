@@ -5,6 +5,8 @@ import net.mcthunder.api.MetadataConstants;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.EntityMetadata;
 import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
+import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
 import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.packet.Packet;
 
@@ -127,8 +129,8 @@ public class ArmorStand extends Entity {
 
     @Override
     public Packet getPacket() {
-        return null;//new ServerSpawnObjectPacket(this.entityID, ObjectType.ARMOR_STAND, this.location.getX(), this.location.getY(), this.location.getZ(),
-                //this.location.getYaw(), this.location.getPitch());
+        return new ServerSpawnObjectPacket(this.entityID, ObjectType.ARMOR_STAND, this.location.getX(), this.location.getY(), this.location.getZ(),
+                this.location.getYaw(), this.location.getPitch());
     }
 
     public void setSmall(boolean small) {

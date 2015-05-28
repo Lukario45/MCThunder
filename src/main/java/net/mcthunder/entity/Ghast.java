@@ -3,6 +3,7 @@ package net.mcthunder.entity;
 import net.mcthunder.api.Location;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.MobType;
+import org.spacehq.mc.protocol.data.game.values.world.GenericSound;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;
@@ -38,6 +39,16 @@ public class Ghast extends LivingEntity {
     @Override
     public void ai() {
 
+    }
+
+    @Override
+    public GenericSound getDeathSound() {
+        return GenericSound.GHAST_DEATH;
+    }
+
+    @Override
+    public GenericSound getHurtSound() {
+        return GenericSound.GHAST_HURT;
     }
 
     public void setAttacking(boolean attacking) {

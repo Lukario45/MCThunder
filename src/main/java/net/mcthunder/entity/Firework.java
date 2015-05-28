@@ -1,8 +1,8 @@
 package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
-import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.block.Material;
+import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.world.World;
 import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;

@@ -7,11 +7,8 @@ import net.mcthunder.block.Chest;
 import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.data.game.values.entity.EntityStatus;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityStatusPacket;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -237,14 +234,7 @@ public class World {
         return this.difficulty;
     }
 
-    public void removeEntity(int e){
-
-
-        ServerEntityStatusPacket packet = new ServerEntityStatusPacket(e, EntityStatus.DEAD);
-        for (Player p : MCThunder.getPlayers())
-            if (p.getWorld().equals(this))
-                p.sendPacket(packet);
-
+    public void removeEntity(int e) {
         this.loadedEntities.remove(e);
     }
 

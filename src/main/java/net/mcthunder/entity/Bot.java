@@ -10,6 +10,7 @@ import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.mc.auth.util.Base64;
 import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
 import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
+import org.spacehq.mc.protocol.data.game.values.world.GenericSound;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -48,6 +49,16 @@ public abstract class Bot extends LivingEntity {
 
     public PlayerListEntry getListEntry() {
         return new PlayerListEntry(getGameProfile(), GameMode.CREATIVE, 0, MessageFormat.formatMessage(this.name));
+    }
+
+    @Override
+    public GenericSound getDeathSound() {
+        return GenericSound.PLAYER_DEATH;
+    }
+
+    @Override
+    public GenericSound getHurtSound() {
+        return GenericSound.PLAYER_HURT;
     }
 
     public String getName() {
@@ -141,6 +152,16 @@ public abstract class Bot extends LivingEntity {
             if (p.getWorld().equals(getWorld()) && p.isColumnLoaded(chunk))
                 for (Packet packet : getPackets())
                     p.sendPacket(packet);
+    }
+
+    public void despawn() {
+        if (!isEntitySpawned())
+            return;
+        this.entitySpawned = false;
+        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(this.entityID);
+        this.entityID = Entity.getNextID();
+        for (Player pl : MCThunder.getPlayers())
+            pl.sendPacket(destroyEntitiesPacket);
     }
 
     public Packet getPacket() {
