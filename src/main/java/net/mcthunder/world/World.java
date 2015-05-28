@@ -335,7 +335,10 @@ public class World {
         gameRules.put(makeStringTag(GameRule.showDeathMessages.name(),"true"));
         data.put(gameRules);
         data.put(makeStringTag("generatorName","default"));
-        data.put(makeIntTag("seed",000000000));
+        data.put(makeLongTag("RandomSeed", (long) 0000000)); //Proceduarl Gneration
+        data.put(makeByteTag("hardcore", (byte) 1));
+        data.put(makeByteTag("MapFeatures", (byte) 1));
+        
         try {
             level.write(data);
         } catch (IOException e) {
