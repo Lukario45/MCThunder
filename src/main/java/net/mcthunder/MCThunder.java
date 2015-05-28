@@ -168,12 +168,22 @@ public class MCThunder {
         worlds = new HashMap<>();
         bots = new ArrayList<>();
         //Load the world files and check for subdirectories recursively if it is not a world folder
+        tellConsole(LoggingLevel.DEBUG,"Loading Worlds");
+        if (!new File("worlds/" + conf.getWorldName()).exists()){
+            tellConsole(LoggingLevel.INFO, "Making world " + conf.getWorldName()  );
+            makeDir("worlds/" + conf.getWorldName());
+            makeDir("worlds/" + conf.getWorldName() + "/DIM" );
+            World.newWorld(conf.getWorldName());
+        }
         File dir = new File("worlds");
+
+
         File[] files = dir.listFiles();
-        if (files != null)
+        if (files != null){
             for (File f : files)
                 if (f.exists())
-                    loadWorld(f);
+                    loadWorld(f);}
+
 
         server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
         server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 256);//Default is 256 not 100

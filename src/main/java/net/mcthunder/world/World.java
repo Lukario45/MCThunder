@@ -1,5 +1,7 @@
 package net.mcthunder.world;
 
+import com.Lukario45.NBTFile.NBTFile;
+import com.Lukario45.NBTFile.Utilities;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.LoggingLevel;
@@ -15,12 +17,14 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;
 import org.spacehq.packetlib.packet.Packet;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import static com.Lukario45.NBTFile.Utilities.*;
 import static net.mcthunder.api.Utils.getLong;
 import static net.mcthunder.api.Utils.tellConsole;
 
@@ -50,7 +54,12 @@ public class World {
         this.path = path;
         this.dimension = 0;
         try {
-            CompoundTag tag = NBTIO.readFile(new File(this.path + "/level.dat"));
+            CompoundTag tag;
+            try {
+                 tag = NBTIO.readFile(new File(this.path + "/level.dat"), false); //MCThunder Gen worlds ONLY
+            } catch(EOFException e){ //for NON MCThunder gen worlds
+                tag = NBTIO.readFile(new File(this.path + "/level.dat"));
+            }
             CompoundTag data = tag.get("Data");
             IntTag xTag = data.get("SpawnX");
             IntTag yTag = data.get("SpawnY");
@@ -296,6 +305,44 @@ public class World {
     public Collection<Sign> getSigns() {
         return this.signs;
     }
+    public static void newWorld(String name){
+
+        NBTFile level = new NBTFile("worlds/"+name + "/level.dat","",true);
+
+        try {
+            level.createFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        CompoundTag data = new CompoundTag("Data");
+        data.put(makeIntTag("SpawnX", 0));
+        data.put(makeIntTag("SpawnY", 4));
+        data.put(makeIntTag("SpawnZ", 0));
+        data.put(Utilities.makeStringTag("LevelName", name));
+        CompoundTag gameRules = new CompoundTag("GameRules");
+        gameRules.put(makeStringTag(GameRule.commandBlockOutput.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.doDaylightCycle.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.doFireTick.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.doMobLoot.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.doMobSpawning.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.doTileDrops.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.keepInventory.name(),"false"));
+        gameRules.put(makeStringTag(GameRule.logAdminCommands.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.mobGriefing.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.naturalRegeneration.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.randomTickSpeed.name(),"3"));
+        gameRules.put(makeStringTag(GameRule.sendCommandFeedback.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.showDeathMessages.name(),"true"));
+        data.put(gameRules);
+        data.put(makeStringTag("generatorName","default"));
+        data.put(makeIntTag("seed",000000000));
+        try {
+            level.write(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     private enum GameRule {
         commandBlockOutput(true),
@@ -371,5 +418,6 @@ public class World {
             if (this.equals(GameRule.randomTickSpeed))
                 this.tickSpeed = speed;
         }
+
     }
 }
