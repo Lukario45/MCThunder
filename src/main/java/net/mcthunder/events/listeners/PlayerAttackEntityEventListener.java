@@ -1,6 +1,7 @@
 package net.mcthunder.events.listeners;
 
 import net.mcthunder.MCThunder;
+import net.mcthunder.entity.Bot;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.LivingEntity;
 import net.mcthunder.entity.Player;
@@ -16,20 +17,20 @@ public class PlayerAttackEntityEventListener implements PlayerAttackEntityEventL
 
     @Override
     public void onAttackEntity(Player player, Entity entity) {
-        if (entity instanceof LivingEntity){
+
+        if (entity instanceof LivingEntity || entity instanceof Bot){
             LivingEntity e = (LivingEntity) player.getWorld().getEntityFromID(entity.getEntityID());
             float health = e.getHealth() - 1 - player.getHeldItem().getBonusDamnage();
             player.sendMessage("Health " + health);
             e.setHealth(health);
             if (e.getHealth() <= 0f) {
                 player.getWorld().removeEntity(entity.getEntityID());
-                 }
-            /*else {
-                ServerEntityStatusPacket packet = new ServerEntityStatusPacket(e.getEntityID(), EntityStatus.HURT_OR_MINECART_SPAWNER_DELAY_RESET);
+                 } else {
+                ServerEntityStatusPacket packet = new ServerEntityStatusPacket(e.getEntityID(), EntityStatus.LIVING_HURT);
                 for (Player p : MCThunder.getPlayers())
                     if (p.getWorld().equals(e.getWorld()) && p.isColumnLoaded(e.getChunk()))
                         p.sendPacket(packet);
-            }*/
+            }
         } else
             player.sendMessage("Why attack a non living entity?");
     }

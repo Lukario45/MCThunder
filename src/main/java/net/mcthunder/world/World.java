@@ -239,14 +239,12 @@ public class World {
 
     public void removeEntity(int e){
 
-        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(e);
+
         ServerEntityStatusPacket packet = new ServerEntityStatusPacket(e, EntityStatus.DEAD);
         for (Player p : MCThunder.getPlayers())
-            if (p.getWorld().equals(this)) {
+            if (p.getWorld().equals(this))
                 p.sendPacket(packet);
-               // p.sendPacket(destroyEntitiesPacket);
 
-            }
         this.loadedEntities.remove(e);
     }
 
