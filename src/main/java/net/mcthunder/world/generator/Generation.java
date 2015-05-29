@@ -1,5 +1,6 @@
 package net.mcthunder.world.generator;
 
+import static java.nio.file.StandardCopyOption.*;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.world.Biome;
@@ -82,7 +83,11 @@ public class Generation {
             tellConsole(LoggingLevel.SEVERE,"MCThunder is missing Region File Template! Download from website");
         } else {
             File newrg = new File("worlds/" + worldName + "/region/r." + regionX + "." + regionZ + ".mca");
-            regionTemplate.renameTo(newrg);
+            CopyOption[] options = new CopyOption[]{
+              StandardCopyOption.REPLACE_EXISTING,
+              StandardCopyOption.COPY_ATTRIBUTES
+            }; 
+            Files.copy(regionTemplate.getAbsolutePath(), newrg.getAbsolutePath(), options);
 
         }
     }
