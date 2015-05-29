@@ -9,6 +9,7 @@ import net.mcthunder.block.Chest;
 import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
+import net.mcthunder.world.generator.Generation;
 import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.opennbt.NBTIO;
@@ -320,8 +321,8 @@ public class World {
         data.put(makeIntTag("SpawnZ", 0));
         data.put(Utilities.makeStringTag("LevelName", name));
         CompoundTag gameRules = new CompoundTag("GameRules");
-        gameRules.put(makeStringTag(GameRule.commandBlockOutput.name(),"true"));
-        gameRules.put(makeStringTag(GameRule.doDaylightCycle.name(),"true"));
+        gameRules.put(makeStringTag(GameRule.commandBlockOutput.name(), "true"));
+        gameRules.put(makeStringTag(GameRule.doDaylightCycle.name(), "true"));
         gameRules.put(makeStringTag(GameRule.doFireTick.name(),"true"));
         gameRules.put(makeStringTag(GameRule.doMobLoot.name(),"true"));
         gameRules.put(makeStringTag(GameRule.doMobSpawning.name(),"true"));
@@ -344,6 +345,7 @@ public class World {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Generation.saveFlatColumn(name, 0,0);
 
     }
 

@@ -1,14 +1,25 @@
 package net.mcthunder.world.generator;
 
+import net.mcthunder.MCThunder;
+import net.mcthunder.api.LoggingLevel;
+import net.mcthunder.world.Biome;
+import net.mcthunder.world.Column;
+import net.mcthunder.world.Region;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
+
+import java.io.File;
+
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by conno_000 on 5/27/2015.
  */
 public class Generation {
-
+    private static byte[] biomeData;
+    private static Column flatColumn;
+    private static File regionTemplate = new File("rgn.mca");
     public static void generateSuperFlat(){
         /** for (int i = 0; i < chunks.length; i++) { //Loop through all 16 chunks (verticle fashion)
          NibbleArray3d blocklight = new NibbleArray3d(light); //Create our blocklight array
@@ -33,6 +44,7 @@ public class Generation {
          chunks[i] = chunk;
          }*/
 
+        Chunk[] chunks = new Chunk[16];
         NibbleArray3d blocklight = new NibbleArray3d(4096); //Create our blocklight array
        NibbleArray3d skylight = new NibbleArray3d(4096); //Create our skylight array
         //THIS IS ALL FOR ONE COLUMN
@@ -51,9 +63,32 @@ public class Generation {
                     blocks.setBlock(cX, cY, cZ, 2); //Grass
                 }
         Chunk chunk = new Chunk(blocks, blocklight, skylight);
-        //chunks[i] = chunk;
+        chunks[i] = chunk;
+        biomeData = new byte[256];
+        int bi = 0;
+        while (bi <= 255) {
+            biomeData[bi] = ((byte) Biome.PLAINS.getID());
+            bi++;
+        }
+        flatColumn = new Column(123,chunks,biomeData);
+
+    }
+
+    public static void saveFlatColumn(String worldName, int regionX, int regionZ){
+        if(flatColumn == null){
+            generateSuperFlat();
+        }
+        if (!regionTemplate.exists()){
+            tellConsole(LoggingLevel.SEVERE,"MCThunder is missing Region File Template! Download from website");
+        } else {
+            File newrg = new File("worlds/" + worldName + "/region/r." + regionX + "." + regionZ + ".mca");
+            regionTemplate.renameTo(newrg);
+
+        }
     }
 }
+
+
 /**
  * THESE ARE NOTES ON 3D PERLIN NOISE FOR WORLD GENERATION
  * I UNDERSTAND HOW IT WORKS SORT OF BUT I DO NOT KNOW THE LOGIC BEHIND PERLIN NOISE 3D

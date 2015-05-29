@@ -172,7 +172,7 @@ public class MCThunder {
         if (!new File("worlds/" + conf.getWorldName()).exists()){
             tellConsole(LoggingLevel.INFO, "Making world " + conf.getWorldName()  );
             makeDir("worlds/" + conf.getWorldName());
-            makeDir("worlds/" + conf.getWorldName() + "/DIM" );
+            makeDir("worlds/" + conf.getWorldName() + "/region" );
             World.newWorld(conf.getWorldName());
         }
         File dir = new File("worlds");
