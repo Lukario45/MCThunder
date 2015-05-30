@@ -2,6 +2,7 @@ package net.mcthunder.world;
 
 import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
+import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.block.Chest;
 import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
@@ -16,9 +17,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
+import static com.Lukario45.NBTFile.Utilities.*;
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/21/2014.
@@ -31,9 +33,15 @@ public class Region {
     private boolean invalid;
 
     public Region(World w, long region) {
-        this.x = (int) (region >> 32);
-        this.z = (int) region;
+        if (region ==0) {
+            this.x = 0;
+            this.z = 0;
+        } else {
+            this.x = (int) (region >> 32);
+            this.z = (int) region;
+        }
         this.world = w;
+        //tellConsole(LoggingLevel.DEBUG, this.world.getName());
         File f = new File(this.world.getPath() + "/region/r." + this.x + "." + this.z + ".mca");
         this.invalid = !f.exists();
         if (this.invalid) {
@@ -44,6 +52,98 @@ public class Region {
     }
 
     public void saveChunk(long l) {
+        if (this.invalid)
+            return;
+        if (l ==0){
+            x = 0;
+            z = 0;
+        } else {
+            int x = (int) (l >> 32);
+            int z = (int) l;
+            while (x < 0)
+                x += 32;
+            while (x > 32)
+                x -= 32;
+            while (z < 0)
+                z += 32;
+            while (z > 32)
+                z -= 32; {
+
+            }
+        if (x > 32 || z > 32 || x < 0 || z < 0)
+            return;
+        DataOutputStream out = this.regionFile.getChunkDataOutputStream(x, z);
+        DataInputStream in = this.regionFile.getChunkDataInputStream(x, z);
+        if (in != null && out != null) {
+            CompoundTag compoundTag = null;
+            try {
+                compoundTag = (CompoundTag) NBTIO.readTag(in);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (compoundTag == null)
+                return;
+            CompoundTag level = compoundTag.get("Level");
+            ListTag sections = level.get("Sections");
+
+            Column c = this.world.getColumn(l);
+            Chunk[] chunks = c.getChunks();
+            Map<String, Tag> values = compoundTag.getValue();
+            Map<String, Tag> levelInfo = level.getValue();
+            ArrayList<Tag> newSections = new ArrayList<>();
+            for (int i = 0; i < sections.size(); i++) {//Loop through all 16 chunks
+                CompoundTag chunkz = sections.get(i);
+                Map<String, Tag> cv = chunkz.getValue();
+                ByteArrayTag blocks = chunkz.get("Blocks");
+                ByteArrayTag blockLight = chunkz.get("BlockLight");
+                ByteArrayTag skyLight = chunkz.get("SkyLight");
+                ByteArrayTag data = chunkz.get("Data");
+                //ByteArrayTag add = chunkz.get("Add");
+                if (chunks[i] != null) {
+                    if (chunks[i].getBlockLight() != null)
+                        blockLight.setValue(chunks[i].getBlockLight().getData());
+                    if (chunks[i].getSkyLight() != null)
+                        skyLight.setValue(chunks[i].getSkyLight().getData());
+                    if (chunks[i].getBlocks() != null)
+                        for (int cX = 0; cX < 16; cX++) //Loop through x
+                            for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
+                                for (int cZ = 0; cZ < 16; cZ++) { //Loop through z
+                                    int index = 256 * cY + 16 * cZ + cX;
+                                    int id = chunks[i].getBlocks().getBlock(cX, cY, cZ);//TODO: Use add where needed
+                                    if (id >= 128)
+                                        id -= 256;
+                                    blocks.setValue(index, Byte.parseByte(id + ""));
+                                    if (index % 2 == 0)
+                                        data.setValue(index / 2, (byte) ((getValue(data, index + 1) << 4) | chunks[i].getBlocks().getData(cX, cY, cZ)));
+                                    else
+                                        data.setValue(index / 2, (byte) ((chunks[i].getBlocks().getData(cX, cY, cZ) << 4) | getValue(data, index - 1)));
+                                }
+                }
+
+                cv.put("Blocks", blocks);
+                cv.put("BlockLight", blockLight);
+                cv.put("SkyLight", skyLight);
+                cv.put("Data", data);
+                //cv.put("Add", add);//How to calculate from value if even needed
+                chunkz.setValue(cv);
+                newSections.add(chunkz);
+            }
+            sections.setValue(newSections);
+            levelInfo.put("Sections", sections);
+            level.setValue(levelInfo);
+            values.put("Level", level);
+            compoundTag.setValue(values);
+            try {
+                NBTIO.writeTag(out, compoundTag);
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        }
+    }
+
+    public void saveNewChunk(long l) {
         if (this.invalid)
             return;
         int x = (int) (l >> 32);
@@ -69,27 +169,28 @@ public class Region {
             }
             if (compoundTag == null)
                 return;
-            CompoundTag level = compoundTag.get("Level");
-            ListTag sections = level.get("Sections");
-            Column c = this.world.getColumn(l);
+            CompoundTag level = new CompoundTag("Level");
+
+            Column c = this.world.getNewColum(l);
             Chunk[] chunks = c.getChunks();
             Map<String,Tag> values = compoundTag.getValue();
             Map<String,Tag> levelInfo = level.getValue();
             ArrayList<Tag> newSections = new ArrayList<>();
-            for (int i = 0; i < sections.size(); i++) {//Loop through all 16 chunks
-                CompoundTag chunkz = sections.get(i);
+            Chunk[] newChunks = c.getChunks();
+            for (int i = 0; i < c.getChunks().length; i++) {//Loop through all 16 chunks
+                CompoundTag chunkz = new CompoundTag(null);
                 Map<String,Tag> cv = chunkz.getValue();
-                ByteArrayTag blocks = chunkz.get("Blocks");
-                ByteArrayTag blockLight = chunkz.get("BlockLight");
-                ByteArrayTag skyLight = chunkz.get("SkyLight");
-                ByteArrayTag data = chunkz.get("Data");
+                ByteArrayTag blocks = new ByteArrayTag("Blocks", new byte[4096]);
+                ByteArrayTag blockLight = new ByteArrayTag("BlockLight", new byte[4096]);
+                ByteArrayTag skyLight = new ByteArrayTag("SkyLight", new byte[4096]);
+                ByteArrayTag data = new ByteArrayTag("Data", new byte[2048]);
                 //ByteArrayTag add = chunkz.get("Add");
-                if (chunks[i] != null) {
-                    if (chunks[i].getBlockLight() != null)
-                        blockLight.setValue(chunks[i].getBlockLight().getData());
-                    if (chunks[i].getSkyLight() != null)
-                        skyLight.setValue(chunks[i].getSkyLight().getData());
-                    if(chunks[i].getBlocks() != null)
+                if (newChunks[i] != null) {
+                    if (newChunks[i].getBlockLight() != null)
+                        blockLight.setValue(newChunks[i].getBlockLight().getData());
+                    if (newChunks[i].getSkyLight() != null)
+                        skyLight.setValue(newChunks[i].getSkyLight().getData());
+                    if(newChunks[i].getBlocks() != null)
                         for (int cX = 0; cX < 16; cX++) //Loop through x
                             for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
                                 for (int cZ = 0; cZ < 16; cZ++) { //Loop through z
@@ -99,11 +200,12 @@ public class Region {
                                         id -= 256;
                                     blocks.setValue(index, Byte.parseByte(id + ""));
                                     if(index%2 == 0)
-                                        data.setValue(index/2, (byte) ((getValue(data, index + 1) << 4) | chunks[i].getBlocks().getData(cX, cY, cZ)));
+                                        data.setValue(index/2, (byte) ((getValue(data, index + 1) << 4) | newChunks[i].getBlocks().getData(cX, cY, cZ)));
                                     else
-                                        data.setValue(index/2, (byte) ((chunks[i].getBlocks().getData(cX, cY, cZ) << 4) | getValue(data, index - 1)));
+                                        data.setValue(index/2, (byte) ((newChunks[i].getBlocks().getData(cX, cY, cZ) << 4) | getValue(data, index - 1)));
                                 }
                 }
+                cv.put("Y", makeByteTag("Y", (byte) i));
                 cv.put("Blocks", blocks);
                 cv.put("BlockLight", blockLight);
                 cv.put("SkyLight", skyLight);
@@ -111,10 +213,14 @@ public class Region {
                 //cv.put("Add", add);//How to calculate from value if even needed
                 chunkz.setValue(cv);
                 newSections.add(chunkz);
-                }
-            sections.setValue(newSections);
+            }
+            List empty = new ArrayList();
+            ListTag sections = new ListTag("Sections",newSections);
             levelInfo.put("Sections", sections);
             level.setValue(levelInfo);
+            level.put(makeByteArrayTag("Biomes", c.getBiomes()));
+            level.put(makeListTag("Entities", empty));
+            level.put(makeListTag("TileEntities",empty));
             values.put("Level", level);
             compoundTag.setValue(values);
             try {
@@ -172,6 +278,8 @@ public class Region {
                             int id = blocks.getValue(index) + (add != null ? getValue(add, index) << 8 : 0);
                             block.setBlockAndData(cX, cY, cZ, id + (id < 0 ? 256 : 0), getValue(data, index));
                         }
+                //tellConsole(LoggingLevel.DEBUG, blockLight.getValue().t);
+                //tellConsole(LoggingLevel.DEBUG,skyLight.getValue());
                 chunks[i] = new Chunk(block, new NibbleArray3d(blockLight.getValue()), new NibbleArray3d(skyLight.getValue()));
             }
             this.world.addColumn(new Column(l, chunks, biomes.getValue()));

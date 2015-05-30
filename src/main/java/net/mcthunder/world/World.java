@@ -177,6 +177,10 @@ public class World {
         this.columnHashMap.put(c.getLong(), c);
     }
 
+    public void addNewColum(Column c){
+        Generation.getGenerationHashMap().put(c.getLong(), c);
+    }
+
     public void unloadColumn(Column c) {
         if (c == null)
             return;
@@ -208,6 +212,10 @@ public class World {
 
     public Column getColumn(long l) {
         return this.columnHashMap.get(l);
+    }
+
+    public Column getNewColum(long l){
+        return Generation.getGenerationHashMap().get(l);
     }
 
     public Region getRegion(long l) {
@@ -345,7 +353,19 @@ public class World {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Generation.saveFlatColumn(name, 0,0);
+
+
+    }
+
+    public void generateNewWorld(World world){
+        Generation.saveFlatRegion(world.getName(), 0, 0);
+        Generation.saveFlatRegion(world.getName(), 0, -1);
+        Generation.saveFlatRegion(world.getName(), 0, -2);
+        Generation.saveFlatRegion(world.getName(), 1, 0);
+        Generation.saveFlatRegion(world.getName(), 1, -1);
+        Generation.saveFlatRegion(world.getName(), -1, -1);
+        Generation.saveFlatRegion(world.getName(), 1, -2);
+        Generation.saveFlatRegion(world.getName(), -1, 0);
 
     }
 

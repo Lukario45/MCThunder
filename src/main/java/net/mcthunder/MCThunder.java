@@ -170,10 +170,14 @@ public class MCThunder {
         //Load the world files and check for subdirectories recursively if it is not a world folder
         tellConsole(LoggingLevel.DEBUG,"Loading Worlds");
         if (!new File("worlds/" + conf.getWorldName()).exists()){
-            tellConsole(LoggingLevel.INFO, "Making world " + conf.getWorldName()  );
+            tellConsole(LoggingLevel.INFO, "Making world " + conf.getWorldName());
             makeDir("worlds/" + conf.getWorldName());
-            makeDir("worlds/" + conf.getWorldName() + "/region" );
-            World.newWorld(conf.getWorldName());
+            makeDir("worlds/" + conf.getWorldName() + "/region");
+
+           World.newWorld(conf.getWorldName());
+            World world = new World(conf.getWorldName(), "worlds/" + conf.getWorldName() + "/");
+            worlds.put(conf.getWorldName().toLowerCase(),world);
+            world.generateNewWorld(world);
         }
         File dir = new File("worlds");
 

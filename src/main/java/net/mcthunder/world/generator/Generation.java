@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 
+import static net.mcthunder.api.Utils.getLong;
 import static net.mcthunder.api.Utils.tellConsole;
 
 /**
@@ -25,6 +27,10 @@ public class Generation {
     private static byte[] biomeData;
     private static Column flatColumn;
     private static File regionTemplate = new File("rgn.mca");
+    private static HashMap<Long, Column> generationHashMap = new HashMap<>();
+    public static HashMap<Long, Column>  getGenerationHashMap(){
+        return generationHashMap;
+    }
     public static void generateSuperFlat(){
         /** for (int i = 0; i < chunks.length; i++) { //Loop through all 16 chunks (verticle fashion)
          NibbleArray3d blocklight = new NibbleArray3d(light); //Create our blocklight array
@@ -49,7 +55,8 @@ public class Generation {
          chunks[i] = chunk;
          }*/
 
-        Chunk[] chunks = new Chunk[16];
+
+        Chunk[] chunks = new Chunk[1];
         NibbleArray3d blocklight = new NibbleArray3d(4096); //Create our blocklight array
        NibbleArray3d skylight = new NibbleArray3d(4096); //Create our skylight array
         //THIS IS ALL FOR ONE COLUMN
@@ -87,12 +94,29 @@ public class Generation {
             tellConsole(LoggingLevel.SEVERE,"MCThunder is missing Region File Template! Download from website");
         } else {
             File newrg = new File("worlds/" + worldName + "/region/r." + regionX + "." + regionZ + ".mca");
-            CopyOption[] options = new CopyOption[]{
-              StandardCopyOption.REPLACE_EXISTING,
-              StandardCopyOption.COPY_ATTRIBUTES
-            };
+          //  CopyOption[] options = new CopyOption[]{
+            //  StandardCopyOption.REPLACE_EXISTING,
+           //   StandardCopyOption.COPY_ATTRIBUTES
+          //  };
             try {
-                Files.copy(regionTemplate.toPath(), newrg.toPath(), options);
+                Files.copy(regionTemplate.toPath(), newrg.toPath() /*options*/);
+                int x = 0;
+                int z = 0;
+
+                Region rg = new Region(MCThunder.getWorld(worldName), getLong(regionX,regionZ));
+
+                while (x <= 31){
+                    while (z <= 31){
+                        getGenerationHashMap().put(getLong(x,z),flatColumn);
+                        rg.saveNewChunk(getLong(x, z));
+                        getGenerationHashMap().remove(getLong(x,z));
+                        z++;
+                    }
+                    x++;
+                    z = 0;
+                }
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
