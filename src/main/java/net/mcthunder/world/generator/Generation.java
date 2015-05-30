@@ -11,6 +11,10 @@ import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import static net.mcthunder.api.Utils.tellConsole;
 
@@ -75,7 +79,7 @@ public class Generation {
 
     }
 
-    public static void saveFlatColumn(String worldName, int regionX, int regionZ){
+    public static void saveFlatRegion(String worldName, int regionX, int regionZ){
         if(flatColumn == null){
             generateSuperFlat();
         }
@@ -86,8 +90,13 @@ public class Generation {
             CopyOption[] options = new CopyOption[]{
               StandardCopyOption.REPLACE_EXISTING,
               StandardCopyOption.COPY_ATTRIBUTES
-            }; 
-            Files.copy(regionTemplate.getAbsolutePath(), newrg.getAbsolutePath(), options);
+            };
+            try {
+                Files.copy(regionTemplate.toPath(), newrg.toPath(), options);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
         }
     }
