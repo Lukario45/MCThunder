@@ -7,9 +7,11 @@ import net.mcthunder.block.Chest;
 import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
+import net.mcthunder.world.generator.Generation;
 import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
+import org.spacehq.mc.protocol.data.game.values.world.WorldType;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.*;
 
@@ -45,8 +47,11 @@ public class Region {
         File f = new File(this.world.getPath() + "/region/r." + this.x + "." + this.z + ".mca");
         this.invalid = !f.exists();
         if (this.invalid) {
-            //Create the region file
-            //Once this if statement actually does things the invalid boolean can be removed
+            //TODO better logic for when we have multiple world types
+            if (this.world.getWorldType().equals(WorldType.FLAT)) {
+                Generation.saveFlatRegion(this.world.getName(), this.x, this.z);
+                this.invalid = false;
+            }
         }
         this.regionFile = new RegionFile(f);
     }

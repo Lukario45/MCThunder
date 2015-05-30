@@ -158,36 +158,29 @@ public class MCThunder {
         metadataChangeEventSource.addEventListener(metadataChangeEventListener);
         playerAttackEntityEventSource.addEventListener(playerAttackEntityEventListener);
 
-
-        if (conf.getUseRankManager()) {
-           rankManager = new RankManager();
-            rankManager.load();
-        }
-
         players = new HashMap<>(conf.getSlots());
         worlds = new HashMap<>();
         bots = new ArrayList<>();
         //Load the world files and check for subdirectories recursively if it is not a world folder
-        tellConsole(LoggingLevel.DEBUG,"Loading Worlds");
         if (!new File("worlds/" + conf.getWorldName()).exists()){
             tellConsole(LoggingLevel.INFO, "Making world " + conf.getWorldName());
             makeDir("worlds/" + conf.getWorldName());
             makeDir("worlds/" + conf.getWorldName() + "/region");
-
-           World.newWorld(conf.getWorldName());
-            World world = new World(conf.getWorldName(), "worlds/" + conf.getWorldName() + "/");
-            worlds.put(conf.getWorldName().toLowerCase(),world);
-            world.generateNewWorld(world);
+            World.newWorld(conf.getWorldName());
         }
+
         File dir = new File("worlds");
-
-
+        tellConsole(LoggingLevel.DEBUG, "Loading Worlds");
         File[] files = dir.listFiles();
         if (files != null){
             for (File f : files)
                 if (f.exists())
                     loadWorld(f);}
 
+        if (conf.getUseRankManager()) {
+            rankManager = new RankManager();
+            rankManager.load();
+        }
 
         server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
         server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 256);//Default is 256 not 100
@@ -258,6 +251,7 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientSwingArmPacket) {
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             long chunk = player.getChunk();
+                            //tellConsole(LoggingLevel.DEBUG, player.isColumnLoaded(chunk));//TODO remove once loadAround player is fixed
                             for (Player p : getPlayers())
                                 if (p.getWorld().equals(player.getWorld()) && p.isColumnLoaded(chunk) && !p.getUniqueID().equals(player.getUniqueID()))
                                     p.sendPacket(new ServerAnimationPacket(player.getEntityID(), Animation.SWING_ARM));

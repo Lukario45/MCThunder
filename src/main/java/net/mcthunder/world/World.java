@@ -314,9 +314,9 @@ public class World {
     public Collection<Sign> getSigns() {
         return this.signs;
     }
-    public static void newWorld(String name){
 
-        NBTFile level = new NBTFile("worlds/"+name + "/level.dat","",true);
+    public static void newWorld(String name){
+        NBTFile level = new NBTFile("worlds/" + name + "/level.dat", "", true);
 
         try {
             level.createFile();
@@ -325,9 +325,9 @@ public class World {
         }
         CompoundTag data = new CompoundTag("Data");
         data.put(makeIntTag("SpawnX", 0));
-        data.put(makeIntTag("SpawnY", 4));
+        data.put(makeIntTag("SpawnY", 5));
         data.put(makeIntTag("SpawnZ", 0));
-        data.put(Utilities.makeStringTag("LevelName", name));
+        data.put(makeStringTag("LevelName", name));
         CompoundTag gameRules = new CompoundTag("GameRules");
         gameRules.put(makeStringTag(GameRule.commandBlockOutput.name(), "true"));
         gameRules.put(makeStringTag(GameRule.doDaylightCycle.name(), "true"));
@@ -343,8 +343,8 @@ public class World {
         gameRules.put(makeStringTag(GameRule.sendCommandFeedback.name(),"true"));
         gameRules.put(makeStringTag(GameRule.showDeathMessages.name(),"true"));
         data.put(gameRules);
-        data.put(makeStringTag("generatorName","default"));
-        data.put(makeLongTag("RandomSeed", (long) 0000000)); //Proceduarl Gneration
+        data.put(makeStringTag("generatorName","FLAT"));
+        data.put(makeLongTag("RandomSeed", (long) 0000000)); //Procedural Generation
         data.put(makeByteTag("hardcore", (byte) 1));
         data.put(makeByteTag("MapFeatures", (byte) 1));
         
@@ -353,20 +353,6 @@ public class World {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-    }
-
-    public void generateNewWorld(World world){
-        Generation.saveFlatRegion(world.getName(), 0, 0);
-        Generation.saveFlatRegion(world.getName(), 0, -1);
-        Generation.saveFlatRegion(world.getName(), 0, -2);
-        Generation.saveFlatRegion(world.getName(), 1, 0);
-        Generation.saveFlatRegion(world.getName(), 1, -1);
-        Generation.saveFlatRegion(world.getName(), -1, -1);
-        Generation.saveFlatRegion(world.getName(), 1, -2);
-        Generation.saveFlatRegion(world.getName(), -1, 0);
-
     }
 
     private enum GameRule {

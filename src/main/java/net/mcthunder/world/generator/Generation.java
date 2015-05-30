@@ -3,6 +3,7 @@ package net.mcthunder.world.generator;
 import static java.nio.file.StandardCopyOption.*;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.LoggingLevel;
+import net.mcthunder.block.Material;
 import net.mcthunder.world.Biome;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.Region;
@@ -24,103 +25,60 @@ import static net.mcthunder.api.Utils.tellConsole;
  * Created by conno_000 on 5/27/2015.
  */
 public class Generation {
-    private static byte[] biomeData;
     private static Column flatColumn;
     private static File regionTemplate = new File("rgn.mca");
     private static HashMap<Long, Column> generationHashMap = new HashMap<>();
+
     public static HashMap<Long, Column>  getGenerationHashMap(){
         return generationHashMap;
     }
-    public static void generateSuperFlat(){
-        /** for (int i = 0; i < chunks.length; i++) { //Loop through all 16 chunks (verticle fashion)
-         NibbleArray3d blocklight = new NibbleArray3d(light); //Create our blocklight array
-         NibbleArray3d skylight = new NibbleArray3d(light); //Create our skylight array
-         ShortArray3d blocks = new ShortArray3d(4096); //Array containing the blocks of THIS sub-chunk only!
 
-         for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
-         for (int cZ = 0; cZ < 16; cZ++) //Loop through z
-         for (int cX = 0; cX < 16; cX++) { //Loop through x
-         int y = cY + i * 16; //Get our ABSOLUTE y coordinate (used only to check our literal position)
-
-         if (y == 0) //lowest point
-         blocks.setBlock(cX, cY, cZ, 7); //Adminium
-         else if (y <= 3)
-         blocks.setBlock(cX, cY, cZ, 3);//Stone
-         else if (y ==4 21 && y < 24) //less than 24 but above 0
-         blocks.setBlock(cX, cY, cZ, 3); //Dirt
-         //else if (y == 24) //Exactly 24
-         //blocks.setBlock(cX, cY, cZ, 2); //Grass
-         }
-         Chunk chunk = new Chunk(blocks, blocklight, skylight);
-         chunks[i] = chunk;
-         }*/
-
-
+    private static void generateSuperFlat() {
         Chunk[] chunks = new Chunk[1];
         NibbleArray3d blocklight = new NibbleArray3d(4096); //Create our blocklight array
-       NibbleArray3d skylight = new NibbleArray3d(4096); //Create our skylight array
+        NibbleArray3d skylight = new NibbleArray3d(4096); //Create our skylight array
         //THIS IS ALL FOR ONE COLUMN
-       ShortArray3d blocks = new ShortArray3d(4096); //Array containing the blocks of THIS sub-chunk only!
-        int i = 0;
+        ShortArray3d blocks = new ShortArray3d(4096); //Array containing the blocks of THIS sub-chunk only!
         for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
             for (int cZ = 0; cZ < 16; cZ++) //Loop through z
                 for (int cX = 0; cX < 16; cX++) { //Loop through x
-                    int y = cY + i * 16; //Get our ABSOLUTE y coordinate (used only to check our literal position)
-
-                    if (y == 0) //lowest point
-                        blocks.setBlock(cX, cY, cZ, 7); //Adminium
-                    else if (y <= 3)
-                        blocks.setBlock(cX, cY, cZ, 3);//Dirt
-                    else if (y ==4) //less than 24 but above 0
-                    blocks.setBlock(cX, cY, cZ, 2); //Grass
+                    if (cY == 0) //lowest point
+                        blocks.setBlock(cX, cY, cZ, Material.BEDROCK.getID()); //Adminium
+                    else if (cY <= 3)
+                        blocks.setBlock(cX, cY, cZ, Material.DIRT.getID());//Dirt
+                    else if (cY == 4)
+                        blocks.setBlock(cX, cY, cZ, Material.GRASS.getID()); //Grass
+                    if (cY >= 4)
+                        skylight.set(cX, cY, cZ, 15);
                 }
-        Chunk chunk = new Chunk(blocks, blocklight, skylight);
-        chunks[i] = chunk;
-        biomeData = new byte[256];
-        int bi = 0;
-        while (bi <= 255) {
-            biomeData[bi] = ((byte) Biome.PLAINS.getID());
-            bi++;
-        }
-        flatColumn = new Column(123,chunks,biomeData);
-
+        chunks[0] = new Chunk(blocks, blocklight, skylight);
+        byte[] biomeData = new byte[256];
+        byte plains = (byte) Biome.PLAINS.getID();
+        for (int j = 0; j < 256; j++)
+            biomeData[j] = plains;
+        flatColumn = new Column(123, chunks, biomeData);
     }
 
     public static void saveFlatRegion(String worldName, int regionX, int regionZ){
-        if(flatColumn == null){
+        if(flatColumn == null)
             generateSuperFlat();
-        }
-        if (!regionTemplate.exists()){
+        if (!regionTemplate.exists())
             tellConsole(LoggingLevel.SEVERE,"MCThunder is missing Region File Template! Download from website");
-        } else {
-            File newrg = new File("worlds/" + worldName + "/region/r." + regionX + "." + regionZ + ".mca");
-          //  CopyOption[] options = new CopyOption[]{
-            //  StandardCopyOption.REPLACE_EXISTING,
-           //   StandardCopyOption.COPY_ATTRIBUTES
-          //  };
+        else {
             try {
-                Files.copy(regionTemplate.toPath(), newrg.toPath() /*options*/);
-                int x = 0;
-                int z = 0;
-
+                Files.copy(regionTemplate.toPath(), new File("worlds/" + worldName + "/region/r." + regionX + "." + regionZ + ".mca").toPath());
                 Region rg = new Region(MCThunder.getWorld(worldName), getLong(regionX,regionZ));
 
-                while (x <= 31){
-                    while (z <= 31){
+                for (int x = 0; x < 32; x++)
+                    for (int z = 0; z < 32; z++) {
                         getGenerationHashMap().put(getLong(x,z),flatColumn);
                         rg.saveNewChunk(getLong(x, z));
                         getGenerationHashMap().remove(getLong(x,z));
-                        z++;
                     }
-                    x++;
-                    z = 0;
-                }
-
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
 
         }
     }
