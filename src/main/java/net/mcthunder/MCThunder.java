@@ -251,7 +251,6 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientSwingArmPacket) {
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             long chunk = player.getChunk();
-                            tellConsole(LoggingLevel.DEBUG, player.isColumnLoaded(chunk));//TODO remove once loadAround player is fixed
                             for (Player p : getPlayers())
                                 if (p.getWorld().equals(player.getWorld()) && p.isColumnLoaded(chunk) && !p.getUniqueID().equals(player.getUniqueID()))
                                     p.sendPacket(new ServerAnimationPacket(player.getEntityID(), Animation.SWING_ARM));

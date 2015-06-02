@@ -1,6 +1,5 @@
 package net.mcthunder.world.generator;
 
-import static java.nio.file.StandardCopyOption.*;
 import net.mcthunder.MCThunder;
 import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.block.Material;
@@ -13,9 +12,7 @@ import org.spacehq.mc.protocol.data.game.ShortArray3d;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 
 import static net.mcthunder.api.Utils.getLong;
@@ -59,7 +56,7 @@ public class Generation {
         flatColumn = new Column(123, chunks, biomeData);
     }
 
-    private static void generateGrid() {//For debug purposes
+    private static void generateGrid() {//For testing purposes to allow seeing chunks at a glance
         Chunk[] chunks = new Chunk[1];
         NibbleArray3d blocklight = new NibbleArray3d(4096); //Create our blocklight array
         NibbleArray3d skylight = new NibbleArray3d(4096); //Create our skylight array
@@ -87,8 +84,7 @@ public class Generation {
 
     public static void saveFlatRegion(String worldName, int regionX, int regionZ){
         if(flatColumn == null)
-            //generateSuperFlat();
-            generateGrid();
+            generateSuperFlat();
         if (!regionTemplate.exists())
             tellConsole(LoggingLevel.SEVERE,"MCThunder is missing Region File Template! Download from website");
         else {

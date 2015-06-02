@@ -2,7 +2,6 @@ package net.mcthunder.world;
 
 import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
-import net.mcthunder.api.LoggingLevel;
 import net.mcthunder.block.Chest;
 import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
@@ -19,10 +18,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static com.Lukario45.NBTFile.Utilities.*;
-import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/21/2014.
