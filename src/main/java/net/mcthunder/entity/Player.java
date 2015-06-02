@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -193,10 +194,10 @@ public final class Player extends LivingEntity {
             loadDir(Direction.EAST);
             loadDir(Direction.SOUTH);
             loadDir(Direction.WEST);
-            updateDir(Direction.NORTH);
-            updateDir(Direction.EAST);
-            updateDir(Direction.SOUTH);
-            updateDir(Direction.WEST);
+            preload(Direction.NORTH);
+            preload(Direction.EAST);
+            preload(Direction.SOUTH);
+            preload(Direction.WEST);
         } else if (d.equals(Direction.NORTH_EAST)) {
             loadDir(Direction.NORTH);
             loadDir(Direction.EAST);
@@ -227,8 +228,8 @@ public final class Player extends LivingEntity {
         if (!preLoaded(d)) {//if not loaded then load it
             int x = (int) getLocation().getX() >> 4;
             int z = (int) getLocation().getZ() >> 4;
-            int xMod = d.equals(Direction.EAST) ? 1 : d.equals(Direction.WEST) ? -1 : 0;
-            int zMod = d.equals(Direction.SOUTH) ? 1 : d.equals(Direction.NORTH) ? -1 : 0;
+            int xMod =0;// d.equals(Direction.EAST) ? 1 : d.equals(Direction.WEST) ? -1 : 0;
+            int zMod =0;// d.equals(Direction.SOUTH) ? 1 : d.equals(Direction.NORTH) ? -1 : 0;
             for (int xAdd = -getView() + xMod; xAdd < getView() + xMod; xAdd++)
                 for (int zAdd = -getView() + zMod; zAdd < getView() + zMod; zAdd++)
                     getWorld().getRegion(getLong((x + xAdd) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + xAdd, z + zAdd), this, d, false);
@@ -256,36 +257,68 @@ public final class Player extends LivingEntity {
             this.northColumns.clear();
             this.southColumns.clear();
             for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
-                getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView() - 1) >> 5)).readChunk(getLong(x + xAdd, z - getView() - 1), this, d, false);
-                getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView()) >> 5)).readChunk(getLong(x + xAdd, z + getView()), this, Direction.SOUTH, true);
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView()) >> 5)).readChunk(getLong(x + xAdd, z - getView()), this, d, false);
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView() + 1) >> 5)).readChunk(getLong(x + xAdd, z + getView() + 1), this, Direction.SOUTH, true);
             }
         } else if (d.equals(Direction.EAST)) {
             temp = (ArrayList<Long>) this.westColumns.clone();
             this.eastColumns.clear();
             this.westColumns.clear();
             for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
-                getWorld().getRegion(getLong((x + getView() + 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView() + 1, z + zAdd), this, d, false);
-                getWorld().getRegion(getLong((x - getView()) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView(), z + zAdd), this, Direction.WEST, true);
+                getWorld().getRegion(getLong((x + getView()) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView(), z + zAdd), this, d, false);
+                getWorld().getRegion(getLong((x - getView() - 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView() - 1, z + zAdd), this, Direction.WEST, true);
             }
         } else if (d.equals(Direction.SOUTH)) {
             temp = (ArrayList<Long>) this.northColumns.clone();
             this.southColumns.clear();
             this.northColumns.clear();
             for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
-                getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView() + 1) >> 5)).readChunk(getLong(x + xAdd, z + getView() + 1), this, d, false);
-                getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView()) >> 5)).readChunk(getLong(x + xAdd, z - getView()), this, Direction.NORTH, true);
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView()) >> 5)).readChunk(getLong(x + xAdd, z + getView()), this, d, false);
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView() - 1) >> 5)).readChunk(getLong(x + xAdd, z - getView() - 1), this, Direction.NORTH, true);
             }
         } else if (d.equals(Direction.WEST)) {
             temp = (ArrayList<Long>) this.eastColumns.clone();
             this.westColumns.clear();
             this.eastColumns.clear();
             for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
-                getWorld().getRegion(getLong((x - getView() - 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView() - 1, z + zAdd), this, d, false);
-                getWorld().getRegion(getLong((x + getView()) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView(), z + zAdd), this, Direction.EAST, true);
+                getWorld().getRegion(getLong((x - getView()) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView(), z + zAdd), this, d, false);
+                getWorld().getRegion(getLong((x + getView() + 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView() + 1, z + zAdd), this, Direction.EAST, true);
+            }
+        }
+        if (d.equals(Direction.EAST) || d.equals(Direction.WEST)) {
+            this.southColumns.clear();
+            this.northColumns.clear();
+            for(int xAdd = -getView(); xAdd < getView(); xAdd++) {
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView() - 1) >> 5)).readChunk(getLong(x + xAdd, z - getView() - 1), this, Direction.NORTH, false);
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView() + 1) >> 5)).readChunk(getLong(x + xAdd, z + getView() + 1), this, Direction.SOUTH, false);
+            }
+        } else if (d.equals(Direction.NORTH) || d.equals(Direction.SOUTH)) {
+            this.westColumns.clear();
+            this.eastColumns.clear();
+            for(int zAdd = -getView(); zAdd < getView(); zAdd++) {
+                getWorld().getRegion(getLong((x + getView() + 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView() + 1, z + zAdd), this, Direction.EAST, false);
+                getWorld().getRegion(getLong((x - getView() - 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView() - 1, z + zAdd), this, Direction.WEST, false);
             }
         }
         if (temp != null)
             unloadColumn(temp);
+    }
+
+    private void preload(Direction d) {
+        int x = (int)this.location.getX() >> 4;
+        int z = (int)this.location.getZ() >> 4;
+        if (d.equals(Direction.NORTH))
+            for(int xAdd = -getView(); xAdd < getView(); xAdd++)
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z - getView() - 1) >> 5)).readChunk(getLong(x + xAdd, z - getView() - 1), this, d, false);
+        else if (d.equals(Direction.EAST))
+            for(int zAdd = -getView(); zAdd < getView(); zAdd++)
+                getWorld().getRegion(getLong((x + getView() + 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x + getView() + 1, z + zAdd), this, d, false);
+        else if (d.equals(Direction.SOUTH))
+            for(int xAdd = -getView(); xAdd < getView(); xAdd++)
+                getWorld().getRegion(getLong((x + xAdd) >> 5, (z + getView() + 1) >> 5)).readChunk(getLong(x + xAdd, z + getView() + 1), this, d, false);
+        else if (d.equals(Direction.WEST))
+            for(int zAdd = -getView(); zAdd < getView(); zAdd++)
+                getWorld().getRegion(getLong((x - getView() - 1) >> 5, (z + zAdd) >> 5)).readChunk(getLong(x - getView() - 1, z + zAdd), this, d, false);
     }
 
     private void unloadColumn(ArrayList<Long> temp) {
@@ -369,6 +402,7 @@ public final class Player extends LivingEntity {
                     }
                     this.loadedColumns.add(column);//Technically is loaded for other purposes
                 }
+        tellConsole(LoggingLevel.DEBUG, this.loadedColumns.size());
     }
 
     public void teleport(Location l) {
@@ -406,7 +440,7 @@ public final class Player extends LivingEntity {
     }
 
     public int getView() {
-        return this.viewDistance;
+        return 2;//this.viewDistance;//Todo: uncomment
     }
 
     public void setView(int distance) {

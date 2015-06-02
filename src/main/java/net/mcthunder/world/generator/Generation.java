@@ -59,9 +59,36 @@ public class Generation {
         flatColumn = new Column(123, chunks, biomeData);
     }
 
+    private static void generateGrid() {//For debug purposes
+        Chunk[] chunks = new Chunk[1];
+        NibbleArray3d blocklight = new NibbleArray3d(4096); //Create our blocklight array
+        NibbleArray3d skylight = new NibbleArray3d(4096); //Create our skylight array
+        //THIS IS ALL FOR ONE COLUMN
+        ShortArray3d blocks = new ShortArray3d(4096); //Array containing the blocks of THIS sub-chunk only!
+        for (int cY = 0; cY < 16; cY++) //Loop through the Y axis
+            for (int cZ = 0; cZ < 16; cZ++) //Loop through z
+                for (int cX = 0; cX < 16; cX++) { //Loop through x
+                    if (cY == 0) //lowest point
+                        blocks.setBlock(cX, cY, cZ, Material.BEDROCK.getID()); //Adminium
+                    else if (cY <= 3)
+                        blocks.setBlock(cX, cY, cZ, Material.DIRT.getID());//Dirt
+                    else if (cY == 4)
+                        blocks.setBlock(cX, cY, cZ, (cX == 0 || cX == 15 || cZ == 0 || cZ == 15) ? Material.LAPIS_BLOCK.getID() : Material.GRASS.getID()); //Grass
+                    if (cY >= 4)
+                        skylight.set(cX, cY, cZ, 15);
+                }
+        chunks[0] = new Chunk(blocks, blocklight, skylight);
+        byte[] biomeData = new byte[256];
+        byte plains = (byte) Biome.PLAINS.getID();
+        for (int j = 0; j < 256; j++)
+            biomeData[j] = plains;
+        flatColumn = new Column(123, chunks, biomeData);
+    }
+
     public static void saveFlatRegion(String worldName, int regionX, int regionZ){
         if(flatColumn == null)
-            generateSuperFlat();
+            //generateSuperFlat();
+            generateGrid();
         if (!regionTemplate.exists())
             tellConsole(LoggingLevel.SEVERE,"MCThunder is missing Region File Template! Download from website");
         else {

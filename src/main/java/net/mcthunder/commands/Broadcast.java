@@ -1,11 +1,13 @@
-package net.mcthunder.commands
+package net.mcthunder.commands;
 
-import net.mcthunder.MCThunder;
 import net.mcthunder.api.Command;
+import net.mcthunder.entity.Player;
+
+import java.util.Arrays;
 
 public class Broadcast extends Command {
   public Broadcast(){
-    super("broadcast", Arrays.asList("say"), "Broadcast a sever message", "/broadcast {message}", 5000, "core.broadcast");
+    super("broadcast", Arrays.asList("say"), "Broadcast a server message", "/broadcast {message}", 5000, "core.broadcast");
   }
   
   @Override
