@@ -80,7 +80,7 @@ public class Config {
             if (!getConf().containsKey("useRankManager"))
                 getConf().setProperty("useRankManager", true);
             if (!getConf().containsKey("GUI-MODE"))
-                getConf().setProperty("GUI-MODE",true);
+                getConf().setProperty("GUI-MODE",false);
             if (!getConf().containsKey("chatFormat"))
                 getConf().setProperty("chatFormat", "{WORLD} &e{NAME}:&r {MESSAGE}");
             getConf().save();

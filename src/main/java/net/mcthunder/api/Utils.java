@@ -29,6 +29,8 @@ public class Utils {
     private static int ln = 0;
 
     public static String getIP() {
+        if (MCThunder.getConfig().getHost().equals("127.0.1.1")){
+
         InetAddress ip = null;
         try {
             ip = InetAddress.getLocalHost();
@@ -36,6 +38,9 @@ public class Utils {
             e.printStackTrace();
         }
         return ip == null ? null : ip.getHostAddress();
+        } else {
+            return MCThunder.getConfig().getHost();
+        }
     }
 
     public static void makeDir(String location) {
