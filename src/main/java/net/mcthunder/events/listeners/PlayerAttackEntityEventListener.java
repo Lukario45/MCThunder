@@ -8,6 +8,7 @@ import net.mcthunder.entity.LivingEntity;
 import net.mcthunder.entity.Player;
 import net.mcthunder.events.interfaces.PlayerAttackEntityEventListenerInterface;
 import org.spacehq.mc.protocol.data.game.values.entity.EntityStatus;
+import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityStatusPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerPlaySoundPacket;
 import org.spacehq.packetlib.packet.Packet;
@@ -22,6 +23,8 @@ public class PlayerAttackEntityEventListener implements PlayerAttackEntityEventL
     public void onAttackEntity(Player player, Entity entity) {
         if (entity instanceof LivingEntity) {
             LivingEntity e = (LivingEntity) entity;
+            if (e instanceof Player && ((Player) e).getGameMode().equals(GameMode.CREATIVE))
+                return;
             e.setHealth(e.getHealth() - 1 - player.getHeldItem().getBonusDamnage());
             Packet status = e.getHealth() <= 0f ? new ServerEntityStatusPacket(entity.getEntityID(), EntityStatus.DEAD) :
                     new ServerEntityStatusPacket(e.getEntityID(), EntityStatus.LIVING_HURT);
