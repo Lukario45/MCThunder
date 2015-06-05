@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
+import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -74,7 +75,10 @@ public final class Player extends LivingEntity {
         this.enderchest = new ChestInventory("EnderChest");
         this.ping = getSession().getFlag(ProtocolConstants.PING_KEY);
         this.skinUUID = this.uuid;
-        this.origSkin = getGameProfile().getProperties().get("textures");
+        if (this.getGameProfile().getProperties().get("textures") == null)
+            this.profile.getProperties().put("textures", this.origSkin = Utils.getSkin(this.skinUUID = Utils.getUUIDfromString(getName())));
+        else
+            this.origSkin = getGameProfile().getProperties().get("textures");
         this.skin = this.origSkin;
         this.maxHealth = 20;
         this.metadata.setMetadata(6, this.health = this.maxHealth);
@@ -182,6 +186,8 @@ public final class Player extends LivingEntity {
         StringTag skinUUID = (StringTag) profileHandler.getAttribute(this, "SkinUUID");
         if (skinUUID != null)
             this.profile.getProperties().put("textures", this.skin = Utils.getSkin(this.skinUUID = UUID.fromString(skinUUID.getValue())));
+        if (this.skin == null)
+            this.profile.getProperties().put("textures", this.skin = Utils.getSkin(this.skinUUID = Utils.getUUIDfromString(getName())));
         StringTag displayName = (StringTag) profileHandler.getAttribute(this, "DisplayName");
         if (displayName != null)
             this.displayName = displayName.getValue();
