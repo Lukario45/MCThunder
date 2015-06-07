@@ -56,18 +56,12 @@ import org.spacehq.packetlib.event.session.PacketReceivedEvent;
 import org.spacehq.packetlib.event.session.SessionAdapter;
 import org.spacehq.packetlib.packet.Packet;
 import org.spacehq.packetlib.tcp.TcpSessionFactory;
-import sun.plugin.security.PluginClassLoader;
-
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.JarURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -172,20 +166,21 @@ public class MCThunder {
             makeDir("worlds/" + conf.getWorldName());
             makeDir("worlds/" + conf.getWorldName() + "/region");
             World.newWorld(conf.getWorldName());
-        } else {
-        File dir = new File("worlds");
+        }
+        File worldDir = new File("worlds");
         tellConsole(LoggingLevel.INFO, "Loading Worlds");
-        File[] files = dir.listFiles();
-        if (files != null) {
+        File[] files = worldDir.listFiles();
+        if (files != null)
             for (File f : files)
                 if (f.exists())
                     loadWorld(f);
-        } }
+
         File dir = new File("plugins");
         tellConsole(LoggingLevel.INFO,"Loading Plugins");
         ArrayList<JarFile> jarFiles = new ArrayList<>();
-        for (File f: dir.listFiles()){
-            if (f.getName().endsWith(".jar")){
+
+        for (File f : dir.listFiles()) {
+            if (f.getName().endsWith(".jar")) {
                 try {
                     jarFiles.add(new JarFile(f));
                 } catch (IOException e) {
@@ -193,63 +188,34 @@ public class MCThunder {
                 }
             }
         }
-        for (JarFile jar: jarFiles){
-           JarEntry mainClass = null;
-           boolean foundmain = false;
+        for (JarFile jar : jarFiles){
+            JarEntry mainClass = null;
             Enumeration<JarEntry> jarEntrys = jar.entries();
-            while (jarEntrys.hasMoreElements() && !foundmain){
-               JarEntry jarEntry = jarEntrys.nextElement();
-               tellConsole(LoggingLevel.DEBUG,jarEntry.getName());
-               if(jarEntry.getName().endsWith("Main.class")){
-                   tellConsole(LoggingLevel.DEBUG, "Found Main Class!");
-                   mainClass = jarEntry;
-                   foundmain = true;
-               }
-           }
-            if (!foundmain){
-                tellConsole(LoggingLevel.ERROR,"Jar " + jar.getName() + " is not a valid MCThunder Plugin!");
-            } else {
+            while (jarEntrys.hasMoreElements()) {
+                JarEntry jarEntry = jarEntrys.nextElement();
+                tellConsole(LoggingLevel.DEBUG, jarEntry.getName());
+                if (jarEntry.getName().toLowerCase().endsWith("main.class")) {
+                    tellConsole(LoggingLevel.DEBUG, "Found Main Class!");
+                    mainClass = jarEntry;
+                    break;
+                }
+            }
+            if (mainClass == null)
+                tellConsole(LoggingLevel.ERROR, "The jar file: " + jar.getName().substring(jar.getName().lastIndexOf('\\') + 1) + " is not a valid MCThunder Plugin!");
+            else {
                 try {
-                    URL url=new URL("jar:file:" + jar.getName()+ "!/");
-                    URLClassLoader ucl = new URLClassLoader(new URL[] { url });
-                    Class cls = Class.forName(mainClass.getName().replace(".class", "").replace("/", "."), false, ucl);
-                    Method load = cls.getMethod("Main");
+                    Class cls = Class.forName(mainClass.getName().replace(".class", "").replace("/", "."), false, new URLClassLoader(new URL[] { new URL("jar:file:" + jar.getName()+ "!/") }));
+                    MCThunderPlugin plugin = (MCThunderPlugin) cls.getMethod("init").invoke(null);
+                    //TODO: have it sort them by load order and then load
+                    //Method load = cls.getMethod("Main");
 
-                    MCThunderPlugin plugin = (MCThunderPlugin) load.invoke(null,"string","string","string","String");
-
-
-                   // ClassLoader classLoader = new PluginClassLoader(new URL("jar"," ",jar.getName()));
-                   // URL url = classLoader.getResource(mainClass.getName());
-                 //   JarURLConnection connection = (JarURLConnection) url.openConnection();
-                 //   JarFile file = connection.getJarFile();
-                 //   String jarPath = file.getName();
-                //    Class cls = classLoader.loadClass(jarPath);
-
-                   // URL url = new URL("jar","", jar.getName() + "!/" + mainClass.getName() );
-                   // URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {  url });
-                  //  Class cls = urlClassLoader.loadClass()
-                   // MCThunderPlugin.class.getClassLoader().loadClass(jar.getName() + "/" + mainClass.getName()).getMethod("load");
-
-
-                } //catch (ClassNotFoundException e) {
-                    //e.printStackTrace();
-                /**}*/ catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
+                    //MCThunderPlugin plugin = (MCThunderPlugin) load.invoke(null,"string","string","string","String");
+                } catch (Exception e) {
+                    tellConsole(LoggingLevel.ERROR, "The jar file: " + jar.getName().substring(jar.getName().lastIndexOf('\\') + 1) + " is not a valid MCThunder Plugin!");
                     e.printStackTrace();
                 }
             }
-
         }
-
 
         if (conf.getUseRankManager()) {
             rankManager = new RankManager();
