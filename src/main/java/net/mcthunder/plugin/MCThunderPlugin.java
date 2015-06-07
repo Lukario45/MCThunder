@@ -1,4 +1,4 @@
-package net.mcthunder.net.mcthunder.plugin;
+package net.mcthunder.plugin;
 
 import java.util.List;
 

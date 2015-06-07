@@ -52,6 +52,9 @@ public class Utils {
             tellConsole(LoggingLevel.INFO, "Creating directory " + location);
         }
     }
+    public static void loadPlugins(){
+
+    }
 
     public static void createInitialDirs() {
         tellConsole(LoggingLevel.INFO, "Checking directories.");
