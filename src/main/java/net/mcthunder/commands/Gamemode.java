@@ -16,7 +16,7 @@ public class Gamemode extends Command {
         if (args.length == 0)
             return false;
         GameMode gm;
-        switch (args[0]) {
+        switch (args[0].toLowerCase()) {
             case "creative": case "c": case "1":
                 gm = GameMode.CREATIVE;
                 break;
