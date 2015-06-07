@@ -33,6 +33,7 @@ public class RankManager {
     private Rank rank;
 
     public void load() {
+        MCThunder.addCommandPath("net.mcthunder.rankmanager.commands");
         MCThunder.addLoginEventListener(new RankManagerLoggingInEventListener());
         MCThunder.addCommandEventListener(new RankManagerCommandEventListener());
         this.rankHashmap = new HashMap<>();

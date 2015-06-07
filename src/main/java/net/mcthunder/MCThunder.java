@@ -66,6 +66,7 @@ import static net.mcthunder.api.Utils.*;
  * Created by Kevin on 8/9/2014.
  */
 public class MCThunder {
+    private static ArrayList<String> commandPaths;
     private static ArrayList<Bot> bots;
     private static HashMap<UUID, Player> players;
     private static HashMap<String, World> worlds;
@@ -90,6 +91,7 @@ public class MCThunder {
 
     public static void main(String args[]) {
         AnsiConsole.systemInstall();
+        commandPaths = new ArrayList();
 
         conf = new Config();
         conf.loadConfig();
@@ -100,7 +102,7 @@ public class MCThunder {
         RENDER_DISTANCE = conf.getRenderDistance();
         guiMODE = conf.getGuiMode();
         //Done Set Server Data
-        if (guiMODE){
+        if (guiMODE) {
             window = new Window();
             window.startGUI();
         }
@@ -118,18 +120,7 @@ public class MCThunder {
         /**
          * Based of of Alphabot/Lukabot code that was created by zack6849
          */
-        Reflections.log = null;
-        int commands = 0;
-        List<String> paths = Arrays.asList("net.mcthunder.commands", "net.mcthunder.rankmanager.commands");
-        for (String path : paths) {
-            Reflections reflections = new Reflections(path);
-            Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
-            for (Class c : subTypes)
-                if (CommandRegistry.loadCommand(c.getSimpleName(), path + ".") != null)
-                    commands++;
-        }
-        tellConsole(LoggingLevel.INFO, commands + " command" + (commands != 1 ? "s " : "") + "were loaded.");
-        //Done
+
 
         server = new Server(HOST, PORT, MinecraftProtocol.class, new TcpSessionFactory());
 
@@ -162,7 +153,7 @@ public class MCThunder {
         worlds = new HashMap<>();
         bots = new ArrayList<>();
         //Load the world files and check for subdirectories recursively if it is not a world folder
-        if (!new File("worlds/" + conf.getWorldName()).exists()){
+        if (!new File("worlds/" + conf.getWorldName()).exists()) {
             tellConsole(LoggingLevel.INFO, "Making world " + conf.getWorldName());
             makeDir("worlds/" + conf.getWorldName());
             makeDir("worlds/" + conf.getWorldName() + "/region");
@@ -172,15 +163,29 @@ public class MCThunder {
         File dir = new File("worlds");
         tellConsole(LoggingLevel.DEBUG, "Loading Worlds");
         File[] files = dir.listFiles();
-        if (files != null){
+        if (files != null) {
             for (File f : files)
                 if (f.exists())
-                    loadWorld(f);}
+                    loadWorld(f);
+        }
 
         if (conf.getUseRankManager()) {
             rankManager = new RankManager();
             rankManager.load();
         }
+        Reflections.log = null;
+        int commands = 0;
+        addCommandPath("net.mcthunder.commands");
+        //"net.mcthunder.commands", "net.mcthunder.rankmanager.commands"
+        for (String path : getCommandPaths()) {
+            Reflections reflections = new Reflections(path);
+            Set<Class<? extends Command>> subTypes = reflections.getSubTypesOf(Command.class);
+            for (Class c : subTypes)
+                if (CommandRegistry.loadCommand(c.getSimpleName(), path + ".") != null)
+                    commands++;
+        }
+        tellConsole(LoggingLevel.INFO, commands + " command" + (commands != 1 ? "s " : "") + "were loaded.");
+        //Done
 
         server.setGlobalFlag(ProtocolConstants.VERIFY_USERS_KEY, conf.getOnlineMode());
         server.setGlobalFlag(ProtocolConstants.SERVER_COMPRESSION_THRESHOLD, 256);//Default is 256 not 100
@@ -196,7 +201,8 @@ public class MCThunder {
                 BufferedImage icon = null;
                 try {
                     icon = ImageIO.read(new File("server-icon.png"));
-                } catch (Exception ignored) { }//When there is no icon set
+                } catch (Exception ignored) {
+                }//When there is no icon set
                 return new ServerStatusInfo(new VersionInfo(ProtocolConstants.GAME_VERSION, ProtocolConstants.PROTOCOL_VERSION), new PlayerInfo(conf.getSlots() + bots.size(), players.size() + bots.size(), gameProfiles), new TextMessage(conf.getServerMOTD()), icon);
             }
         });
@@ -245,7 +251,9 @@ public class MCThunder {
                                 case STOP_SPRINTING:
                                     player.setSprinting(false);
                                     break;
-                                case RIDING_JUMP: case OPEN_INVENTORY: case LEAVE_BED:
+                                case RIDING_JUMP:
+                                case OPEN_INVENTORY:
+                                case LEAVE_BED:
                                     break;
                             }
                         } else if (event.getPacket() instanceof ClientSwingArmPacket) {
@@ -268,26 +276,26 @@ public class MCThunder {
                                     }
                             } else
                                 playerChatEventSource.fireEvent(player, packet);
-                        } else if (event.getPacket() instanceof ClientPlayerInteractEntityPacket){
+                        } else if (event.getPacket() instanceof ClientPlayerInteractEntityPacket) {
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ClientPlayerInteractEntityPacket packet = event.getPacket();
                             Entity ent = player.getWorld().getEntityFromID(packet.getEntityId());
                             if (ent == null) {
                                 for (Player p : MCThunder.getPlayers())
-                                    if (p.getEntityID() == packet.getEntityId()){
+                                    if (p.getEntityID() == packet.getEntityId()) {
                                         ent = p;
                                         break;
                                     }
                                 if (ent == null)
                                     for (int i = 0; i < bots.size(); i++)
-                                        if (bots.get(i).getEntityID() == packet.getEntityId()){
+                                        if (bots.get(i).getEntityID() == packet.getEntityId()) {
                                             ent = bots.get(i);
                                             break;
                                         }
                             }
                             switch (packet.getAction()) {
-                                 case INTERACT:
-                                   player.sendMessage("INTERACT/INTERACTAT");
+                                case INTERACT:
+                                    player.sendMessage("INTERACT/INTERACTAT");
                                     break;
                                 case ATTACK:
                                     try {
@@ -370,13 +378,13 @@ public class MCThunder {
                                         player.getWorld().getChest(b.getLocation()).getInventory() : b.getType().equals(Material.ENDER_CHEST) ?
                                         player.getEnderChest() : b.getType().equals(Material.CRAFTING_TABLE) ? new CraftingInventory("Crafting") :
                                         b.getType().getParent().equals(Material.HOPPER) ? new HopperInventory("Hopper") :
-                                        b.getType().equals(Material.BEACON) ? new BeaconInventory("Beacon") :
-                                        b.getType().getParent().equals(Material.ANVIL) ? new AnvilInventory("Anvil") :
-                                        b.getType().equals(Material.BREWING_STAND_BLOCK) ? new BrewingStandInventory("BrewingStand") :
-                                        b.getType().equals(Material.DISPENSER) ? new DispenserInventory("Dispenser") :
-                                        b.getType().equals(Material.DROPPER) ? new DropperInventory("Dropper") :
-                                        b.getType().equals(Material.FURNACE) ? new FurnaceInventory("Furnace") :
-                                        b.getType().equals(Material.ENCHANTING_TABLE) ? new EnchantingInventory("Enchanting") : null;
+                                                b.getType().equals(Material.BEACON) ? new BeaconInventory("Beacon") :
+                                                        b.getType().getParent().equals(Material.ANVIL) ? new AnvilInventory("Anvil") :
+                                                                b.getType().equals(Material.BREWING_STAND_BLOCK) ? new BrewingStandInventory("BrewingStand") :
+                                                                        b.getType().equals(Material.DISPENSER) ? new DispenserInventory("Dispenser") :
+                                                                                b.getType().equals(Material.DROPPER) ? new DropperInventory("Dropper") :
+                                                                                        b.getType().equals(Material.FURNACE) ? new FurnaceInventory("Furnace") :
+                                                                                                b.getType().equals(Material.ENCHANTING_TABLE) ? new EnchantingInventory("Enchanting") : null;
                                 if (inv != null) {
                                     player.openInventory(inv);
                                     return;
@@ -396,9 +404,9 @@ public class MCThunder {
                             if (setType.getParent().equals(Material.TORCH) || setType.getParent().equals(Material.REDSTONE_TORCH))//TODO: Check if is a valid torch position
                                 setType = packet.getFace().equals(Face.SOUTH) ? Material.fromString("EAST_" + setType.getParent()) :
                                         packet.getFace().equals(Face.NORTH) ? Material.fromString("WEST_" + setType.getParent()) :
-                                        packet.getFace().equals(Face.WEST) ? Material.fromString("SOUTH_" + setType.getParent()) :
-                                        packet.getFace().equals(Face.EAST) ? Material.fromString("NORTH_" + setType.getParent()) :
-                                        Material.fromString("UP_" + setType.getParent());
+                                                packet.getFace().equals(Face.WEST) ? Material.fromString("SOUTH_" + setType.getParent()) :
+                                                        packet.getFace().equals(Face.EAST) ? Material.fromString("NORTH_" + setType.getParent()) :
+                                                                Material.fromString("UP_" + setType.getParent());
                             if (setType.equals(Material.REDSTONE))
                                 setType = Material.REDSTONE_WIRE;
                             if (setType.equals(Material.STRING))
@@ -493,7 +501,8 @@ public class MCThunder {
                                     f.setTime((byte) (f.getTime() + 1));
                                 }
                             }
-                        } catch (Exception ignored) { }//Entity added at exact same time it checked for entities
+                        } catch (Exception ignored) {
+                        }//Entity added at exact same time it checked for entities
                 for (int i = 0; i < bots.size(); i++)
                     bots.get(i).ai();
                 for (Player p : getPlayers()) {
@@ -509,7 +518,8 @@ public class MCThunder {
                 long time = 50 + startTime - System.currentTimeMillis();
                 if (time > 0)
                     Thread.sleep(time);//Wait for next tick after everything finishes
-            } catch (InterruptedException ignored) { }
+            } catch (InterruptedException ignored) {
+            }
         }
     }
 
@@ -532,7 +542,7 @@ public class MCThunder {
                         fromChunkX - toChunkX < 0 ? Direction.SOUTH_EAST : fromChunkZ - toChunkZ < 0 && fromChunkX - toChunkX > 0 ?
                         Direction.SOUTH_WEST : fromChunkZ - toChunkZ > 0 && fromChunkX - toChunkX > 0 ? Direction.NORTH_WEST :
                         fromChunkZ - toChunkZ > 0 ? Direction.NORTH : fromChunkX - toChunkX < 0 ? Direction.EAST :
-                        fromChunkZ - toChunkZ < 0 ? Direction.SOUTH : fromChunkX - toChunkX > 0 ? Direction.WEST : null);
+                                fromChunkZ - toChunkZ < 0 ? Direction.SOUTH : fromChunkX - toChunkX > 0 ? Direction.WEST : null);
         }
 
         if (packet instanceof ClientPlayerRotationPacket || packet instanceof ClientPlayerPositionRotationPacket) {
@@ -540,6 +550,18 @@ public class MCThunder {
             player.setYaw((float) packet.getYaw());
         }
         player.setOnGround(packet.isOnGround());
+    }
+    public static List<String> getCommandPaths(){
+        return commandPaths;
+    }
+
+    public static void addCommandPath(String path) {
+        if (!path.contains(".")) {
+            tellConsole(LoggingLevel.ERROR, path + " is not a valid command path, please check your plugins!");
+        } else {
+            commandPaths.add(path);
+
+        }
     }
 
     private static List<Packet> createUpdatePackets(Session session, ClientPlayerMovementPacket packet) {
@@ -574,6 +596,7 @@ public class MCThunder {
             packets.add(new ServerEntityRotationPacket(player.getEntityID(), yaw, (float) packet.getPitch(), player.isOnGround()));
             packets.add(new ServerEntityHeadLookPacket(player.getEntityID(), yaw));
         }
+
         return packets;
     }
 
@@ -606,7 +629,9 @@ public class MCThunder {
         return PORT;
     }
 
-    public static boolean getGuiMode(){return guiMODE;}
+    public static boolean getGuiMode() {
+        return guiMODE;
+    }
 
     public static String getIp() {
         return HOST;
@@ -675,19 +700,23 @@ public class MCThunder {
         return conf;
     }
 
-    public static Window getGui(){
+    public static Window getGui() {
         return window;
     }
 
-    public static RankManager getRankManager(){return rankManager;}
+    public static RankManager getRankManager() {
+        return rankManager;
+    }
 
     public static void addLoginEventListener(PlayerLoggingInEventListenerInterface listener) {
         loggingInEventSource.addEventListener(listener);
     }
-    public static void addCommandEventListener(PlayerCommandEventListenerInterface listener){
+
+    public static void addCommandEventListener(PlayerCommandEventListenerInterface listener) {
         playerCommandEventSource.addEventListener(listener);
     }
-    public static void addPlayerEntityAttackListener(PlayerAttackEntityEventListenerInterface listener){
+
+    public static void addPlayerEntityAttackListener(PlayerAttackEntityEventListenerInterface listener) {
         playerAttackEntityEventSource.addEventListener(listener);
     }
 
