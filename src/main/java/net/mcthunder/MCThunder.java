@@ -198,30 +198,21 @@ public class MCThunder {
             }
         }
         for (JarFile jar : jarFiles){
-            JarEntry mainClass = null;
             Enumeration<JarEntry> jarEntrys = jar.entries();
             while (jarEntrys.hasMoreElements()) {
                 JarEntry jarEntry = jarEntrys.nextElement();
-                tellConsole(LoggingLevel.DEBUG, jarEntry.getName());
-                if (jarEntry.getName().toLowerCase().endsWith("main.class")) {
-                    tellConsole(LoggingLevel.DEBUG, "Found Main Class!");
-                    mainClass = jarEntry;
-                    break;
-                }
-            }
-            if (mainClass == null)
-                tellConsole(LoggingLevel.ERROR, "The jar file: " + jar.getName().substring(jar.getName().lastIndexOf('\\') + 1) + " is not a valid MCThunder Plugin!");
-            else {
-                try {
-                    Class cls = Class.forName(mainClass.getName().replace(".class", "").replace("/", "."), false, new URLClassLoader(new URL[] { new URL("jar:file:" + jar.getName()+ "!/") }));
-                    MCThunderPlugin plugin = (MCThunderPlugin) cls.getMethod("init").invoke(null);
-                    //TODO: have it sort them by load order and then load
-                    //Method load = cls.getMethod("Main");
-
-                    //MCThunderPlugin plugin = (MCThunderPlugin) load.invoke(null,"string","string","string","String");
-                } catch (Exception e) {
-                    tellConsole(LoggingLevel.ERROR, "The jar file: " + jar.getName().substring(jar.getName().lastIndexOf('\\') + 1) + " is not a valid MCThunder Plugin!");
-                    e.printStackTrace();
+                //tellConsole(LoggingLevel.DEBUG, jarEntry.getName());
+                if (jarEntry.getName().toLowerCase().endsWith(".class")) {
+                    try {
+                        Class cls = Class.forName(jarEntry.getName().replace(".class", "").replace("/", "."), false, new URLClassLoader(new URL[]{new URL("jar:file:" + jar.getName() + "!/")}));
+                        if (MCThunderPlugin.class.isAssignableFrom(cls)) {
+                            MCThunderPlugin plugin = (MCThunderPlugin) cls.getConstructor().newInstance();
+                            break;
+                        }
+                    } catch (Exception e) {
+                        tellConsole(LoggingLevel.ERROR, "The jar file: " + jar.getName().substring(jar.getName().lastIndexOf('\\') + 1) + " is not a valid MCThunder Plugin!");
+                        e.printStackTrace();
+                    }
                 }
             }
         }
