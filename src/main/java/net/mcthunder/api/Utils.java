@@ -29,7 +29,7 @@ public class Utils {
     private static int ln = 0;
 
     public static String getIP() {
-        if (MCThunder.getConfig().getHost().equals("127.0.1.1")){
+        if (MCThunder.getConfig().getHost().equals("127.0.0.1")){
 
         InetAddress ip = null;
         try {

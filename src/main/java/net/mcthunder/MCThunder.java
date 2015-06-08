@@ -5,6 +5,7 @@ import net.mcthunder.api.*;
 import net.mcthunder.block.Block;
 import net.mcthunder.block.Material;
 import net.mcthunder.entity.*;
+import net.mcthunder.events.PlayerBreakBlockEvent;
 import net.mcthunder.events.interfaces.PlayerAttackEntityEventListenerInterface;
 import net.mcthunder.events.interfaces.PlayerCommandEventListenerInterface;
 import net.mcthunder.events.interfaces.PlayerLoggingInEventListenerInterface;
@@ -93,6 +94,8 @@ public class MCThunder {
     private static PlayerLoggingInEventSource loggingInEventSource;
     private static MetadataChangeEventSource metadataChangeEventSource;
     private static PlayerAttackEntityEventSource playerAttackEntityEventSource;
+    private static PlayerBreakBlockEventSource playerBreakBlockEventSource;
+    private static PlayerPlaceBlockEventSource playerPlaceBlockEventSource;
     private static RankManager rankManager;
     private static boolean guiMODE;
     private static Window window;
@@ -144,18 +147,24 @@ public class MCThunder {
         PlayerLoggingInEventListener loggingInEventListener = new PlayerLoggingInEventListener();
         MetadataChangeEventListener metadataChangeEventListener = new MetadataChangeEventListener();
         PlayerAttackEntityEventListener playerAttackEntityEventListener = new PlayerAttackEntityEventListener();
+        PlayerBreakBlockEventListener playerBreakBlockEventListener = new PlayerBreakBlockEventListener();
+        PlayerPlaceBlockEventListener playerPlaceBlockEventListener = new PlayerPlaceBlockEventListener();
 
         playerChatEventSource = new PlayerChatEventSource();
         playerCommandEventSource = new PlayerCommandEventSource();
         loggingInEventSource = new PlayerLoggingInEventSource();
         metadataChangeEventSource = new MetadataChangeEventSource();
         playerAttackEntityEventSource = new PlayerAttackEntityEventSource();
+        playerBreakBlockEventSource = new PlayerBreakBlockEventSource();
+        playerPlaceBlockEventSource = new PlayerPlaceBlockEventSource();
 
         playerChatEventSource.addEventListener(defaultPlayerChatEventListener);
         playerCommandEventSource.addEventListener(defaultPlayerCommandEventListener);
         loggingInEventSource.addEventListener(loggingInEventListener);
         metadataChangeEventSource.addEventListener(metadataChangeEventListener);
         playerAttackEntityEventSource.addEventListener(playerAttackEntityEventListener);
+        playerBreakBlockEventSource.addEventListener(playerBreakBlockEventListener);
+        playerPlaceBlockEventSource.addEventListener(playerPlaceBlockEventListener);
 
         players = new HashMap<>(conf.getSlots());
         worlds = new HashMap<>();
@@ -344,7 +353,7 @@ public class MCThunder {
                             }
                             switch (packet.getAction()) {
                                 case INTERACT:
-                                    player.sendMessage("INTERACT/INTERACTAT");
+                                    //player.sendMessage("INTERACT/INTERACTAT");
                                     break;
                                 case ATTACK:
                                     try {
@@ -416,77 +425,23 @@ public class MCThunder {
                         } else if (event.getPacket() instanceof ClientPlayerPlaceBlockPacket) {
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ClientPlayerPlaceBlockPacket packet = event.getPacket();
-                            Position position = packet.getPosition();
-                            ItemStack heldItem = packet.getHeldItem() == null ? null : new ItemStack(Material.fromData(packet.getHeldItem().getId(),
-                                    (short) packet.getHeldItem().getData()), packet.getHeldItem().getAmount());
-                            if ((position.getY() >> 4) < 0)
-                                return;
-                            Block b = new Block(new Location(player.getWorld(), position));
-                            if (!player.isSneaking()) {
-                                Inventory inv = b.getType().equals(Material.CHEST) || b.getType().equals(Material.TRAPPED_CHEST) ?
-                                        player.getWorld().getChest(b.getLocation()).getInventory() : b.getType().equals(Material.ENDER_CHEST) ?
-                                        player.getEnderChest() : b.getType().equals(Material.CRAFTING_TABLE) ? new CraftingInventory("Crafting") :
-                                        b.getType().getParent().equals(Material.HOPPER) ? new HopperInventory("Hopper") :
-                                                b.getType().equals(Material.BEACON) ? new BeaconInventory("Beacon") :
-                                                        b.getType().getParent().equals(Material.ANVIL) ? new AnvilInventory("Anvil") :
-                                                                b.getType().equals(Material.BREWING_STAND_BLOCK) ? new BrewingStandInventory("BrewingStand") :
-                                                                        b.getType().equals(Material.DISPENSER) ? new DispenserInventory("Dispenser") :
-                                                                                b.getType().equals(Material.DROPPER) ? new DropperInventory("Dropper") :
-                                                                                        b.getType().equals(Material.FURNACE) ? new FurnaceInventory("Furnace") :
-                                                                                                b.getType().equals(Material.ENCHANTING_TABLE) ? new EnchantingInventory("Enchanting") : null;
-                                if (inv != null) {
-                                    player.openInventory(inv);
-                                    return;
-                                }
+                            try {
+                                playerPlaceBlockEventSource.fireEvent(player,packet);
+                            } catch (ClassNotFoundException e) {
+                                e.printStackTrace();
                             }
-                            if (heldItem == null)
-                                return;
-                            if (!b.getType().isLiquid() && !b.getType().equals(Material.SNOW_LAYER) && !b.getType().isLongGrass())
-                                b = b.getRelative(Direction.fromFace(packet.getFace()));
-                            if (!b.getType().equals(Material.AIR))
-                                return;
-                            Location clicked = new Location(player.getWorld(), b.getLocation().getX() + packet.getCursorX(), b.getLocation().getY() +
-                                    1 - (packet.getCursorY() == 0 ? 1 : packet.getCursorY()), b.getLocation().getZ() + packet.getCursorZ());
-                            Material setType = heldItem.getType();
-                            if (setType == null)
-                                return;
-                            if (setType.getParent().equals(Material.TORCH) || setType.getParent().equals(Material.REDSTONE_TORCH))//TODO: Check if is a valid torch position
-                                setType = packet.getFace().equals(Face.SOUTH) ? Material.fromString("EAST_" + setType.getParent()) :
-                                        packet.getFace().equals(Face.NORTH) ? Material.fromString("WEST_" + setType.getParent()) :
-                                                packet.getFace().equals(Face.WEST) ? Material.fromString("SOUTH_" + setType.getParent()) :
-                                                        packet.getFace().equals(Face.EAST) ? Material.fromString("NORTH_" + setType.getParent()) :
-                                                                Material.fromString("UP_" + setType.getParent());
-                            if (setType.equals(Material.REDSTONE))
-                                setType = Material.REDSTONE_WIRE;
-                            if (setType.equals(Material.STRING))
-                                setType = Material.TRIPWIRE;
-                            if (Material.fromString(setType.getName() + "_BLOCK") != null && !setType.equals(Material.BROWN_MUSHROOM) && !setType.equals(Material.RED_MUSHROOM) &&
-                                    !setType.equals(Material.MELON))
-                                setType = Material.fromString(setType.getName() + "_BLOCK");
-                            String name = setType.getName().replace("_UP", "");
-                            if ((packet.getFace().equals(Face.BOTTOM) || packet.getFace().equals(Face.TOP)) && Material.fromString(name + "_UP") != null)
-                                setType = Material.fromString(name + "_UP");
-                            else if ((packet.getFace().equals(Face.NORTH) || packet.getFace().equals(Face.SOUTH)) && Material.fromString(name + "_EAST") != null)
-                                setType = Material.fromString(name + "_EAST");
-                            else if ((packet.getFace().equals(Face.EAST) || packet.getFace().equals(Face.WEST)) && Material.fromString(name + "_NORTH") != null)
-                                setType = Material.fromString(name + "_NORTH");
-                            if (setType.getName().contains("BUCKET"))
-                                setType = Material.fromString(setType.getName().replace("_BUCKET", ""));
-                            if (setType.getParent().equals(Material.SPAWN_EGG))
-                                clicked.getWorld().loadEntity(Entity.fromType(EntityType.fromString(setType.getName().replaceFirst("SPAWN_", "")), clicked));
-                            else if (setType.equals(Material.ARMOR_STAND))
-                                clicked.getWorld().loadEntity(Entity.fromType(EntityType.ARMOR_STAND, clicked));
-                            else
-                                b.setType(setType);
+
                         } else if (event.getPacket() instanceof ClientPlayerActionPacket) {
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ClientPlayerActionPacket packet = event.getPacket();
                             if ((packet.getAction().equals(PlayerAction.START_DIGGING) && player.getGameMode().equals(GameMode.CREATIVE)) ||
                                     (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
-                                Block b = new Block(new Location(player.getWorld(), packet.getPosition()));
-                                if (player.getGameMode().equals(GameMode.SURVIVAL))
-                                    player.getWorld().loadEntity(new DroppedItem(player.getLocation(), new ItemStack(b.getType(), 1)));
-                                b.setType(Material.AIR);
+                                try {
+                                    playerBreakBlockEventSource.fireEvent(player,packet);
+                                } catch (ClassNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+
                             } else if (packet.getAction().equals(PlayerAction.DROP_ITEM) || packet.getAction().equals(PlayerAction.DROP_ITEM_STACK)) {
                                 player.getWorld().loadEntity(new DroppedItem(new Location(player.getWorld(), packet.getPosition()), player.getHeldItem()));
                                 //TODO: Remove from inventory as well as only drop 1 when its not a full stack
