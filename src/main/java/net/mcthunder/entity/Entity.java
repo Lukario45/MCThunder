@@ -115,6 +115,14 @@ public abstract class Entity {
         StringTag queryResultName = commandStats != null ? (StringTag) commandStats.get("QueryResultName") : null;
         StringTag queryResultObjective = commandStats != null ? (StringTag) commandStats.get("QueryResultObjective") : null;
     }
+    public boolean isNear(Entity other, double distance) {
+        return other != null && this != null && (Math.abs(this.location.getX() - other.getLocation().getX()) <= distance &&
+                Math.abs(this.location.getZ() - other.getLocation().getZ()) <= distance && Math.abs(this.location.getY() - other.getLocation().getY()) <= distance);
+    }
+
+    public boolean isTouching(Entity other) {
+        return isNear(other, 1);
+    }
 
     public static int getNextID() {
         return nextID++;//Returns it and adds 1 incase they use it

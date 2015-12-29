@@ -284,6 +284,16 @@ public class MCThunder {
                                     if (p.getWorld().equals(player.getWorld()) && p.isColumnLoaded(chunk) && !p.getUniqueID().equals(player.getUniqueID()))
                                         p.sendPacket(packet);
                             updatePlayerPosition(event.getSession(), pack);
+                            for ( Entity e: player.getWorld().getEntities()){
+                                if (player.isTouching(e) && e.getType().isItem()){
+                                    DroppedItem i = (DroppedItem) e;
+                                    player.getInventory().add(i.getItemStack());
+                                    player.updateInventory();
+                                    player.getWorld().getEntities().remove(e);
+                                    player.sendPacket(new ServerCollectItemPacket(i.getEntityID(), player.getEntityID()));
+                                }
+                            }
+
                         } else if (event.getPacket() instanceof ClientPlayerStatePacket) {
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ClientPlayerStatePacket packet = event.getPacket();
