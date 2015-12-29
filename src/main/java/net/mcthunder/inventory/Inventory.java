@@ -41,8 +41,13 @@ public class Inventory {
                 setSlot(i, is);
                 break;
             } else if (this.contents.get(i).canStack(is)) {//TODO: Check with max stack size and stuff also
+                //if(this.contents.get(i).getAmount() == 64) {
+                  //  this.contents.get(i + 1).setAmount(this.contents.get(i).getAmount() + is.getAmount());
+                  //  break;
+               // } else {
                 this.contents.get(i).setAmount(this.contents.get(i).getAmount() + is.getAmount());
                 break;
+               // }
             }
     }
 

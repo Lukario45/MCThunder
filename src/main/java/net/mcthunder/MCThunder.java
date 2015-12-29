@@ -185,7 +185,7 @@ public class MCThunder {
                     loadWorld(f);
 
         File dir = new File("plugins");
-        tellConsole(LoggingLevel.INFO,"Loading Plugins");
+        tellConsole(LoggingLevel.INFO, "Loading Plugins");
         ArrayList<JarFile> jarFiles = new ArrayList<>();
 
         for (File f : dir.listFiles()) {
@@ -197,7 +197,7 @@ public class MCThunder {
                 }
             }
         }
-        for (JarFile jar : jarFiles){
+        for (JarFile jar : jarFiles) {
             Enumeration<JarEntry> jarEntrys = jar.entries();
             while (jarEntrys.hasMoreElements()) {
                 JarEntry jarEntry = jarEntrys.nextElement();
@@ -417,7 +417,7 @@ public class MCThunder {
                             Player player = getPlayer(event.getSession().<GameProfile>getFlag(ProtocolConstants.PROFILE_KEY).getId());
                             ClientPlayerPlaceBlockPacket packet = event.getPacket();
                             try {
-                                playerPlaceBlockEventSource.fireEvent(player,packet);
+                                playerPlaceBlockEventSource.fireEvent(player, packet);
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();
                             }
@@ -428,20 +428,22 @@ public class MCThunder {
                             if ((packet.getAction().equals(PlayerAction.START_DIGGING) && player.getGameMode().equals(GameMode.CREATIVE)) ||
                                     (player.getGameMode().equals(GameMode.SURVIVAL) && packet.getAction().equals(PlayerAction.FINISH_DIGGING))) {
                                 try {
-                                    playerBreakBlockEventSource.fireEvent(player,packet);
+                                    playerBreakBlockEventSource.fireEvent(player, packet);
                                 } catch (ClassNotFoundException e) {
                                     e.printStackTrace();
                                 }
 
                             } else if (packet.getAction().equals(PlayerAction.DROP_ITEM) || packet.getAction().equals(PlayerAction.DROP_ITEM_STACK)) {
-                                player.getWorld().loadEntity(new DroppedItem(player.getLocation(),new ItemStack(player.getHeldItem().getType(),1)));
-                                Inventory i = player.getInventory();
-                                if(i.getItemAt(player.getSlot()).getAmount() > 1){
-                                    i.getItemAt(player.getSlot()).setAmount(player.getHeldItem().getAmount() - 1);
-                                    player.setInventory(i);
-                                } else if (i.getItemAt(player.getSlot()).getAmount() == 1){
-                                    i.getItemAt(player.getSlot()).setType(Material.AIR);
-                                    player.setInventory(i);
+                                if (player.getHeldItem().getType() != Material.AIR) {
+                                    player.getWorld().loadEntity(new DroppedItem(player.getLocation(), new ItemStack(player.getHeldItem().getType(), 1)));
+                                    Inventory i = player.getInventory();
+                                    if (i.getItemAt(player.getSlot()).getAmount() > 1) {
+                                        i.getItemAt(player.getSlot()).setAmount(player.getHeldItem().getAmount() - 1);
+                                        player.setInventory(i);
+                                    } else if (i.getItemAt(player.getSlot()).getAmount() == 1) {
+                                        i.getItemAt(player.getSlot()).setType(Material.AIR);
+                                        player.setInventory(i);
+                                    }
                                 }
                             }
                         } else if (event.getPacket() != null)
@@ -553,7 +555,8 @@ public class MCThunder {
         }
         player.setOnGround(packet.isOnGround());
     }
-    public static List<String> getCommandPaths(){
+
+    public static List<String> getCommandPaths() {
         return commandPaths;
     }
 
