@@ -656,6 +656,10 @@ public final class Player extends LivingEntity {
         for (int i = 0; i < this.inv.getSize(); i++)
             sendPacket(new ServerSetSlotPacket(0, i, this.inv.getItemAt(i).getItemStack()));
     }
+    public void setInventory(Inventory i){
+        inv = i;
+        updateInventory();
+    }
 
     public Inventory getOpenInventory() {
         return this.openInventory;

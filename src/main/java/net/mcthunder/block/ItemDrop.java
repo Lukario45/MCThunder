@@ -4,7 +4,9 @@ package net.mcthunder.block;
  * Created by conno_000 on 12/28/2015.
  */
 public enum ItemDrop {
-    GRASS("GRASS","DIRT");
+    GRASS("GRASS","DIRT"),
+    STONE("STONE", "COBBLESTONE");
+
 
     private final String itemThatDrops;
     private final String name;

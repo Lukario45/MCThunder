@@ -434,8 +434,15 @@ public class MCThunder {
                                 }
 
                             } else if (packet.getAction().equals(PlayerAction.DROP_ITEM) || packet.getAction().equals(PlayerAction.DROP_ITEM_STACK)) {
-                                player.getWorld().loadEntity(new DroppedItem(new Location(player.getWorld(), packet.getPosition()), player.getHeldItem()));
-                                //TODO: Remove from inventory as well as only drop 1 when its not a full stack
+                                player.getWorld().loadEntity(new DroppedItem(player.getLocation(),new ItemStack(player.getHeldItem().getType(),1)));
+                                Inventory i = player.getInventory();
+                                if(i.getItemAt(player.getSlot()).getAmount() > 1){
+                                    i.getItemAt(player.getSlot()).setAmount(player.getHeldItem().getAmount() - 1);
+                                    player.setInventory(i);
+                                } else if (i.getItemAt(player.getSlot()).getAmount() == 1){
+                                    i.getItemAt(player.getSlot()).setType(Material.AIR);
+                                    player.setInventory(i);
+                                }
                             }
                         } else if (event.getPacket() != null)
                             tellConsole(LoggingLevel.DEBUG, event.getPacket());
