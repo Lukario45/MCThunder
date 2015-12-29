@@ -287,10 +287,16 @@ public class MCThunder {
                             for ( Entity e: player.getWorld().getEntities()){
                                 if (player.isTouching(e) && e.getType().isItem()){
                                     DroppedItem i = (DroppedItem) e;
-                                    player.getInventory().add(i.getItemStack());
-                                    player.updateInventory();
-                                    player.getWorld().getEntities().remove(e);
-                                    player.sendPacket(new ServerCollectItemPacket(i.getEntityID(), player.getEntityID()));
+                                    if (i.getAge() >= 0) {
+                                        player.getInventory().add(i.getItemStack());
+                                        player.updateInventory();
+                                        player.getWorld().getEntities().remove(e);
+                                        for (Player p : getPlayers()) {
+                                            if (player.getWorld() == player.getWorld()) {
+                                                p.sendPacket(new ServerCollectItemPacket(i.getEntityID(), player.getEntityID()));
+                                            }
+                                        }
+                                    }
                                 }
                             }
 
@@ -445,7 +451,9 @@ public class MCThunder {
 
                             } else if (packet.getAction().equals(PlayerAction.DROP_ITEM) || packet.getAction().equals(PlayerAction.DROP_ITEM_STACK)) {
                                 if (player.getHeldItem().getType() != Material.AIR) {
-                                    player.getWorld().loadEntity(new DroppedItem(player.getLocation(), new ItemStack(player.getHeldItem().getType(), 1)));
+                                    DroppedItem di = new DroppedItem(player.getLocation(), new ItemStack(player.getHeldItem().getType(), 1));
+                                    di.setAge((short) -20);
+                                    player.getWorld().loadEntity(di);
                                     Inventory i = player.getInventory();
                                     if (i.getItemAt(player.getSlot()).getAmount() > 1) {
                                         i.getItemAt(player.getSlot()).setAmount(player.getHeldItem().getAmount() - 1);

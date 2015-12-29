@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.Lukario45.NBTFile.Utilities.*;
 import static net.mcthunder.api.Utils.getLong;
@@ -40,7 +41,7 @@ public class World {
     private Difficulty difficulty;
     private HashMap<Long, Region> regionHashMap = new HashMap<>();
     private HashMap<Long, Column> columnHashMap = new HashMap<>();
-    private HashMap<Integer, Entity> loadedEntities = new HashMap<>();
+    private ConcurrentHashMap<Integer, Entity> loadedEntities = new ConcurrentHashMap<>();
     private HashMap<Location, Chest> chestData = new HashMap<>();
     private ArrayList<Sign> signs = new ArrayList<>();//TEMP arraylist
     private WorldType worldType;
