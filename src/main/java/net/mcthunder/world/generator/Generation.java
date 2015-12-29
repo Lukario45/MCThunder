@@ -10,6 +10,7 @@ import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -80,6 +81,10 @@ public class Generation {
         for (int j = 0; j < 256; j++)
             biomeData[j] = plains;
         flatColumn = new Column(123, chunks, biomeData);
+    }
+
+    public static void createPerlinNoise(){
+
     }
 
     public static void saveFlatRegion(String worldName, int regionX, int regionZ){

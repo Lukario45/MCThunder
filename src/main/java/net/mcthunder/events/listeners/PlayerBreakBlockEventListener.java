@@ -24,6 +24,7 @@ import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPac
 import org.spacehq.packetlib.Session;
 import org.spacehq.packetlib.packet.Packet;
 
+import static net.mcthunder.api.Utils.getDropped;
 import static net.mcthunder.api.Utils.tellConsole;
 
 /**
@@ -34,7 +35,8 @@ public class PlayerBreakBlockEventListener implements PlayerBreakBlockEventListe
     public void onBlockBreak(Player player, ClientPlayerActionPacket packet) throws ClassNotFoundException {
         Block b = new Block(new Location(player.getWorld(), packet.getPosition()));
         if (player.getGameMode().equals(GameMode.SURVIVAL))
-            player.getWorld().loadEntity(new DroppedItem(player.getLocation(), new ItemStack(b.getType(), 1)));
+            //player.getWorld().loadEntity(new DroppedItem(b.getLocation(), new ItemStack(b.getType(), 1)));
+            player.getWorld().loadEntity(getDropped(b));
         b.setType(Material.AIR);
     }
 }

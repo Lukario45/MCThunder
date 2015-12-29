@@ -1,6 +1,12 @@
 package net.mcthunder.api;
 
 import net.mcthunder.MCThunder;
+import net.mcthunder.block.Block;
+
+import net.mcthunder.block.ItemDrop;
+import net.mcthunder.block.Material;
+import net.mcthunder.entity.DroppedItem;
+import net.mcthunder.inventory.ItemStack;
 import org.spacehq.mc.auth.properties.Property;
 import org.spacehq.opennbt.tag.builtin.Tag;
 
@@ -15,10 +21,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Kevin on 8/9/2014.
@@ -27,6 +30,26 @@ import java.util.UUID;
 public class Utils {
     private static HashMap<UUID,Property> skins = new HashMap<>();
     private static int ln = 0;
+
+    public static DroppedItem getDropped(Block b){
+        HashMap<String,ItemDrop> values = new HashMap<>();
+        for (ItemDrop i: ItemDrop.values()){
+            values.put(i.getName(),i);
+    }
+        try{
+        if (values.values().contains(ItemDrop.valueOf(b.getType().getName()))){
+            return new DroppedItem(b.getLocation(),new ItemStack(Material.valueOf(values.get(b.getType().getName()).getDropped()),1));
+
+        } else {
+
+            return new DroppedItem(b.getLocation(), new ItemStack(b.getType(), 1));
+
+        } }catch (IllegalArgumentException e){
+            return new DroppedItem(b.getLocation(), new ItemStack(b.getType(), 1));
+        }
+
+
+    }
 
     public static String getIP() {
         if (MCThunder.getConfig().getHost().equals("127.0.0.1")){

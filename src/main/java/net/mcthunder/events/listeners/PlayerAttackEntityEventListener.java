@@ -25,7 +25,7 @@ public class PlayerAttackEntityEventListener implements PlayerAttackEntityEventL
             LivingEntity e = (LivingEntity) entity;
             if (e instanceof Player && ((Player) e).getGameMode().equals(GameMode.CREATIVE))
                 return;
-            e.setHealth(e.getHealth() - 1 - player.getHeldItem().getBonusDamnage());
+            e.setHealth(e.getHealth() - 1 - player.getHeldItem().getBonusDamnage() );
             Packet status = e.getHealth() <= 0f ? new ServerEntityStatusPacket(entity.getEntityID(), EntityStatus.DEAD) :
                     new ServerEntityStatusPacket(e.getEntityID(), EntityStatus.LIVING_HURT);
             Location l = entity.getLocation();
