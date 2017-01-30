@@ -1,6 +1,6 @@
 package net.mcthunder.inventory;
 
-import org.spacehq.mc.protocol.data.game.values.window.WindowType;
+import org.spacehq.mc.protocol.data.game.window.WindowType;
 
 public class DispenserInventory extends Inventory {
     public DispenserInventory(String name) {

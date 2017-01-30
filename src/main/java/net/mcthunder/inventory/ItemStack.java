@@ -724,8 +724,8 @@ public class ItemStack {//TODO: Add a simpler way to modify blockEntityTag once 
         return nbt;
     }
 
-    public org.spacehq.mc.protocol.data.game.ItemStack getItemStack() {
+    public org.spacehq.mc.protocol.data.game.entity.metadata.ItemStack getItemStack() {
         CompoundTag nbt = getNBT();
-        return nbt == null ? null : new org.spacehq.mc.protocol.data.game.ItemStack(this.type.getID(), this.amount, this.type.getData(), nbt.getValue().isEmpty() ? null : nbt);
+        return nbt == null ? null : new org.spacehq.mc.protocol.data.game.entity.metadata.ItemStack(this.type.getID(), this.amount, this.type.getData(), nbt.getValue().isEmpty() ? null : nbt);
     }
 }
