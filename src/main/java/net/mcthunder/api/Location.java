@@ -1,7 +1,7 @@
 package net.mcthunder.api;
 
 import net.mcthunder.world.World;
-import org.spacehq.mc.protocol.data.game.Position;
+import org.spacehq.mc.protocol.data.game.entity.metadata.Position;
 
 /**
  * Created by zack6849 on 10/17/14.

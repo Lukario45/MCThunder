@@ -1,10 +1,6 @@
 package net.mcthunder.api;
 
-import org.spacehq.mc.protocol.data.game.EntityMetadata;
-import org.spacehq.mc.protocol.data.game.ItemStack;
-import org.spacehq.mc.protocol.data.game.Position;
-import org.spacehq.mc.protocol.data.game.Rotation;
-import org.spacehq.mc.protocol.data.game.values.entity.MetadataType;
+import org.spacehq.mc.protocol.data.game.entity.metadata.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,8 +32,6 @@ public class MetadataMap {
         MetadataType type;
         if (value instanceof Byte)
             type = MetadataType.BYTE;
-        else if (value instanceof Short)
-            type = MetadataType.SHORT;
         else if (value instanceof Integer)
             type = MetadataType.INT;
         else if (value instanceof Float)

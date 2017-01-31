@@ -5,13 +5,14 @@ import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
 import net.mcthunder.entity.Player;
 import net.mcthunder.world.Column;
-import org.spacehq.mc.protocol.data.game.Chunk;
-import org.spacehq.mc.protocol.data.game.NibbleArray3d;
-import org.spacehq.mc.protocol.data.game.ShortArray3d;
-import org.spacehq.mc.protocol.data.game.values.world.block.BlockChangeRecord;
+import org.spacehq.mc.protocol.data.game.chunk.Chunk;
+import org.spacehq.mc.protocol.data.game.chunk.NibbleArray3d;
+import org.spacehq.mc.protocol.data.game.world.block.BlockChangeRecord;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerBlockChangePacket;
 
 import static net.mcthunder.api.Utils.getLong;
+
+//import org.spacehq.mc.protocol.data.game.chunk.ShortArray3d;
 
 public class Block {
     private Location loc;

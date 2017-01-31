@@ -1,6 +1,6 @@
 package net.mcthunder.api;
 
-import org.spacehq.mc.protocol.data.game.values.Face;
+import org.spacehq.mc.protocol.data.game.world.block.BlockFace;
 
 public enum Direction {
     NORTH("NORTH"),
@@ -12,7 +12,8 @@ public enum Direction {
     WEST("WEST"),
     NORTH_WEST("NORTH_WEST"),
     UP("UP"),
-    DOWN("DOWN");
+    DOWN("DOWN"),
+    SPECIAL("SPECIAL");
 
     public static Direction fromString(String name) {
         if(name.equalsIgnoreCase("north"))
@@ -36,19 +37,21 @@ public enum Direction {
         return DOWN;
     }
 
-    public static Direction fromFace(Face side) {
-        if (side.equals(Face.NORTH))
+    public static Direction fromFace(BlockFace side) {
+        if (side.equals(BlockFace.NORTH))
             return NORTH;
-        if (side.equals(Face.EAST))
+        if (side.equals(BlockFace.EAST))
             return EAST;
-        if (side.equals(Face.SOUTH))
+        if (side.equals(BlockFace.SOUTH))
             return SOUTH;
-        if (side.equals(Face.WEST))
+        if (side.equals(BlockFace.WEST))
             return WEST;
-        if (side.equals(Face.TOP))
+        if (side.equals(BlockFace.UP))
             return UP;
-        if (side.equals(Face.BOTTOM))
+        if (side.equals(BlockFace.DOWN))
             return DOWN;
+        if (side.equals(BlockFace.SPECIAL))
+            return SPECIAL;
         return null;
     }
 

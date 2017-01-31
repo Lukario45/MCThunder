@@ -3,8 +3,8 @@ package net.mcthunder.entity;
 import net.mcthunder.api.Location;
 import net.mcthunder.api.MetadataConstants;
 import net.mcthunder.world.World;
-import org.spacehq.mc.protocol.data.game.values.entity.MobType;
-import org.spacehq.mc.protocol.data.game.values.world.GenericSound;
+import org.spacehq.mc.protocol.data.game.entity.type.MobType;
+import org.spacehq.mc.protocol.data.game.world.sound.BuiltinSound;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -84,7 +84,7 @@ public class Horse extends Ageable {
     }
 
     public Packet getPacket() {
-        return new ServerSpawnMobPacket(this.entityID, MobType.HORSE, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
+        return new ServerSpawnMobPacket(this.entityID, null, MobType.HORSE, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
                 this.location.getPitch(), this.location.getYaw(), getMotion().getdX(), getMotion().getdY(), getMotion().getdZ(), getMetadata().getMetadataArray());
     }
 
@@ -94,13 +94,13 @@ public class Horse extends Ageable {
     }
 
     @Override
-    public GenericSound getDeathSound() {
-        return GenericSound.HORSE_DEATH;
+    public BuiltinSound getDeathSound() {
+        return BuiltinSound.ENTITY_HORSE_DEATH;
     }
 
     @Override
-    public GenericSound getHurtSound() {
-        return GenericSound.HORSE_HURT;
+    public BuiltinSound getHurtSound() {
+        return BuiltinSound.ENTITY_HORSE_HURT;
     }
 
     public void setHasReproduced(boolean hasReproduced) {

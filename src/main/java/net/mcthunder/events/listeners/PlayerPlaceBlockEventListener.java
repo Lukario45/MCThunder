@@ -4,17 +4,13 @@ import net.mcthunder.api.Direction;
 import net.mcthunder.api.Location;
 import net.mcthunder.block.Block;
 import net.mcthunder.block.Material;
-import net.mcthunder.entity.DroppedItem;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.EntityType;
 import net.mcthunder.entity.Player;
-import net.mcthunder.events.interfaces.PlayerBreakBlockEventListenerInterface;
 import net.mcthunder.events.interfaces.PlayerPlaceBlockEventListenerInterface;
 import net.mcthunder.inventory.*;
 import org.spacehq.mc.protocol.data.game.Position;
 import org.spacehq.mc.protocol.data.game.values.Face;
-import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
-import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPlaceBlockPacket;
 
 /**

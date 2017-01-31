@@ -5,13 +5,13 @@ import net.mcthunder.api.Location;
 import net.mcthunder.api.MessageFormat;
 import net.mcthunder.api.PotionEffectType;
 import net.mcthunder.api.Utils;
-import org.spacehq.mc.auth.GameProfile;
-import org.spacehq.mc.auth.properties.Property;
+import org.spacehq.mc.auth.data.GameProfile;
+import org.spacehq.mc.auth.data.GameProfile.Property;
 import org.spacehq.mc.auth.util.Base64;
-import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
-import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
-import org.spacehq.mc.protocol.data.game.values.world.GenericSound;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
+import org.spacehq.mc.protocol.data.game.PlayerListEntry;
+import org.spacehq.mc.protocol.data.game.entity.player.GameMode;
+import org.spacehq.mc.protocol.data.game.world.sound.BuiltinSound;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityDestroyPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.packet.Packet;
@@ -52,13 +52,13 @@ public abstract class Bot extends LivingEntity {
     }
 
     @Override
-    public GenericSound getDeathSound() {
-        return GenericSound.PLAYER_DEATH;
+    public BuiltinSound getDeathSound() {
+        return BuiltinSound.ENTITY_PLAYER_DEATH;
     }
 
     @Override
-    public GenericSound getHurtSound() {
-        return GenericSound.PLAYER_HURT;
+    public BuiltinSound getHurtSound() {
+        return BuiltinSound.ENTITY_PLAYER_HURT;
     }
 
     public String getName() {
@@ -73,12 +73,12 @@ public abstract class Bot extends LivingEntity {
             super.setCustomName(nick);
             this.metadata.setMetadata(2, nick);
             this.botProfile = new GameProfile(this.uuid, nick);
-            this.botProfile.getProperties().put("textures", this.skin);
+            this.botProfile.getProperties().add(this.skin);
             updateMetadata();
         }
         MCThunder.getEntryListHandler().refresh(this);
         if (nick.length() < 17) {
-            ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+            ServerEntityDestroyPacket destroyEntitiesPacket = new ServerEntityDestroyPacket(getEntityID());
             this.entityID = getNextID();
             long chunk = getChunk();
             for (Player pl : MCThunder.getPlayers()) {
@@ -112,10 +112,10 @@ public abstract class Bot extends LivingEntity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        this.botProfile.getProperties().put("textures", this.skin);
+        this.botProfile.getProperties().add(this.skin);
         MCThunder.getEntryListHandler().refresh(this);
         if (isEntitySpawned()) {
-            ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(this.entityID);
+            ServerEntityDestroyPacket destroyEntitiesPacket = new ServerEntityDestroyPacket(this.entityID);
             this.entityID = Entity.getNextID();
             long chunk = getChunk();
             for (Player pl : MCThunder.getPlayers()) {
@@ -139,7 +139,7 @@ public abstract class Bot extends LivingEntity {
 
     public void setSkin(UUID uuid) {
         this.skinUUID = uuid;
-        setSkin(Utils.getSkin(this.skinUUID));
+        //setSkin(Utils.getSkin(this.skinUUID));
     }
 
     public void spawn(Location l) {
@@ -158,14 +158,14 @@ public abstract class Bot extends LivingEntity {
         if (!isEntitySpawned())
             return;
         this.entitySpawned = false;
-        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(this.entityID);
+        ServerEntityDestroyPacket destroyEntitiesPacket = new ServerEntityDestroyPacket(this.entityID);
         this.entityID = Entity.getNextID();
         for (Player pl : MCThunder.getPlayers())
             pl.sendPacket(destroyEntitiesPacket);
     }
 
     public Packet getPacket() {
-        return new ServerSpawnPlayerPacket(this.entityID, this.uuid, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), 0, getMetadata().getMetadataArray());
+        return new ServerSpawnPlayerPacket(this.entityID, this.uuid, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), getMetadata().getMetadataArray());
     }
 
     public void showCape(boolean show) {

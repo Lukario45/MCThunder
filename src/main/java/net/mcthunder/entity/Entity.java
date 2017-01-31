@@ -5,7 +5,7 @@ import net.mcthunder.api.*;
 import net.mcthunder.block.Material;
 import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.world.World;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityDestroyPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityMetadataPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
 import org.spacehq.opennbt.tag.builtin.*;
@@ -193,7 +193,7 @@ public abstract class Entity {
     public void teleport(Location l) {
         long chunk = getChunk();
         if (!l.getWorld().equals(getWorld())) {
-            ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+            ServerEntityDestroyPacket destroyEntitiesPacket = new ServerEntityDestroyPacket(getEntityID());
             Packet respawn = getPacket();
             if (respawn != null)
                 for (Player p : MCThunder.getPlayers()) {

@@ -1,7 +1,6 @@
 package net.mcthunder.events.interfaces;
 
 import net.mcthunder.entity.Player;
-import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPlaceBlockPacket;
 
 /**

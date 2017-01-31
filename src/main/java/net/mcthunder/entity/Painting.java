@@ -2,8 +2,8 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 import net.mcthunder.world.World;
-import org.spacehq.mc.protocol.data.game.values.entity.Art;
-import org.spacehq.mc.protocol.data.game.values.entity.HangingDirection;
+import org.spacehq.mc.protocol.data.game.entity.type.object.HangingDirection;
+import org.spacehq.mc.protocol.data.game.entity.type.PaintingType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPaintingPacket;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -13,7 +13,7 @@ import org.spacehq.packetlib.packet.Packet;
 
 public class Painting extends Entity {
     private HangingDirection direction = HangingDirection.SOUTH;
-    private Art picture = Art.ALBAN;
+    private PaintingType picture = PaintingType.ALBAN;
 
     public Painting(Location location) {
         super(location);
@@ -31,19 +31,19 @@ public class Painting extends Entity {
                 HangingDirection.NORTH : HangingDirection.EAST;
         StringTag motive = tag.get("Motive");
         if (motive != null)
-            this.picture = Art.valueOf(motive.getValue());
+            this.picture = PaintingType.valueOf(motive.getValue());
     }
 
     @Override
     public Packet getPacket() {
-        return new ServerSpawnPaintingPacket(this.entityID, this.picture, this.location.getPosition(), this.direction);
+        return new ServerSpawnPaintingPacket(this.entityID, null, this.picture, this.location.getPosition(), this.direction);
     }
 
-    public void setPicture(Art picture) {
+    public void setPicture(PaintingType picture) {
         this.picture = picture;
     }
 
-    public Art getPicture() {
+    public PaintingType getPicture() {
         return this.picture;
     }
 

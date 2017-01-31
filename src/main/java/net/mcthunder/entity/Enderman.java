@@ -3,8 +3,8 @@ package net.mcthunder.entity;
 import net.mcthunder.api.Location;
 import net.mcthunder.block.Material;
 import net.mcthunder.world.World;
-import org.spacehq.mc.protocol.data.game.values.entity.MobType;
-import org.spacehq.mc.protocol.data.game.values.world.GenericSound;
+import org.spacehq.mc.protocol.data.game.entity.type.MobType;
+import org.spacehq.mc.protocol.data.game.world.sound.BuiltinSound;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.ShortTag;
@@ -37,7 +37,7 @@ public class Enderman extends LivingEntity {
     }
 
     public Packet getPacket() {
-        return new ServerSpawnMobPacket(this.entityID, MobType.ENDERMAN, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
+        return new ServerSpawnMobPacket(this.entityID,null, MobType.ENDERMAN, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
                 this.location.getPitch(), this.location.getYaw(), getMotion().getdX(), getMotion().getdY(), getMotion().getdZ(), getMetadata().getMetadataArray());
     }
 
@@ -47,13 +47,13 @@ public class Enderman extends LivingEntity {
     }
 
     @Override
-    public GenericSound getDeathSound() {
-        return GenericSound.ENDERMAN_DEATH;
+    public BuiltinSound getDeathSound() {
+        return BuiltinSound.ENTITY_ENDERMEN_DEATH;
     }
 
     @Override
-    public GenericSound getHurtSound() {
-        return GenericSound.ENDERMAN_HURT;
+    public BuiltinSound getHurtSound() {
+        return BuiltinSound.ENTITY_ENDERMEN_HURT;
     }
 
     public void setBlockType(Material type) {

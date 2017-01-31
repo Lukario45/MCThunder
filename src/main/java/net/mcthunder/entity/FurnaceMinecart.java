@@ -3,8 +3,8 @@ package net.mcthunder.entity;
 import net.mcthunder.api.Location;
 import net.mcthunder.block.Material;
 import net.mcthunder.world.World;
-import org.spacehq.mc.protocol.data.game.values.entity.MinecartType;
-import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
+import org.spacehq.mc.protocol.data.game.entity.type.object.MinecartType;
+import org.spacehq.mc.protocol.data.game.entity.type.object.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.IntTag;
@@ -51,7 +51,7 @@ public class FurnaceMinecart extends Minecart {
 
     @Override
     public Packet getPacket() {
-        return new ServerSpawnObjectPacket(this.entityID, ObjectType.MINECART, MinecartType.POWERED, this.location.getX(), this.location.getY(), this.location.getZ(),
+        return new ServerSpawnObjectPacket(this.entityID,null, ObjectType.MINECART, MinecartType.POWERED, this.location.getX(), this.location.getY(), this.location.getZ(),
                 this.location.getYaw(), this.location.getPitch());
     }
 

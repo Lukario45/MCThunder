@@ -2,8 +2,8 @@ package net.mcthunder.entity;
 
 import net.mcthunder.api.Location;
 import net.mcthunder.world.World;
-import org.spacehq.mc.protocol.data.game.values.entity.MobType;
-import org.spacehq.mc.protocol.data.game.values.world.GenericSound;
+import org.spacehq.mc.protocol.data.game.entity.type.MobType;
+import org.spacehq.mc.protocol.data.game.world.sound.BuiltinSound;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnMobPacket;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -28,7 +28,7 @@ public class Guardian extends LivingEntity {
     }
 
     public Packet getPacket() {
-        return new ServerSpawnMobPacket(this.entityID, MobType.GUARDIAN, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
+        return new ServerSpawnMobPacket(this.entityID,null, MobType.GUARDIAN, this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(),
                 this.location.getPitch(), this.location.getYaw(), getMotion().getdX(), getMotion().getdY(), getMotion().getdZ(), getMetadata().getMetadataArray());
     }
 
@@ -38,13 +38,13 @@ public class Guardian extends LivingEntity {
     }
 
     @Override
-    public GenericSound getDeathSound() {
-        return GenericSound.MOB_DEATH;
+    public BuiltinSound getDeathSound() {
+        return BuiltinSound.ENTITY_GUARDIAN_DEATH;
     }
 
     @Override
-    public GenericSound getHurtSound() {
-        return GenericSound.MOB_HURT;
+    public BuiltinSound getHurtSound() {
+        return BuiltinSound.ENTITY_GUARDIAN_HURT;
     }
 
     public void setElder(boolean elder) {

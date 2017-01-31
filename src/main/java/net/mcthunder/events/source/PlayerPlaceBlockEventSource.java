@@ -1,9 +1,7 @@
 package net.mcthunder.events.source;
 
 import net.mcthunder.entity.Player;
-import net.mcthunder.events.interfaces.PlayerBreakBlockEventListenerInterface;
 import net.mcthunder.events.interfaces.PlayerPlaceBlockEventListenerInterface;
-import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerActionPacket;
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerPlaceBlockPacket;
 
 import java.util.ArrayList;

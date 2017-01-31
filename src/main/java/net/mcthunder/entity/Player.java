@@ -9,20 +9,20 @@ import net.mcthunder.inventory.ItemStack;
 import net.mcthunder.inventory.PlayerInventory;
 import net.mcthunder.world.Column;
 import net.mcthunder.world.World;
-import org.spacehq.mc.auth.GameProfile;
-import org.spacehq.mc.auth.properties.Property;
+import org.spacehq.mc.auth.data.GameProfile;
+import org.spacehq.mc.auth.data.GameProfile.Property;
 import org.spacehq.mc.auth.properties.PropertyMap;
 import org.spacehq.mc.auth.util.Base64;
-import org.spacehq.mc.protocol.ProtocolConstants;
-import org.spacehq.mc.protocol.data.game.values.PlayerListEntry;
-import org.spacehq.mc.protocol.data.game.values.entity.player.GameMode;
-import org.spacehq.mc.protocol.data.game.values.world.GenericSound;
+import org.spacehq.mc.protocol.MinecraftConstants;
+import org.spacehq.mc.protocol.data.game.PlayerListEntry;
+import org.spacehq.mc.protocol.data.game.entity.player.GameMode;
+import org.spacehq.mc.protocol.data.game.world.sound.BuiltinSound;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerRespawnPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerDestroyEntitiesPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityDestroyPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.ServerEntityTeleportPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerHealthPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
-import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerUpdateHealthPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.window.ServerSetSlotPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static net.mcthunder.api.Utils.getLong;
-import static net.mcthunder.api.Utils.tellConsole;
 
 /**
  * Created by Kevin on 10/14/2014.
@@ -65,7 +64,7 @@ public final class Player extends LivingEntity {
         super(null);
         this.type = EntityType.PLAYER;
         this.session = session;
-        this.profile = getSession().getFlag(ProtocolConstants.PROFILE_KEY);
+        this.profile = getSession().getFlag(MinecraftConstants.PROFILE_KEY);
         this.origProfile = this.profile;
         this.uuid = getGameProfile().getId();
         this.metadata.setMetadata(2, this.name = getGameProfile().getName());
@@ -73,12 +72,12 @@ public final class Player extends LivingEntity {
         this.displayName = this.name;
         this.inv = new PlayerInventory(this.name, this);
         this.enderchest = new ChestInventory("EnderChest");
-        this.ping = getSession().getFlag(ProtocolConstants.PING_KEY);
+        this.ping = getSession().getFlag(MinecraftConstants.PING_KEY);
         this.skinUUID = this.uuid;
-        if (this.getGameProfile().getProperties().get("textures") == null)
-            this.profile.getProperties().put("textures", this.origSkin = Utils.getSkin(this.skinUUID = Utils.getUUIDfromString(getName())));
+        if (this.getGameProfile().getProperties().get(0) == null)
+            this.profile.getProperties().add(this.origSkin = Utils.getSkin(this.skinUUID = Utils.getUUIDfromString(getName())));
         else
-            this.origSkin = getGameProfile().getProperties().get("textures");
+            this.origSkin = getGameProfile().getProperties().get(0);
         this.skin = this.origSkin;
         this.maxHealth = 20;
         this.metadata.setMetadata(6, this.health = this.maxHealth);
@@ -185,9 +184,9 @@ public final class Player extends LivingEntity {
         }
         StringTag skinUUID = (StringTag) profileHandler.getAttribute(this, "SkinUUID");
         if (skinUUID != null)
-            this.profile.getProperties().put("textures", this.skin = Utils.getSkin(this.skinUUID = UUID.fromString(skinUUID.getValue())));
+            this.profile.getProperties().add( this.skin = Utils.getSkin(this.skinUUID = UUID.fromString(skinUUID.getValue())));
         if (this.skin == null)
-            this.profile.getProperties().put("textures", this.skin = Utils.getSkin(this.skinUUID = Utils.getUUIDfromString(getName())));
+            this.profile.getProperties().add( this.skin = Utils.getSkin(this.skinUUID = Utils.getUUIDfromString(getName())));
         StringTag displayName = (StringTag) profileHandler.getAttribute(this, "DisplayName");
         if (displayName != null)
             this.displayName = displayName.getValue();
@@ -341,19 +340,19 @@ public final class Player extends LivingEntity {
     }
 
     @Override
-    public GenericSound getDeathSound() {
-        return GenericSound.PLAYER_DEATH;
+    public BuiltinSound getDeathSound() {
+        return BuiltinSound.ENTITY_PLAYER_DEATH;
     }
 
     @Override
-    public GenericSound getHurtSound() {
-        return GenericSound.PLAYER_HURT;
+    public BuiltinSound getHurtSound() {
+        return BuiltinSound.ENTITY_PLAYER_HURT;
     }
 
     public void setHealth(float health) {
         this.metadata.setMetadata(6, this.health = health);
         updateMetadata();
-        sendPacket(new ServerUpdateHealthPacket(this.health, this.hunger, 0.5f));
+        sendPacket(new ServerPlayerHealthPacket(this.health, this.hunger, 0.5f));
     }
 
     public void respawn() {//TODO: Figure out if client already opens the button to respawn if so this is uneeded
@@ -379,7 +378,7 @@ public final class Player extends LivingEntity {
             this.westColumns.add(l);
         if (removeOld && isColumnLoaded(l)) {
             this.loadedColumns.remove(l);
-            sendPacket(new ServerChunkDataPacket(getWorld().getColumn(l).getX(), getWorld().getColumn(l).getZ()));
+            sendPacket(new ServerChunkDataPacket(new org.spacehq.mc.protocol.data.game.chunk.Column(getWorld().getColumn(l).getX(), getWorld().getColumn(l).getZ(),getWorld().getColumn(l).getChunks(),null)));
         }
     }
 
@@ -389,7 +388,7 @@ public final class Player extends LivingEntity {
                 if (!isColumnLoaded(column)) {
                     Column c = getWorld().getColumn(column);
                     if (c != null) {
-                        sendPacket(new ServerChunkDataPacket(c.getX(), c.getZ(), c.getChunks(), c.getBiomes()));
+                        sendPacket(new ServerChunkDataPacket(new org.spacehq.mc.protocol.data.game.chunk.Column(c.getX(), c.getZ(), c.getChunks(), c.getBiomes(),null)));
                         for (Player player1 : MCThunder.getPlayers())
                             if (player1.getWorld().equals(getWorld()) && column == player1.getChunk() && !player1.getUniqueID().equals(getUniqueID()))
                                 for (Packet packet : player1.getPackets())
@@ -410,7 +409,7 @@ public final class Player extends LivingEntity {
     public void teleport(Location l) {
         toggleMoveable();
         if (!l.getWorld().equals(getWorld())) {
-            ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+            ServerEntityDestroyPacket destroyEntitiesPacket = new ServerEntityDestroyPacket(getEntityID());
             setLocation(l);
             long chunk = getChunk();
             this.entityID = getNextID();//Is this needed? depends on how when going back and forth between worlds we do it
@@ -437,7 +436,7 @@ public final class Player extends LivingEntity {
         }
         loadChunks(null);//Load the needed chunks
         toggleMoveable();
-        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
+        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(),0,null));//TODO
         sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
     }
 
@@ -487,15 +486,15 @@ public final class Player extends LivingEntity {
         if (uncolored.length() < 17) {
             super.setCustomName(uncolored);
             this.metadata.setMetadata(2, uncolored);
-            PropertyMap properties = (PropertyMap) this.profile.getProperties().clone();
+            PropertyMap properties = (PropertyMap) this.profile.getProperties();
             this.profile = this.displayName == null ? this.origProfile : new GameProfile(this.uuid, uncolored);
             for (String key : properties.keySet())
-                this.profile.getProperties().put(key, properties.get(key));
+                this.profile.getProperties().add(null);
             updateMetadata();
         }
         MCThunder.getEntryListHandler().refresh(this);
         if (uncolored.length() < 17) {
-            ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+            ServerEntityDestroyPacket destroyEntitiesPacket = new ServerEntityDestroyPacket(getEntityID());
             this.entityID = getNextID();
             long chunk = getChunk();
             for (Player pl : MCThunder.getPlayers())
@@ -507,7 +506,7 @@ public final class Player extends LivingEntity {
                 }
             sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
             updateInventory();
-            sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
+            sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(),0,null));
             sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
         }
     }
@@ -525,7 +524,7 @@ public final class Player extends LivingEntity {
     }
 
     public Packet getPacket() {
-        return new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), getHeldItem().getType().getID(), getMetadata().getMetadataArray());
+        return new ServerSpawnPlayerPacket(getEntityID(), getUniqueID(), this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(), getMetadata().getMetadataArray());
     }
 
     public int getSlot() {
@@ -544,7 +543,7 @@ public final class Player extends LivingEntity {
         this.gamemode = gm;
         sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
         updateInventory();
-        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
+        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(),0,null));//todo
         sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
     }
 
@@ -577,7 +576,7 @@ public final class Player extends LivingEntity {
         super.setWorld(w);
         sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
         updateInventory();
-        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
+        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(),0,null));//// TODO: 1/30/2017
         sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
         loadChunks(null);
     }
@@ -613,9 +612,9 @@ public final class Player extends LivingEntity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        this.profile.getProperties().put("textures", this.skin);
+        this.profile.getProperties().add(this.skin);
         MCThunder.getEntryListHandler().refresh(this);
-        ServerDestroyEntitiesPacket destroyEntitiesPacket = new ServerDestroyEntitiesPacket(getEntityID());
+        ServerEntityDestroyPacket destroyEntitiesPacket = new ServerEntityDestroyPacket(getEntityID());
         this.entityID = getNextID();
         long chunk = getChunk();
         for (Player pl : MCThunder.getPlayers())
@@ -627,7 +626,7 @@ public final class Player extends LivingEntity {
             }
         sendPacket(new ServerRespawnPacket(getWorld().getDimension(), getWorld().getDifficulty(), getGameMode(), getWorld().getWorldType()));
         updateInventory();
-        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch()));
+        sendPacket(new ServerPlayerPositionRotationPacket(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch(),0,null));//// TODO: 1/30/2017
         sendPacket(new ServerSpawnPositionPacket(this.location.getPosition()));
     }
 

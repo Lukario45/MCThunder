@@ -10,7 +10,6 @@ import org.spacehq.mc.protocol.data.game.Chunk;
 import org.spacehq.mc.protocol.data.game.NibbleArray3d;
 import org.spacehq.mc.protocol.data.game.ShortArray3d;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

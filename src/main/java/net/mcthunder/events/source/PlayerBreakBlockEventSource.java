@@ -1,11 +1,8 @@
 package net.mcthunder.events.source;
 
 import net.mcthunder.entity.Player;
-import net.mcthunder.events.PlayerLoggingInEvent;
 import net.mcthunder.events.interfaces.PlayerBreakBlockEventListenerInterface;
-import net.mcthunder.events.interfaces.PlayerLoggingInEventListenerInterface;
 import org.spacehq.mc.protocol.packet.ingame.client.player.ClientPlayerActionPacket;
-import org.spacehq.packetlib.Session;
 
 import java.util.ArrayList;
 import java.util.List;

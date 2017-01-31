@@ -1,7 +1,8 @@
 package net.mcthunder.world;
 
 import net.mcthunder.api.Utils;
-import org.spacehq.mc.protocol.data.game.Chunk;
+import org.spacehq.mc.protocol.data.game.chunk.Chunk;
+
 
 /**
  * Created by Kevin on 10/21/2014.

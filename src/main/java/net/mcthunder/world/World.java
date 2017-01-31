@@ -9,8 +9,8 @@ import net.mcthunder.block.Sign;
 import net.mcthunder.entity.Entity;
 import net.mcthunder.entity.Player;
 import net.mcthunder.world.generator.Generation;
-import org.spacehq.mc.protocol.data.game.values.setting.Difficulty;
-import org.spacehq.mc.protocol.data.game.values.world.WorldType;
+import org.spacehq.mc.protocol.data.game.setting.Difficulty;
+import org.spacehq.mc.protocol.data.game.world.WorldType;
 import org.spacehq.opennbt.NBTIO;
 import org.spacehq.opennbt.tag.builtin.ByteTag;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
@@ -57,7 +57,7 @@ public class World {
         try {
             CompoundTag tag;
             try {
-                 tag = NBTIO.readFile(new File(this.path + "/level.dat"), false); //MCThunder Gen worlds ONLY
+                 tag = NBTIO.readFile(new File(this.path + "/level.dat")); //MCThunder Gen worlds ONLY
             } catch(EOFException e){ //for NON MCThunder gen worlds
                 tag = NBTIO.readFile(new File(this.path + "/level.dat"));
             }

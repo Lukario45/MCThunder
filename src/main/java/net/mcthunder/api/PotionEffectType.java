@@ -1,6 +1,6 @@
 package net.mcthunder.api;
 
-import org.spacehq.mc.protocol.data.game.values.entity.Effect;
+import org.spacehq.mc.protocol.data.game.entity.Effect;
 
 import java.util.HashMap;
 

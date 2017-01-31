@@ -3,8 +3,8 @@ package net.mcthunder.entity;
 import net.mcthunder.api.Location;
 import net.mcthunder.block.Material;
 import net.mcthunder.world.World;
-import org.spacehq.mc.protocol.data.game.values.entity.FallingBlockData;
-import org.spacehq.mc.protocol.data.game.values.entity.ObjectType;
+import org.spacehq.mc.protocol.data.game.entity.type.object.FallingBlockData;
+import org.spacehq.mc.protocol.data.game.entity.type.object.ObjectType;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnObjectPacket;
 import org.spacehq.opennbt.tag.builtin.*;
 import org.spacehq.packetlib.packet.Packet;
@@ -50,7 +50,7 @@ public class FallingSand extends Entity {
 
     @Override
     public Packet getPacket() {
-        return new ServerSpawnObjectPacket(this.entityID, ObjectType.FALLING_BLOCK, new FallingBlockData(this.falling.getID() + (this.falling.getData() << 12), 0),
+        return new ServerSpawnObjectPacket(this.entityID, null, ObjectType.FALLING_BLOCK, new FallingBlockData(this.falling.getID() + (this.falling.getData() << 12), 0),
                 this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch());
     }
 
